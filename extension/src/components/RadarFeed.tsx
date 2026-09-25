@@ -239,13 +239,21 @@ export const RadarFeed: React.FC<RadarFeedProps> = ({
 
   return (
     <div style={{ width: '100%' }}>
-      {/* Top Search & Filter Bar */}
+      {/* Sticky Header: Search Bar + Role Pills + Target Match Indicator */}
       <div style={{
-        padding: '12px 16px',
-        borderBottom: '1px solid var(--border-subtle)',
+        position: 'sticky',
+        top: 0,
+        zIndex: 40,
         background: 'var(--bg-secondary)',
+        borderBottom: '1px solid var(--border-subtle)',
         width: '100%',
+        boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)',
       }}>
+        {/* Top Search & Filter Bar */}
+        <div style={{
+          padding: '12px 20px',
+          width: '100%',
+        }}>
         {/* Search Bar + Toggle Filter Drawer */}
         <div style={{ display: 'flex', gap: 8, marginBottom: 10 }}>
           <div style={{ position: 'relative', flex: 1 }}>
@@ -614,9 +622,10 @@ export const RadarFeed: React.FC<RadarFeedProps> = ({
           </div>
         )}
       </div>
+      </div>
 
       {/* Job Cards Stream (Full Width) */}
-      <div style={{ padding: '12px 16px', width: '100%' }}>
+      <div style={{ padding: '16px 20px', width: '100%' }}>
         {loading ? (
           <div style={{ padding: '32px 0', textAlign: 'center', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)', fontSize: 12 }}>
             SCANNING LIVE ATS RADARS...

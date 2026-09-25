@@ -1,5 +1,5 @@
-import React, { useEffect, useState, useCallback } from 'react';
-import { Radio, Building2, Bookmark, Sliders, Bell, RefreshCw, ExternalLink, Sun, Moon } from 'lucide-react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
+import { Radio, Building2, Bookmark, Sliders, Bell, RefreshCw, ExternalLink, Sun, Moon, ArrowUp } from 'lucide-react';
 import { api } from '../lib/api';
 import { Job, Company, Preferences, RadarStats, NotificationItem } from '../types';
 import { getInitialTheme, applyTheme, syncThemeFromStorage, Theme } from '../lib/theme';
@@ -22,6 +22,8 @@ export const OptionsApp: React.FC = () => {
   const [isSyncing, setIsSyncing] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
   const [selectedRole, setSelectedRole] = useState<string>('all_matching');
+  const [showScrollTop, setShowScrollTop] = useState<boolean>(false);
+  const mainScrollRef = useRef<HTMLElement>(null);
 
   // Q-3 FIX: Filter state lives here so it survives tab switches
   const [filterHub, setFilterHub] = useState<string>('all');
@@ -161,7 +163,10 @@ export const OptionsApp: React.FC = () => {
     <div
       data-theme={theme}
       style={{
-        minHeight: '100vh',
+        height: '100vh',
+        maxHeight: '100vh',
+        width: '100vw',
+        overflow: 'hidden',
         background: 'var(--bg-primary)',
         color: 'var(--text-primary)',
         display: 'flex',
@@ -170,15 +175,14 @@ export const OptionsApp: React.FC = () => {
     >
       {/* Top Editorial Brutalist Navigation Bar */}
       <header style={{
-        padding: '14px 32px',
+        padding: '12px 28px',
         background: 'var(--bg-secondary)',
         borderBottom: '1px solid var(--border-subtle)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
-        position: 'sticky',
-        top: 0,
-        zIndex: 1000,
+        flexShrink: 0,
+        zIndex: 100,
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
           <div style={{
@@ -274,12 +278,13 @@ export const OptionsApp: React.FC = () => {
       {/* Metrics Strip */}
       {stats && (
         <div style={{
-          padding: '14px 32px',
+          padding: '10px 28px',
           background: 'var(--bg-secondary)',
           borderBottom: '1px solid var(--border-subtle)',
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
-          gap: 12,
+          gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))',
+          gap: 10,
+          flexShrink: 0,
         }}>
           {[
             { label: 'TARGET MATCHES', value: stats.matched_jobs, highlight: 'var(--accent)' },
@@ -291,13 +296,13 @@ export const OptionsApp: React.FC = () => {
             <div key={idx} style={{
               background: 'var(--bg-card)',
               border: '1px solid var(--border-subtle)',
-              padding: '10px 14px',
+              padding: '8px 12px',
             }}>
-              <div className="eyebrow" style={{ color: 'var(--text-muted)', fontSize: 9.5 }}>
+              <div className="eyebrow" style={{ color: 'var(--text-muted)', fontSize: 9 }}>
                 {item.label}
               </div>
               <div style={{
-                fontSize: 22,
+                fontSize: 18,
                 fontFamily: 'var(--font-mono)',
                 fontWeight: 700,
                 color: item.highlight,
@@ -310,74 +315,101 @@ export const OptionsApp: React.FC = () => {
         </div>
       )}
 
-      {/* Main Content Layout */}
-      <div style={{ display: 'flex', flex: 1 }}>
-        {/* Editorial Sidebar Nav */}
+      {/* Main Content Layout — Full Screen Height, Sidebar Pinned */}
+      <div style={{ display: 'flex', flex: 1, minHeight: 0, overflow: 'hidden' }}>
+        {/* Editorial Sidebar Nav — Permanently Pinned */}
         <aside style={{
-          width: 230,
+          width: 220,
+          flexShrink: 0,
+          height: '100%',
+          overflowY: 'auto',
           borderRight: '1px solid var(--border-subtle)',
           background: 'var(--bg-secondary)',
           padding: '16px 0',
           display: 'flex',
           flexDirection: 'column',
-          gap: 2,
+          justifyContent: 'space-between',
         }}>
-          {[
-            { id: 'feed', label: 'RADAR FEED', icon: Radio },
-            { id: 'watchlist', label: 'WATCHLIST', icon: Building2 },
-            { id: 'saved', label: 'SAVED JOBS', icon: Bookmark, badge: savedJobs.length },
-            { id: 'rules', label: 'RADAR RULES', icon: Sliders },
-            { id: 'notifications', label: 'ALERTS LOG', icon: Bell, badge: notifications.filter((n) => !n.is_read).length },
-          ].map((tab) => {
-            const Icon = tab.icon;
-            const isActive = activeTab === tab.id;
-            return (
-              <button
-                key={tab.id}
-                onClick={() => handleTabChange(tab.id as typeof activeTab)}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  padding: '11px 20px',
-                  borderRadius: 0,
-                  background: isActive ? 'var(--bg-card)' : 'transparent',
-                  color: isActive ? 'var(--text-primary)' : 'var(--text-muted)',
-                  border: 'none',
-                  borderLeft: isActive ? '3px solid var(--accent)' : '3px solid transparent',
-                  cursor: 'pointer',
-                  fontWeight: isActive ? 700 : 500,
-                  fontSize: 11,
-                  fontFamily: 'var(--font-mono)',
-                  letterSpacing: '0.06em',
-                  transition: 'all 0.15s cubic-bezier(0.16, 1, 0.3, 1)',
-                  textAlign: 'left',
-                }}
-              >
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                  <Icon size={14} color={isActive ? 'var(--accent)' : 'currentColor'} />
-                  <span>{tab.label}</span>
-                </div>
-                {Boolean(tab.badge && tab.badge > 0) && (
-                  <span style={{
-                    background: 'var(--accent)',
-                    color: '#ffffff',
-                    fontSize: 9,
-                    fontWeight: 700,
-                    padding: '1px 5px',
-                    fontFamily: 'var(--font-mono)',
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+            {[
+              { id: 'feed', label: 'RADAR FEED', icon: Radio },
+              { id: 'watchlist', label: 'WATCHLIST', icon: Building2 },
+              { id: 'saved', label: 'SAVED JOBS', icon: Bookmark, badge: savedJobs.length },
+              { id: 'rules', label: 'RADAR RULES', icon: Sliders },
+              { id: 'notifications', label: 'ALERTS LOG', icon: Bell, badge: notifications.filter((n) => !n.is_read).length },
+            ].map((tab) => {
+              const Icon = tab.icon;
+              const isActive = activeTab === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => handleTabChange(tab.id as typeof activeTab)}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    padding: '11px 20px',
                     borderRadius: 0,
-                  }}>
-                    {tab.badge}
-                  </span>
-                )}
-              </button>
-            );
-          })}
+                    background: isActive ? 'var(--bg-card)' : 'transparent',
+                    color: isActive ? 'var(--text-primary)' : 'var(--text-muted)',
+                    border: 'none',
+                    borderLeft: isActive ? '3px solid var(--accent)' : '3px solid transparent',
+                    cursor: 'pointer',
+                    fontWeight: isActive ? 700 : 500,
+                    fontSize: 11,
+                    fontFamily: 'var(--font-mono)',
+                    letterSpacing: '0.06em',
+                    transition: 'all 0.15s cubic-bezier(0.16, 1, 0.3, 1)',
+                    textAlign: 'left',
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <Icon size={14} color={isActive ? 'var(--accent)' : 'currentColor'} />
+                    <span>{tab.label}</span>
+                  </div>
+                  {Boolean(tab.badge && tab.badge > 0) && (
+                    <span style={{
+                      background: 'var(--accent)',
+                      color: '#ffffff',
+                      fontSize: 9,
+                      fontWeight: 700,
+                      padding: '1px 5px',
+                      fontFamily: 'var(--font-mono)',
+                      borderRadius: 0,
+                    }}>
+                      {tab.badge}
+                    </span>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+
+          {/* System status pinned at bottom of sidebar */}
+          <div style={{ padding: '14px 20px', borderTop: '1px solid var(--border-subtle)', background: 'var(--bg-card)' }}>
+            <div style={{ fontSize: 9.5, fontFamily: 'var(--font-mono)', color: 'var(--text-muted)', letterSpacing: '0.04em' }}>
+              JOBLY LIVE RADAR
+            </div>
+            <div style={{ fontSize: 11, fontFamily: 'var(--font-mono)', fontWeight: 700, color: 'var(--green)', marginTop: 2 }}>
+              357 ATS MONITORS
+            </div>
+          </div>
         </aside>
 
-        {/* Content Pane */}
-        <main style={{ flex: 1, padding: '24px 32px', overflowY: 'auto', width: '100%' }}>
+        {/* Content Pane — Independent Smooth Scroll */}
+        <main
+          ref={mainScrollRef}
+          onScroll={(e) => setShowScrollTop(e.currentTarget.scrollTop > 350)}
+          style={{
+            flex: 1,
+            height: '100%',
+            minHeight: 0,
+            overflowY: 'auto',
+            width: '100%',
+            padding: activeTab === 'feed' ? '0' : '24px 32px',
+            position: 'relative',
+          }}
+        >
           {activeTab === 'feed' && (
             <ErrorBoundary label="Radar Feed">
               <div style={{ width: '100%' }}>
@@ -527,6 +559,30 @@ export const OptionsApp: React.FC = () => {
                 )}
               </div>
             </div>
+          )}
+
+          {/* Floating Back to Top Button */}
+          {showScrollTop && (
+            <button
+              onClick={() => mainScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' })}
+              className="btn btn-secondary btn-sm"
+              style={{
+                position: 'fixed',
+                bottom: 24,
+                right: 28,
+                zIndex: 90,
+                background: 'var(--bg-card)',
+                border: '1px solid var(--border-strong)',
+                boxShadow: '0 4px 16px rgba(0,0,0,0.3)',
+                fontFamily: 'var(--font-mono)',
+                fontSize: 10,
+                fontWeight: 700,
+                gap: 6,
+              }}
+            >
+              <ArrowUp size={12} />
+              <span>TOP</span>
+            </button>
           )}
         </main>
       </div>
