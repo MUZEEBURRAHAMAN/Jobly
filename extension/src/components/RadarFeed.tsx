@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useRef } from 'react';
+import React, { useState, useMemo, useRef, useEffect, useCallback } from 'react';
 import {
   Search,
   SlidersHorizontal,
@@ -18,6 +18,8 @@ import {
   MapPin,
   Sliders,
   Check,
+  ChevronLeft,
+  ChevronRight,
 } from 'lucide-react';
 import { Job, Preferences } from '../types';
 import { JobCard } from './JobCard';
@@ -149,15 +151,114 @@ export const RadarFeed: React.FC<RadarFeedProps> = ({
     }
   };
 
+  const tabsScrollRef = useRef<HTMLDivElement>(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(true);
+
+  const checkScroll = useCallback(() => {
+    const el = tabsScrollRef.current;
+    if (!el) return;
+    setCanScrollLeft(el.scrollLeft > 3);
+    setCanScrollRight(el.scrollLeft + el.clientWidth < el.scrollWidth - 3);
+  }, []);
+
+  useEffect(() => {
+    checkScroll();
+    const handleResize = () => checkScroll();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [checkScroll, jobs.length, activeRoleFilter]);
+
+  const scrollTabs = (dir: 'left' | 'right') => {
+    const el = tabsScrollRef.current;
+    if (!el) return;
+    const distance = 130;
+    el.scrollBy({ left: dir === 'left' ? -distance : distance, behavior: 'smooth' });
+    setTimeout(checkScroll, 200);
+  };
+
   const roleTabs = [
-    { id: 'all_matching', label: 'TARGET MATCHES', icon: Sparkles },
-    { id: 'product_design', label: 'DESIGN', icon: Palette },
-    { id: 'frontend_engineering', label: 'FRONTEND', icon: Code2 },
-    { id: 'product_management', label: 'PRODUCT', icon: Layers },
-    { id: 'ai_ml', label: 'AI / ML', icon: Bot },
-    { id: 'fullstack_engineering', label: 'FULLSTACK', icon: Zap },
-    { id: 'all', label: 'ALL ROLES', icon: Globe },
+    { id: 'all_matching', label: 'TARGET MATCHES', shortLabel: 'TARGET', icon: Sparkles },
+    { id: 'product_design', label: 'DESIGN', shortLabel: 'DESIGN', icon: Palette },
+    { id: 'frontend_engineering', label: 'FRONTEND', shortLabel: 'FRONTEND', icon: Code2 },
+    { id: 'product_management', label: 'PRODUCT', shortLabel: 'PRODUCT', icon: Layers },
+    { id: 'ai_ml', label: 'AI & MACHINE LEARNING', shortLabel: 'AI/ML', icon: Bot },
+    { id: 'fullstack_engineering', label: 'FULLSTACK', shortLabel: 'FULLSTACK', icon: Zap },
+    { id: 'all', label: 'ALL ROLES', shortLabel: 'ALL', icon: Globe },
   ];
+
+  // Dynamic live count for each tab based on active filters and search
+  const tabCounts = useMemo(() => {
+    const targetRoles = preferences?.roles && preferences.roles.length > 0
+      ? preferences.roles
+      : ['product_design', 'frontend_engineering', 'product_management', 'ai_ml', 'fullstack_engineering'];
+
+    let targetCount = 0;
+    const roleCounts: Record<string, number> = {
+      product_design: 0,
+      frontend_engineering: 0,
+      product_management: 0,
+      ai_ml: 0,
+      fullstack_engineering: 0,
+    };
+
+    const ALIAS_MAP: Record<string, string[]> = {
+      bangalore: ['bangalore', 'bengaluru'],
+      bengaluru: ['bengaluru', 'bangalore'],
+      gurgaon: ['gurgaon', 'gurugram'],
+      gurugram: ['gurugram', 'gurgaon'],
+      delhi: ['delhi', 'delhi_ncr', 'noida', 'gurgaon', 'gurugram'],
+      noida: ['noida', 'delhi', 'delhi_ncr'],
+      sf: ['sf', 'san francisco', 'bay area'],
+      'bay area': ['bay area', 'san francisco'],
+      nyc: ['nyc', 'new york'],
+      ny: ['ny', 'new york'],
+    };
+
+    jobs.forEach((job) => {
+      // Remote
+      if (remoteOnly && job.work_mode !== 'remote') return;
+      // Hub
+      if (selectedHub !== 'all' && (job.geo_hub || 'global') !== selectedHub) return;
+      // Exp
+      if (selectedExp !== 'all' && job.experience_tier !== selectedExp) return;
+      // Budget
+      if (salaryOnly && !job.salary_summary) return;
+      if (selectedBudget > 0 && (job.max_salary || 0) < selectedBudget) return;
+      // Freshness
+      if (freshnessDays > 0) {
+        const cutoff = Date.now() - freshnessDays * 24 * 60 * 60 * 1000;
+        if (new Date(job.first_seen_at).getTime() < cutoff) return;
+      }
+      // Search
+      if (search.trim()) {
+        const tokens = search.trim().toLowerCase().split(/\s+/).filter(Boolean);
+        const corpus = `${job.title} ${job.company_name} ${job.location || ''} ${job.geo_hub || ''} ${job.normalized_role || ''} ${job.salary_summary || ''}`.toLowerCase();
+        const allTokensMatch = tokens.every((token) => {
+          const aliases = ALIAS_MAP[token] || [token];
+          return aliases.some((a) => corpus.includes(a));
+        });
+        if (!allTokensMatch) return;
+      }
+
+      // Target match
+      const roleMatches = job.normalized_role ? targetRoles.includes(job.normalized_role as any) : false;
+      if (job.is_match || roleMatches) {
+        targetCount++;
+      }
+
+      // Role specific count
+      if (job.normalized_role && roleCounts[job.normalized_role] !== undefined) {
+        roleCounts[job.normalized_role]++;
+      }
+    });
+
+    return {
+      all_matching: targetCount,
+      all: jobs.length,
+      ...roleCounts,
+    };
+  }, [jobs, preferences?.roles, search, remoteOnly, selectedHub, selectedExp, salaryOnly, selectedBudget, freshnessDays]);
 
   const activeFilterCount = useMemo(() => {
     let count = 0;
@@ -262,128 +363,233 @@ export const RadarFeed: React.FC<RadarFeedProps> = ({
         width: '100%',
         boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)',
       }}>
-        {/* Top Search & Filter Bar */}
+        {/* Compact Search & Arrow Tabs Bar */}
         <div style={{
-          padding: '12px 20px',
+          padding: '8px 12px 6px',
           width: '100%',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 6,
         }}>
-        {/* Search Bar + Toggle Filter Drawer */}
-        <div style={{ display: 'flex', gap: 8, marginBottom: 10 }}>
-          <div style={{ position: 'relative', flex: 1 }}>
-            <Search
-              size={13}
-              style={{
-                position: 'absolute',
-                left: 10,
-                top: '50%',
-                transform: 'translateY(-50%)',
-                color: 'var(--text-muted)',
-              }}
-            />
-            <input
-              type="text"
-              className="input-text"
-              placeholder="Search title, company, skills, or city..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              style={{ paddingLeft: 30, fontSize: 12, height: 34 }}
-            />
-            {search && (
-              <button
-                onClick={() => setSearch('')}
+          {/* Row 1: Search Input + Filter Drawer Button */}
+          <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+            <div style={{ position: 'relative', flex: 1 }}>
+              <Search
+                size={13}
                 style={{
                   position: 'absolute',
-                  right: 8,
+                  left: 10,
                   top: '50%',
                   transform: 'translateY(-50%)',
-                  background: 'transparent',
-                  border: 'none',
                   color: 'var(--text-muted)',
-                  cursor: 'pointer'
+                  pointerEvents: 'none',
                 }}
-              >
-                <X size={13} />
-              </button>
-            )}
-          </div>
-
-          <button
-            onClick={() => setShowFilters(!showFilters)}
-            className={`btn btn-sm ${activeFilterCount > 0 ? 'btn-accent' : 'btn-secondary'}`}
-            style={{
-              padding: '0 12px',
-              fontFamily: 'var(--font-mono)',
-              gap: 6,
-              height: 34,
-              border: activeFilterCount > 0 ? '1px solid var(--accent)' : '1px solid var(--border-subtle)'
-            }}
-          >
-            <SlidersHorizontal size={13} />
-            <span>FILTERS{activeFilterCount > 0 ? ` (${activeFilterCount})` : ''}</span>
-          </button>
-        </div>
-
-        {/* Role Pills — Clean, elegant flex row without arrows */}
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 6,
-            flexWrap: 'wrap',
-          }}
-        >
-          {roleTabs.map((tab) => {
-            const Icon = tab.icon;
-            const isActive = activeRoleFilter === tab.id;
-            const isTargetTab = tab.id === 'all_matching';
-            return (
-              <div key={tab.id} style={{ display: 'inline-flex', alignItems: 'center' }}>
+              />
+              <input
+                type="text"
+                className="input-text"
+                placeholder="Search jobs, skills, cities (e.g. noida, react)..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                style={{ paddingLeft: 28, paddingRight: search ? 28 : 8, fontSize: 11.5, height: 30, width: '100%' }}
+              />
+              {search && (
                 <button
-                  onClick={() => setActiveRoleFilter(tab.id)}
-                  className={`filter-pill ${isActive ? 'active' : ''}`}
+                  type="button"
+                  onClick={() => setSearch('')}
                   style={{
-                    fontFamily: 'var(--font-mono)',
-                    fontSize: 10,
-                    padding: '4px 10px',
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: 5,
-                    whiteSpace: 'nowrap',
+                    position: 'absolute',
+                    right: 6,
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    background: 'transparent',
+                    border: 'none',
+                    color: 'var(--text-muted)',
                     cursor: 'pointer',
-                    borderRadius: isTargetTab && onConfigureTargets ? '2px 0 0 2px' : 2,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    padding: 2,
                   }}
                 >
-                  <Icon size={11} />
-                  <span>{tab.label}</span>
+                  <X size={12} />
                 </button>
-                {isTargetTab && (
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      openTargetModal();
-                    }}
-                    title="Configure Target Roles & Matching Rules"
-                    style={{
-                      background: isActive ? 'var(--accent)' : 'var(--bg-tertiary)',
-                      color: isActive ? '#ffffff' : 'var(--text-muted)',
-                      border: '1px solid var(--border-subtle)',
-                      borderLeft: 'none',
-                      padding: '4px 6px',
-                      cursor: 'pointer',
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      height: 24,
-                      borderRadius: '0 2px 2px 0',
-                    }}
-                  >
-                    <Sliders size={10} />
-                  </button>
-                )}
-              </div>
-            );
-          })}
-        </div>
+              )}
+            </div>
+
+            <button
+              type="button"
+              onClick={() => setShowFilters(!showFilters)}
+              className={`btn btn-sm ${activeFilterCount > 0 ? 'btn-accent' : 'btn-secondary'}`}
+              style={{
+                padding: '0 8px',
+                fontFamily: 'var(--font-mono)',
+                fontSize: 10,
+                gap: 4,
+                height: 30,
+                flexShrink: 0,
+                border: activeFilterCount > 0 ? '1px solid var(--accent)' : '1px solid var(--border-subtle)',
+              }}
+            >
+              <SlidersHorizontal size={11} />
+              <span>FILTERS{activeFilterCount > 0 ? ` (${activeFilterCount})` : ''}</span>
+            </button>
+          </div>
+
+          {/* Row 2: Single-Row Arrow-Navigated Role Tabs Carousel */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 4, width: '100%' }}>
+            {/* Left Scroll Arrow */}
+            <button
+              type="button"
+              onClick={() => scrollTabs('left')}
+              disabled={!canScrollLeft}
+              title="Scroll tabs left"
+              style={{
+                width: 20,
+                height: 26,
+                minWidth: 20,
+                flexShrink: 0,
+                background: 'var(--bg-card)',
+                border: '1px solid var(--border-subtle)',
+                borderRadius: 0,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: canScrollLeft ? 'pointer' : 'default',
+                opacity: canScrollLeft ? 1 : 0.25,
+                color: 'var(--text-primary)',
+                padding: 0,
+                transition: 'all 0.15s ease',
+              }}
+            >
+              <ChevronLeft size={12} />
+            </button>
+
+            {/* Scrollable Tabs Container */}
+            <div
+              ref={tabsScrollRef}
+              onScroll={checkScroll}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 5,
+                overflowX: 'auto',
+                scrollbarWidth: 'none',
+                msOverflowStyle: 'none',
+                flex: 1,
+                scrollBehavior: 'smooth',
+                padding: '1px 0',
+              }}
+            >
+              {roleTabs.map((tab) => {
+                const Icon = tab.icon;
+                const isActive = activeRoleFilter === tab.id;
+                const isTargetTab = tab.id === 'all_matching';
+                const count = tabCounts[tab.id as keyof typeof tabCounts] ?? 0;
+
+                return (
+                  <div key={tab.id} style={{ display: 'inline-flex', alignItems: 'center', flexShrink: 0 }}>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setActiveRoleFilter(tab.id);
+                        setDisplayLimit(30);
+                      }}
+                      className={`filter-pill ${isActive ? 'active' : ''}`}
+                      style={{
+                        fontFamily: 'var(--font-mono)',
+                        fontSize: 9.5,
+                        padding: '3px 8px',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: 4,
+                        whiteSpace: 'nowrap',
+                        cursor: 'pointer',
+                        borderRadius: 0,
+                        height: 26,
+                        border: isActive ? '1px solid var(--accent)' : '1px solid var(--border-subtle)',
+                        background: isActive ? 'var(--accent)' : 'var(--bg-card)',
+                        color: isActive ? '#ffffff' : 'var(--text-secondary)',
+                        fontWeight: isActive ? 700 : 500,
+                        letterSpacing: '0.03em',
+                        transition: 'all 0.15s ease',
+                      }}
+                    >
+                      <Icon size={10} color={isActive ? '#ffffff' : 'var(--accent)'} />
+                      <span>{tab.shortLabel}</span>
+                      <span style={{
+                        fontSize: 8.5,
+                        fontFamily: 'var(--font-mono)',
+                        fontWeight: 700,
+                        padding: '0 4px',
+                        lineHeight: '13px',
+                        borderRadius: 0,
+                        background: isActive ? 'rgba(0, 0, 0, 0.25)' : 'var(--bg-tertiary)',
+                        color: isActive ? '#ffffff' : 'var(--accent)',
+                        border: isActive ? '1px solid rgba(255, 255, 255, 0.3)' : '1px solid var(--border-subtle)',
+                      }}>
+                        {count}
+                      </span>
+                    </button>
+
+                    {isTargetTab && (
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          openTargetModal();
+                        }}
+                        title="Configure Target Roles & Rules"
+                        style={{
+                          background: isActive ? 'var(--accent)' : 'var(--bg-card)',
+                          color: isActive ? '#ffffff' : 'var(--text-muted)',
+                          border: '1px solid var(--border-subtle)',
+                          borderLeft: 'none',
+                          padding: '0 5px',
+                          cursor: 'pointer',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          height: 26,
+                          borderRadius: 0,
+                          flexShrink: 0,
+                        }}
+                      >
+                        <Sliders size={10} />
+                      </button>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Right Scroll Arrow */}
+            <button
+              type="button"
+              onClick={() => scrollTabs('right')}
+              disabled={!canScrollRight}
+              title="Scroll tabs right"
+              style={{
+                width: 20,
+                height: 26,
+                minWidth: 20,
+                flexShrink: 0,
+                background: 'var(--bg-card)',
+                border: '1px solid var(--border-subtle)',
+                borderRadius: 0,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: canScrollRight ? 'pointer' : 'default',
+                opacity: canScrollRight ? 1 : 0.25,
+                color: 'var(--text-primary)',
+                padding: 0,
+                transition: 'all 0.15s ease',
+              }}
+            >
+              <ChevronRight size={12} />
+            </button>
+          </div>
 
         {/* Expandable Advanced Filter Drawer (Clean SVG Icons, Zero Emojis) */}
         {showFilters && (
@@ -546,95 +752,72 @@ export const RadarFeed: React.FC<RadarFeedProps> = ({
         )}
       </div>
 
-      {/* Subheader: Results count & Target Roles indicator */}
-      <div style={{
-        padding: '8px 16px',
-        display: 'flex',
-        flexDirection: 'column',
-        gap: 6,
-        fontSize: 10,
-        fontFamily: 'var(--font-mono)',
-        color: 'var(--text-muted)',
-        borderBottom: '1px solid var(--border-subtle)',
-        background: 'var(--bg-primary)',
-        width: '100%',
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <span style={{ fontWeight: 700, letterSpacing: '0.04em' }}>
-              {activeRoleFilter === 'all_matching' ? `TARGET MATCHES (${filteredJobs.length})` : `SHOWING ${filteredJobs.length} POSITIONS`}
+        {/* Ultra-thin Status Strip (Height ~22px) */}
+        <div style={{
+          padding: '4px 14px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          fontSize: 9.5,
+          fontFamily: 'var(--font-mono)',
+          color: 'var(--text-muted)',
+          borderTop: '1px solid var(--border-subtle)',
+          background: 'var(--bg-primary)',
+          width: '100%',
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            <span style={{ fontWeight: 700, color: 'var(--text-primary)', letterSpacing: '0.04em' }}>
+              {filteredJobs.length} POSITIONS
             </span>
+            {search.trim() && (
+              <span style={{ color: 'var(--accent)' }}>
+                FOR "{search.trim().toUpperCase()}"
+              </span>
+            )}
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             {activeRoleFilter === 'all_matching' && (
               <button
+                type="button"
                 onClick={openTargetModal}
                 style={{
-                  background: 'var(--accent)',
-                  color: '#ffffff',
+                  background: 'transparent',
                   border: 'none',
+                  color: 'var(--accent)',
                   fontSize: 9,
-                  fontWeight: 700,
                   fontFamily: 'var(--font-mono)',
-                  letterSpacing: '0.04em',
-                  padding: '2px 7px',
-                  borderRadius: 2,
+                  fontWeight: 700,
                   cursor: 'pointer',
+                  padding: 0,
                   display: 'inline-flex',
                   alignItems: 'center',
-                  gap: 4,
+                  gap: 3,
                 }}
               >
                 <Sliders size={9} />
-                <span>EDIT TARGETS</span>
+                <span>{currentTargetRoles.length} TARGET DISCIPLINES</span>
+              </button>
+            )}
+            {activeFilterCount > 0 && (
+              <button
+                type="button"
+                onClick={resetFilters}
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  color: 'var(--text-muted)',
+                  fontSize: 9,
+                  fontFamily: 'var(--font-mono)',
+                  cursor: 'pointer',
+                  padding: 0,
+                }}
+              >
+                RESET ({activeFilterCount})
               </button>
             )}
           </div>
-          {activeFilterCount > 0 && (
-            <span style={{ color: 'var(--accent)' }}>
-              {activeFilterCount} ACTIVE FILTER{activeFilterCount > 1 ? 'S' : ''}
-            </span>
-          )}
         </div>
-
-        {/* Target role tags indicator when on target matches tab */}
-        {activeRoleFilter === 'all_matching' && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: 4, flexWrap: 'wrap' }}>
-            <span style={{ color: 'var(--text-muted)', fontSize: 9 }}>MATCHING:</span>
-            {currentTargetRoles.length === 0 ? (
-              <span
-                style={{ color: 'var(--accent)', fontSize: 9, cursor: 'pointer', fontWeight: 700 }}
-                onClick={openTargetModal}
-              >
-                NO ROLES SET — CLICK TO CONFIGURE
-              </span>
-            ) : (
-              currentTargetRoles.map((r) => {
-                const matchedDef = AVAILABLE_TARGET_ROLES.find((d) => d.id === r);
-                const label = matchedDef
-                  ? matchedDef.label.replace(' ENGINEERING', '').replace(' & MACHINE LEARNING', '/ML')
-                  : r;
-                return (
-                  <span
-                    key={r}
-                    onClick={openTargetModal}
-                    style={{
-                      background: 'var(--bg-tertiary)',
-                      border: '1px solid var(--border-subtle)',
-                      padding: '1px 5px',
-                      fontSize: 9,
-                      borderRadius: 2,
-                      color: 'var(--text-secondary)',
-                      cursor: 'pointer',
-                    }}
-                    title="Click to edit target roles"
-                  >
-                    {label}
-                  </span>
-                );
-              })
-            )}
-          </div>
-        )}
-      </div>
       </div>
 
       {/* Job Cards Stream (Full Width) */}
