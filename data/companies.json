@@ -1,0 +1,1595 @@
+[
+  {
+    "name": "OpenAI",
+    "slug": "openai",
+    "careers_url": "https://openai.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "openai",
+    "industry": "Artificial Intelligence",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "Anthropic",
+    "slug": "anthropic",
+    "careers_url": "https://www.anthropic.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "anthropic",
+    "industry": "Artificial Intelligence",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "Perplexity AI",
+    "slug": "perplexity",
+    "careers_url": "https://www.perplexity.ai/careers",
+    "source_type": "ashby",
+    "source_identifier": "perplexity",
+    "industry": "Artificial Intelligence",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "Cursor",
+    "slug": "cursor",
+    "careers_url": "https://www.cursor.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "cursor",
+    "industry": "AI Developer Tools",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "ElevenLabs",
+    "slug": "elevenlabs",
+    "careers_url": "https://elevenlabs.io/careers",
+    "source_type": "ashby",
+    "source_identifier": "elevenlabs",
+    "industry": "Voice AI",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "Cohere",
+    "slug": "cohere",
+    "careers_url": "https://cohere.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "cohere",
+    "industry": "Enterprise AI & LLMs",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "Scale AI",
+    "slug": "scaleai",
+    "careers_url": "https://scale.com/careers",
+    "source_type": "greenhouse",
+    "source_identifier": "scaleai",
+    "industry": "AI Data Infrastructure",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "Midjourney",
+    "slug": "midjourney",
+    "careers_url": "https://www.midjourney.com/",
+    "source_type": "ashby",
+    "source_identifier": "midjourney",
+    "industry": "Generative AI & Imagery",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "LangChain",
+    "slug": "langchain",
+    "careers_url": "https://www.langchain.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "langchain",
+    "industry": "AI Agent Framework",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "Braintrust",
+    "slug": "braintrust",
+    "careers_url": "https://www.braintrust.dev/careers",
+    "source_type": "ashby",
+    "source_identifier": "braintrust",
+    "industry": "AI Evaluation Platform",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "Modal",
+    "slug": "modal",
+    "careers_url": "https://modal.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "modal",
+    "industry": "Serverless AI Cloud",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "Synthesia",
+    "slug": "synthesia",
+    "careers_url": "https://www.synthesia.io/careers",
+    "source_type": "ashby",
+    "source_identifier": "synthesia",
+    "industry": "AI Video Platform",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "Character AI",
+    "slug": "character",
+    "careers_url": "https://character.ai/careers",
+    "source_type": "ashby",
+    "source_identifier": "character",
+    "industry": "Conversational AI",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "Anyscale",
+    "slug": "anyscale",
+    "careers_url": "https://www.anyscale.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "anyscale",
+    "industry": "Distributed Ray AI",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "Pinecone",
+    "slug": "pinecone",
+    "careers_url": "https://www.pinecone.io/careers/",
+    "source_type": "ashby",
+    "source_identifier": "pinecone",
+    "industry": "Vector Search Database",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "Weaviate",
+    "slug": "weaviate",
+    "careers_url": "https://weaviate.io/company/careers",
+    "source_type": "ashby",
+    "source_identifier": "weaviate",
+    "industry": "Open Source Vector Search",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "HeyGen",
+    "slug": "heygen",
+    "careers_url": "https://www.heygen.com/careers",
+    "source_type": "greenhouse",
+    "source_identifier": "heygen",
+    "industry": "AI Video Avatars",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "Snorkel AI",
+    "slug": "snorkelai",
+    "careers_url": "https://snorkel.ai/careers/",
+    "source_type": "greenhouse",
+    "source_identifier": "snorkelai",
+    "industry": "Programmatic Data AI",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "SambaNova Systems",
+    "slug": "sambanovasystems",
+    "careers_url": "https://sambanova.ai/careers",
+    "source_type": "greenhouse",
+    "source_identifier": "sambanovasystems",
+    "industry": "AI Hardware & Cloud",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "Palantir",
+    "slug": "palantir",
+    "careers_url": "https://www.palantir.com/careers/",
+    "source_type": "lever",
+    "source_identifier": "palantir",
+    "industry": "Enterprise AI & Defense",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "Figma",
+    "slug": "figma",
+    "careers_url": "https://www.figma.com/careers/",
+    "source_type": "greenhouse",
+    "source_identifier": "figma",
+    "industry": "Design & Collaboration",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "Canva",
+    "slug": "canva",
+    "careers_url": "https://www.canva.com/careers/",
+    "source_type": "greenhouse",
+    "source_identifier": "canva",
+    "industry": "Visual Design Suite",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "Webflow",
+    "slug": "webflow",
+    "careers_url": "https://webflow.com/careers",
+    "source_type": "greenhouse",
+    "source_identifier": "webflow",
+    "industry": "Visual Web Development",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "Framer",
+    "slug": "framer",
+    "careers_url": "https://www.framer.com/careers/",
+    "source_type": "ashby",
+    "source_identifier": "framer",
+    "industry": "Interactive Web Builder",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "Miro",
+    "slug": "miro",
+    "careers_url": "https://miro.com/careers/",
+    "source_type": "ashby",
+    "source_identifier": "miro",
+    "industry": "Visual Collaboration Workspace",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "Descript",
+    "slug": "descript",
+    "careers_url": "https://www.descript.com/careers",
+    "source_type": "greenhouse",
+    "source_identifier": "descript",
+    "industry": "Video & Audio Editing",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "Pinterest",
+    "slug": "pinterest",
+    "careers_url": "https://www.pinterestcareers.com/",
+    "source_type": "greenhouse",
+    "source_identifier": "pinterest",
+    "industry": "Visual Discovery Engine",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "Linear",
+    "slug": "linear",
+    "careers_url": "https://linear.app/careers",
+    "source_type": "ashby",
+    "source_identifier": "linear",
+    "industry": "Product & Issue Tracking",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "Vercel",
+    "slug": "vercel",
+    "careers_url": "https://vercel.com/careers",
+    "source_type": "greenhouse",
+    "source_identifier": "vercel",
+    "industry": "Frontend Cloud & Next.js",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "Supabase",
+    "slug": "supabase",
+    "careers_url": "https://supabase.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "supabase",
+    "industry": "Open Source Firebase",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "GitLab",
+    "slug": "gitlab",
+    "careers_url": "https://about.gitlab.com/jobs/",
+    "source_type": "greenhouse",
+    "source_identifier": "gitlab",
+    "industry": "The DevSecOps Platform",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "Canonical",
+    "slug": "canonical",
+    "careers_url": "https://canonical.com/careers",
+    "source_type": "greenhouse",
+    "source_identifier": "canonical",
+    "industry": "Ubuntu & Open Source",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "Datadog",
+    "slug": "datadog",
+    "careers_url": "https://www.datadoghq.com/careers/",
+    "source_type": "greenhouse",
+    "source_identifier": "datadog",
+    "industry": "Cloud Observability",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "Cloudflare",
+    "slug": "cloudflare",
+    "careers_url": "https://www.cloudflare.com/careers/",
+    "source_type": "greenhouse",
+    "source_identifier": "cloudflare",
+    "industry": "Global Cloud Network",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "Elastic",
+    "slug": "elastic",
+    "careers_url": "https://www.elastic.co/about/careers",
+    "source_type": "greenhouse",
+    "source_identifier": "elastic",
+    "industry": "Search AI & Elasticsearch",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "MongoDB",
+    "slug": "mongodb",
+    "careers_url": "https://www.mongodb.com/careers",
+    "source_type": "greenhouse",
+    "source_identifier": "mongodb",
+    "industry": "Modern Database Platform",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "ClickHouse",
+    "slug": "clickhouse",
+    "careers_url": "https://clickhouse.com/company/careers",
+    "source_type": "ashby",
+    "source_identifier": "clickhouse",
+    "industry": "Real-Time Columnar Database",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "Cockroach Labs",
+    "slug": "cockroachlabs",
+    "careers_url": "https://www.cockroachlabs.com/careers/",
+    "source_type": "greenhouse",
+    "source_identifier": "cockroachlabs",
+    "industry": "Distributed SQL",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "Grafana Labs",
+    "slug": "grafanalabs",
+    "careers_url": "https://grafana.com/about/careers/",
+    "source_type": "greenhouse",
+    "source_identifier": "grafanalabs",
+    "industry": "Open Observability Stack",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "Temporal",
+    "slug": "temporal",
+    "careers_url": "https://temporal.io/careers",
+    "source_type": "ashby",
+    "source_identifier": "temporal",
+    "industry": "Durable Execution Engine",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "LaunchDarkly",
+    "slug": "launchdarkly",
+    "careers_url": "https://launchdarkly.com/careers/",
+    "source_type": "greenhouse",
+    "source_identifier": "launchdarkly",
+    "industry": "Feature Management Platform",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "PostHog",
+    "slug": "posthog",
+    "careers_url": "https://posthog.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "posthog",
+    "industry": "Product Analytics Suite",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "Sentry",
+    "slug": "sentry",
+    "careers_url": "https://sentry.io/careers/",
+    "source_type": "ashby",
+    "source_identifier": "sentry",
+    "industry": "Developer Error Tracking",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "Replit",
+    "slug": "replit",
+    "careers_url": "https://replit.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "replit",
+    "industry": "Software Creation Cloud",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "Render",
+    "slug": "render",
+    "careers_url": "https://render.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "render",
+    "industry": "Unified Cloud Platform",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "Railway",
+    "slug": "railway",
+    "careers_url": "https://railway.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "railway",
+    "industry": "Infrastructure Cloud",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "PlanetScale",
+    "slug": "planetscale",
+    "careers_url": "https://planetscale.com/careers",
+    "source_type": "greenhouse",
+    "source_identifier": "planetscale",
+    "industry": "Serverless MySQL",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "Neon",
+    "slug": "neon",
+    "careers_url": "https://neon.tech/careers",
+    "source_type": "ashby",
+    "source_identifier": "neon",
+    "industry": "Serverless PostgreSQL",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "Warp",
+    "slug": "warp",
+    "careers_url": "https://www.warp.dev/careers",
+    "source_type": "greenhouse",
+    "source_identifier": "warp",
+    "industry": "AI-Powered Terminal",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "Raycast",
+    "slug": "raycast",
+    "careers_url": "https://www.raycast.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "raycast",
+    "industry": "Mac Productivity Platform",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "Resend",
+    "slug": "resend",
+    "careers_url": "https://resend.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "resend",
+    "industry": "Modern Email API",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "Liveblocks",
+    "slug": "liveblocks",
+    "careers_url": "https://liveblocks.io/careers",
+    "source_type": "ashby",
+    "source_identifier": "liveblocks",
+    "industry": "Real-Time Collaborative Infrastructure",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "Confluent",
+    "slug": "confluent",
+    "careers_url": "https://www.confluent.io/careers/",
+    "source_type": "ashby",
+    "source_identifier": "confluent",
+    "industry": "Data in Motion (Apache Kafka)",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "Astronomer",
+    "slug": "astronomer",
+    "careers_url": "https://www.astronomer.io/careers/",
+    "source_type": "ashby",
+    "source_identifier": "astronomer",
+    "industry": "Unified Data Orchestration",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "Starburst",
+    "slug": "starburst",
+    "careers_url": "https://www.starburst.io/careers/",
+    "source_type": "greenhouse",
+    "source_identifier": "starburst",
+    "industry": "Trino Data Lakehouse",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "Neo4j",
+    "slug": "neo4j",
+    "careers_url": "https://neo4j.com/careers/",
+    "source_type": "greenhouse",
+    "source_identifier": "neo4j",
+    "industry": "Graph Database Platform",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "Algolia",
+    "slug": "algolia",
+    "careers_url": "https://www.algolia.com/careers/",
+    "source_type": "greenhouse",
+    "source_identifier": "algolia",
+    "industry": "AI Search & Discovery",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "Sanity",
+    "slug": "sanity",
+    "careers_url": "https://www.sanity.io/careers",
+    "source_type": "ashby",
+    "source_identifier": "sanity",
+    "industry": "Composable Content Cloud",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "Contentful",
+    "slug": "contentful",
+    "careers_url": "https://www.contentful.com/careers/",
+    "source_type": "greenhouse",
+    "source_identifier": "contentful",
+    "industry": "Intelligent Content Platform",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "Ghost",
+    "slug": "ghost",
+    "careers_url": "https://ghost.org/careers/",
+    "source_type": "greenhouse",
+    "source_identifier": "ghost",
+    "industry": "Independent Publishing Platform",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "Fivetran",
+    "slug": "fivetran",
+    "careers_url": "https://www.fivetran.com/careers",
+    "source_type": "greenhouse",
+    "source_identifier": "fivetran",
+    "industry": "Automated Data Pipelines",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "Dataiku",
+    "slug": "dataiku",
+    "careers_url": "https://www.dataiku.com/careers/",
+    "source_type": "greenhouse",
+    "source_identifier": "dataiku",
+    "industry": "Everyday AI & Analytics",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "Mozilla",
+    "slug": "mozilla",
+    "careers_url": "https://www.mozilla.org/careers/",
+    "source_type": "greenhouse",
+    "source_identifier": "mozilla",
+    "industry": "Open Source & Firefox",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "Stripe",
+    "slug": "stripe",
+    "careers_url": "https://stripe.com/jobs",
+    "source_type": "greenhouse",
+    "source_identifier": "stripe",
+    "industry": "Financial Infrastructure",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "Ramp",
+    "slug": "ramp",
+    "careers_url": "https://ramp.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "ramp",
+    "industry": "Finance Operations & Cards",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "Brex",
+    "slug": "brex",
+    "careers_url": "https://www.brex.com/careers",
+    "source_type": "greenhouse",
+    "source_identifier": "brex",
+    "industry": "Corporate Spend & AI",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "Robinhood",
+    "slug": "robinhood",
+    "careers_url": "https://robinhood.com/careers/",
+    "source_type": "greenhouse",
+    "source_identifier": "robinhood",
+    "industry": "Modern Financial Services",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "Affirm",
+    "slug": "affirm",
+    "careers_url": "https://www.affirm.com/careers",
+    "source_type": "greenhouse",
+    "source_identifier": "affirm",
+    "industry": "Pay-Over-Time Network",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "Chime",
+    "slug": "chime",
+    "careers_url": "https://www.chime.com/careers/",
+    "source_type": "greenhouse",
+    "source_identifier": "chime",
+    "industry": "Consumer Digital Banking",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "Coinbase",
+    "slug": "coinbase",
+    "careers_url": "https://www.coinbase.com/careers",
+    "source_type": "greenhouse",
+    "source_identifier": "coinbase",
+    "industry": "Crypto & Onchain Economy",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "Carta",
+    "slug": "carta",
+    "careers_url": "https://carta.com/careers/",
+    "source_type": "greenhouse",
+    "source_identifier": "carta",
+    "industry": "Cap Table & Equity Management",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "Wealthfront",
+    "slug": "wealthfront",
+    "careers_url": "https://www.wealthfront.com/careers",
+    "source_type": "lever",
+    "source_identifier": "wealthfront",
+    "industry": "Automated Investment Management",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "Paddle",
+    "slug": "paddle",
+    "careers_url": "https://www.paddle.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "paddle",
+    "industry": "Billing & Payments for SaaS",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "Toast",
+    "slug": "toast",
+    "careers_url": "https://careers.toasttab.com/",
+    "source_type": "greenhouse",
+    "source_identifier": "toast",
+    "industry": "Restaurant Technology",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "Notion",
+    "slug": "notion",
+    "careers_url": "https://www.notion.so/careers",
+    "source_type": "ashby",
+    "source_identifier": "notion",
+    "industry": "Connected Workspace",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "Retool",
+    "slug": "retool",
+    "careers_url": "https://retool.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "retool",
+    "industry": "Internal Development Platform",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "Clay",
+    "slug": "clay",
+    "careers_url": "https://www.clay.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "clay",
+    "industry": "GTM AI & Relationship Engine",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "Vanta",
+    "slug": "vanta",
+    "careers_url": "https://www.vanta.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "vanta",
+    "industry": "Automated Security & Trust",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "Gusto",
+    "slug": "gusto",
+    "careers_url": "https://gusto.com/about/careers",
+    "source_type": "greenhouse",
+    "source_identifier": "gusto",
+    "industry": "Modern HR, Payroll & Benefits",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "Deel",
+    "slug": "deel",
+    "careers_url": "https://www.deel.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "deel",
+    "industry": "Global Hiring & Payroll",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "Intercom",
+    "slug": "intercom",
+    "careers_url": "https://www.intercom.com/careers",
+    "source_type": "greenhouse",
+    "source_identifier": "intercom",
+    "industry": "AI Customer Service",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "Asana",
+    "slug": "asana",
+    "careers_url": "https://asana.com/jobs",
+    "source_type": "greenhouse",
+    "source_identifier": "asana",
+    "industry": "Work & Project Management",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "Airtable",
+    "slug": "airtable",
+    "careers_url": "https://airtable.com/careers",
+    "source_type": "greenhouse",
+    "source_identifier": "airtable",
+    "industry": "Connected Apps Platform",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "Lattice",
+    "slug": "lattice",
+    "careers_url": "https://lattice.com/careers",
+    "source_type": "greenhouse",
+    "source_identifier": "lattice",
+    "industry": "People Success Platform",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "Culture Amp",
+    "slug": "cultureamp",
+    "careers_url": "https://www.cultureamp.com/about/careers",
+    "source_type": "greenhouse",
+    "source_identifier": "cultureamp",
+    "industry": "Employee Experience Platform",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "Zapier",
+    "slug": "zapier",
+    "careers_url": "https://zapier.com/jobs",
+    "source_type": "ashby",
+    "source_identifier": "zapier",
+    "industry": "Workflow Automation Cloud",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "Braze",
+    "slug": "braze",
+    "careers_url": "https://www.braze.com/company/careers",
+    "source_type": "greenhouse",
+    "source_identifier": "braze",
+    "industry": "Customer Engagement Platform",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "Klaviyo",
+    "slug": "klaviyo",
+    "careers_url": "https://www.klaviyo.com/careers",
+    "source_type": "greenhouse",
+    "source_identifier": "klaviyo",
+    "industry": "Intelligent Marketing Cloud",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "Twilio",
+    "slug": "twilio",
+    "careers_url": "https://www.twilio.com/company/jobs",
+    "source_type": "greenhouse",
+    "source_identifier": "twilio",
+    "industry": "Customer Engagement APIs",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "PagerDuty",
+    "slug": "pagerduty",
+    "careers_url": "https://www.pagerduty.com/careers/",
+    "source_type": "greenhouse",
+    "source_identifier": "pagerduty",
+    "industry": "Digital Operations Management",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "Checkr",
+    "slug": "checkr",
+    "careers_url": "https://checkr.com/careers",
+    "source_type": "greenhouse",
+    "source_identifier": "checkr",
+    "industry": "People Infrastructure & Backgrounds",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "Verkada",
+    "slug": "verkada",
+    "careers_url": "https://www.verkada.com/careers/",
+    "source_type": "greenhouse",
+    "source_identifier": "verkada",
+    "industry": "Physical Cloud Security",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "Okta",
+    "slug": "okta",
+    "careers_url": "https://www.okta.com/company/careers/",
+    "source_type": "greenhouse",
+    "source_identifier": "okta",
+    "industry": "Identity & Access Cloud",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "Bitwarden",
+    "slug": "bitwarden",
+    "careers_url": "https://bitwarden.com/careers/",
+    "source_type": "greenhouse",
+    "source_identifier": "bitwarden",
+    "industry": "Password Security Cloud",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "Dropbox",
+    "slug": "dropbox",
+    "careers_url": "https://jobs.dropbox.com/",
+    "source_type": "greenhouse",
+    "source_identifier": "dropbox",
+    "industry": "Smart Cloud Workspace",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "Mixpanel",
+    "slug": "mixpanel",
+    "careers_url": "https://mixpanel.com/jobs/",
+    "source_type": "greenhouse",
+    "source_identifier": "mixpanel",
+    "industry": "Self-Serve Product Analytics",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "Samsara",
+    "slug": "samsara",
+    "careers_url": "https://www.samsara.com/careers/",
+    "source_type": "greenhouse",
+    "source_identifier": "samsara",
+    "industry": "IoT & Connected Operations",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "Flexport",
+    "slug": "flexport",
+    "careers_url": "https://www.flexport.com/careers/",
+    "source_type": "greenhouse",
+    "source_identifier": "flexport",
+    "industry": "Supply Chain & Logistics OS",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "Gympass",
+    "slug": "gympass",
+    "careers_url": "https://wellhub.com/en-us/careers/",
+    "source_type": "greenhouse",
+    "source_identifier": "gympass",
+    "industry": "Corporate Wellness Network",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "Labelbox",
+    "slug": "labelbox",
+    "careers_url": "https://labelbox.com/careers/",
+    "source_type": "greenhouse",
+    "source_identifier": "labelbox",
+    "industry": "AI Data & Model Evaluation",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "Branch",
+    "slug": "branchmetrics",
+    "careers_url": "https://branch.io/careers/",
+    "source_type": "greenhouse",
+    "source_identifier": "branchmetrics",
+    "industry": "Mobile Linking & Measurement",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "Clever",
+    "slug": "clever",
+    "careers_url": "https://clever.com/careers",
+    "source_type": "greenhouse",
+    "source_identifier": "clever",
+    "industry": "K-12 Education Platform",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "Coursera",
+    "slug": "coursera",
+    "careers_url": "https://about.coursera.org/careers",
+    "source_type": "greenhouse",
+    "source_identifier": "coursera",
+    "industry": "Global Online Learning",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "Duolingo",
+    "slug": "duolingo",
+    "careers_url": "https://careers.duolingo.com/",
+    "source_type": "greenhouse",
+    "source_identifier": "duolingo",
+    "industry": "Language & Learning Tech",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "Airbnb",
+    "slug": "airbnb",
+    "careers_url": "https://careers.airbnb.com/",
+    "source_type": "greenhouse",
+    "source_identifier": "airbnb",
+    "industry": "Global Travel Marketplace",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "Reddit",
+    "slug": "reddit",
+    "careers_url": "https://www.redditinc.com/careers",
+    "source_type": "greenhouse",
+    "source_identifier": "reddit",
+    "industry": "Online Community Network",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "Discord",
+    "slug": "discord",
+    "careers_url": "https://discord.com/careers",
+    "source_type": "greenhouse",
+    "source_identifier": "discord",
+    "industry": "Voice & Chat Communities",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "Twitch",
+    "slug": "twitch",
+    "careers_url": "https://www.twitch.tv/jobs/",
+    "source_type": "greenhouse",
+    "source_identifier": "twitch",
+    "industry": "Live Interactive Entertainment",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "Instacart",
+    "slug": "instacart",
+    "careers_url": "https://instacart.careers/",
+    "source_type": "greenhouse",
+    "source_identifier": "instacart",
+    "industry": "Online Grocery & Retail AI",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "Lyft",
+    "slug": "lyft",
+    "careers_url": "https://www.lyft.com/careers",
+    "source_type": "greenhouse",
+    "source_identifier": "lyft",
+    "industry": "Rideshare & Transportation",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "Faire",
+    "slug": "faire",
+    "careers_url": "https://www.faire.com/careers",
+    "source_type": "greenhouse",
+    "source_identifier": "faire",
+    "industry": "Online Wholesale Marketplace",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "Patreon",
+    "slug": "patreon",
+    "careers_url": "https://www.patreon.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "patreon",
+    "industry": "Creator Economy Platform",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "Substack",
+    "slug": "substack",
+    "careers_url": "https://substack.com/jobs",
+    "source_type": "ashby",
+    "source_identifier": "substack",
+    "industry": "Independent Subscription Media",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "Partiful",
+    "slug": "partiful",
+    "careers_url": "https://partiful.com/jobs",
+    "source_type": "ashby",
+    "source_identifier": "partiful",
+    "industry": "Social Events Platform",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "Peloton",
+    "slug": "peloton",
+    "careers_url": "https://careers.onepeloton.com/",
+    "source_type": "greenhouse",
+    "source_identifier": "peloton",
+    "industry": "Connected Fitness Technology",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "ClassPass",
+    "slug": "classpass",
+    "careers_url": "https://classpass.com/careers",
+    "source_type": "greenhouse",
+    "source_identifier": "classpass",
+    "industry": "Fitness & Beauty Membership",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "Glossier",
+    "slug": "glossier",
+    "careers_url": "https://www.glossier.com/careers",
+    "source_type": "greenhouse",
+    "source_identifier": "glossier",
+    "industry": "Modern Beauty & DTC",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "GoFundMe",
+    "slug": "gofundme",
+    "careers_url": "https://www.gofundme.com/c/careers",
+    "source_type": "greenhouse",
+    "source_identifier": "gofundme",
+    "industry": "Social Crowdfunding Platform",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "Kickstarter",
+    "slug": "kickstarter",
+    "careers_url": "https://www.kickstarter.com/jobs",
+    "source_type": "greenhouse",
+    "source_identifier": "kickstarter",
+    "industry": "Creative Project Funding",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "Paytm",
+    "slug": "paytm",
+    "careers_url": "https://paytm.com/careers",
+    "source_type": "lever",
+    "source_identifier": "paytm",
+    "industry": "Indian Fintech & Payments",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "Meesho",
+    "slug": "meesho",
+    "careers_url": "https://www.meesho.io/jobs",
+    "source_type": "lever",
+    "source_identifier": "meesho",
+    "industry": "Indian E-Commerce Unicorn",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "InMobi",
+    "slug": "inmobi",
+    "careers_url": "https://www.inmobi.com/company/careers",
+    "source_type": "greenhouse",
+    "source_identifier": "inmobi",
+    "industry": "AdTech & Consumer Tech",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "CRED",
+    "slug": "cred",
+    "careers_url": "https://careers.cred.club/",
+    "source_type": "lever",
+    "source_identifier": "cred",
+    "industry": "Fintech & Credit Unicorn",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "Groww",
+    "slug": "groww",
+    "careers_url": "https://groww.in/careers",
+    "source_type": "greenhouse",
+    "source_identifier": "groww",
+    "industry": "Indian Investment Tech",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "Cresta",
+    "slug": "cresta",
+    "careers_url": "https://cresta.com/careers/",
+    "source_type": "greenhouse",
+    "source_identifier": "cresta",
+    "industry": "Contact Center AI",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "Harvey",
+    "slug": "harvey",
+    "careers_url": "https://www.harvey.ai/careers",
+    "source_type": "ashby",
+    "source_identifier": "harvey",
+    "industry": "Legal AI",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "Poolside",
+    "slug": "poolside",
+    "careers_url": "https://poolside.ai/careers",
+    "source_type": "ashby",
+    "source_identifier": "poolside",
+    "industry": "AI for Code Generation",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "Cognition AI",
+    "slug": "cognition",
+    "careers_url": "https://www.cognition.ai/careers",
+    "source_type": "ashby",
+    "source_identifier": "cognition",
+    "industry": "AI Applied Research (Devin)",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "Databricks",
+    "slug": "databricks",
+    "careers_url": "https://www.databricks.com/company/careers",
+    "source_type": "greenhouse",
+    "source_identifier": "databricks",
+    "industry": "Data Intelligence Platform",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "Writer",
+    "slug": "writer",
+    "careers_url": "https://writer.com/careers/",
+    "source_type": "ashby",
+    "source_identifier": "writer",
+    "industry": "Generative AI for Enterprise",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "Anduril",
+    "slug": "andurilindustries",
+    "careers_url": "https://www.anduril.com/careers/",
+    "source_type": "greenhouse",
+    "source_identifier": "andurilindustries",
+    "industry": "Defense & Autonomous Tech",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "Fi Money",
+    "slug": "fi",
+    "careers_url": "https://fi.money/careers",
+    "source_type": "lever",
+    "source_identifier": "fi",
+    "industry": "Digital Banking",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "Glean",
+    "slug": "glean",
+    "careers_url": "https://www.glean.com/careers",
+    "source_type": "greenhouse",
+    "source_identifier": "gleanwork",
+    "industry": "Enterprise AI & Search",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "Razorpay",
+    "slug": "razorpay",
+    "careers_url": "https://razorpay.com/jobs/",
+    "source_type": "greenhouse",
+    "source_identifier": "razorpaysoftwareprivatelimited",
+    "industry": "Fintech & Payments",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "Runway",
+    "slug": "runway",
+    "careers_url": "https://runwayml.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "runway",
+    "industry": "Generative AI Video",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "Tailscale",
+    "slug": "tailscale",
+    "careers_url": "https://tailscale.com/careers",
+    "source_type": "greenhouse",
+    "source_identifier": "tailscale",
+    "industry": "Mesh VPN & Networking",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "Nvidia",
+    "slug": "nvidia",
+    "careers_url": "https://www.nvidia.com/careers/",
+    "source_type": "workday",
+    "source_identifier": "nvidia.wd5/NVIDIAExternalCareerSite",
+    "industry": "AI Computing & GPUs",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "Adobe",
+    "slug": "adobe",
+    "careers_url": "https://www.adobe.com/careers.html",
+    "source_type": "workday",
+    "source_identifier": "adobe.wd5/external_experienced",
+    "industry": "Creative Cloud & Design AI",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "Salesforce",
+    "slug": "salesforce",
+    "careers_url": "https://www.salesforce.com/company/careers/",
+    "source_type": "workday",
+    "source_identifier": "salesforce.wd12/External_Career_Site",
+    "industry": "Enterprise Cloud & CRM",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "Amazon",
+    "slug": "amazon",
+    "careers_url": "https://www.amazon.jobs",
+    "source_type": "amazon",
+    "source_identifier": "software-development",
+    "industry": "Cloud & E-Commerce (AWS)",
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+  },
+  {
+    "name": "Honeycomb",
+    "slug": "honeycomb",
+    "careers_url": "https://www.honeycomb.io/careers",
+    "source_type": "greenhouse",
+    "source_identifier": "honeycomb",
+    "industry": "Observability & Tracing",
+    "logo_url": "https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://www.honeycomb.io/careers&size=128"
+  },
+  {
+    "name": "Speckle",
+    "slug": "speckle",
+    "careers_url": "https://speckle.systems/careers",
+    "source_type": "ashby",
+    "source_identifier": "speckle",
+    "industry": "3D Data Infrastructure",
+    "logo_url": "https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://speckle.systems/careers&size=128"
+  },
+  {
+    "name": "Netlify",
+    "slug": "netlify",
+    "careers_url": "https://www.netlify.com/careers",
+    "source_type": "greenhouse",
+    "source_identifier": "netlify",
+    "industry": "Web Architecture & Serverless",
+    "logo_url": "https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://www.netlify.com/careers&size=128"
+  },
+  {
+    "name": "GitBook",
+    "slug": "gitbook",
+    "careers_url": "https://jobs.gitbook.com",
+    "source_type": "ashby",
+    "source_identifier": "gitbook",
+    "industry": "Documentation Platform",
+    "logo_url": "https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://jobs.gitbook.com&size=128"
+  },
+  {
+    "name": "Monzo",
+    "slug": "monzo",
+    "careers_url": "https://monzo.com/careers",
+    "source_type": "greenhouse",
+    "source_identifier": "monzo",
+    "industry": "Digital Banking",
+    "logo_url": "https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://monzo.com/careers&size=128"
+  },
+  {
+    "name": "N26",
+    "slug": "n26",
+    "careers_url": "https://n26.com/en-eu/careers",
+    "source_type": "greenhouse",
+    "source_identifier": "n26",
+    "industry": "Mobile Banking",
+    "logo_url": "https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://n26.com/en-eu/careers&size=128"
+  },
+  {
+    "name": "SumUp",
+    "slug": "sumup",
+    "careers_url": "https://www.sumup.com/careers",
+    "source_type": "greenhouse",
+    "source_identifier": "sumup",
+    "industry": "Merchant Payments & POS",
+    "logo_url": "https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://www.sumup.com/careers&size=128"
+  },
+  {
+    "name": "Wise",
+    "slug": "wise",
+    "careers_url": "https://wise.jobs",
+    "source_type": "greenhouse",
+    "source_identifier": "wise",
+    "industry": "Cross-Border Money Transfer",
+    "logo_url": "https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://wise.jobs&size=128"
+  },
+  {
+    "name": "Amplitude",
+    "slug": "amplitude",
+    "careers_url": "https://amplitude.com/careers",
+    "source_type": "greenhouse",
+    "source_identifier": "amplitude",
+    "industry": "Digital Analytics Platform",
+    "logo_url": "https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://amplitude.com/careers&size=128"
+  },
+  {
+    "name": "Waymo",
+    "slug": "waymo",
+    "careers_url": "https://waymo.com/careers",
+    "source_type": "greenhouse",
+    "source_identifier": "waymo",
+    "industry": "Autonomous Mobility & AI",
+    "logo_url": "https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://waymo.com/careers&size=128"
+  },
+  {
+    "name": "Lucid Motors",
+    "slug": "lucidmotors",
+    "careers_url": "https://lucidmotors.com/careers",
+    "source_type": "greenhouse",
+    "source_identifier": "lucidmotors",
+    "industry": "Electric Vehicles & Tech",
+    "logo_url": "https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://lucidmotors.com/careers&size=128"
+  },
+  {
+    "name": "Roblox",
+    "slug": "roblox",
+    "careers_url": "https://careers.roblox.com",
+    "source_type": "greenhouse",
+    "source_identifier": "roblox",
+    "industry": "Gaming & Metaverse Platform",
+    "logo_url": "https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://careers.roblox.com&size=128"
+  },
+  {
+    "name": "Riot Games",
+    "slug": "riotgames",
+    "careers_url": "https://www.riotgames.com/en/work-with-us",
+    "source_type": "greenhouse",
+    "source_identifier": "riotgames",
+    "industry": "Gaming & Esports",
+    "logo_url": "https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://www.riotgames.com/en/work-with-us&size=128"
+  },
+  {
+    "name": "Epic Games",
+    "slug": "epicgames",
+    "careers_url": "https://www.epicgames.com/site/en-US/careers",
+    "source_type": "greenhouse",
+    "source_identifier": "epicgames",
+    "industry": "Gaming & Unreal Engine",
+    "logo_url": "https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://www.epicgames.com/site/en-US/careers&size=128"
+  },
+  {
+    "name": "Speechify",
+    "slug": "speechify",
+    "careers_url": "https://speechify.com/careers",
+    "source_type": "greenhouse",
+    "source_identifier": "speechify",
+    "industry": "Voice AI & Audio",
+    "logo_url": "https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://speechify.com/careers&size=128"
+  },
+  {
+    "name": "Etched",
+    "slug": "etched",
+    "careers_url": "https://www.etched.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "etched",
+    "industry": "AI Hardware & Silicon",
+    "logo_url": "https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://www.etched.com/careers&size=128"
+  },
+  {
+    "name": "Baseten",
+    "slug": "baseten",
+    "careers_url": "https://www.baseten.co/careers",
+    "source_type": "ashby",
+    "source_identifier": "baseten",
+    "industry": "AI Model Inference Cloud",
+    "logo_url": "https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://www.baseten.co/careers&size=128"
+  },
+  {
+    "name": "Fireworks AI",
+    "slug": "fireworks",
+    "careers_url": "https://fireworks.ai/careers",
+    "source_type": "ashby",
+    "source_identifier": "fireworks",
+    "industry": "Fast AI Inference Platform",
+    "logo_url": "https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://fireworks.ai/careers&size=128"
+  },
+  {
+    "name": "Fireblocks",
+    "slug": "fireblocks",
+    "careers_url": "https://www.fireblocks.com/careers",
+    "source_type": "greenhouse",
+    "source_identifier": "fireblocks",
+    "industry": "Digital Asset Security",
+    "logo_url": "https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://www.fireblocks.com/careers&size=128"
+  },
+  {
+    "name": "Suno",
+    "slug": "suno",
+    "careers_url": "https://suno.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "suno",
+    "industry": "Generative Audio & Music AI",
+    "logo_url": "https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://suno.com/careers&size=128"
+  },
+  {
+    "name": "SoFi",
+    "slug": "sofi",
+    "careers_url": "https://www.sofi.com/careers",
+    "source_type": "greenhouse",
+    "source_identifier": "sofi",
+    "industry": "Digital Banking & Investing",
+    "logo_url": "https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://www.sofi.com/careers&size=128"
+  },
+  {
+    "name": "Fastly",
+    "slug": "fastly",
+    "careers_url": "https://www.fastly.com/about/careers",
+    "source_type": "greenhouse",
+    "source_identifier": "fastly",
+    "industry": "Edge Cloud & Programmable CDN",
+    "logo_url": "https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://www.fastly.com/about/careers&size=128"
+  },
+  {
+    "name": "BitGo",
+    "slug": "bitgo",
+    "careers_url": "https://www.bitgo.com/careers",
+    "source_type": "greenhouse",
+    "source_identifier": "bitgo",
+    "industry": "Institutional Digital Asset Infrastructure",
+    "logo_url": "https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://www.bitgo.com/careers&size=128"
+  },
+  {
+    "name": "Standard Bots",
+    "slug": "standardbots",
+    "careers_url": "https://standardbots.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "standardbots",
+    "industry": "Next-Gen Collaborative Robotics",
+    "logo_url": "https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://standardbots.com/careers&size=128"
+  },
+  {
+    "name": "Squarespace",
+    "slug": "squarespace",
+    "careers_url": "https://www.squarespace.com/about/careers",
+    "source_type": "greenhouse",
+    "source_identifier": "squarespace",
+    "industry": "Website & Design OS",
+    "logo_url": "https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://www.squarespace.com/about/careers&size=128"
+  },
+  {
+    "name": "Cartesia",
+    "slug": "cartesia",
+    "careers_url": "https://cartesia.ai/careers",
+    "source_type": "ashby",
+    "source_identifier": "cartesia",
+    "industry": "State-of-the-Art Voice AI",
+    "logo_url": "https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://cartesia.ai/careers&size=128"
+  },
+  {
+    "name": "Betterment",
+    "slug": "betterment",
+    "careers_url": "https://www.betterment.com/careers",
+    "source_type": "greenhouse",
+    "source_identifier": "betterment",
+    "industry": "Automated Investing & Wealth",
+    "logo_url": "https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://www.betterment.com/careers&size=128"
+  },
+  {
+    "name": "Melio",
+    "slug": "melio",
+    "careers_url": "https://www.meliopayments.com/careers",
+    "source_type": "greenhouse",
+    "source_identifier": "melio",
+    "industry": "B2B Payments & Accounts Payable",
+    "logo_url": "https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://www.meliopayments.com/careers&size=128"
+  },
+  {
+    "name": "Pika",
+    "slug": "pika",
+    "careers_url": "https://pika.art/careers",
+    "source_type": "ashby",
+    "source_identifier": "pika",
+    "industry": "AI Video Generation",
+    "logo_url": "https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://pika.art/careers&size=128"
+  },
+  {
+    "name": "Brave Software",
+    "slug": "brave",
+    "careers_url": "https://brave.com/careers",
+    "source_type": "greenhouse",
+    "source_identifier": "brave",
+    "industry": "Privacy Browser & Search",
+    "logo_url": "https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://brave.com/careers&size=128"
+  },
+  {
+    "name": "AssemblyAI",
+    "slug": "assemblyai",
+    "careers_url": "https://www.assemblyai.com/careers",
+    "source_type": "greenhouse",
+    "source_identifier": "assemblyai",
+    "industry": "Speech AI APIs",
+    "logo_url": "https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://www.assemblyai.com/careers&size=128"
+  },
+  {
+    "name": "LlamaIndex",
+    "slug": "llamaindex",
+    "careers_url": "https://www.llamaindex.ai/careers",
+    "source_type": "ashby",
+    "source_identifier": "llamaindex",
+    "industry": "Data Framework for LLMs",
+    "logo_url": "https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://www.llamaindex.ai/careers&size=128"
+  },
+  {
+    "name": "Orca Security",
+    "slug": "orcasecurity",
+    "careers_url": "https://orca.security/company/careers",
+    "source_type": "greenhouse",
+    "source_identifier": "orcasecurity",
+    "industry": "Agentless Cloud Security",
+    "logo_url": "https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://orca.security/company/careers&size=128"
+  },
+  {
+    "name": "Mysten Labs",
+    "slug": "mystenlabs",
+    "careers_url": "https://mystenlabs.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "mystenlabs",
+    "industry": "Decentralized Infrastructure (Sui)",
+    "logo_url": "https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://mystenlabs.com/careers&size=128"
+  },
+  {
+    "name": "Unstructured",
+    "slug": "unstructured",
+    "careers_url": "https://unstructured.io/careers",
+    "source_type": "ashby",
+    "source_identifier": "unstructured",
+    "industry": "ETL for LLMs",
+    "logo_url": "https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://unstructured.io/careers&size=128"
+  },
+  {
+    "name": "Paradigm",
+    "slug": "paradigm",
+    "careers_url": "https://www.paradigm.xyz/careers",
+    "source_type": "ashby",
+    "source_identifier": "paradigm",
+    "industry": "Crypto & Tech Investment Firm",
+    "logo_url": "https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://www.paradigm.xyz/careers&size=128"
+  },
+  {
+    "name": "Hightouch",
+    "slug": "hightouch",
+    "careers_url": "https://hightouch.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "hightouch",
+    "industry": "Composable Customer Data Platform",
+    "logo_url": "https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://hightouch.com/careers&size=128"
+  }
+]
