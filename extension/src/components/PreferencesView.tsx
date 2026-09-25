@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Check, Bell, Sliders, Globe, Layers, Save } from 'lucide-react';
+import { Check, Bell, Sliders, Globe, Layers, Save, AlertTriangle } from 'lucide-react';
 import { Preferences } from '../types';
 
 interface PreferencesViewProps {
@@ -58,13 +58,72 @@ export const PreferencesView: React.FC<PreferencesViewProps> = ({ preferences, o
     <form onSubmit={handleSubmit} style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: 16, width: '100%' }}>
       {/* Target Roles */}
       <div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
-          <Layers size={13} color="var(--accent)" />
-          <span className="eyebrow">TARGET ROLES</span>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            <Layers size={13} color="var(--accent)" />
+            <span className="eyebrow">TARGET ROLES ({prefs.roles.length}/{availableRoles.length})</span>
+          </div>
+          <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+            <button
+              type="button"
+              onClick={() => setPrefs({ ...prefs, roles: availableRoles.map((r) => r.id) })}
+              style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', fontSize: 9.5, fontFamily: 'var(--font-mono)', cursor: 'pointer', padding: 0 }}
+            >
+              SELECT ALL
+            </button>
+            <span style={{ color: 'var(--border-subtle)', fontSize: 10 }}>·</span>
+            <button
+              type="button"
+              onClick={() => setPrefs({ ...prefs, roles: [] })}
+              style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', fontSize: 9.5, fontFamily: 'var(--font-mono)', cursor: 'pointer', padding: 0 }}
+            >
+              CLEAR
+            </button>
+          </div>
         </div>
         <p style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 10 }}>
           Jobly monitors and matches postings falling into these disciplines:
         </p>
+
+        {/* Edge Case Warning: 0 Target Roles */}
+        {prefs.roles.length === 0 && (
+          <div style={{
+            padding: '10px 12px',
+            background: 'rgba(232, 96, 42, 0.08)',
+            border: '1px solid var(--accent)',
+            marginBottom: 10,
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 6,
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: 'var(--accent)', fontWeight: 700, fontSize: 11 }}>
+              <AlertTriangle size={13} />
+              <span>WARNING: NO TARGET DISCIPLINES SELECTED</span>
+            </div>
+            <p style={{ fontSize: 11, color: 'var(--text-secondary)', margin: 0, lineHeight: 1.4 }}>
+              Your Target Matches radar feed will show 0 listings until at least one discipline is checked.
+            </p>
+            <div style={{ display: 'flex', gap: 6 }}>
+              <button
+                type="button"
+                onClick={() => setPrefs({ ...prefs, roles: ['fullstack_engineering', 'ai_ml'] })}
+                className="btn btn-secondary btn-sm"
+                style={{ fontSize: 9.5, padding: '3px 8px' }}
+              >
+                RECOMMENDED (FULLSTACK & AI)
+              </button>
+              <button
+                type="button"
+                onClick={() => setPrefs({ ...prefs, roles: availableRoles.map((r) => r.id) })}
+                className="btn btn-primary btn-sm"
+                style={{ fontSize: 9.5, padding: '3px 8px' }}
+              >
+                SELECT ALL 5
+              </button>
+            </div>
+          </div>
+        )}
+
         <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
           {availableRoles.map((role) => {
             const isChecked = prefs.roles.includes(role.id);
@@ -116,10 +175,56 @@ export const PreferencesView: React.FC<PreferencesViewProps> = ({ preferences, o
 
       {/* Target Seniority & Experience */}
       <div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
-          <Sliders size={13} color="var(--accent)" />
-          <span className="eyebrow">EXPERIENCE & SENIORITY</span>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            <Sliders size={13} color="var(--accent)" />
+            <span className="eyebrow">EXPERIENCE & SENIORITY ({prefs.seniorities.length}/{availableSeniorities.length})</span>
+          </div>
+          <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+            <button
+              type="button"
+              onClick={() => setPrefs({ ...prefs, seniorities: availableSeniorities.map((s) => s.id) })}
+              style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', fontSize: 9.5, fontFamily: 'var(--font-mono)', cursor: 'pointer', padding: 0 }}
+            >
+              SELECT ALL
+            </button>
+            <span style={{ color: 'var(--border-subtle)', fontSize: 10 }}>·</span>
+            <button
+              type="button"
+              onClick={() => setPrefs({ ...prefs, seniorities: [] })}
+              style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', fontSize: 9.5, fontFamily: 'var(--font-mono)', cursor: 'pointer', padding: 0 }}
+            >
+              CLEAR
+            </button>
+          </div>
         </div>
+
+        {/* Edge Case Warning: 0 Seniorities */}
+        {prefs.seniorities.length === 0 && (
+          <div style={{
+            padding: '8px 10px',
+            background: 'rgba(232, 96, 42, 0.08)',
+            border: '1px solid var(--accent)',
+            marginTop: 6,
+            marginBottom: 6,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+          }}>
+            <div style={{ fontSize: 10.5, color: 'var(--accent)', fontWeight: 600 }}>
+              No experience level selected. Target radar may exclude all listings.
+            </div>
+            <button
+              type="button"
+              onClick={() => setPrefs({ ...prefs, seniorities: availableSeniorities.map((s) => s.id) })}
+              className="btn btn-primary btn-sm"
+              style={{ fontSize: 9, padding: '2px 6px' }}
+            >
+              SELECT ALL
+            </button>
+          </div>
+        )}
+
         <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 8 }}>
           {availableSeniorities.map((sen) => {
             const isChecked = prefs.seniorities.includes(sen.id);

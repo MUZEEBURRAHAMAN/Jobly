@@ -85,6 +85,30 @@ export const OptionsApp: React.FC = () => {
     loadData();
   }, [loadData]);
 
+  // Dynamic backend search & role filtering across all 20,000+ jobs
+  useEffect(() => {
+    if (activeTab !== 'feed') return;
+    const timer = setTimeout(async () => {
+      setLoading(true);
+      try {
+        const isMatchingOnly = selectedRole === 'all_matching';
+        const specificRole = !isMatchingOnly && selectedRole !== 'all' ? selectedRole : undefined;
+        const res = await api.getJobs({
+          role: specificRole,
+          only_matching: isMatchingOnly,
+          search: filterSearch.trim() || undefined,
+          limit: 300,
+        });
+        setJobs(res.items);
+      } catch {
+        // Fallback to offline cache
+      } finally {
+        setLoading(false);
+      }
+    }, 250);
+    return () => clearTimeout(timer);
+  }, [activeTab, selectedRole, filterSearch]);
+
   const handleSync = async () => {
     setIsSyncing(true);
     try {
@@ -461,19 +485,33 @@ export const OptionsApp: React.FC = () => {
               <div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: '100%' }}>
                 {savedJobs.length === 0 ? (
                   <div style={{
-                    padding: '36px 20px',
+                    padding: '44px 20px',
                     textAlign: 'center',
                     background: 'var(--bg-secondary)',
                     border: '1px solid var(--border-subtle)',
                     width: '100%',
                   }}>
-                    <Bookmark size={24} color="var(--accent)" style={{ margin: '0 auto 8px', display: 'block' }} />
+                    <Bookmark size={24} color="var(--accent)" style={{ margin: '0 auto 10px', display: 'block' }} />
+                    <span className="eyebrow" style={{ fontSize: 9.5, color: 'var(--accent)', display: 'block', marginBottom: 4 }}>
+                      SHORTLIST EMPTY
+                    </span>
                     <h3 style={{ fontSize: 13, fontWeight: 700, letterSpacing: '0.04em', textTransform: 'uppercase', color: 'var(--text-primary)' }}>
                       No Saved Opportunities
                     </h3>
-                    <p style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 4 }}>
-                      Bookmark jobs from the Radar feed to build your interview queue.
+                    <p style={{ fontSize: 11.5, color: 'var(--text-muted)', maxWidth: 300, margin: '6px auto 14px', lineHeight: 1.4 }}>
+                      Click the "SAVE" button on any card in the radar stream to pin positions here for active interview tracking.
                     </p>
+                    <button
+                      onClick={() => {
+                        setSelectedRole('all_matching');
+                        setActiveTab('feed');
+                      }}
+                      className="btn btn-primary btn-sm"
+                      style={{ gap: 6, margin: '0 auto' }}
+                    >
+                      <Radio size={12} />
+                      <span>BROWSE RADAR MATCHES</span>
+                    </button>
                   </div>
                 ) : (
                   savedJobs.map((j) => (
@@ -515,15 +553,30 @@ export const OptionsApp: React.FC = () => {
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8, width: '100%' }}>
                 {notifications.length === 0 ? (
                   <div style={{
-                    padding: '36px 20px',
+                    padding: '44px 20px',
                     textAlign: 'center',
                     background: 'var(--bg-secondary)',
                     border: '1px solid var(--border-subtle)',
                   }}>
-                    <Bell size={24} color="var(--text-muted)" style={{ margin: '0 auto 8px', display: 'block' }} />
-                    <p style={{ color: 'var(--text-muted)', fontSize: 12, fontFamily: 'var(--font-mono)' }}>
-                      NO ALERTS LOGGED YET. NEW MATCHES DISPATCHED AUTOMATICALLY.
+                    <Bell size={24} color="var(--text-muted)" style={{ margin: '0 auto 10px', display: 'block' }} />
+                    <span className="eyebrow" style={{ fontSize: 9.5, color: 'var(--accent)', display: 'block', marginBottom: 4 }}>
+                      DISPATCH LOG EMPTY
+                    </span>
+                    <h3 style={{ fontSize: 13, fontWeight: 700, letterSpacing: '0.04em', textTransform: 'uppercase', color: 'var(--text-primary)' }}>
+                      No Alerts Logged Yet
+                    </h3>
+                    <p style={{ color: 'var(--text-muted)', fontSize: 11.5, maxWidth: 360, margin: '6px auto 14px', lineHeight: 1.4 }}>
+                      Background monitoring scans 357 employers automatically every 30 minutes. When new jobs match your target rules, instant alerts appear here.
                     </p>
+                    <button
+                      onClick={handleSync}
+                      disabled={isSyncing}
+                      className="btn btn-primary btn-sm"
+                      style={{ gap: 6, margin: '0 auto' }}
+                    >
+                      <RefreshCw size={12} className={isSyncing ? 'spin' : ''} />
+                      <span>{isSyncing ? 'SCANNING ATS RADARS...' : 'RUN LIVE SCAN NOW'}</span>
+                    </button>
                   </div>
                 ) : (
                   notifications.map((n) => (

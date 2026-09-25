@@ -223,14 +223,27 @@ export const RadarFeed: React.FC<RadarFeedProps> = ({
         if (jobTime < cutoff) return false;
       }
 
-      // Search query
+      // Search query (Multi-token match with alias expansion)
       if (search.trim()) {
-        const q = search.toLowerCase();
-        const matchesTitle = job.title.toLowerCase().includes(q);
-        const matchesComp = job.company_name.toLowerCase().includes(q);
-        const matchesLoc = (job.location || '').toLowerCase().includes(q);
-        const matchesSal = (job.salary_summary || '').toLowerCase().includes(q);
-        if (!matchesTitle && !matchesComp && !matchesLoc && !matchesSal) return false;
+        const ALIAS_MAP: Record<string, string[]> = {
+          bangalore: ['bangalore', 'bengaluru'],
+          bengaluru: ['bengaluru', 'bangalore'],
+          gurgaon: ['gurgaon', 'gurugram'],
+          gurugram: ['gurugram', 'gurgaon'],
+          delhi: ['delhi', 'delhi_ncr', 'noida', 'gurgaon', 'gurugram'],
+          noida: ['noida', 'delhi', 'delhi_ncr'],
+          sf: ['sf', 'san francisco', 'bay area'],
+          'bay area': ['bay area', 'san francisco'],
+          nyc: ['nyc', 'new york'],
+          ny: ['ny', 'new york'],
+        };
+        const tokens = search.trim().toLowerCase().split(/\s+/).filter(Boolean);
+        const corpus = `${job.title} ${job.company_name} ${job.location || ''} ${job.geo_hub || ''} ${job.normalized_role || ''} ${job.salary_summary || ''}`.toLowerCase();
+        const allTokensMatch = tokens.every((token) => {
+          const aliases = ALIAS_MAP[token] || [token];
+          return aliases.some((a) => corpus.includes(a));
+        });
+        if (!allTokensMatch) return false;
       }
 
       return true;
@@ -638,42 +651,195 @@ export const RadarFeed: React.FC<RadarFeedProps> = ({
             border: '1px solid var(--border-subtle)',
             width: '100%',
           }}>
-            <Sparkles size={24} color="var(--accent)" style={{ margin: '0 auto 10px', display: 'block' }} />
-            <h3 style={{ fontSize: 13, fontWeight: 700, letterSpacing: '0.04em', textTransform: 'uppercase' }}>
-              {activeRoleFilter === 'all_matching' ? 'No Positions Match Target Rules' : 'No Positions Match Current Filters'}
-            </h3>
-            <p style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 4, marginBottom: 14 }}>
-              {activeRoleFilter === 'all_matching'
-                ? 'Your target radar is currently scanning for your configured roles and seniority rules. Adjust your target roles or broaden your filters.'
-                : 'Try broadening your location hub, budget tier, or search keywords.'}
-            </p>
-            <div style={{ display: 'flex', gap: 8, justifyContent: 'center', flexWrap: 'wrap' }}>
-              <button
-                onClick={openTargetModal}
-                className="btn btn-primary btn-sm"
-                style={{ gap: 6, fontFamily: 'var(--font-mono)' }}
-              >
-                <Sliders size={12} />
-                <span>SET TARGET ROLES</span>
-              </button>
-              <button
-                onClick={() => {
-                  resetFilters();
-                  setActiveRoleFilter('all');
-                }}
-                className="btn btn-secondary btn-sm"
-              >
-                VIEW ALL 20,000+ JOBS
-              </button>
-              {activeFilterCount > 0 && (
-                <button
-                  onClick={resetFilters}
-                  className="btn btn-secondary btn-sm"
-                >
-                  RESET FILTERS
-                </button>
-              )}
-            </div>
+            {search.trim() ? (
+              // Edge Case 1: Search returned 0 results
+              <>
+                <Search size={24} color="var(--accent)" style={{ margin: '0 auto 10px', display: 'block' }} />
+                <span className="eyebrow" style={{ fontSize: 9.5, color: 'var(--accent)', display: 'block', marginBottom: 4 }}>
+                  0 SEARCH MATCHES
+                </span>
+                <h3 style={{ fontSize: 13, fontWeight: 700, letterSpacing: '0.04em', textTransform: 'uppercase', color: 'var(--text-primary)' }}>
+                  No Positions Match "{search.trim()}"
+                </h3>
+                <p style={{ fontSize: 11.5, color: 'var(--text-muted)', marginTop: 4, marginBottom: 14, maxWidth: 360, margin: '6px auto 14px', lineHeight: 1.4 }}>
+                  {activeRoleFilter !== 'all'
+                    ? `Zero listings found in ${roleTabs.find((t) => t.id === activeRoleFilter)?.label || 'this role'} for "${search.trim()}". Search across all 20,000+ listings or clear your query.`
+                    : `Zero listings found matching "${search.trim()}". Try searching by another city (e.g. "Bangalore", "Noida", "Remote"), company name, or tech stack.`}
+                </p>
+                <div style={{ display: 'flex', gap: 8, justifyContent: 'center', flexWrap: 'wrap' }}>
+                  <button
+                    onClick={() => setSearch('')}
+                    className="btn btn-primary btn-sm"
+                    style={{ gap: 6, fontFamily: 'var(--font-mono)' }}
+                  >
+                    <X size={12} />
+                    <span>CLEAR SEARCH</span>
+                  </button>
+                  {activeRoleFilter !== 'all' && (
+                    <button
+                      onClick={() => setActiveRoleFilter('all')}
+                      className="btn btn-secondary btn-sm"
+                      style={{ gap: 6, fontFamily: 'var(--font-mono)' }}
+                    >
+                      <Globe size={12} />
+                      <span>SEARCH ALL 20,000+ JOBS</span>
+                    </button>
+                  )}
+                  {activeFilterCount > 0 && (
+                    <button
+                      onClick={resetFilters}
+                      className="btn btn-secondary btn-sm"
+                      style={{ gap: 6, fontFamily: 'var(--font-mono)' }}
+                    >
+                      <RotateCcw size={12} />
+                      <span>RESET FILTERS</span>
+                    </button>
+                  )}
+                </div>
+              </>
+            ) : activeRoleFilter === 'all_matching' && preferences?.roles && preferences.roles.length === 0 ? (
+              // Edge Case 2: Target Matches active, but 0 roles selected
+              <>
+                <Sliders size={24} color="var(--accent)" style={{ margin: '0 auto 10px', display: 'block' }} />
+                <span className="eyebrow" style={{ fontSize: 9.5, color: 'var(--accent)', display: 'block', marginBottom: 4 }}>
+                  TARGET RADAR · STANDBY
+                </span>
+                <h3 style={{ fontSize: 13, fontWeight: 700, letterSpacing: '0.04em', textTransform: 'uppercase', color: 'var(--text-primary)' }}>
+                  No Target Disciplines Selected
+                </h3>
+                <p style={{ fontSize: 11.5, color: 'var(--text-muted)', marginTop: 4, marginBottom: 14, maxWidth: 360, margin: '6px auto 14px', lineHeight: 1.4 }}>
+                  Your Target Matches radar is paused because no disciplines are selected. Select your target roles to begin live automated matching.
+                </p>
+                <div style={{ display: 'flex', gap: 8, justifyContent: 'center', flexWrap: 'wrap' }}>
+                  <button
+                    onClick={openTargetModal}
+                    className="btn btn-primary btn-sm"
+                    style={{ gap: 6, fontFamily: 'var(--font-mono)' }}
+                  >
+                    <Sliders size={12} />
+                    <span>SELECT TARGET ROLES</span>
+                  </button>
+                  <button
+                    onClick={() => {
+                      resetFilters();
+                      setActiveRoleFilter('all');
+                    }}
+                    className="btn btn-secondary btn-sm"
+                    style={{ gap: 6, fontFamily: 'var(--font-mono)' }}
+                  >
+                    <Globe size={12} />
+                    <span>VIEW ALL 20,000+ JOBS</span>
+                  </button>
+                </div>
+              </>
+            ) : activeRoleFilter === 'all_matching' ? (
+              // Edge Case 3: Target Matches active, but no items match current rules/filters
+              <>
+                <Sparkles size={24} color="var(--accent)" style={{ margin: '0 auto 10px', display: 'block' }} />
+                <span className="eyebrow" style={{ fontSize: 9.5, color: 'var(--accent)', display: 'block', marginBottom: 4 }}>
+                  TARGET RADAR ACTIVE
+                </span>
+                <h3 style={{ fontSize: 13, fontWeight: 700, letterSpacing: '0.04em', textTransform: 'uppercase', color: 'var(--text-primary)' }}>
+                  No Positions Match Target Rules
+                </h3>
+                <p style={{ fontSize: 11.5, color: 'var(--text-muted)', marginTop: 4, marginBottom: 14, maxWidth: 360, margin: '6px auto 14px', lineHeight: 1.4 }}>
+                  Your radar is scanning for {currentTargetRoles.length} target disciplines. No listings currently meet your seniority, hub, or budget criteria.
+                </p>
+                <div style={{ display: 'flex', gap: 8, justifyContent: 'center', flexWrap: 'wrap' }}>
+                  <button
+                    onClick={openTargetModal}
+                    className="btn btn-primary btn-sm"
+                    style={{ gap: 6, fontFamily: 'var(--font-mono)' }}
+                  >
+                    <Sliders size={12} />
+                    <span>ADJUST TARGET RULES</span>
+                  </button>
+                  <button
+                    onClick={() => {
+                      resetFilters();
+                      setActiveRoleFilter('all');
+                    }}
+                    className="btn btn-secondary btn-sm"
+                    style={{ gap: 6, fontFamily: 'var(--font-mono)' }}
+                  >
+                    <Globe size={12} />
+                    <span>VIEW ALL 20,000+ JOBS</span>
+                  </button>
+                  {activeFilterCount > 0 && (
+                    <button
+                      onClick={resetFilters}
+                      className="btn btn-secondary btn-sm"
+                      style={{ gap: 6, fontFamily: 'var(--font-mono)' }}
+                    >
+                      <RotateCcw size={12} />
+                      <span>RESET FILTERS</span>
+                    </button>
+                  )}
+                </div>
+              </>
+            ) : activeFilterCount > 0 ? (
+              // Edge Case 4: Active filters excluded all jobs
+              <>
+                <SlidersHorizontal size={24} color="var(--accent)" style={{ margin: '0 auto 10px', display: 'block' }} />
+                <span className="eyebrow" style={{ fontSize: 9.5, color: 'var(--accent)', display: 'block', marginBottom: 4 }}>
+                  FILTER EXCLUSION
+                </span>
+                <h3 style={{ fontSize: 13, fontWeight: 700, letterSpacing: '0.04em', textTransform: 'uppercase', color: 'var(--text-primary)' }}>
+                  No Positions Match Active Filters
+                </h3>
+                <p style={{ fontSize: 11.5, color: 'var(--text-muted)', marginTop: 4, marginBottom: 14, maxWidth: 360, margin: '6px auto 14px', lineHeight: 1.4 }}>
+                  Active hub, budget, or experience filters excluded all listings in {roleTabs.find((t) => t.id === activeRoleFilter)?.label || 'this category'}.
+                </p>
+                <div style={{ display: 'flex', gap: 8, justifyContent: 'center', flexWrap: 'wrap' }}>
+                  <button
+                    onClick={resetFilters}
+                    className="btn btn-primary btn-sm"
+                    style={{ gap: 6, fontFamily: 'var(--font-mono)' }}
+                  >
+                    <RotateCcw size={12} />
+                    <span>RESET ALL FILTERS</span>
+                  </button>
+                  <button
+                    onClick={() => {
+                      resetFilters();
+                      setActiveRoleFilter('all');
+                    }}
+                    className="btn btn-secondary btn-sm"
+                    style={{ gap: 6, fontFamily: 'var(--font-mono)' }}
+                  >
+                    <Globe size={12} />
+                    <span>VIEW ALL 20,000+ JOBS</span>
+                  </button>
+                </div>
+              </>
+            ) : (
+              // Edge Case 5: Empty category stream
+              <>
+                <Globe size={24} color="var(--text-muted)" style={{ margin: '0 auto 10px', display: 'block' }} />
+                <span className="eyebrow" style={{ fontSize: 9.5, color: 'var(--text-muted)', display: 'block', marginBottom: 4 }}>
+                  FEED STREAM EMPTY
+                </span>
+                <h3 style={{ fontSize: 13, fontWeight: 700, letterSpacing: '0.04em', textTransform: 'uppercase', color: 'var(--text-primary)' }}>
+                  No Positions In Stream
+                </h3>
+                <p style={{ fontSize: 11.5, color: 'var(--text-muted)', marginTop: 4, marginBottom: 14, maxWidth: 360, margin: '6px auto 14px', lineHeight: 1.4 }}>
+                  No listings found for this category. Expand to view all 20,000+ opportunities across 357 monitored employers.
+                </p>
+                <div style={{ display: 'flex', gap: 8, justifyContent: 'center', flexWrap: 'wrap' }}>
+                  <button
+                    onClick={() => {
+                      resetFilters();
+                      setActiveRoleFilter('all');
+                    }}
+                    className="btn btn-primary btn-sm"
+                    style={{ gap: 6, fontFamily: 'var(--font-mono)' }}
+                  >
+                    <Globe size={12} />
+                    <span>VIEW ALL 20,000+ JOBS</span>
+                  </button>
+                </div>
+              </>
+            )}
           </div>
         ) : (
           <>

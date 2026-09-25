@@ -160,9 +160,29 @@ async def list_jobs(
             params.append(f"%{location.lower()}%")
 
         if search:
-            search_pattern = f"%{search.lower()}%"
-            conditions.append("(LOWER(title) LIKE ? OR LOWER(company_name) LIKE ? OR LOWER(location) LIKE ?)")
-            params.extend([search_pattern, search_pattern, search_pattern])
+            ALIAS_MAP = {
+                "bangalore": ["bangalore", "bengaluru"],
+                "bengaluru": ["bengaluru", "bangalore"],
+                "gurgaon": ["gurgaon", "gurugram"],
+                "gurugram": ["gurugram", "gurgaon"],
+                "delhi": ["delhi", "delhi_ncr", "noida", "gurgaon", "gurugram"],
+                "noida": ["noida", "delhi", "delhi_ncr"],
+                "sf": ["sf", "san francisco", "bay area"],
+                "bay area": ["bay area", "san francisco", "silicon valley"],
+                "nyc": ["nyc", "new york"],
+                "ny": ["ny", "new york"],
+            }
+            search_tokens = [t.strip().lower() for t in search.split() if t.strip()]
+            for token in search_tokens:
+                aliases = ALIAS_MAP.get(token, [token])
+                sub_conds = []
+                for alias in aliases:
+                    pattern = f"%{alias}%"
+                    sub_conds.append(
+                        "(LOWER(title) LIKE ? OR LOWER(company_name) LIKE ? OR LOWER(location) LIKE ? OR LOWER(normalized_role) LIKE ? OR LOWER(geo_hub) LIKE ?)"
+                    )
+                    params.extend([pattern, pattern, pattern, pattern, pattern])
+                conditions.append(f"({' OR '.join(sub_conds)})")
 
         where_clause = f"WHERE {' AND '.join(conditions)}"
 

@@ -189,16 +189,39 @@ export const WatchlistView: React.FC<WatchlistViewProps> = ({
             top: '50%',
             transform: 'translateY(-50%)',
             color: 'var(--text-muted)',
+            pointerEvents: 'none',
           }}
         />
         <input
           type="text"
           className="input-text"
-          placeholder="Search 140 monitored companies..."
+          placeholder={`Search ${companies.length} monitored employers...`}
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          style={{ paddingLeft: 30, fontSize: 12, height: 34, width: '100%' }}
+          style={{ paddingLeft: 30, paddingRight: search ? 30 : 12, fontSize: 12, height: 34, width: '100%' }}
         />
+        {search && (
+          <button
+            type="button"
+            onClick={() => setSearch('')}
+            style={{
+              position: 'absolute',
+              right: 8,
+              top: '50%',
+              transform: 'translateY(-50%)',
+              background: 'transparent',
+              border: 'none',
+              color: 'var(--text-muted)',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: 2,
+            }}
+          >
+            <X size={13} />
+          </button>
+        )}
       </div>
 
       {/* Tier Filter Pills (Zero Emojis, Real Lucide Icons) */}
@@ -239,110 +262,204 @@ export const WatchlistView: React.FC<WatchlistViewProps> = ({
         </button>
       </div>
 
-      {/* Company List with Real Logos */}
+      {/* Company List with Real Logos or Contextual Empty States */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 6, width: '100%' }}>
-        {filtered.map((company) => {
-          const logo = getCompanyLogoUrl(company.name, company.careers_url);
-          return (
-            <div
-              key={company.id}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                padding: '10px 14px',
-                background: 'var(--bg-secondary)',
-                border: '1px solid var(--border-subtle)',
-                opacity: company.is_active ? 1 : 0.45,
-                transition: 'all var(--t-fast) var(--ease)',
-                width: '100%',
-              }}
-            >
-              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                {/* Real Company Website Logo */}
-                <div style={{
-                  width: 32,
-                  height: 32,
-                  minWidth: 32,
-                  background: '#ffffff',
-                  border: '1px solid var(--border-subtle)',
+        {filtered.length === 0 ? (
+          <div style={{
+            padding: '36px 20px',
+            textAlign: 'center',
+            background: 'var(--bg-secondary)',
+            border: '1px solid var(--border-subtle)',
+            width: '100%',
+          }}>
+            {search.trim() ? (
+              // Edge Case 1: Search returned 0 companies
+              <>
+                <Building2 size={24} color="var(--accent)" style={{ margin: '0 auto 10px', display: 'block' }} />
+                <span className="eyebrow" style={{ fontSize: 9.5, color: 'var(--accent)', display: 'block', marginBottom: 4 }}>
+                  UNMONITORED EMPLOYER
+                </span>
+                <h3 style={{ fontSize: 13, fontWeight: 700, letterSpacing: '0.04em', textTransform: 'uppercase', color: 'var(--text-primary)' }}>
+                  No Employers Matching "{search.trim()}"
+                </h3>
+                <p style={{ fontSize: 11.5, color: 'var(--text-muted)', marginTop: 4, marginBottom: 14, maxWidth: 360, margin: '6px auto 14px', lineHeight: 1.4 }}>
+                  We are not tracking "{search.trim()}" in your local directory yet. You can connect their Greenhouse, Lever, Ashby, or Workday ATS board right now.
+                </p>
+                <div style={{ display: 'flex', gap: 8, justifyContent: 'center', flexWrap: 'wrap' }}>
+                  <button
+                    onClick={() => {
+                      setName(search.trim());
+                      setShowAddForm(true);
+                    }}
+                    className="btn btn-primary btn-sm"
+                    style={{ gap: 6, fontFamily: 'var(--font-mono)' }}
+                  >
+                    <Plus size={12} />
+                    <span>CONNECT "{search.trim().toUpperCase()}" ATS</span>
+                  </button>
+                  <button
+                    onClick={() => setSearch('')}
+                    className="btn btn-secondary btn-sm"
+                    style={{ gap: 6, fontFamily: 'var(--font-mono)' }}
+                  >
+                    <X size={12} />
+                    <span>CLEAR SEARCH</span>
+                  </button>
+                </div>
+              </>
+            ) : tierFilter !== 'all' ? (
+              // Edge Case 2: Tier filter returned 0 companies
+              <>
+                <Building2 size={24} color="var(--accent)" style={{ margin: '0 auto 10px', display: 'block' }} />
+                <span className="eyebrow" style={{ fontSize: 9.5, color: 'var(--accent)', display: 'block', marginBottom: 4 }}>
+                  CATEGORY EMPTY
+                </span>
+                <h3 style={{ fontSize: 13, fontWeight: 700, letterSpacing: '0.04em', textTransform: 'uppercase', color: 'var(--text-primary)' }}>
+                  No Employers in this Category
+                </h3>
+                <p style={{ fontSize: 11.5, color: 'var(--text-muted)', marginTop: 4, marginBottom: 14, maxWidth: 360, margin: '6px auto 14px', lineHeight: 1.4 }}>
+                  No monitored employers found under the {tierFilter.toUpperCase()} tier filter.
+                </p>
+                <div style={{ display: 'flex', gap: 8, justifyContent: 'center', flexWrap: 'wrap' }}>
+                  <button
+                    onClick={() => setTierFilter('all')}
+                    className="btn btn-secondary btn-sm"
+                    style={{ gap: 6, fontFamily: 'var(--font-mono)' }}
+                  >
+                    <span>VIEW ALL {companies.length} MONITORED EMPLOYERS</span>
+                  </button>
+                </div>
+              </>
+            ) : (
+              // Edge Case 3: Zero companies in directory
+              <>
+                <Building2 size={24} color="var(--text-muted)" style={{ margin: '0 auto 10px', display: 'block' }} />
+                <span className="eyebrow" style={{ fontSize: 9.5, color: 'var(--text-muted)', display: 'block', marginBottom: 4 }}>
+                  WATCHLIST EMPTY
+                </span>
+                <h3 style={{ fontSize: 13, fontWeight: 700, letterSpacing: '0.04em', textTransform: 'uppercase', color: 'var(--text-primary)' }}>
+                  No Monitored Employers
+                </h3>
+                <p style={{ fontSize: 11.5, color: 'var(--text-muted)', marginTop: 4, marginBottom: 14, maxWidth: 360, margin: '6px auto 14px', lineHeight: 1.4 }}>
+                  Your employer watchlist is empty. Connect an ATS board to begin tracking postings directly.
+                </p>
+                <div style={{ display: 'flex', gap: 8, justifyContent: 'center', flexWrap: 'wrap' }}>
+                  <button
+                    onClick={() => setShowAddForm(true)}
+                    className="btn btn-primary btn-sm"
+                    style={{ gap: 6, fontFamily: 'var(--font-mono)' }}
+                  >
+                    <Plus size={12} />
+                    <span>CONNECT ATS BOARD</span>
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        ) : (
+          filtered.map((company) => {
+            const logo = getCompanyLogoUrl(company.name, company.careers_url);
+            return (
+              <div
+                key={company.id}
+                style={{
                   display: 'flex',
                   alignItems: 'center',
-                  justifyContent: 'center',
-                  position: 'relative',
-                  overflow: 'hidden',
-                  padding: 2,
-                }}>
-                  <img
-                    src={logo}
-                    alt={company.name}
-                    style={{
-                      width: '100%',
-                      height: '100%',
-                      objectFit: 'contain',
-                    }}
-                    onError={(e) => {
-                      (e.target as HTMLElement).style.display = 'none';
-                      const fallback = (e.target as HTMLElement).nextElementSibling as HTMLElement;
-                      if (fallback) fallback.style.display = 'flex';
-                    }}
-                    loading="lazy"
-                  />
+                  justifyContent: 'space-between',
+                  padding: '10px 14px',
+                  background: 'var(--bg-secondary)',
+                  border: '1px solid var(--border-subtle)',
+                  opacity: company.is_active ? 1 : 0.45,
+                  transition: 'all var(--t-fast) var(--ease)',
+                  width: '100%',
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                  {/* Real Company Website Logo */}
                   <div style={{
-                    display: 'none',
-                    width: '100%',
-                    height: '100%',
+                    width: 32,
+                    height: 32,
+                    minWidth: 32,
+                    background: '#ffffff',
+                    border: '1px solid var(--border-subtle)',
+                    display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    fontFamily: 'var(--font-mono)',
-                    fontWeight: 800,
-                    fontSize: 12,
-                    color: 'var(--accent)',
-                    background: 'var(--bg-tertiary)',
+                    position: 'relative',
+                    overflow: 'hidden',
+                    padding: 2,
                   }}>
-                    {company.name.slice(0, 1).toUpperCase()}
+                    <img
+                      src={logo}
+                      alt={company.name}
+                      style={{
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'contain',
+                      }}
+                      onError={(e) => {
+                        (e.target as HTMLElement).style.display = 'none';
+                        const fallback = (e.target as HTMLElement).nextElementSibling as HTMLElement;
+                        if (fallback) fallback.style.display = 'flex';
+                      }}
+                      loading="lazy"
+                    />
+                    <div style={{
+                      display: 'none',
+                      width: '100%',
+                      height: '100%',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontFamily: 'var(--font-mono)',
+                      fontWeight: 800,
+                      fontSize: 12,
+                      color: 'var(--accent)',
+                      background: 'var(--bg-tertiary)',
+                    }}>
+                      {company.name.slice(0, 1).toUpperCase()}
+                    </div>
+                  </div>
+
+                  <div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                      <span style={{ fontWeight: 700, fontSize: 12.5, color: 'var(--text-primary)', letterSpacing: '0.02em' }}>
+                        {company.name}
+                      </span>
+                      <span className="badge badge-gray" style={{ fontSize: 8, padding: '1px 4px' }}>
+                        {company.source_type}
+                      </span>
+                    </div>
+                    <div style={{ fontSize: 10, fontFamily: 'var(--font-mono)', color: 'var(--text-muted)', marginTop: 2 }}>
+                      {company.industry || 'Tech'} · {company.job_count} LIVE OPENINGS
+                    </div>
                   </div>
                 </div>
 
-                <div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                    <span style={{ fontWeight: 700, fontSize: 12.5, color: 'var(--text-primary)', letterSpacing: '0.02em' }}>
-                      {company.name}
-                    </span>
-                    <span className="badge badge-gray" style={{ fontSize: 8, padding: '1px 4px' }}>
-                      {company.source_type}
-                    </span>
-                  </div>
-                  <div style={{ fontSize: 10, fontFamily: 'var(--font-mono)', color: 'var(--text-muted)', marginTop: 2 }}>
-                    {company.industry || 'Tech'} · {company.job_count} LIVE OPENINGS
-                  </div>
-                </div>
-              </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  {company.careers_url && (
+                    <a
+                      href={company.careers_url}
+                      target="_blank"
+                      rel="noreferrer"
+                      title="Official Career Page"
+                      style={{ color: 'var(--text-muted)', display: 'inline-flex' }}
+                    >
+                      <ExternalLink size={13} />
+                    </a>
+                  )}
 
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                {company.careers_url && (
-                  <a
-                    href={company.careers_url}
-                    target="_blank"
-                    rel="noreferrer"
-                    title="Official Career Page"
-                    style={{ color: 'var(--text-muted)', display: 'inline-flex' }}
+                  <button
+                    onClick={() => onToggleCompany(company.id)}
+                    className={`filter-pill ${company.is_active ? 'active' : ''}`}
+                    style={{ fontSize: 9, padding: '3px 8px' }}
                   >
-                    <ExternalLink size={13} />
-                  </a>
-                )}
-
-                <button
-                  onClick={() => onToggleCompany(company.id)}
-                  className={`filter-pill ${company.is_active ? 'active' : ''}`}
-                  style={{ fontSize: 9, padding: '3px 8px' }}
-                >
-                  {company.is_active ? 'TRACKING' : 'MUTED'}
-                </button>
+                    {company.is_active ? 'TRACKING' : 'MUTED'}
+                  </button>
+                </div>
               </div>
-            </div>
-          );
-        })}
+            );
+          })
+        )}
       </div>
     </div>
   );

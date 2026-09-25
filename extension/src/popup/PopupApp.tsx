@@ -44,8 +44,8 @@ export const PopupApp: React.FC = () => {
     applyTheme(nextTheme);
   };
 
-  // Load jobs based on current active role filter
-  const fetchJobsForFilter = useCallback(async (roleFilter: string) => {
+  // Load jobs based on current active role filter and optional search query
+  const fetchJobsForFilter = useCallback(async (roleFilter: string, searchQuery?: string) => {
     setLoading(true);
     try {
       const isMatchingOnly = roleFilter === 'all_matching';
@@ -54,6 +54,7 @@ export const PopupApp: React.FC = () => {
       const jobsData = await api.getJobs({
         role: specificRole,
         only_matching: isMatchingOnly,
+        search: searchQuery?.trim() || undefined,
         limit: 150,
       });
 
@@ -90,12 +91,14 @@ export const PopupApp: React.FC = () => {
     loadInitialData();
   }, [loadInitialData]);
 
-  // Fetch jobs whenever role filter changes
+  // Fetch jobs whenever role filter or search query changes (debounced 250ms)
   useEffect(() => {
-    if (activeTab === 'feed') {
-      fetchJobsForFilter(activeRoleFilter);
-    }
-  }, [activeTab, activeRoleFilter, fetchJobsForFilter]);
+    if (activeTab !== 'feed') return;
+    const timer = setTimeout(() => {
+      fetchJobsForFilter(activeRoleFilter, filterSearch);
+    }, 250);
+    return () => clearTimeout(timer);
+  }, [activeTab, activeRoleFilter, filterSearch, fetchJobsForFilter]);
 
   const handleSync = async () => {
     setIsSyncing(true);
