@@ -1,8 +1,8 @@
 import { Job, JobsResponse, Company, Preferences, RadarStats, NotificationItem } from '../types';
 
 const BASE_URLS = [
-  'https://api.getcatchly.com',
   'https://jobly-yd6l.onrender.com',
+  'https://api.getcatchly.com',
   'http://127.0.0.1:8000',
   'http://localhost:8000',
 ];
@@ -33,6 +33,10 @@ class ApiClient {
 
   getOnlineStatus(): boolean {
     return this.isOnline;
+  }
+
+  getActiveBaseUrl(): string {
+    return this.activeBaseUrl;
   }
 
   private async safeFetch(endpoint: string, options?: RequestInit): Promise<Response | null> {

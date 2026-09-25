@@ -228,8 +228,12 @@ export const OptionsApp: React.FC = () => {
               {isOnline ? (
                 <>
                   <span className="status-dot" style={{ width: 6, height: 6 }}></span>
-                  <span style={{ color: 'var(--green)', fontWeight: 600 }}>LOCAL ENGINE ACTIVE</span>
-                  <span>[127.0.0.1:8000]</span>
+                  <span style={{ color: 'var(--green)', fontWeight: 600 }}>
+                    {api.getActiveBaseUrl().includes('127.0.0.1') || api.getActiveBaseUrl().includes('localhost')
+                      ? 'LOCAL DEV ENGINE ACTIVE'
+                      : 'CLOUD RADAR LIVE'}
+                  </span>
+                  <span>[{api.getActiveBaseUrl().replace('https://', '').replace('http://', '')}]</span>
                 </>
               ) : (
                 <>
