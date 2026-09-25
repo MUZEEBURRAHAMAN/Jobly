@@ -16,15 +16,35 @@ import {
   Clock,
   Calendar,
   MapPin,
+  Sliders,
+  Check,
 } from 'lucide-react';
 import { Job, Preferences } from '../types';
 import { JobCard } from './JobCard';
+
+const AVAILABLE_TARGET_ROLES = [
+  { id: 'product_design', label: 'PRODUCT DESIGN', sub: 'UI/UX, Design Systems, UX Research', icon: Palette },
+  { id: 'frontend_engineering', label: 'FRONTEND ENGINEERING', sub: 'React, TypeScript, Web Platform, Next.js', icon: Code2 },
+  { id: 'product_management', label: 'PRODUCT MANAGEMENT', sub: 'Product Manager, Technical PM, Lead PM', icon: Layers },
+  { id: 'ai_ml', label: 'AI & MACHINE LEARNING', sub: 'ML Engineer, AI Researcher, Applied Scientist, LLMs', icon: Bot },
+  { id: 'fullstack_engineering', label: 'FULLSTACK ENGINEERING', sub: 'Fullstack, Software Engineer, Cloud Services', icon: Zap },
+];
+
+const AVAILABLE_SENIORITIES = [
+  { id: 'intern', label: 'INTERN' },
+  { id: 'junior', label: '0–2Y (JUNIOR)' },
+  { id: 'mid', label: '2–5Y (MID)' },
+  { id: 'senior', label: '5–8Y (SENIOR)' },
+  { id: 'lead', label: '8+Y (LEAD/STAFF)' },
+];
 
 interface RadarFeedProps {
   jobs: Job[];
   loading: boolean;
   preferences?: Preferences | null;
   onToggleSave: (job: Job) => void;
+  onConfigureTargets?: () => void;
+  onSavePreferences?: (prefs: Preferences) => Promise<void>;
   activeRoleFilter: string;
   setActiveRoleFilter: (role: string) => void;
   // Q-3: Lifted filter state props
@@ -44,6 +64,8 @@ export const RadarFeed: React.FC<RadarFeedProps> = ({
   loading,
   preferences,
   onToggleSave,
+  onConfigureTargets,
+  onSavePreferences,
   activeRoleFilter,
   setActiveRoleFilter,
   filterHub: selectedHub, setFilterHub: setSelectedHub,
@@ -56,6 +78,76 @@ export const RadarFeed: React.FC<RadarFeedProps> = ({
   displayLimit, setDisplayLimit,
 }) => {
   const [showFilters, setShowFilters] = useState(false);
+  const [showTargetModal, setShowTargetModal] = useState(false);
+  const [draftRoles, setDraftRoles] = useState<string[]>([]);
+  const [draftSeniorities, setDraftSeniorities] = useState<string[]>([]);
+  const [draftRemoteOnly, setDraftRemoteOnly] = useState<boolean>(false);
+  const [isSavingTargets, setIsSavingTargets] = useState<boolean>(false);
+
+  const currentTargetRoles = useMemo(() => {
+    return preferences?.roles && preferences.roles.length > 0
+      ? preferences.roles
+      : ['product_design', 'frontend_engineering', 'product_management', 'ai_ml', 'fullstack_engineering'];
+  }, [preferences?.roles]);
+
+  const openTargetModal = () => {
+    setDraftRoles(
+      preferences?.roles && preferences.roles.length > 0
+        ? preferences.roles
+        : ['product_design', 'frontend_engineering', 'product_management', 'ai_ml', 'fullstack_engineering']
+    );
+    setDraftSeniorities(
+      preferences?.seniorities && preferences.seniorities.length > 0
+        ? preferences.seniorities
+        : ['intern', 'junior', 'mid', 'senior', 'lead']
+    );
+    setDraftRemoteOnly(preferences?.remote_only ?? false);
+    setShowTargetModal(true);
+  };
+
+  const toggleDraftRole = (roleId: string) => {
+    setDraftRoles((prev) =>
+      prev.includes(roleId) ? prev.filter((r) => r !== roleId) : [...prev, roleId]
+    );
+  };
+
+  const toggleDraftSeniority = (senId: string) => {
+    setDraftSeniorities((prev) =>
+      prev.includes(senId) ? prev.filter((s) => s !== senId) : [...prev, senId]
+    );
+  };
+
+  const handleSaveTargets = async () => {
+    if (onSavePreferences) {
+      setIsSavingTargets(true);
+      try {
+        const basePrefs: Preferences = preferences || {
+          roles: [],
+          seniorities: ['intern', 'junior', 'mid', 'senior', 'lead'],
+          locations: [],
+          remote_only: false,
+          custom_keywords: '',
+          excluded_keywords: '',
+          notify_enabled: true,
+          sync_interval_mins: 30,
+        };
+        await onSavePreferences({
+          ...basePrefs,
+          roles: draftRoles,
+          seniorities: draftSeniorities,
+          remote_only: draftRemoteOnly,
+        });
+        setShowTargetModal(false);
+      } finally {
+        setIsSavingTargets(false);
+      }
+    } else if (onConfigureTargets) {
+      setShowTargetModal(false);
+      onConfigureTargets();
+    } else {
+      setShowTargetModal(false);
+    }
+  };
 
   const roleTabs = [
     { id: 'all_matching', label: 'TARGET MATCHES', icon: Sparkles },
@@ -222,26 +314,52 @@ export const RadarFeed: React.FC<RadarFeedProps> = ({
           {roleTabs.map((tab) => {
             const Icon = tab.icon;
             const isActive = activeRoleFilter === tab.id;
+            const isTargetTab = tab.id === 'all_matching';
             return (
-              <button
-                key={tab.id}
-                onClick={() => setActiveRoleFilter(tab.id)}
-                className={`filter-pill ${isActive ? 'active' : ''}`}
-                style={{
-                  fontFamily: 'var(--font-mono)',
-                  fontSize: 10,
-                  padding: '4px 10px',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: 5,
-                  whiteSpace: 'nowrap',
-                  cursor: 'pointer',
-                  borderRadius: 2,
-                }}
-              >
-                <Icon size={11} />
-                <span>{tab.label}</span>
-              </button>
+              <div key={tab.id} style={{ display: 'inline-flex', alignItems: 'center' }}>
+                <button
+                  onClick={() => setActiveRoleFilter(tab.id)}
+                  className={`filter-pill ${isActive ? 'active' : ''}`}
+                  style={{
+                    fontFamily: 'var(--font-mono)',
+                    fontSize: 10,
+                    padding: '4px 10px',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 5,
+                    whiteSpace: 'nowrap',
+                    cursor: 'pointer',
+                    borderRadius: isTargetTab && onConfigureTargets ? '2px 0 0 2px' : 2,
+                  }}
+                >
+                  <Icon size={11} />
+                  <span>{tab.label}</span>
+                </button>
+                {isTargetTab && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      openTargetModal();
+                    }}
+                    title="Configure Target Roles & Matching Rules"
+                    style={{
+                      background: isActive ? 'var(--accent)' : 'var(--bg-tertiary)',
+                      color: isActive ? '#ffffff' : 'var(--text-muted)',
+                      border: '1px solid var(--border-subtle)',
+                      borderLeft: 'none',
+                      padding: '4px 6px',
+                      cursor: 'pointer',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      height: 24,
+                      borderRadius: '0 2px 2px 0',
+                    }}
+                  >
+                    <Sliders size={10} />
+                  </button>
+                )}
+              </div>
             );
           })}
         </div>
@@ -407,12 +525,12 @@ export const RadarFeed: React.FC<RadarFeedProps> = ({
         )}
       </div>
 
-      {/* Subheader: Results count */}
+      {/* Subheader: Results count & Target Roles indicator */}
       <div style={{
-        padding: '6px 16px',
+        padding: '8px 16px',
         display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
+        flexDirection: 'column',
+        gap: 6,
         fontSize: 10,
         fontFamily: 'var(--font-mono)',
         color: 'var(--text-muted)',
@@ -420,11 +538,80 @@ export const RadarFeed: React.FC<RadarFeedProps> = ({
         background: 'var(--bg-primary)',
         width: '100%',
       }}>
-        <span>SHOWING {filteredJobs.length} VERIFIED POSITIONS</span>
-        {activeFilterCount > 0 && (
-          <span style={{ color: 'var(--accent)' }}>
-            {activeFilterCount} ACTIVE FILTER{activeFilterCount > 1 ? 'S' : ''}
-          </span>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <span style={{ fontWeight: 700, letterSpacing: '0.04em' }}>
+              {activeRoleFilter === 'all_matching' ? `TARGET MATCHES (${filteredJobs.length})` : `SHOWING ${filteredJobs.length} POSITIONS`}
+            </span>
+            {activeRoleFilter === 'all_matching' && (
+              <button
+                onClick={openTargetModal}
+                style={{
+                  background: 'var(--accent)',
+                  color: '#ffffff',
+                  border: 'none',
+                  fontSize: 9,
+                  fontWeight: 700,
+                  fontFamily: 'var(--font-mono)',
+                  letterSpacing: '0.04em',
+                  padding: '2px 7px',
+                  borderRadius: 2,
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 4,
+                }}
+              >
+                <Sliders size={9} />
+                <span>EDIT TARGETS</span>
+              </button>
+            )}
+          </div>
+          {activeFilterCount > 0 && (
+            <span style={{ color: 'var(--accent)' }}>
+              {activeFilterCount} ACTIVE FILTER{activeFilterCount > 1 ? 'S' : ''}
+            </span>
+          )}
+        </div>
+
+        {/* Target role tags indicator when on target matches tab */}
+        {activeRoleFilter === 'all_matching' && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 4, flexWrap: 'wrap' }}>
+            <span style={{ color: 'var(--text-muted)', fontSize: 9 }}>MATCHING:</span>
+            {currentTargetRoles.length === 0 ? (
+              <span
+                style={{ color: 'var(--accent)', fontSize: 9, cursor: 'pointer', fontWeight: 700 }}
+                onClick={openTargetModal}
+              >
+                NO ROLES SET — CLICK TO CONFIGURE
+              </span>
+            ) : (
+              currentTargetRoles.map((r) => {
+                const matchedDef = AVAILABLE_TARGET_ROLES.find((d) => d.id === r);
+                const label = matchedDef
+                  ? matchedDef.label.replace(' ENGINEERING', '').replace(' & MACHINE LEARNING', '/ML')
+                  : r;
+                return (
+                  <span
+                    key={r}
+                    onClick={openTargetModal}
+                    style={{
+                      background: 'var(--bg-tertiary)',
+                      border: '1px solid var(--border-subtle)',
+                      padding: '1px 5px',
+                      fontSize: 9,
+                      borderRadius: 2,
+                      color: 'var(--text-secondary)',
+                      cursor: 'pointer',
+                    }}
+                    title="Click to edit target roles"
+                  >
+                    {label}
+                  </span>
+                );
+              })
+            )}
+          </div>
         )}
       </div>
 
@@ -444,18 +631,40 @@ export const RadarFeed: React.FC<RadarFeedProps> = ({
           }}>
             <Sparkles size={24} color="var(--accent)" style={{ margin: '0 auto 10px', display: 'block' }} />
             <h3 style={{ fontSize: 13, fontWeight: 700, letterSpacing: '0.04em', textTransform: 'uppercase' }}>
-              No Positions Match Current Filters
+              {activeRoleFilter === 'all_matching' ? 'No Positions Match Target Rules' : 'No Positions Match Current Filters'}
             </h3>
-            <p style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 4, marginBottom: 12 }}>
-              Try broadening your location hub, budget tier, or search keywords.
+            <p style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 4, marginBottom: 14 }}>
+              {activeRoleFilter === 'all_matching'
+                ? 'Your target radar is currently scanning for your configured roles and seniority rules. Adjust your target roles or broaden your filters.'
+                : 'Try broadening your location hub, budget tier, or search keywords.'}
             </p>
-            <button
-              onClick={resetFilters}
-              className="btn btn-secondary btn-sm"
-              style={{ margin: '0 auto' }}
-            >
-              RESET ALL FILTERS
-            </button>
+            <div style={{ display: 'flex', gap: 8, justifyContent: 'center', flexWrap: 'wrap' }}>
+              <button
+                onClick={openTargetModal}
+                className="btn btn-primary btn-sm"
+                style={{ gap: 6, fontFamily: 'var(--font-mono)' }}
+              >
+                <Sliders size={12} />
+                <span>SET TARGET ROLES</span>
+              </button>
+              <button
+                onClick={() => {
+                  resetFilters();
+                  setActiveRoleFilter('all');
+                }}
+                className="btn btn-secondary btn-sm"
+              >
+                VIEW ALL 20,000+ JOBS
+              </button>
+              {activeFilterCount > 0 && (
+                <button
+                  onClick={resetFilters}
+                  className="btn btn-secondary btn-sm"
+                >
+                  RESET FILTERS
+                </button>
+              )}
+            </div>
           </div>
         ) : (
           <>
@@ -477,6 +686,221 @@ export const RadarFeed: React.FC<RadarFeedProps> = ({
           </>
         )}
       </div>
+
+      {/* Target Settings Modal / Drawer */}
+      {showTargetModal && (
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            background: 'rgba(0, 0, 0, 0.75)',
+            backdropFilter: 'blur(3px)',
+            zIndex: 9999,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: 12,
+          }}
+          onClick={() => setShowTargetModal(false)}
+        >
+          <div
+            style={{
+              background: 'var(--bg-primary)',
+              border: '1px solid var(--border-strong)',
+              width: '100%',
+              maxWidth: 360,
+              maxHeight: '90vh',
+              overflowY: 'auto',
+              padding: 16,
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 14,
+              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.45)',
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid var(--border-subtle)', paddingBottom: 10 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                <Sparkles size={14} color="var(--accent)" />
+                <span style={{ fontSize: 12, fontWeight: 700, letterSpacing: '0.04em', fontFamily: 'var(--font-mono)' }}>
+                  TARGET ROLES & RULES
+                </span>
+              </div>
+              <button
+                onClick={() => setShowTargetModal(false)}
+                style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: 2 }}
+              >
+                <X size={15} />
+              </button>
+            </div>
+
+            <p style={{ fontSize: 11, color: 'var(--text-muted)', lineHeight: 1.4, margin: 0 }}>
+              Select which disciplines Jobly matches on your radar. Jobs matching these roles will appear under <strong>TARGET MATCHES</strong>.
+            </p>
+
+            {/* Target Disciplines */}
+            <div>
+              <span className="eyebrow" style={{ fontSize: 10, display: 'block', marginBottom: 8 }}>
+                TARGET DISCIPLINES ({draftRoles.length} SELECTED)
+              </span>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                {AVAILABLE_TARGET_ROLES.map((role) => {
+                  const isChecked = draftRoles.includes(role.id);
+                  const Icon = role.icon;
+                  return (
+                    <div
+                      key={role.id}
+                      onClick={() => toggleDraftRole(role.id)}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        padding: '8px 10px',
+                        background: isChecked ? 'var(--bg-tertiary)' : 'var(--bg-secondary)',
+                        border: isChecked ? '1px solid var(--accent)' : '1px solid var(--border-subtle)',
+                        cursor: 'pointer',
+                        transition: 'all var(--t-fast) var(--ease)',
+                        borderRadius: 2,
+                      }}
+                    >
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                        <Icon size={13} color={isChecked ? 'var(--accent)' : 'var(--text-muted)'} />
+                        <div>
+                          <div style={{ fontSize: 11, fontWeight: 700, color: isChecked ? 'var(--text-primary)' : 'var(--text-secondary)' }}>
+                            {role.label}
+                          </div>
+                          <div style={{ fontSize: 9, color: 'var(--text-muted)', marginTop: 1 }}>
+                            {role.sub}
+                          </div>
+                        </div>
+                      </div>
+                      <div style={{
+                        width: 16,
+                        height: 16,
+                        border: isChecked ? '1px solid var(--accent)' : '1px solid var(--border-strong)',
+                        background: isChecked ? 'var(--accent)' : 'transparent',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        borderRadius: 2,
+                        flexShrink: 0,
+                      }}>
+                        {isChecked && <Check size={11} color="#ffffff" />}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Seniority */}
+            <div>
+              <span className="eyebrow" style={{ fontSize: 10, display: 'block', marginBottom: 8 }}>
+                EXPERIENCE LEVEL
+              </span>
+              <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
+                {AVAILABLE_SENIORITIES.map((sen) => {
+                  const isChecked = draftSeniorities.includes(sen.id);
+                  return (
+                    <button
+                      key={sen.id}
+                      type="button"
+                      onClick={() => toggleDraftSeniority(sen.id)}
+                      style={{
+                        padding: '4px 8px',
+                        fontSize: 9,
+                        fontFamily: 'var(--font-mono)',
+                        fontWeight: isChecked ? 700 : 400,
+                        background: isChecked ? 'var(--accent)' : 'var(--bg-tertiary)',
+                        color: isChecked ? '#ffffff' : 'var(--text-secondary)',
+                        border: '1px solid ' + (isChecked ? 'var(--accent)' : 'var(--border-subtle)'),
+                        cursor: 'pointer',
+                        borderRadius: 2,
+                      }}
+                    >
+                      {sen.label}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Remote Only */}
+            <div
+              onClick={() => setDraftRemoteOnly(!draftRemoteOnly)}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                padding: '8px 10px',
+                background: 'var(--bg-secondary)',
+                border: '1px solid var(--border-subtle)',
+                cursor: 'pointer',
+                borderRadius: 2,
+              }}
+            >
+              <div>
+                <div style={{ fontSize: 11, fontWeight: 700 }}>REMOTE ONLY</div>
+                <div style={{ fontSize: 9, color: 'var(--text-muted)' }}>Only match 100% remote positions</div>
+              </div>
+              <div style={{
+                width: 16,
+                height: 16,
+                border: draftRemoteOnly ? '1px solid var(--accent)' : '1px solid var(--border-strong)',
+                background: draftRemoteOnly ? 'var(--accent)' : 'transparent',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                borderRadius: 2,
+              }}>
+                {draftRemoteOnly && <Check size={11} color="#ffffff" />}
+              </div>
+            </div>
+
+            {/* Save Button */}
+            <button
+              onClick={handleSaveTargets}
+              disabled={isSavingTargets}
+              className="btn btn-primary"
+              style={{
+                width: '100%',
+                padding: '8px',
+                fontSize: 11,
+                fontFamily: 'var(--font-mono)',
+                fontWeight: 700,
+                justifyContent: 'center',
+                gap: 6,
+              }}
+            >
+              {isSavingTargets ? 'SAVING TARGETS...' : 'SAVE & UPDATE RADAR'}
+            </button>
+
+            {/* Advanced Rules link */}
+            {onConfigureTargets && (
+              <button
+                type="button"
+                onClick={() => {
+                  setShowTargetModal(false);
+                  onConfigureTargets();
+                }}
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  color: 'var(--accent)',
+                  fontSize: 10,
+                  fontFamily: 'var(--font-mono)',
+                  cursor: 'pointer',
+                  textAlign: 'center',
+                  padding: '2px 0',
+                }}
+              >
+                OPEN FULL RULES TAB (KEYWORDS & EXCLUSIONS) →
+              </button>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

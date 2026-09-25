@@ -382,6 +382,8 @@ export const OptionsApp: React.FC = () => {
                   loading={loading}
                   preferences={preferences}
                   onToggleSave={handleToggleSave}
+                  onConfigureTargets={() => setActiveTab('rules')}
+                  onSavePreferences={handleSavePreferences}
                   activeRoleFilter={selectedRole}
                   setActiveRoleFilter={(r) => { setSelectedRole(r); setDisplayLimit(30); }}
                   // Q-3: lifted filter state passed as props

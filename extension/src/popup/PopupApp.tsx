@@ -190,7 +190,10 @@ export const PopupApp: React.FC = () => {
           <RadarFeed
             jobs={jobs}
             loading={loading}
+            preferences={preferences}
             onToggleSave={handleToggleSave}
+            onConfigureTargets={() => setActiveTab('rules')}
+            onSavePreferences={handleSavePreferences}
             activeRoleFilter={activeRoleFilter}
             setActiveRoleFilter={(r) => { setActiveRoleFilter(r); setDisplayLimit(30); }}
             filterHub={filterHub} setFilterHub={setFilterHub}

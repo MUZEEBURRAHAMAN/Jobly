@@ -1,6 +1,11 @@
 import { Job, JobsResponse, Company, Preferences, RadarStats, NotificationItem } from '../types';
 
-const BASE_URLS = ['https://api.getcatchly.com', 'http://127.0.0.1:8000', 'http://localhost:8000'];
+const BASE_URLS = [
+  'https://api.getcatchly.com',
+  'https://jobly-yd6l.onrender.com',
+  'http://127.0.0.1:8000',
+  'http://localhost:8000',
+];
 
 class ApiClient {
   private activeBaseUrl: string = BASE_URLS[0];
@@ -10,7 +15,7 @@ class ApiClient {
     for (const url of BASE_URLS) {
       try {
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 1200);
+        const timeoutId = setTimeout(() => controller.abort(), 1800);
         const res = await fetch(`${url}/health`, { signal: controller.signal });
         clearTimeout(timeoutId);
         if (res.ok) {
@@ -31,23 +36,28 @@ class ApiClient {
   }
 
   private async safeFetch(endpoint: string, options?: RequestInit): Promise<Response | null> {
-    try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 4000);
-      const res = await fetch(`${this.activeBaseUrl}${endpoint}`, {
-        ...options,
-        signal: controller.signal,
-      });
-      clearTimeout(timeoutId);
-      if (res.ok) {
-        this.isOnline = true;
-        return res;
+    // Try currently active base URL first, then failover through remaining candidates
+    const urlsToTry = [this.activeBaseUrl, ...BASE_URLS.filter((u) => u !== this.activeBaseUrl)];
+    for (const baseUrl of urlsToTry) {
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 4000);
+        const res = await fetch(`${baseUrl}${endpoint}`, {
+          ...options,
+          signal: controller.signal,
+        });
+        clearTimeout(timeoutId);
+        if (res.ok) {
+          this.activeBaseUrl = baseUrl;
+          this.isOnline = true;
+          return res;
+        }
+      } catch {
+        // Continue to next candidate
       }
-      return null;
-    } catch {
-      this.isOnline = false;
-      return null;
     }
+    this.isOnline = false;
+    return null;
   }
 
   async getPreferences(): Promise<Preferences> {

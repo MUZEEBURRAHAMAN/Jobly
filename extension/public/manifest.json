@@ -10,6 +10,7 @@
   ],
   "host_permissions": [
     "https://api.getcatchly.com/*",
+    "https://jobly-yd6l.onrender.com/*",
     "http://127.0.0.1:8000/*",
     "http://localhost:8000/*"
   ],
@@ -28,6 +29,6 @@
     "128": "icons/icon-128.png"
   },
   "content_security_policy": {
-    "extension_pages": "default-src 'self'; img-src 'self' https://t2.gstatic.com data:; connect-src https://api.getcatchly.com http://127.0.0.1:8000 http://localhost:8000; script-src 'self'"
+    "extension_pages": "default-src 'self'; img-src 'self' https://t2.gstatic.com data:; connect-src https://api.getcatchly.com https://jobly-yd6l.onrender.com http://127.0.0.1:8000 http://localhost:8000; script-src 'self'"
   }
 }
