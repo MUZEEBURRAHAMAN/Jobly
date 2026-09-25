@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: jobly
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    plan: free            # 512MB RAM — optimised for by workers=1 + batch sync
+    healthCheckPath: /health
+    envVars:
+      - key: PYTHONDONTWRITEBYTECODE
+        value: "1"
+      - key: PYTHONUNBUFFERED
+        value: "1"
+      - key: DATABASE_PATH
+        value: /data/hiring_radar.db
+    disk:
+      name: jobly-db
+      mountPath: /data
+      sizeGB: 1           # Persistent disk so DB survives restarts
