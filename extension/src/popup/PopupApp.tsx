@@ -101,18 +101,37 @@ export const PopupApp: React.FC = () => {
   }, [activeTab, activeRoleFilter, filterSearch, fetchJobsForFilter]);
 
   const handleSync = async () => {
+    if (isSyncing) return;
     setIsSyncing(true);
+    const startTime = Date.now();
     try {
-      await api.triggerSync();
+      // 1. Kick off background ATS sync on backend asynchronously
+      api.triggerSync().catch(() => {});
+
+      // 2. Notify background service worker safely
       if (typeof chrome !== 'undefined' && chrome.runtime?.sendMessage) {
-        chrome.runtime.sendMessage({ type: 'TRIGGER_BACKGROUND_CHECK' });
+        try {
+          chrome.runtime.sendMessage({ type: 'TRIGGER_BACKGROUND_CHECK' }, () => {
+            if (chrome.runtime?.lastError) {}
+          });
+        } catch {}
       }
-      await loadInitialData();
-      await fetchJobsForFilter(activeRoleFilter);
+
+      // 3. Immediately reload all radar data & current filtered jobs stream
+      await Promise.all([
+        loadInitialData(),
+        fetchJobsForFilter(activeRoleFilter, filterSearch),
+      ]);
     } catch {
-      setIsOnline(false);
+      // Keep current health status
     } finally {
-      setIsSyncing(false);
+      // Ensure at least 500ms spin feedback for clear visual confirmation
+      const elapsed = Date.now() - startTime;
+      if (elapsed < 500) {
+        setTimeout(() => setIsSyncing(false), 500 - elapsed);
+      } else {
+        setIsSyncing(false);
+      }
     }
   };
 

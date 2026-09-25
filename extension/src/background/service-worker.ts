@@ -1,5 +1,10 @@
-// S-4 FIX: Mirrors the fallback logic in ApiClient — checks production api.getcatchly.com first, then local dev
-const API_BASE_CANDIDATES = ['https://api.getcatchly.com', 'http://127.0.0.1:8000', 'http://localhost:8000'];
+// Mirrors the fallback logic in ApiClient — checks production backend first, then local dev
+const API_BASE_CANDIDATES = [
+  'https://jobly-yd6l.onrender.com',
+  'https://api.getcatchly.com',
+  'http://127.0.0.1:8000',
+  'http://localhost:8000',
+];
 let activeApiBase = API_BASE_CANDIDATES[0];
 
 async function resolveApiBase(): Promise<string | null> {

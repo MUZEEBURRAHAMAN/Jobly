@@ -103,6 +103,7 @@ export const Header: React.FC<HeaderProps> = ({
       <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
         {/* Dark/Light Theme Toggle */}
         <button
+          type="button"
           onClick={onToggleTheme}
           className="btn-icon"
           title={`Switch to ${theme === 'dark' ? 'Light' : 'Dark'} mode`}
@@ -111,12 +112,14 @@ export const Header: React.FC<HeaderProps> = ({
           {theme === 'dark' ? <Sun size={13} /> : <Moon size={13} />}
         </button>
 
-        {/* Sync ATS Boards */}
+        {/* Sync ATS Boards & Refresh Feed */}
         <button
+          type="button"
           onClick={onSync}
           disabled={isSyncing}
           className="btn-icon"
-          title="Sync ATS Boards"
+          title={isSyncing ? 'Refreshing Radar...' : 'Refresh Radar & Sync ATS Boards'}
+          aria-label="Refresh Radar & Sync ATS Boards"
           style={{ cursor: isSyncing ? 'not-allowed' : 'pointer' }}
         >
           <RefreshCw
@@ -131,9 +134,11 @@ export const Header: React.FC<HeaderProps> = ({
         {/* Full Screen Dashboard */}
         {openOptions && (
           <button
+            type="button"
             onClick={openOptions}
             className="btn-icon"
             title="Open Full Screen Dashboard"
+            aria-label="Open Full Screen Dashboard"
           >
             <ExternalLink size={13} />
           </button>

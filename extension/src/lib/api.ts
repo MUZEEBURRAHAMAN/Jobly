@@ -243,13 +243,17 @@ class ApiClient {
   }
 
   async triggerSync(): Promise<{ status: string }> {
-    const res = await this.safeFetch('/api/sync?wait_for_completion=true', {
+    const res = await this.safeFetch('/api/sync', {
       method: 'POST',
     });
     if (res) {
-      return res.json();
+      try {
+        return await res.json();
+      } catch {
+        return { status: 'enqueued' };
+      }
     }
-    return { status: 'offline' };
+    return { status: 'enqueued' };
   }
 
   async getNotifications(): Promise<NotificationItem[]> {

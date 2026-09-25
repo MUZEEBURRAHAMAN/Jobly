@@ -110,17 +110,28 @@ export const OptionsApp: React.FC = () => {
   }, [activeTab, selectedRole, filterSearch]);
 
   const handleSync = async () => {
+    if (isSyncing) return;
     setIsSyncing(true);
+    const startTime = Date.now();
     try {
-      await api.triggerSync();
+      api.triggerSync().catch(() => {});
       if (typeof chrome !== 'undefined' && chrome.runtime?.sendMessage) {
-        chrome.runtime.sendMessage({ type: 'TRIGGER_BACKGROUND_CHECK' });
+        try {
+          chrome.runtime.sendMessage({ type: 'TRIGGER_BACKGROUND_CHECK' }, () => {
+            if (chrome.runtime?.lastError) {}
+          });
+        } catch {}
       }
       await loadData();
     } catch {
-      setIsOnline(false);
+      // Keep online status
     } finally {
-      setIsSyncing(false);
+      const elapsed = Date.now() - startTime;
+      if (elapsed < 500) {
+        setTimeout(() => setIsSyncing(false), 500 - elapsed);
+      } else {
+        setIsSyncing(false);
+      }
     }
   };
 
