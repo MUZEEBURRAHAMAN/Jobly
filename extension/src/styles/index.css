@@ -1,0 +1,450 @@
+@import url('https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
+/* ==========================================================================
+   MUZEEB PORTFOLIO DESIGN SYSTEM (MZ / DS)
+   Editorial Brutalist with Warm Neutrals, Sharp Geometry (Zero Radius)
+   Both Light and Dark Theme Support
+   ========================================================================== */
+
+:root,
+[data-theme="dark"] {
+  color-scheme: dark;
+
+  /* Muzeeb Dark Palette */
+  --ds-bg: #0f0f0f;
+  --ds-surface: #1a1a1a;
+  --ds-surface-2: #141414;
+  --ds-surface-3: #161616;
+  --ds-text: #f4f2ed;
+  --ds-text-2: #cfcfcd;
+  --ds-muted: #8a8a8a;
+  --ds-border: #242424;
+  --ds-border-2: #2a2a2a;
+  --ds-accent: #e8602a;
+  --ds-accent-soft: #2e1810;
+  --ds-code-bg: #1a1a1a;
+  --ds-nav-bg: rgba(15, 15, 15, 0.95);
+  --ds-swatch-border: rgba(255, 255, 255, 0.08);
+  --ds-tag-bg: #242424;
+  --ds-tag-text: #cfcfcd;
+  --ds-green: #4ade80;
+  --ds-green-soft: #123321;
+  --ds-amber: #f5b84f;
+  --ds-amber-soft: rgba(245, 184, 79, 0.15);
+
+  /* Unified variable aliases */
+  --bg-primary: var(--ds-bg);
+  --bg-secondary: var(--ds-surface-2);
+  --bg-tertiary: var(--ds-surface);
+  --bg-card: var(--ds-surface-3);
+  --bg-card-hover: #1c1c1c;
+
+  --border-subtle: var(--ds-border);
+  --border-strong: var(--ds-border-2);
+  --border-active: var(--ds-accent);
+
+  --text-primary: var(--ds-text);
+  --text-secondary: var(--ds-text-2);
+  --text-muted: var(--ds-muted);
+
+  --accent: var(--ds-accent);
+  --accent-soft: var(--ds-accent-soft);
+  --accent-blue: var(--ds-accent);
+  --green: var(--ds-green);
+  --green-soft: var(--ds-green-soft);
+  --semantic-success: var(--ds-green);
+  --amber-400: var(--ds-amber);
+}
+
+[data-theme="light"] {
+  color-scheme: light;
+
+  /* Muzeeb Light Palette */
+  --ds-bg: #faf9f7;
+  --ds-surface: #ffffff;
+  --ds-surface-2: #f1f0ec;
+  --ds-surface-3: #f4f4f2;
+  --ds-text: #17170f;
+  --ds-text-2: #3a3a38;
+  --ds-muted: #6a6a66;
+  --ds-border: #e6e4df;
+  --ds-border-2: #dcdad4;
+  --ds-accent: #e8602a;
+  --ds-accent-soft: #fef0ea;
+  --ds-code-bg: #f4f4f2;
+  --ds-nav-bg: rgba(250, 249, 247, 0.95);
+  --ds-swatch-border: rgba(0, 0, 0, 0.08);
+  --ds-tag-bg: #f1f0ec;
+  --ds-tag-text: #3a3a38;
+  --ds-green: #22c55e;
+  --ds-green-soft: #e9f6ef;
+  --ds-amber: #F5A623;
+  --ds-amber-soft: rgba(245, 166, 35, 0.15);
+
+  /* Unified variable aliases */
+  --bg-primary: var(--ds-bg);
+  --bg-secondary: var(--ds-surface-2);
+  --bg-tertiary: var(--ds-surface);
+  --bg-card: var(--ds-surface);
+  --bg-card-hover: var(--ds-surface-3);
+
+  --border-subtle: var(--ds-border);
+  --border-strong: var(--ds-border-2);
+  --border-active: var(--ds-accent);
+
+  --text-primary: var(--ds-text);
+  --text-secondary: var(--ds-text-2);
+  --text-muted: var(--ds-muted);
+
+  --accent: var(--ds-accent);
+  --accent-soft: var(--ds-accent-soft);
+  --accent-blue: var(--ds-accent);
+  --green: var(--ds-green);
+  --green-soft: var(--ds-green-soft);
+  --semantic-success: var(--ds-green);
+  --amber-400: var(--ds-amber);
+}
+
+/* ==========================================================================
+   GLOBAL DESIGN TOKENS
+   ========================================================================== */
+
+:root {
+  /* Typography */
+  --font-sans: 'Archivo', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  /* Zero-Radius Brutalist System (Enforced) */
+  --radius-none: 0px;
+  --radius-sm: 0px;
+  --radius-md: 0px;
+  --radius-lg: 0px;
+  --radius-full: 9999px; /* Status indicator dots only */
+
+  /* Motion */
+  --t-fast: 150ms;
+  --t-base: 250ms;
+  --t-slow: 400ms;
+  --ease: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  border-radius: 0px;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  line-height: 1.55;
+  transition: background-color var(--t-base) var(--ease), color var(--t-base) var(--ease);
+}
+
+/* Scrollbars */
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-primary);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border-subtle);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}
+
+/* ==========================================================================
+   BUTTONS — EDITORIAL BRUTALIST (ZERO RADIUS)
+   ========================================================================== */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  padding: 8px 16px;
+  border-radius: 0px !important;
+  cursor: pointer;
+  transition: transform var(--t-fast) var(--ease), opacity var(--t-fast);
+  border: 1px solid transparent;
+  outline: none;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+}
+
+.btn:active {
+  transform: translateY(0);
+}
+
+/* Primary Button (Inverted text / ground) */
+.btn-primary {
+  background: var(--text-primary);
+  color: var(--bg-primary);
+  border: 1px solid var(--text-primary);
+}
+.btn-primary:hover {
+  opacity: 0.92;
+}
+
+/* Accent Button (Muzeeb Orange #e8602a) */
+.btn-accent {
+  background: var(--accent);
+  color: #ffffff;
+  border: 1px solid var(--accent);
+}
+.btn-accent:hover {
+  opacity: 0.92;
+}
+
+/* Outline / Secondary Button */
+.btn-secondary {
+  background: transparent;
+  color: var(--text-primary);
+  border: 1px solid var(--border-subtle);
+}
+.btn-secondary:hover {
+  border-color: var(--border-strong);
+  background: var(--bg-secondary);
+}
+
+.btn-sm {
+  padding: 5px 12px;
+  font-size: 11px;
+}
+
+/* Brutalist Icon Button */
+.btn-icon {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border-radius: 0px !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-subtle);
+  cursor: pointer;
+  transition: all var(--t-fast) var(--ease);
+}
+.btn-icon:hover {
+  background: var(--bg-tertiary);
+  border-color: var(--border-strong);
+  color: var(--accent);
+}
+
+/* ==========================================================================
+   CARDS & TILES — ZERO RADIUS
+   ========================================================================== */
+
+.radar-card {
+  width: 100%;
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 0px !important;
+  padding: 14px 16px;
+  transition: transform var(--t-fast) var(--ease), background var(--t-fast), border-color var(--t-fast);
+  position: relative;
+}
+
+.radar-card:hover {
+  border-color: var(--border-strong);
+  background: var(--bg-card-hover);
+  transform: translateY(-1px);
+}
+
+/* Match Card Accent Edge */
+.radar-card.featured-card {
+  border-left: 3px solid var(--accent);
+}
+
+/* ==========================================================================
+   BADGES & PILLS — TRACKED UPPERCASE, ZERO RADIUS
+   ========================================================================== */
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 8px;
+  border-radius: 0px !important;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  border: 1px solid var(--border-subtle);
+  background: var(--ds-tag-bg);
+  color: var(--ds-tag-text);
+  white-space: nowrap;
+}
+
+.badge-accent,
+.badge-cyan {
+  background: var(--accent-soft);
+  color: var(--accent);
+  border-color: rgba(232, 96, 42, 0.4);
+}
+
+.badge-green,
+.badge-emerald {
+  background: var(--green-soft);
+  color: var(--green);
+  border-color: rgba(74, 222, 128, 0.35);
+}
+
+.badge-violet,
+.badge-indigo {
+  background: rgba(110, 168, 255, 0.12);
+  color: #6ea8ff;
+  border-color: rgba(110, 168, 255, 0.3);
+}
+
+.badge-orange,
+.badge-amber {
+  background: var(--ds-amber-soft);
+  color: var(--amber-400);
+  border-color: rgba(245, 184, 79, 0.35);
+}
+
+.badge-gray {
+  background: var(--bg-secondary);
+  color: var(--text-muted);
+  border-color: var(--border-subtle);
+}
+
+/* ==========================================================================
+   INPUTS — ZERO RADIUS + ACCENT FOCUS
+   ========================================================================== */
+
+.input-text {
+  width: 100%;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
+  border-radius: 0px !important;
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: 13px;
+  padding: 8px 12px;
+  outline: none;
+  transition: border-color var(--t-fast) var(--ease);
+}
+
+.input-text:focus {
+  border-color: var(--accent);
+}
+
+.input-text::placeholder {
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+/* ==========================================================================
+   FILTER BAR PILL TABS — ZERO RADIUS
+   ========================================================================== */
+
+.filter-pill {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 5px 10px;
+  border-radius: 0px !important;
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-secondary);
+  color: var(--text-muted);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all var(--t-fast) var(--ease);
+}
+
+.filter-pill:hover {
+  color: var(--text-primary);
+  border-color: var(--border-strong);
+}
+
+.filter-pill.active {
+  background: var(--accent-soft);
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+/* Filter Drawer */
+.filter-drawer {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
+  border-radius: 0px !important;
+  padding: 12px 14px;
+  margin-bottom: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Eyebrow Label */
+.eyebrow {
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+/* Status Indicator Dot (Exception: 50% radius allowed for dots) */
+.status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50% !important;
+  background-color: var(--green);
+  display: inline-block;
+}
+
+.status-dot.offline {
+  background-color: var(--amber-400);
+}
+
+/* Radar Pulse Animation */
+@keyframes radar-pulse {
+  0% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(232, 96, 42, 0.7);
+  }
+  70% {
+    transform: scale(1);
+    box-shadow: 0 0 0 6px rgba(232, 96, 42, 0);
+  }
+  100% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(232, 96, 42, 0);
+  }
+}
+
+.radar-ping {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50% !important;
+  background-color: var(--accent);
+  animation: radar-pulse 2s infinite cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.radar-ping.offline {
+  background-color: var(--amber-400);
+  animation: none;
+}

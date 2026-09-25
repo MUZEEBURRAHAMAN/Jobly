@@ -13,7 +13,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(
     title=settings.APP_NAME,
     version=settings.APP_VERSION,
-    description="Local-first, zero-cost job discovery and matching engine for Hiring Radar Chrome Extension",
+    description="Find jobs. Apply smarter — Zero-cost job discovery and matching engine for Jobly Chrome Extension",
     lifespan=lifespan
 )
 
