@@ -1,4 +1,8 @@
+import asyncio
+import gc
 import json
+import logging
+import time
 from datetime import datetime, timezone, timedelta
 from typing import Any
 from fastapi import APIRouter, HTTPException, Query, BackgroundTasks
@@ -10,7 +14,13 @@ from ..schemas import (
 from ..matching import matches_preferences
 from ..ingestion.runner import sync_all_sources
 
+logger = logging.getLogger(__name__)
 router = APIRouter()
+
+# Global lock & cooldown to protect low-RAM instances from concurrent OOM spikes
+_sync_lock = asyncio.Lock()
+_last_sync_timestamp: float = 0.0
+SYNC_COOLDOWN_SECONDS = 180  # 3 minutes cooldown between background syncs
 
 # Q-6 FIX: Column name allowlist — prevents any future f-string SQL injection via column names
 ALLOWED_FILTER_COLUMNS = {
@@ -191,9 +201,14 @@ async def list_jobs(
         count_row = await count_cursor.fetchone()
         total = count_row["count"] if count_row else 0
 
-        # Query items
+        # Query items with explicit projection (omitting raw_json to conserve container memory)
         query = f"""
-            SELECT * FROM jobs
+            SELECT id, company_id, company_name, source_type, external_id,
+                   title, normalized_role, seniority, work_mode, location,
+                   description, application_url, first_seen_at, last_seen_at,
+                   status, is_saved, salary_summary, min_salary, max_salary,
+                   geo_hub, experience_tier
+            FROM jobs
             {where_clause}
             ORDER BY first_seen_at DESC
             LIMIT ? OFFSET ?
@@ -387,11 +402,45 @@ async def toggle_company(company_id: int):
 
 @router.post("/api/sync")
 async def trigger_sync(background_tasks: BackgroundTasks, wait_for_completion: bool = False):
+    global _last_sync_timestamp
+    if _sync_lock.locked():
+        return {
+            "status": "in_progress",
+            "message": "A sync is already in progress. Please wait for completion."
+        }
+
+    now_ts = time.time()
+    # Enforce a 3-minute cooldown between background syncs to avoid overloading low-RAM containers
+    if not wait_for_completion and (now_ts - _last_sync_timestamp < SYNC_COOLDOWN_SECONDS):
+        remaining = int(SYNC_COOLDOWN_SECONDS - (now_ts - _last_sync_timestamp))
+        return {
+            "status": "cached",
+            "message": f"Sync was recently performed. Next background sync available in {remaining}s."
+        }
+
+    async def _safe_sync_worker():
+        global _last_sync_timestamp
+        if _sync_lock.locked():
+            return
+        async with _sync_lock:
+            _last_sync_timestamp = time.time()
+            try:
+                await sync_all_sources()
+            except Exception as e:
+                logger.error(f"[Sync] Error in guarded sync: {e}")
+            finally:
+                gc.collect()
+
     if wait_for_completion:
-        result = await sync_all_sources()
-        return {"status": "completed", "result": result}
+        async with _sync_lock:
+            _last_sync_timestamp = time.time()
+            try:
+                result = await sync_all_sources()
+            finally:
+                gc.collect()
+            return {"status": "completed", "result": result}
     else:
-        background_tasks.add_task(sync_all_sources)
+        background_tasks.add_task(_safe_sync_worker)
         return {"status": "enqueued", "message": "Background sync started"}
 
 @router.get("/api/notifications", response_model=list[NotificationOut])

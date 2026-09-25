@@ -75,6 +75,48 @@ async def get_or_create_company(
     return comp_id
 
 
+def extract_salary_info(source_type: str, raw_data: dict[str, Any] | None, description: str | None) -> tuple[str | None, int | None, int | None]:
+    """Extract salary range and min/max numbers without keeping bulky payloads."""
+    if source_type == 'ashby' and raw_data:
+        try:
+            comp = raw_data.get('compensation') or {}
+            if comp:
+                summary = comp.get('scrapeableCompensationSalarySummary') or comp.get('compensationTierSummary')
+                min_v, max_v = None, None
+                tiers = comp.get('compensationTiers', [])
+                for t in tiers:
+                    for c in t.get('components', []):
+                        if c.get('compensationType') == 'Salary':
+                            min_v = c.get('minValue')
+                            max_v = c.get('maxValue')
+                            break
+                if summary:
+                    summary = summary.replace('• Offers Equity', '• Equity').strip()
+                    return summary, min_v, max_v
+        except Exception:
+            pass
+
+    text = description or ''
+    if text:
+        m = re.search(r'\$([0-9]{2,3}),?([0-9]{3})\s*(?:-|to|–)\s*\$([0-9]{2,3}),?([0-9]{3})', text)
+        if m:
+            v1 = int(m.group(1) + m.group(2))
+            v2 = int(m.group(3) + m.group(4))
+            return f"${v1//1000}K - ${v2//1000}K", v1, v2
+        m_k = re.search(r'\$([0-9]{2,3})[kK]\s*(?:-|to|–)\s*\$([0-9]{2,3})[kK]', text)
+        if m_k:
+            v1 = int(m_k.group(1)) * 1000
+            v2 = int(m_k.group(2)) * 1000
+            return f"${m_k.group(1)}K - ${m_k.group(2)}K", v1, v2
+        m_inr = re.search(r'(?:₹|INR)\s*([0-9]{1,2}(?:\.[0-9]+)?)\s*(?:-|to|–)\s*([0-9]{1,2}(?:\.[0-9]+)?)\s*(?:LPA|Lakhs|L)', text, re.I)
+        if m_inr:
+            v1 = int(float(m_inr.group(1)) * 100000)
+            v2 = int(float(m_inr.group(2)) * 100000)
+            return f"₹{m_inr.group(1)}L - ₹{m_inr.group(2)}L", v1, v2
+
+    return None, None, None
+
+
 async def upsert_job_record(
     db,
     job: NormalizedJob,
@@ -84,7 +126,7 @@ async def upsert_job_record(
     now: str,
     summary: dict[str, Any],
 ) -> None:
-    """Insert or update a job record and trigger notifications if matched."""
+    """Insert or update a job record with minimal memory overhead and fast-path hash check."""
     role = job.normalized_role or detect_role(job.title)
     seniority = job.seniority or detect_seniority(job.title)
     work_mode = job.work_mode or detect_work_mode(job.location, job.title)
@@ -93,7 +135,10 @@ async def upsert_job_record(
     content_hash = calculate_content_hash(
         comp_name, job.title, job.location, job.application_url
     )
-    raw_json = json.dumps(job.raw_data)
+
+    # Bound description length to avoid holding multi-megabyte HTML strings in memory/DB
+    desc = (job.description or "").strip()
+    compact_desc = desc[:1500] if desc else None
 
     check_cur = await db.execute(
         "SELECT id, content_hash FROM jobs WHERE source_type = ? AND external_id = ?",
@@ -102,6 +147,25 @@ async def upsert_job_record(
     existing = await check_cur.fetchone()
 
     if existing:
+        if existing["content_hash"] == content_hash:
+            # FAST-PATH: Job content hasn't changed. Update last_seen_at with minimal I/O & memory.
+            await db.execute(
+                "UPDATE jobs SET last_seen_at = ?, status = 'active' WHERE id = ?",
+                (now, existing["id"])
+            )
+            return
+
+        # Full update only when content actually changed
+        salary_summary, min_sal, max_sal = extract_salary_info(job.source_type, job.raw_data, desc)
+        compact_raw = None
+        if job.raw_data:
+            clean_raw = {
+                k: v for k, v in job.raw_data.items()
+                if k in ("company_logo", "salary", "compensation") and v
+            }
+            if clean_raw:
+                compact_raw = json.dumps(clean_raw)
+
         await db.execute("""
             UPDATE jobs SET
                 title = ?,
@@ -115,6 +179,9 @@ async def upsert_job_record(
                 last_seen_at = ?,
                 status = 'active',
                 raw_json = ?,
+                salary_summary = COALESCE(?, salary_summary),
+                min_salary = COALESCE(?, min_salary),
+                max_salary = COALESCE(?, max_salary),
                 geo_hub = ?,
                 experience_tier = ?
             WHERE id = ?
@@ -124,25 +191,40 @@ async def upsert_job_record(
             seniority,
             work_mode,
             job.location,
-            job.description,
+            compact_desc,
             job.application_url,
             content_hash,
             now,
-            raw_json,
+            compact_raw,
+            salary_summary,
+            min_sal,
+            max_sal,
             geo_hub,
             experience_tier,
             existing["id"]
         ))
         summary["updated_jobs"] += 1
     else:
+        # New job insertion
+        salary_summary, min_sal, max_sal = extract_salary_info(job.source_type, job.raw_data, desc)
+        compact_raw = None
+        if job.raw_data:
+            clean_raw = {
+                k: v for k, v in job.raw_data.items()
+                if k in ("company_logo", "salary", "compensation") and v
+            }
+            if clean_raw:
+                compact_raw = json.dumps(clean_raw)
+
         cursor = await db.execute("""
             INSERT INTO jobs (
                 company_id, company_name, source_type, external_id,
                 title, normalized_role, seniority, work_mode,
                 location, description, application_url, content_hash,
                 first_seen_at, last_seen_at, status, raw_json,
+                salary_summary, min_salary, max_salary,
                 geo_hub, experience_tier
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'active', ?, ?, ?)
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'active', ?, ?, ?, ?, ?, ?)
         """, (
             comp_id,
             comp_name,
@@ -153,12 +235,15 @@ async def upsert_job_record(
             seniority,
             work_mode,
             job.location,
-            job.description,
+            compact_desc,
             job.application_url,
             content_hash,
             now,
             now,
-            raw_json,
+            compact_raw,
+            salary_summary,
+            min_sal,
+            max_sal,
             geo_hub,
             experience_tier
         ))
@@ -222,7 +307,13 @@ async def fetch_company_jobs(
         return company, [], str(e)
 
 
+BATCH_SIZE = 10
+SEMAPHORE_LIMIT = 5
+
+
 async def sync_all_sources(company_id_filter: int | None = None, include_aggregators: bool = True) -> dict[str, Any]:
+    """Low-memory streaming ingestion: processes companies in batches of 10 and commits frequently."""
+    import gc
     now = get_utc_now()
     summary = {
         "timestamp": now,
@@ -235,7 +326,7 @@ async def sync_all_sources(company_id_filter: int | None = None, include_aggrega
     }
 
     async with get_db_connection() as db:
-        # Load user preferences for notifications matching
+        # Load user preferences
         pref_cursor = await db.execute("SELECT * FROM preferences LIMIT 1;")
         pref_row = await pref_cursor.fetchone()
         preferences = {}
@@ -250,13 +341,13 @@ async def sync_all_sources(company_id_filter: int | None = None, include_aggrega
                 "notify_enabled": bool(pref_row["notify_enabled"]),
             }
 
-        # Cache known companies in memory for instant lookups
+        # Cache company names
         cursor = await db.execute("SELECT id, name FROM companies;")
         company_cache: dict[str, int] = {
             row["name"].strip().lower(): row["id"] for row in await cursor.fetchall()
         }
 
-        # 1. Company ATS Sync (only query direct ATS sources)
+        # 1. Company ATS Sync in controlled batches of 10
         query = """
             SELECT * FROM companies
             WHERE is_active = 1
@@ -272,13 +363,23 @@ async def sync_all_sources(company_id_filter: int | None = None, include_aggrega
         companies = [dict(row) for row in await cursor.fetchall()]
         summary["companies_checked"] = len(companies)
 
-        limits = httpx.Limits(max_keepalive_connections=10, max_connections=20)
-        async with httpx.AsyncClient(timeout=30.0, limits=limits) as client:
-            if companies:
-                tasks = [fetch_company_jobs(comp, client) for comp in companies]
-                results = await asyncio.gather(*tasks)
+        limits = httpx.Limits(max_keepalive_connections=5, max_connections=10)
+        async with httpx.AsyncClient(timeout=25.0, limits=limits) as client:
+            sem = asyncio.Semaphore(SEMAPHORE_LIMIT)
 
-                for comp, jobs, err in results:
+            async def _fetch_safe(comp: dict[str, Any]):
+                async with sem:
+                    return await fetch_company_jobs(comp, client)
+
+            for i in range(0, len(companies), BATCH_SIZE):
+                batch = companies[i : i + BATCH_SIZE]
+                tasks = [_fetch_safe(comp) for comp in batch]
+                batch_results = await asyncio.gather(*tasks, return_exceptions=True)
+
+                for item in batch_results:
+                    if isinstance(item, Exception):
+                        continue
+                    comp, jobs, err = item
                     if err:
                         summary["errors"].append({"company": comp["name"], "error": err})
                         continue
@@ -295,51 +396,89 @@ async def sync_all_sources(company_id_filter: int | None = None, include_aggrega
                         (now, comp_id)
                     )
 
-            # 2. Board Aggregators Sync (Remotive, WWR, Himalayas, Arbeitnow)
+                # Commit after every batch to keep dirty pages and WAL memory flat
+                await db.commit()
+                del batch_results
+                del tasks
+
+                # Periodic garbage collection every 5 batches (50 companies)
+                if (i // BATCH_SIZE) % 5 == 0:
+                    gc.collect()
+
+            # 2. Board Aggregators Sync (processed sequentially to prevent memory peaks)
             if include_aggregators:
-                logger.info("[Ingestion] Starting board feeds sync (Remotive, WWR, Himalayas, Arbeitnow)...")
+                # 2A. Remotive
                 try:
-                    aggregator_tasks = [
-                        fetch_remotive_jobs(client),
-                        fetch_wwr_jobs(),
-                        fetch_all_remote_rss_jobs(client),
-                    ]
-                    aggregator_results = await asyncio.gather(*aggregator_tasks, return_exceptions=True)
-
-                    board_jobs: list[NormalizedJob] = []
-                    for res in aggregator_results:
-                        if isinstance(res, list):
-                            board_jobs.extend(res)
-                        elif isinstance(res, Exception):
-                            logger.error(f"[Aggregator] Task error: {res}")
-                            summary["errors"].append({"source": "aggregator", "error": str(res)})
-
-                    summary["board_jobs_fetched"] = len(board_jobs)
-                    summary["jobs_fetched"] += len(board_jobs)
-
-                    for b_job in board_jobs:
+                    logger.info("[Ingestion] Fetching Remotive feeds...")
+                    remotive_jobs = await fetch_remotive_jobs(client)
+                    summary["board_jobs_fetched"] += len(remotive_jobs)
+                    summary["jobs_fetched"] += len(remotive_jobs)
+                    for b_job in remotive_jobs:
                         b_comp_name = b_job.company_name or "Remote Employer"
-                        b_logo = b_job.raw_data.get("company_logo")
+                        b_logo = b_job.raw_data.get("company_logo") if b_job.raw_data else None
                         comp_id = await get_or_create_company(
-                            db,
-                            company_name=b_comp_name,
-                            source_type=b_job.source_type,
-                            careers_url=b_job.application_url,
-                            logo_url=b_logo,
-                            cache=company_cache,
+                            db, company_name=b_comp_name, source_type=b_job.source_type,
+                            careers_url=b_job.application_url, logo_url=b_logo, cache=company_cache
                         )
                         await upsert_job_record(db, b_job, comp_id, b_comp_name, preferences, now, summary)
+                    await db.commit()
+                    del remotive_jobs
+                    gc.collect()
+                except Exception as rem_err:
+                    logger.error(f"[Ingestion] Remotive sync error: {rem_err}")
+                    summary["errors"].append({"source": "remotive", "error": str(rem_err)})
 
-                except Exception as agg_err:
-                    logger.error(f"[Ingestion] Aggregator sync failed: {agg_err}")
-                    summary["errors"].append({"source": "aggregators", "error": str(agg_err)})
+                # 2B. WeWorkRemotely
+                try:
+                    logger.info("[Ingestion] Fetching WWR feeds...")
+                    wwr_jobs = await fetch_wwr_jobs()
+                    summary["board_jobs_fetched"] += len(wwr_jobs)
+                    summary["jobs_fetched"] += len(wwr_jobs)
+                    for b_job in wwr_jobs:
+                        b_comp_name = b_job.company_name or "Remote Employer"
+                        b_logo = b_job.raw_data.get("company_logo") if b_job.raw_data else None
+                        comp_id = await get_or_create_company(
+                            db, company_name=b_comp_name, source_type=b_job.source_type,
+                            careers_url=b_job.application_url, logo_url=b_logo, cache=company_cache
+                        )
+                        await upsert_job_record(db, b_job, comp_id, b_comp_name, preferences, now, summary)
+                    await db.commit()
+                    del wwr_jobs
+                    gc.collect()
+                except Exception as wwr_err:
+                    logger.error(f"[Ingestion] WWR sync error: {wwr_err}")
+                    summary["errors"].append({"source": "wwr", "error": str(wwr_err)})
 
+                # 2C. Remote RSS Feeds (Himalayas, Arbeitnow, etc.)
+                try:
+                    logger.info("[Ingestion] Fetching Remote RSS feeds...")
+                    rss_jobs = await fetch_all_remote_rss_jobs(client)
+                    summary["board_jobs_fetched"] += len(rss_jobs)
+                    summary["jobs_fetched"] += len(rss_jobs)
+                    for b_job in rss_jobs:
+                        b_comp_name = b_job.company_name or "Remote Employer"
+                        b_logo = b_job.raw_data.get("company_logo") if b_job.raw_data else None
+                        comp_id = await get_or_create_company(
+                            db, company_name=b_comp_name, source_type=b_job.source_type,
+                            careers_url=b_job.application_url, logo_url=b_logo, cache=company_cache
+                        )
+                        await upsert_job_record(db, b_job, comp_id, b_comp_name, preferences, now, summary)
+                    await db.commit()
+                    del rss_jobs
+                    gc.collect()
+                except Exception as rss_err:
+                    logger.error(f"[Ingestion] RSS sync error: {rss_err}")
+                    summary["errors"].append({"source": "rss", "error": str(rss_err)})
+
+        # Final commit and garbage collection
         await db.commit()
+        gc.collect()
     return summary
 
 
 async def sync_board_sources() -> dict[str, Any]:
-    """Sync only board/aggregator sources (Remotive, WWR, Himalayas, Arbeitnow)."""
+    """Sync only board/aggregator sources sequentially to keep RAM minimal."""
+    import gc
     now = get_utc_now()
     summary = {
         "timestamp": now,
@@ -369,37 +508,62 @@ async def sync_board_sources() -> dict[str, Any]:
             row["name"].strip().lower(): row["id"] for row in await cursor.fetchall()
         }
 
-        limits = httpx.Limits(max_keepalive_connections=10, max_connections=20)
-        async with httpx.AsyncClient(timeout=30.0, limits=limits) as client:
-            aggregator_tasks = [
-                fetch_remotive_jobs(client),
-                fetch_wwr_jobs(),
-                fetch_all_remote_rss_jobs(client),
-            ]
-            aggregator_results = await asyncio.gather(*aggregator_tasks, return_exceptions=True)
+        limits = httpx.Limits(max_keepalive_connections=5, max_connections=10)
+        async with httpx.AsyncClient(timeout=25.0, limits=limits) as client:
+            # 1. Remotive
+            try:
+                remotive_jobs = await fetch_remotive_jobs(client)
+                summary["board_jobs_fetched"] += len(remotive_jobs)
+                for b_job in remotive_jobs:
+                    b_comp_name = b_job.company_name or "Remote Employer"
+                    b_logo = b_job.raw_data.get("company_logo") if b_job.raw_data else None
+                    comp_id = await get_or_create_company(
+                        db, company_name=b_comp_name, source_type=b_job.source_type,
+                        careers_url=b_job.application_url, logo_url=b_logo, cache=company_cache
+                    )
+                    await upsert_job_record(db, b_job, comp_id, b_comp_name, preferences, now, summary)
+                await db.commit()
+                del remotive_jobs
+                gc.collect()
+            except Exception as e:
+                summary["errors"].append({"source": "remotive", "error": str(e)})
 
-            board_jobs: list[NormalizedJob] = []
-            for res in aggregator_results:
-                if isinstance(res, list):
-                    board_jobs.extend(res)
-                elif isinstance(res, Exception):
-                    logger.error(f"[Aggregator] Task error: {res}")
-                    summary["errors"].append({"source": "aggregator", "error": str(res)})
+            # 2. WWR
+            try:
+                wwr_jobs = await fetch_wwr_jobs()
+                summary["board_jobs_fetched"] += len(wwr_jobs)
+                for b_job in wwr_jobs:
+                    b_comp_name = b_job.company_name or "Remote Employer"
+                    b_logo = b_job.raw_data.get("company_logo") if b_job.raw_data else None
+                    comp_id = await get_or_create_company(
+                        db, company_name=b_comp_name, source_type=b_job.source_type,
+                        careers_url=b_job.application_url, logo_url=b_logo, cache=company_cache
+                    )
+                    await upsert_job_record(db, b_job, comp_id, b_comp_name, preferences, now, summary)
+                await db.commit()
+                del wwr_jobs
+                gc.collect()
+            except Exception as e:
+                summary["errors"].append({"source": "wwr", "error": str(e)})
 
-            summary["board_jobs_fetched"] = len(board_jobs)
-
-            for b_job in board_jobs:
-                b_comp_name = b_job.company_name or "Remote Employer"
-                b_logo = b_job.raw_data.get("company_logo")
-                comp_id = await get_or_create_company(
-                    db,
-                    company_name=b_comp_name,
-                    source_type=b_job.source_type,
-                    careers_url=b_job.application_url,
-                    logo_url=b_logo,
-                    cache=company_cache,
-                )
-                await upsert_job_record(db, b_job, comp_id, b_comp_name, preferences, now, summary)
+            # 3. RSS
+            try:
+                rss_jobs = await fetch_all_remote_rss_jobs(client)
+                summary["board_jobs_fetched"] += len(rss_jobs)
+                for b_job in rss_jobs:
+                    b_comp_name = b_job.company_name or "Remote Employer"
+                    b_logo = b_job.raw_data.get("company_logo") if b_job.raw_data else None
+                    comp_id = await get_or_create_company(
+                        db, company_name=b_comp_name, source_type=b_job.source_type,
+                        careers_url=b_job.application_url, logo_url=b_logo, cache=company_cache
+                    )
+                    await upsert_job_record(db, b_job, comp_id, b_comp_name, preferences, now, summary)
+                await db.commit()
+                del rss_jobs
+                gc.collect()
+            except Exception as e:
+                summary["errors"].append({"source": "rss", "error": str(e)})
 
         await db.commit()
+        gc.collect()
     return summary

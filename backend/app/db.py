@@ -14,6 +14,9 @@ async def get_db_connection():
     db.row_factory = aiosqlite.Row
     await db.execute("PRAGMA journal_mode=WAL")
     await db.execute("PRAGMA foreign_keys=ON")
+    await db.execute("PRAGMA cache_size=-4000")          # Cap memory cache to ~4MB
+    await db.execute("PRAGMA temp_store=FILE")            # Offload temporary tables/sorts to disk
+    await db.execute("PRAGMA wal_autocheckpoint=500")     # Checkpoint frequently to keep WAL small
     try:
         yield db
     finally:
@@ -21,6 +24,7 @@ async def get_db_connection():
 
 async def init_db():
     async with get_db_connection() as db:
+        await db.execute("PRAGMA wal_checkpoint(TRUNCATE);")
         await db.execute("""
             CREATE TABLE IF NOT EXISTS companies (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
