@@ -3,12 +3,14 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from .config import settings
 from .db import init_db
-from .api.routes import router
+from .api.routes import router, start_periodic_sync, stop_periodic_sync
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     await init_db()
+    start_periodic_sync()
     yield
+    stop_periodic_sync()
 
 app = FastAPI(
     title=settings.APP_NAME,

@@ -6,6 +6,7 @@ import time
 from datetime import datetime, timezone, timedelta
 from typing import Any
 from fastapi import APIRouter, HTTPException, Query, BackgroundTasks
+from ..config import settings
 from ..db import get_db_connection, get_utc_now
 from ..schemas import (
     JobOut, JobsResponse, CompanyOut, CompanyCreate,
@@ -21,6 +22,8 @@ router = APIRouter()
 _sync_lock = asyncio.Lock()
 _last_sync_timestamp: float = 0.0
 SYNC_COOLDOWN_SECONDS = 180  # 3 minutes cooldown between background syncs
+
+_periodic_sync_task: asyncio.Task | None = None
 
 # Q-6 FIX: Column name allowlist — prevents any future f-string SQL injection via column names
 ALLOWED_FILTER_COLUMNS = {
@@ -400,6 +403,40 @@ async def toggle_company(company_id: int):
         await db.commit()
         return {"success": True, "company_id": company_id, "is_active": bool(new_status)}
 
+async def _guarded_sync_once():
+    """Run a sync under the shared lock, skipping if one is already in progress."""
+    global _last_sync_timestamp
+    if _sync_lock.locked():
+        return
+    async with _sync_lock:
+        _last_sync_timestamp = time.time()
+        try:
+            await sync_all_sources()
+        except Exception as e:
+            logger.error(f"[Sync] Error in guarded sync: {e}")
+        finally:
+            gc.collect()
+
+async def _periodic_sync_loop():
+    """Runs sync_all_sources on a fixed interval from inside the app process itself,
+    so scheduled syncs no longer depend on an external cron service reaching /api/sync."""
+    interval_seconds = settings.AUTO_SYNC_INTERVAL_HOURS * 3600
+    while True:
+        await asyncio.sleep(interval_seconds)
+        logger.info("[PeriodicSync] Running scheduled internal sync")
+        await _guarded_sync_once()
+
+def start_periodic_sync():
+    global _periodic_sync_task
+    if _periodic_sync_task is None:
+        _periodic_sync_task = asyncio.create_task(_periodic_sync_loop())
+
+def stop_periodic_sync():
+    global _periodic_sync_task
+    if _periodic_sync_task is not None:
+        _periodic_sync_task.cancel()
+        _periodic_sync_task = None
+
 @router.post("/api/sync")
 async def trigger_sync(background_tasks: BackgroundTasks, wait_for_completion: bool = False):
     global _last_sync_timestamp
@@ -418,19 +455,6 @@ async def trigger_sync(background_tasks: BackgroundTasks, wait_for_completion: b
             "message": f"Sync was recently performed. Next background sync available in {remaining}s."
         }
 
-    async def _safe_sync_worker():
-        global _last_sync_timestamp
-        if _sync_lock.locked():
-            return
-        async with _sync_lock:
-            _last_sync_timestamp = time.time()
-            try:
-                await sync_all_sources()
-            except Exception as e:
-                logger.error(f"[Sync] Error in guarded sync: {e}")
-            finally:
-                gc.collect()
-
     if wait_for_completion:
         async with _sync_lock:
             _last_sync_timestamp = time.time()
@@ -440,7 +464,7 @@ async def trigger_sync(background_tasks: BackgroundTasks, wait_for_completion: b
                 gc.collect()
             return {"status": "completed", "result": result}
     else:
-        background_tasks.add_task(_safe_sync_worker)
+        background_tasks.add_task(_guarded_sync_once)
         return {"status": "enqueued", "message": "Background sync started"}
 
 @router.get("/api/notifications", response_model=list[NotificationOut])
