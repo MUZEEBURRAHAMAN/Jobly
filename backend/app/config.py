@@ -16,14 +16,6 @@ class Settings(BaseSettings):
     # Internal self-scheduled sync — replaces the external cron-job.org "Auto-Sync" pinger,
     # which was an unreliable way to trigger real background work from a 3rd-party watchdog.
     AUTO_SYNC_INTERVAL_HOURS: float = 2
-    CORS_ORIGINS: list[str] = [
-        "http://localhost:3000",
-        "http://127.0.0.1:3000",
-        "http://localhost:5173",
-        "http://127.0.0.1:5173",
-        "chrome-extension://*",
-        "*"
-    ]
 
     class Config:
         env_file = ".env"

@@ -7,6 +7,12 @@ __pycache__/
 # Node
 extension/node_modules/
 
+# Local/runtime data — production DB lives on Render's persistent disk, not in git
+hiring_radar.db
+hiring_radar.db-wal
+hiring_radar.db-shm
+jobly-extension.zip
+
 # OS
 .DS_Store
 Thumbs.db
