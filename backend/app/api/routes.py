@@ -2,10 +2,13 @@ import asyncio
 import gc
 import json
 import logging
+import re
+import sqlite3
 import time
 from datetime import datetime, timezone, timedelta
 from typing import Any
-from fastapi import APIRouter, HTTPException, Query, BackgroundTasks
+from fastapi import APIRouter, BackgroundTasks, Depends, Header, HTTPException, Query
+from pydantic import ValidationError
 from ..config import settings
 from ..db import get_db_connection, get_utc_now
 from ..schemas import (
@@ -14,6 +17,7 @@ from ..schemas import (
 )
 from ..matching import matches_preferences
 from ..ingestion.runner import sync_all_sources
+from ..security import UnsafeURL, require_admin, validate_public_url
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
@@ -32,7 +36,7 @@ ALLOWED_FILTER_COLUMNS = {
     "salary_summary", "max_salary", "first_seen_at", "location", "title", "company_name"
 }
 
-@router.get("/health")
+@router.api_route("/health", methods=["GET", "HEAD"])
 async def health():
     return {
         "status": "ok",
@@ -40,13 +44,11 @@ async def health():
         "timestamp": get_utc_now()
     }
 
-@router.get("/api/preferences", response_model=PreferencesSchema)
-async def get_preferences():
-    async with get_db_connection() as db:
-        cursor = await db.execute("SELECT * FROM preferences LIMIT 1;")
-        row = await cursor.fetchone()
-        if not row:
-            return PreferencesSchema()
+def _prefs_from_row(row) -> PreferencesSchema:
+    """Build preferences from a DB row; rows written before input validation existed fall back to defaults."""
+    if not row:
+        return PreferencesSchema()
+    try:
         return PreferencesSchema(
             roles=json.loads(row["roles"] or "[]"),
             seniorities=json.loads(row["seniorities"] or "[]"),
@@ -57,6 +59,15 @@ async def get_preferences():
             notify_enabled=bool(row["notify_enabled"]),
             sync_interval_mins=row["sync_interval_mins"] or 30
         )
+    except (ValidationError, ValueError, TypeError):
+        logger.warning("[Prefs] Stored preferences failed validation; serving defaults")
+        return PreferencesSchema()
+
+@router.get("/api/preferences", response_model=PreferencesSchema)
+async def get_preferences():
+    async with get_db_connection() as db:
+        cursor = await db.execute("SELECT * FROM preferences LIMIT 1;")
+        return _prefs_from_row(await cursor.fetchone())
 
 @router.post("/api/preferences", response_model=PreferencesSchema)
 async def update_preferences(prefs: PreferencesSchema):
@@ -90,21 +101,21 @@ async def update_preferences(prefs: PreferencesSchema):
 
 @router.get("/api/jobs", response_model=JobsResponse)
 async def list_jobs(
-    role: str | None = None,
-    location: str | None = None,
-    seniority: str | None = None,
-    company_id: int | None = None,
-    search: str | None = None,
-    work_mode: str | None = None,
-    geo_hub: str | None = None,
-    experience_tier: str | None = None,
-    min_budget: int | None = None,
+    role: str | None = Query(default=None, max_length=64),
+    location: str | None = Query(default=None, max_length=100),
+    seniority: str | None = Query(default=None, max_length=32),
+    company_id: int | None = Query(default=None, ge=0, le=2**31 - 1),
+    search: str | None = Query(default=None, max_length=100),
+    work_mode: str | None = Query(default=None, max_length=32),
+    geo_hub: str | None = Query(default=None, max_length=64),
+    experience_tier: str | None = Query(default=None, max_length=32),
+    min_budget: int | None = Query(default=None, ge=0, le=10_000_000),
     has_salary: bool = False,
-    freshness_days: int | None = None,
+    freshness_days: int | None = Query(default=None, ge=0, le=3650),
     only_matching: bool = False,
     saved_only: bool = False,
-    limit: int = Query(default=30, le=200),
-    offset: int = Query(default=0, ge=0)
+    limit: int = Query(default=30, ge=1, le=200),
+    offset: int = Query(default=0, ge=0, le=1_000_000)
 ):
     async with get_db_connection() as db:
         # Load preferences
@@ -112,15 +123,7 @@ async def list_jobs(
         pref_row = await pref_cursor.fetchone()
         prefs_dict = {}
         if pref_row:
-            prefs_dict = {
-                "roles": json.loads(pref_row["roles"] or "[]"),
-                "seniorities": json.loads(pref_row["seniorities"] or "[]"),
-                "locations": json.loads(pref_row["locations"] or "[]"),
-                "remote_only": bool(pref_row["remote_only"]),
-                "custom_keywords": pref_row["custom_keywords"] or "",
-                "excluded_keywords": pref_row["excluded_keywords"] or "",
-                "notify_enabled": bool(pref_row["notify_enabled"]),
-            }
+            prefs_dict = _prefs_from_row(pref_row).model_dump()
 
         conditions = ["status = 'active'"]
         params = []
@@ -168,9 +171,13 @@ async def list_jobs(
             conditions.append("first_seen_at >= ?")
             params.append(since)
 
+        def _like(term: str) -> str:
+            escaped = term.lower().replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
+            return f"%{escaped}%"
+
         if location:
-            conditions.append("LOWER(location) LIKE ?")
-            params.append(f"%{location.lower()}%")
+            conditions.append("LOWER(location) LIKE ? ESCAPE '\\'")
+            params.append(_like(location))
 
         if search:
             ALIAS_MAP = {
@@ -185,14 +192,14 @@ async def list_jobs(
                 "nyc": ["nyc", "new york"],
                 "ny": ["ny", "new york"],
             }
-            search_tokens = [t.strip().lower() for t in search.split() if t.strip()]
+            search_tokens = [t.strip().lower() for t in search.split() if t.strip()][:6]
             for token in search_tokens:
                 aliases = ALIAS_MAP.get(token, [token])
                 sub_conds = []
                 for alias in aliases:
-                    pattern = f"%{alias}%"
+                    pattern = _like(alias)
                     sub_conds.append(
-                        "(LOWER(title) LIKE ? OR LOWER(company_name) LIKE ? OR LOWER(location) LIKE ? OR LOWER(normalized_role) LIKE ? OR LOWER(geo_hub) LIKE ?)"
+                        "(LOWER(title) LIKE ? ESCAPE '\\' OR LOWER(company_name) LIKE ? ESCAPE '\\' OR LOWER(location) LIKE ? ESCAPE '\\' OR LOWER(normalized_role) LIKE ? ESCAPE '\\' OR LOWER(geo_hub) LIKE ? ESCAPE '\\')"
                     )
                     params.extend([pattern, pattern, pattern, pattern, pattern])
                 conditions.append(f"({' OR '.join(sub_conds)})")
@@ -216,8 +223,7 @@ async def list_jobs(
             ORDER BY first_seen_at DESC
             LIMIT ? OFFSET ?
         """
-        limit_val = limit.default if hasattr(limit, "default") else int(limit)
-        offset_val = offset.default if hasattr(offset, "default") else int(offset)
+        limit_val, offset_val = limit, offset
         item_params = params + [limit_val, offset_val]
         cursor = await db.execute(query, item_params)
         rows = await cursor.fetchall()
@@ -301,7 +307,7 @@ async def unsave_job(job_id: int):
 ALLOWED_REPORT_REASONS = {"fake", "expired", "misinfo", "spam", "other"}
 
 @router.post("/api/jobs/{job_id}/report")
-async def report_job(job_id: int, reason: str, details: str = ""):
+async def report_job(job_id: int, reason: str = Query(..., max_length=32), details: str = Query(default="", max_length=500)):
     if reason not in ALLOWED_REPORT_REASONS:
         raise HTTPException(status_code=422, detail=f"Invalid reason. Must be one of: {', '.join(ALLOWED_REPORT_REASONS)}")
     # Verify job exists
@@ -345,10 +351,16 @@ async def list_companies():
             for r in rows
         ]
 
-@router.post("/api/companies", response_model=CompanyOut)
+@router.post("/api/companies", response_model=CompanyOut, dependencies=[Depends(require_admin)])
 async def create_company(company: CompanyCreate, background_tasks: BackgroundTasks):
+    # Admin-only: the server will fetch this company's careers page, so the URL must be publicly routable (SSRF guard).
+    if company.careers_url:
+        try:
+            await validate_public_url(company.careers_url)
+        except UnsafeURL as exc:
+            raise HTTPException(status_code=400, detail=f"careers_url rejected: {exc}")
     now = get_utc_now()
-    slug = company.name.lower().replace(" ", "-")
+    slug = re.sub(r"[^a-z0-9]+", "-", company.name.lower()).strip("-") or "company"
     async with get_db_connection() as db:
         try:
             cursor = await db.execute("""
@@ -361,7 +373,7 @@ async def create_company(company: CompanyCreate, background_tasks: BackgroundTas
                 company.name,
                 slug,
                 company.careers_url,
-                company.source_type.lower(),
+                company.source_type,
                 company.source_identifier,
                 company.industry,
                 company.logo_url,
@@ -370,18 +382,21 @@ async def create_company(company: CompanyCreate, background_tasks: BackgroundTas
             ))
             new_id = cursor.lastrowid
             await db.commit()
-        except Exception as e:
-            raise HTTPException(status_code=400, detail=f"Failed to create company: {e}")
+        except sqlite3.IntegrityError:
+            raise HTTPException(status_code=409, detail="A company with this name already exists")
+        except Exception:
+            logger.exception("[Companies] Failed to create company")
+            raise HTTPException(status_code=500, detail="Could not create company")
 
-    # Trigger background sync for the new company
-    background_tasks.add_task(sync_all_sources, new_id)
+    # Sync the new company under the shared lock so concurrent creations can't stack crawls.
+    background_tasks.add_task(_guarded_sync_once, new_id)
 
     return CompanyOut(
         id=new_id,
         name=company.name,
         slug=slug,
         careers_url=company.careers_url,
-        source_type=company.source_type.lower(),
+        source_type=company.source_type,
         source_identifier=company.source_identifier,
         industry=company.industry,
         logo_url=company.logo_url,
@@ -391,7 +406,7 @@ async def create_company(company: CompanyCreate, background_tasks: BackgroundTas
         updated_at=now
     )
 
-@router.patch("/api/companies/{company_id}/toggle")
+@router.patch("/api/companies/{company_id}/toggle", dependencies=[Depends(require_admin)])
 async def toggle_company(company_id: int):
     async with get_db_connection() as db:
         cursor = await db.execute("SELECT is_active FROM companies WHERE id = ?", (company_id,))
@@ -403,15 +418,18 @@ async def toggle_company(company_id: int):
         await db.commit()
         return {"success": True, "company_id": company_id, "is_active": bool(new_status)}
 
-async def _guarded_sync_once():
-    """Run a sync under the shared lock, skipping if one is already in progress."""
+async def _guarded_sync_once(company_id: int | None = None):
+    """Run a sync under the shared lock, skipping if one is already in progress.
+
+    A company-scoped sync does not touch the global cooldown timestamp."""
     global _last_sync_timestamp
     if _sync_lock.locked():
         return
     async with _sync_lock:
-        _last_sync_timestamp = time.time()
+        if company_id is None:
+            _last_sync_timestamp = time.time()
         try:
-            await sync_all_sources()
+            await sync_all_sources(company_id)
         except Exception as e:
             logger.error(f"[Sync] Error in guarded sync: {e}")
         finally:
@@ -438,8 +456,15 @@ def stop_periodic_sync():
         _periodic_sync_task = None
 
 @router.post("/api/sync")
-async def trigger_sync(background_tasks: BackgroundTasks, wait_for_completion: bool = False):
+async def trigger_sync(
+    background_tasks: BackgroundTasks,
+    wait_for_completion: bool = False,
+    x_admin_token: str | None = Header(default=None),
+):
     global _last_sync_timestamp
+    if wait_for_completion:
+        # Synchronous full crawl ignores the cooldown and holds the connection open: admin only.
+        await require_admin(x_admin_token)
     if _sync_lock.locked():
         return {
             "status": "in_progress",

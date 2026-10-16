@@ -66,10 +66,7 @@ class TestAdapters(unittest.TestCase):
 
     def test_custom_portal_schema_parsing(self):
         async def run():
-            mock_client = AsyncMock(spec=httpx.AsyncClient)
-            mock_response = MagicMock()
-            mock_response.status_code = 200
-            mock_response.text = """
+            page = """
             <html>
             <head>
             <script type="application/ld+json">
@@ -94,9 +91,11 @@ class TestAdapters(unittest.TestCase):
             <body></body>
             </html>
             """
-            mock_client.get.return_value = mock_response
-
-            jobs = await fetch_custom_portal_jobs("https://careers.google.com", "Google", mock_client)
+            transport = httpx.MockTransport(lambda request: httpx.Response(200, text=page))
+            # The SSRF guard resolves the hostname first; pin it to a public address so the test needs no network.
+            with patch("socket.getaddrinfo", return_value=[(2, 1, 6, "", ("142.250.80.46", 0))]):
+                async with httpx.AsyncClient(transport=transport) as client:
+                    jobs = await fetch_custom_portal_jobs("https://careers.google.com", "Google", client)
             self.assertEqual(len(jobs), 1)
             self.assertEqual(jobs[0].title, "Staff Product Designer")
             self.assertEqual(jobs[0].source_type, "custom")

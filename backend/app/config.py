@@ -17,6 +17,17 @@ class Settings(BaseSettings):
     # which was an unreliable way to trigger real background work from a 3rd-party watchdog.
     AUTO_SYNC_INTERVAL_HOURS: float = 2
 
+    # Required (X-Admin-Token header) for company create/toggle. Empty = those endpoints are disabled.
+    ADMIN_TOKEN: str = ""
+    # Comma-separated Chrome extension IDs allowed by CORS. Empty = any extension (dev only; set after publishing).
+    EXTENSION_IDS: str = ""
+    # Interactive API docs are off in production.
+    ENABLE_DOCS: bool = False
+    # Per-IP, per-minute limits. 0 disables a limit.
+    RATE_LIMIT_PER_MIN: int = 120
+    RATE_LIMIT_WRITES_PER_MIN: int = 30
+    RATE_LIMIT_SYNC_PER_MIN: int = 3
+
     class Config:
         env_file = ".env"
 

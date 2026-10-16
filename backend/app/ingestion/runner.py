@@ -10,6 +10,7 @@ from ..matching import (
     detect_role, detect_seniority, detect_work_mode,
     detect_geo_hub, detect_experience_tier, matches_preferences
 )
+from ..security import sanitize_http_url
 from .base import NormalizedJob, calculate_content_hash
 from .greenhouse import fetch_greenhouse_jobs
 from .lever import fetch_lever_jobs
@@ -75,6 +76,14 @@ async def get_or_create_company(
     return comp_id
 
 
+def _as_int(value: Any) -> int | None:
+    """Hourly rates arrive as floats (60.58); the column is INTEGER."""
+    try:
+        return None if value is None else int(round(float(value)))
+    except (TypeError, ValueError):
+        return None
+
+
 def extract_salary_info(source_type: str, raw_data: dict[str, Any] | None, description: str | None) -> tuple[str | None, int | None, int | None]:
     """Extract salary range and min/max numbers without keeping bulky payloads."""
     if source_type == 'ashby' and raw_data:
@@ -92,7 +101,7 @@ def extract_salary_info(source_type: str, raw_data: dict[str, Any] | None, descr
                             break
                 if summary:
                     summary = summary.replace('• Offers Equity', '• Equity').strip()
-                    return summary, min_v, max_v
+                    return summary, _as_int(min_v), _as_int(max_v)
         except Exception:
             pass
 
@@ -127,6 +136,11 @@ async def upsert_job_record(
     summary: dict[str, Any],
 ) -> None:
     """Insert or update a job record with minimal memory overhead and fast-path hash check."""
+    # Drop jobs whose apply link isn't plain http(s): they would render as dead or malicious buttons.
+    clean_url = sanitize_http_url(job.application_url)
+    if clean_url is None:
+        return
+    job.application_url = clean_url
     role = job.normalized_role or detect_role(job.title)
     seniority = job.seniority or detect_seniority(job.title)
     work_mode = job.work_mode or detect_work_mode(job.location, job.title)
