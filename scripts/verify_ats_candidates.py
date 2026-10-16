@@ -93,7 +93,7 @@ def main():
     print(f"\nFound {len(verified)} live verified candidate boards!", flush=True)
 
     # Load existing companies
-    companies_file = Path(__file__).resolve().parent.parent / "data" / "companies.json"
+    companies_file = Path(__file__).resolve().parent.parent / "backend" / "app" / "data" / "companies.json"
     with open(companies_file, "r") as f:
         existing = json.load(f)
 

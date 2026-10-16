@@ -1,7 +1,7 @@
 import json
 from pathlib import Path
 
-with open('data/companies.json') as f:
+with open('backend/app/data/companies.json') as f:
     comps = json.load(f)
 
 domains = {}

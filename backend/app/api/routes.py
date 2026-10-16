@@ -435,19 +435,25 @@ async def _guarded_sync_once(company_id: int | None = None):
         finally:
             gc.collect()
 
-async def _periodic_sync_loop():
+async def _periodic_sync_loop(initial_delay: float | None = None):
     """Runs sync_all_sources on a fixed interval from inside the app process itself,
-    so scheduled syncs no longer depend on an external cron service reaching /api/sync."""
+    so scheduled syncs no longer depend on an external cron service reaching /api/sync.
+
+    `initial_delay` triggers a first sync shortly after boot (empty/stale database)."""
     interval_seconds = settings.AUTO_SYNC_INTERVAL_HOURS * 3600
+    if initial_delay is not None:
+        await asyncio.sleep(initial_delay)
+        logger.info("[PeriodicSync] Running initial sync (empty or stale database)")
+        await _guarded_sync_once()
     while True:
         await asyncio.sleep(interval_seconds)
         logger.info("[PeriodicSync] Running scheduled internal sync")
         await _guarded_sync_once()
 
-def start_periodic_sync():
+def start_periodic_sync(initial_delay: float | None = None):
     global _periodic_sync_task
     if _periodic_sync_task is None:
-        _periodic_sync_task = asyncio.create_task(_periodic_sync_loop())
+        _periodic_sync_task = asyncio.create_task(_periodic_sync_loop(initial_delay))
 
 def stop_periodic_sync():
     global _periodic_sync_task
@@ -543,8 +549,8 @@ async def get_stats():
         n_cur = await db.execute("SELECT COUNT(*) as count FROM jobs WHERE first_seen_at >= ?", (day_ago,))
         new_jobs_today = (await n_cur.fetchone())["count"]
 
-        # Last sync
-        comp_cur = await db.execute("SELECT MAX(updated_at) as last_sync FROM companies")
+        # Last sync = newest job we've seen (company rows are also touched by seeding/edits)
+        comp_cur = await db.execute("SELECT MAX(last_seen_at) as last_sync FROM jobs")
         last_sync = (await comp_cur.fetchone())["last_sync"]
 
         # Matched jobs count according to preferences
@@ -567,5 +573,6 @@ async def get_stats():
             matched_jobs=matched_jobs,
             saved_jobs=saved_jobs,
             new_jobs_today=new_jobs_today,
-            last_sync_time=last_sync
+            last_sync_time=last_sync,
+            is_syncing=_sync_lock.locked()
         )

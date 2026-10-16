@@ -10,7 +10,7 @@ class Settings(BaseSettings):
     # Render persistent disk mounts to /data — override DATABASE_PATH env var to use it.
     # Local dev falls back to project root.
     DATABASE_PATH: Path = Path(os.environ.get("DATABASE_PATH", str(BASE_DIR / "hiring_radar.db")))
-    COMPANIES_FILE: Path = BASE_DIR / "data" / "companies.json"
+    COMPANIES_FILE: Path = Path(__file__).resolve().parent / "data" / "companies.json"  # ships inside the Docker image
     HOST: str = "127.0.0.1"
     PORT: int = 8000
     # Internal self-scheduled sync — replaces the external cron-job.org "Auto-Sync" pinger,

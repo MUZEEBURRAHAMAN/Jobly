@@ -6,11 +6,14 @@ from .config import settings
 from .db import init_db
 from .api.routes import router, start_periodic_sync, stop_periodic_sync
 from .security import RateLimitMiddleware, SecurityHeadersMiddleware
+from .seed import needs_initial_sync, seed_companies_if_missing
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     await init_db()
-    start_periodic_sync()
+    await seed_companies_if_missing()
+    # Empty/stale database (normal after a deploy on a free instance): crawl right away instead of in 2 hours.
+    start_periodic_sync(initial_delay=10 if await needs_initial_sync(settings.AUTO_SYNC_INTERVAL_HOURS) else None)
     yield
     stop_periodic_sync()
 

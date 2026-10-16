@@ -131,3 +131,5 @@ class StatsOut(BaseModel):
     saved_jobs: int
     new_jobs_today: int
     last_sync_time: str | None = None
+    # True while a crawl is running (the client shows "gathering jobs" instead of an empty list)
+    is_syncing: bool = False

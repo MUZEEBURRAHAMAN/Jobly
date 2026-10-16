@@ -10,6 +10,7 @@ def get_utc_now() -> str:
 
 @asynccontextmanager
 async def get_db_connection():
+    settings.DATABASE_PATH.parent.mkdir(parents=True, exist_ok=True)  # e.g. /data when no disk is mounted
     db = await aiosqlite.connect(settings.DATABASE_PATH)
     db.row_factory = aiosqlite.Row
     await db.execute("PRAGMA journal_mode=WAL")

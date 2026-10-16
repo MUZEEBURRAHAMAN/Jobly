@@ -153,7 +153,7 @@ def main():
             "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
         })
 
-    out_file = Path(__file__).resolve().parent.parent / "data" / "companies.json"
+    out_file = Path(__file__).resolve().parent.parent / "backend" / "app" / "data" / "companies.json"
     with open(out_file, "w") as f:
         json.dump(cleaned, f, indent=2)
 

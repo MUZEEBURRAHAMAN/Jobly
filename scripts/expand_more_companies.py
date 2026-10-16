@@ -1,7 +1,7 @@
 """
 Verified ATS company discovery script.
 Tests candidate companies against Greenhouse, Ashby, and Lever public APIs.
-Adds all confirmed companies with > 0 jobs to data/companies.json and SQLite DB.
+Adds all confirmed companies with > 0 jobs to backend/app/data/companies.json and SQLite DB.
 """
 import asyncio
 import json
@@ -137,7 +137,7 @@ def run():
     print(f"\nFound {len(verified)} live verified candidate boards!", flush=True)
 
     # Load existing companies
-    companies_file = Path(__file__).resolve().parent.parent / "data" / "companies.json"
+    companies_file = Path(__file__).resolve().parent.parent / "backend" / "app" / "data" / "companies.json"
     with open(companies_file, "r") as f:
         existing = json.load(f)
 
