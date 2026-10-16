@@ -1,7 +1,10 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Plus, Search, ExternalLink, X, Bot, Sparkles, Building2 } from 'lucide-react';
 import { Company } from '../types';
 import { getCompanyLogoUrl } from '../lib/companyLogos';
+import { safeHttpUrl } from '../lib/url';
+
+const PAGE = 60; // render the list in pages; 600+ rows at once is slow in a popup
 
 interface WatchlistViewProps {
   companies: Company[];
@@ -29,6 +32,10 @@ export const WatchlistView: React.FC<WatchlistViewProps> = ({
   const [sourceId, setSourceId] = useState('');
   const [industry, setIndustry] = useState('');
   const [adding, setAdding] = useState(false);
+  const [addError, setAddError] = useState<string | null>(null);
+  const [visible, setVisible] = useState(PAGE);
+
+  useEffect(() => { setVisible(PAGE); }, [search, tierFilter]);
 
   const filtered = companies.filter((c) => {
     // Search query
@@ -56,6 +63,11 @@ export const WatchlistView: React.FC<WatchlistViewProps> = ({
   const handleAddSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim() || !sourceId.trim()) return;
+    if (careersUrl.trim() && !safeHttpUrl(careersUrl)) {
+      setAddError('Careers URL must start with http:// or https://');
+      return;
+    }
+    setAddError(null);
     setAdding(true);
     try {
       await onAddCompany({
@@ -70,6 +82,8 @@ export const WatchlistView: React.FC<WatchlistViewProps> = ({
       setSourceId('');
       setIndustry('');
       setShowAddForm(false);
+    } catch (err) {
+      setAddError(err instanceof Error ? err.message : "Couldn't add the company. Please try again.");
     } finally {
       setAdding(false);
     }
@@ -120,6 +134,8 @@ export const WatchlistView: React.FC<WatchlistViewProps> = ({
             type="text"
             className="input-text"
             placeholder="Company Name (e.g. Supabase)"
+            aria-label="Company name"
+            maxLength={120}
             value={name}
             onChange={(e) => setName(e.target.value)}
             required
@@ -127,6 +143,7 @@ export const WatchlistView: React.FC<WatchlistViewProps> = ({
 
           <div style={{ display: 'flex', gap: 8 }}>
             <select
+              aria-label="ATS provider"
               value={sourceType}
               onChange={(e) => setSourceType(e.target.value)}
               className="input-text"
@@ -142,6 +159,8 @@ export const WatchlistView: React.FC<WatchlistViewProps> = ({
               type="text"
               className="input-text"
               placeholder="Board Token (e.g. supabase)"
+              aria-label="Board token"
+              maxLength={120}
               value={sourceId}
               onChange={(e) => setSourceId(e.target.value)}
               required
@@ -154,6 +173,8 @@ export const WatchlistView: React.FC<WatchlistViewProps> = ({
               type="text"
               className="input-text"
               placeholder="Industry (e.g. Developer Tools)"
+              aria-label="Industry"
+              maxLength={80}
               value={industry}
               onChange={(e) => setIndustry(e.target.value)}
               style={{ width: '50%' }}
@@ -162,11 +183,16 @@ export const WatchlistView: React.FC<WatchlistViewProps> = ({
               type="url"
               className="input-text"
               placeholder="Careers URL (optional)"
+              aria-label="Careers URL (optional)"
               value={careersUrl}
               onChange={(e) => setCareersUrl(e.target.value)}
               style={{ width: '50%' }}
             />
           </div>
+
+          {addError && (
+            <p role="alert" style={{ margin: 0, fontSize: 11.5, color: 'var(--amber-400)', lineHeight: 1.4 }}>{addError}</p>
+          )}
 
           <button
             type="submit"
@@ -196,6 +222,7 @@ export const WatchlistView: React.FC<WatchlistViewProps> = ({
           type="text"
           className="input-text"
           placeholder={`Search ${companies.length} monitored employers...`}
+          aria-label="Search monitored employers"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           style={{ paddingLeft: 30, paddingRight: search ? 30 : 12, fontSize: 12, height: 34, width: '100%' }}
@@ -276,7 +303,7 @@ export const WatchlistView: React.FC<WatchlistViewProps> = ({
               // Edge Case 1: Search returned 0 companies
               <>
                 <Building2 size={24} color="var(--accent)" style={{ margin: '0 auto 10px', display: 'block' }} />
-                <span className="eyebrow" style={{ fontSize: 9.5, color: 'var(--accent)', display: 'block', marginBottom: 4 }}>
+                <span className="eyebrow" style={{ fontSize: 10, color: 'var(--accent)', display: 'block', marginBottom: 4 }}>
                   UNMONITORED EMPLOYER
                 </span>
                 <h3 style={{ fontSize: 13, fontWeight: 700, letterSpacing: '0.04em', textTransform: 'uppercase', color: 'var(--text-primary)' }}>
@@ -311,7 +338,7 @@ export const WatchlistView: React.FC<WatchlistViewProps> = ({
               // Edge Case 2: Tier filter returned 0 companies
               <>
                 <Building2 size={24} color="var(--accent)" style={{ margin: '0 auto 10px', display: 'block' }} />
-                <span className="eyebrow" style={{ fontSize: 9.5, color: 'var(--accent)', display: 'block', marginBottom: 4 }}>
+                <span className="eyebrow" style={{ fontSize: 10, color: 'var(--accent)', display: 'block', marginBottom: 4 }}>
                   CATEGORY EMPTY
                 </span>
                 <h3 style={{ fontSize: 13, fontWeight: 700, letterSpacing: '0.04em', textTransform: 'uppercase', color: 'var(--text-primary)' }}>
@@ -334,7 +361,7 @@ export const WatchlistView: React.FC<WatchlistViewProps> = ({
               // Edge Case 3: Zero companies in directory
               <>
                 <Building2 size={24} color="var(--text-muted)" style={{ margin: '0 auto 10px', display: 'block' }} />
-                <span className="eyebrow" style={{ fontSize: 9.5, color: 'var(--text-muted)', display: 'block', marginBottom: 4 }}>
+                <span className="eyebrow" style={{ fontSize: 10, color: 'var(--text-muted)', display: 'block', marginBottom: 4 }}>
                   WATCHLIST EMPTY
                 </span>
                 <h3 style={{ fontSize: 13, fontWeight: 700, letterSpacing: '0.04em', textTransform: 'uppercase', color: 'var(--text-primary)' }}>
@@ -357,7 +384,7 @@ export const WatchlistView: React.FC<WatchlistViewProps> = ({
             )}
           </div>
         ) : (
-          filtered.map((company) => {
+          filtered.slice(0, visible).map((company) => {
             const logo = getCompanyLogoUrl(company.name, company.careers_url);
             return (
               <div
@@ -425,7 +452,7 @@ export const WatchlistView: React.FC<WatchlistViewProps> = ({
                       <span style={{ fontWeight: 700, fontSize: 12.5, color: 'var(--text-primary)', letterSpacing: '0.02em' }}>
                         {company.name}
                       </span>
-                      <span className="badge badge-gray" style={{ fontSize: 8, padding: '1px 4px' }}>
+                      <span className="badge badge-gray" style={{ fontSize: 10, padding: '1px 4px' }}>
                         {company.source_type}
                       </span>
                     </div>
@@ -436,11 +463,12 @@ export const WatchlistView: React.FC<WatchlistViewProps> = ({
                 </div>
 
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                  {company.careers_url && (
+                  {safeHttpUrl(company.careers_url) && (
                     <a
-                      href={company.careers_url}
+                      href={safeHttpUrl(company.careers_url)!}
                       target="_blank"
-                      rel="noreferrer"
+                      rel="noopener noreferrer"
+                      aria-label={`${company.name} careers page`}
                       title="Official Career Page"
                       style={{ color: 'var(--text-muted)', display: 'inline-flex' }}
                     >
@@ -450,8 +478,10 @@ export const WatchlistView: React.FC<WatchlistViewProps> = ({
 
                   <button
                     onClick={() => onToggleCompany(company.id)}
+                    aria-pressed={company.is_active}
+                    aria-label={`${company.is_active ? 'Stop tracking' : 'Track'} ${company.name}`}
                     className={`filter-pill ${company.is_active ? 'active' : ''}`}
-                    style={{ fontSize: 9, padding: '3px 8px' }}
+                    style={{ fontSize: 10, padding: '3px 8px' }}
                   >
                     {company.is_active ? 'TRACKING' : 'MUTED'}
                   </button>
@@ -459,6 +489,11 @@ export const WatchlistView: React.FC<WatchlistViewProps> = ({
               </div>
             );
           })
+        )}
+        {filtered.length > visible && (
+          <button type="button" onClick={() => setVisible(visible + PAGE)} className="btn btn-secondary btn-sm" style={{ fontFamily: 'var(--font-mono)', width: '100%' }}>
+            SHOW MORE ({filtered.length - visible} REMAINING)
+          </button>
         )}
       </div>
     </div>

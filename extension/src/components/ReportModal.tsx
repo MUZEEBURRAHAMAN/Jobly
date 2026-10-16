@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { X, Flag, AlertTriangle, CheckCircle2 } from 'lucide-react';
 import { Job } from '../types';
@@ -21,6 +21,29 @@ export const ReportModal: React.FC<ReportModalProps> = ({ job, onClose }) => {
   const [selected, setSelected] = useState<string>('');
   const [details, setDetails]   = useState('');
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const dialogRef = useRef<HTMLDivElement>(null);
+
+  // Focus management: move focus into the dialog, keep Tab inside it, and restore focus to the trigger on close.
+  useEffect(() => {
+    const opener = document.activeElement as HTMLElement | null;
+    const focusables = () =>
+      Array.from(dialogRef.current?.querySelectorAll<HTMLElement>('button:not([disabled]), input, textarea, a[href], [tabindex]:not([tabindex="-1"])') ?? []);
+    (focusables().find((el) => el.tagName === 'INPUT') ?? focusables()[0])?.focus();
+    const trap = (e: KeyboardEvent) => {
+      if (e.key !== 'Tab') return;
+      const items = focusables();
+      if (!items.length) return;
+      const first = items[0], last = items[items.length - 1];
+      const active = document.activeElement;
+      if (!dialogRef.current?.contains(active)) { e.preventDefault(); first.focus(); }
+      else if (e.shiftKey && active === first) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && active === last) { e.preventDefault(); first.focus(); }
+    };
+    document.addEventListener('keydown', trap);
+    return () => { document.removeEventListener('keydown', trap); opener?.focus?.(); };
+  }, []);
 
   // Lock body scroll while modal is open
   useEffect(() => {
@@ -38,9 +61,15 @@ export const ReportModal: React.FC<ReportModalProps> = ({ job, onClose }) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!selected) return;
-    // S-3/Q-4 FIX: Send report to backend
-    await api.reportJob(job.id, selected, details);
+    if (!selected || submitting) return;
+    setSubmitting(true);
+    setError(null);
+    const ok = await api.reportJob(job.id, selected, details);
+    setSubmitting(false);
+    if (!ok) {
+      setError("Couldn't send your report. Check your connection and try again.");
+      return;
+    }
     setSubmitted(true);
   };
 
@@ -62,6 +91,7 @@ export const ReportModal: React.FC<ReportModalProps> = ({ job, onClose }) => {
       }}
     >
       <div
+        ref={dialogRef}
         role="dialog"
         aria-modal="true"
         aria-label="Report listing"
@@ -142,10 +172,10 @@ export const ReportModal: React.FC<ReportModalProps> = ({ job, onClose }) => {
                 color: 'var(--text-primary)',
                 margin: 0,
               }}>
-                REPORT RECEIVED
+                REPORT SENT
               </p>
               <p style={{ fontSize: 12, color: 'var(--text-secondary)', margin: 0, lineHeight: 1.6 }}>
-                Thank you — we will review this listing<br />and take action within 24 hours.
+                Thanks — your report about this listing<br />has been recorded.
               </p>
               <button
                 onClick={onClose}
@@ -251,6 +281,8 @@ export const ReportModal: React.FC<ReportModalProps> = ({ job, onClose }) => {
                 value={details}
                 onChange={(e) => setDetails(e.target.value)}
                 placeholder="Describe the issue..."
+                aria-label="Additional details (optional)"
+                maxLength={500}
                 rows={3}
                 style={{
                   width: '100%',
@@ -269,6 +301,10 @@ export const ReportModal: React.FC<ReportModalProps> = ({ job, onClose }) => {
                 onFocus={(e) => (e.target.style.borderColor = 'var(--accent)')}
                 onBlur={(e) => (e.target.style.borderColor = 'var(--border-subtle)')}
               />
+
+              {error && (
+                <p role="alert" style={{ margin: '10px 0 0', fontSize: 11.5, color: 'var(--amber-400)' }}>{error}</p>
+              )}
 
               {/* Footer */}
               <div style={{
@@ -289,7 +325,7 @@ export const ReportModal: React.FC<ReportModalProps> = ({ job, onClose }) => {
                 </button>
                 <button
                   type="submit"
-                  disabled={!selected}
+                  disabled={!selected || submitting}
                   className="btn btn-primary btn-sm"
                   style={{
                     fontFamily: 'var(--font-mono)',
@@ -301,7 +337,7 @@ export const ReportModal: React.FC<ReportModalProps> = ({ job, onClose }) => {
                   }}
                 >
                   <Flag size={11} />
-                  SUBMIT REPORT
+                  {submitting ? 'SENDING...' : 'SUBMIT REPORT'}
                 </button>
               </div>
 

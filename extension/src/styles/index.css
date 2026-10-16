@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+/* Fonts are bundled (see src/styles/fonts.css): remote @import is blocked by the extension CSP. */
 
 /* ==========================================================================
    MUZEEB PORTFOLIO DESIGN SYSTEM (MZ / DS)
@@ -21,6 +21,7 @@
   --ds-border: #242424;
   --ds-border-2: #2a2a2a;
   --ds-accent: #e8602a;
+  --on-accent: #0f0f0f;            /* text on accent fills: 5.6:1 (white was 3.4:1) */
   --ds-accent-soft: #2e1810;
   --ds-code-bg: #1a1a1a;
   --ds-nav-bg: rgba(15, 15, 15, 0.95);
@@ -69,16 +70,17 @@
   --ds-muted: #6a6a66;
   --ds-border: #e6e4df;
   --ds-border-2: #dcdad4;
-  --ds-accent: #e8602a;
+  --ds-accent: #c2410c;            /* was #e8602a (3.0:1 as text on light); 4.5:1+ now */
+  --on-accent: #ffffff;
   --ds-accent-soft: #fef0ea;
   --ds-code-bg: #f4f4f2;
   --ds-nav-bg: rgba(250, 249, 247, 0.95);
   --ds-swatch-border: rgba(0, 0, 0, 0.08);
   --ds-tag-bg: #f1f0ec;
   --ds-tag-text: #3a3a38;
-  --ds-green: #22c55e;
+  --ds-green: #166534;             /* was #22c55e (2.0:1 on light) */
   --ds-green-soft: #e9f6ef;
-  --ds-amber: #F5A623;
+  --ds-amber: #92400e;             /* was #F5A623 (1.8:1 on light) */
   --ds-amber-soft: rgba(245, 166, 35, 0.15);
 
   /* Unified variable aliases */
@@ -201,10 +203,31 @@ body {
   opacity: 0.92;
 }
 
+/* Keyboard focus: .btn sets outline:none, so every control needs an explicit :focus-visible ring (WCAG 2.4.7) */
+:where(button, a, input, select, textarea, [tabindex]):focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+.input-text:focus-visible {
+  outline: 2px solid var(--accent);   /* beats `.input-text { outline: none }` declared later */
+  outline-offset: 0;
+}
+@media (forced-colors: active) {
+  :where(button, a, input, select, textarea, [tabindex]):focus-visible { outline-color: Highlight; }
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+}
+
 /* Accent Button (Muzeeb Orange #e8602a) */
 .btn-accent {
   background: var(--accent);
-  color: #ffffff;
+  color: var(--on-accent);
   border: 1px solid var(--accent);
 }
 .btn-accent:hover {

@@ -1,24 +1,7 @@
-// Mirrors the fallback logic in ApiClient — checks production backend first, then local dev
-const API_BASE_CANDIDATES = [
-  'https://jobly-yd6l.onrender.com',
-  'https://api.getcatchly.com',
-  'http://127.0.0.1:8000',
-  'http://localhost:8000',
-];
-let activeApiBase = API_BASE_CANDIDATES[0];
+import { API_BASES } from '../lib/config';
 
-async function resolveApiBase(): Promise<string | null> {
-  for (const url of API_BASE_CANDIDATES) {
-    try {
-      const ctrl = new AbortController();
-      const tid = setTimeout(() => ctrl.abort(), 1200);
-      const res = await fetch(`${url}/health`, { signal: ctrl.signal });
-      clearTimeout(tid);
-      if (res.ok) { activeApiBase = url; return url; }
-    } catch { /* try next */ }
-  }
-  return null;
-}
+const ALARM_NAME = 'jobly-sync';
+const MAX_REMEMBERED_ALERTS = 200;
 
 interface NotificationData {
   id: number;
@@ -32,53 +15,72 @@ interface NotificationData {
   is_read: boolean;
 }
 
-// Alarm Setup on installation
-chrome.runtime.onInstalled.addListener(async () => {
-  console.log('[Jobly SW] Extension installed/updated.');
-  
-  // Staggered alarm (30-45 mins jitter) to spread background load across 10,000+ users
-  const randomPeriod = 30 + Math.floor(Math.random() * 15);
-  await chrome.alarms.create('jobly-sync', {
-    delayInMinutes: 1,
-    periodInMinutes: randomPeriod,
-  });
+// The background check is not user-facing, so it can afford to wait for a sleeping free-tier server.
+async function fetchNotifications(): Promise<NotificationData[] | null> {
+  for (const base of API_BASES) {
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), 20000);
+    try {
+      const res = await fetch(`${base}/api/notifications`, { signal: ctrl.signal });
+      if (res.ok) {
+        const data = await res.json();
+        return Array.isArray(data) ? data : null;
+      }
+    } catch {
+      /* try the next candidate */
+    } finally {
+      clearTimeout(timer);
+    }
+  }
+  return null;
+}
 
-  // Set default badge styling
+// Chrome may drop alarms when the browser restarts (it only guarantees they survive until an update), so
+// re-create the alarm every time the worker starts, not only in onInstalled.
+async function ensureAlarm() {
+  if (await chrome.alarms.get(ALARM_NAME)) return;
+  // Staggered period (30-45 min) spreads load across users
+  const period = 30 + Math.floor(Math.random() * 15);
+  await chrome.alarms.create(ALARM_NAME, { delayInMinutes: 1, periodInMinutes: period });
+}
+void ensureAlarm();
+
+chrome.runtime.onInstalled.addListener(async (details) => {
   await chrome.action.setBadgeBackgroundColor({ color: '#06b6d4' });
-  await checkNewMatchesAndNotify();
+  await ensureAlarm();
+  // First install: remember everything that already exists instead of announcing a backlog of old alerts.
+  await checkNewMatchesAndNotify({ silent: details.reason === 'install' });
 });
 
-// Alarm Listener
+chrome.runtime.onStartup.addListener(() => { void ensureAlarm(); });
+
 chrome.alarms.onAlarm.addListener(async (alarm) => {
-  if (alarm.name === 'jobly-sync' || alarm.name === 'hiring-radar-sync') {
+  if (alarm.name === ALARM_NAME || alarm.name === 'hiring-radar-sync') {
     await checkNewMatchesAndNotify();
   }
 });
 
-// Check for newly published matched jobs and dispatch notification
-async function checkNewMatchesAndNotify() {
+async function alertsEnabled(): Promise<boolean> {
+  // Respect the "Desktop alerts" setting (it used to be saved but never read here).
+  const { cachedPreferences } = await chrome.storage.local.get('cachedPreferences');
+  return cachedPreferences?.notify_enabled !== false;
+}
+
+// Check for newly published matched jobs and dispatch a notification
+async function checkNewMatchesAndNotify({ silent = false }: { silent?: boolean } = {}) {
   try {
-    const base = await resolveApiBase();
-    if (!base) return; // engine offline
-    const res = await fetch(`${activeApiBase}/api/notifications`);
-    if (!res.ok) return;
+    const notifs = await fetchNotifications();
+    if (!notifs) return; // server unreachable: try again at the next alarm
 
-    const notifs: NotificationData[] = await res.json();
     const unread = notifs.filter((n) => !n.is_read);
-
-    // Retrieve already notified IDs to prevent duplicate desktop alerts
     const stored = await chrome.storage.local.get(['alertedNotificationIds']);
     const alertedIds = new Set<number>(stored.alertedNotificationIds || []);
-
     const newToAlert = unread.filter((n) => !alertedIds.has(n.id));
 
-    if (newToAlert.length > 0) {
-      // Update badge text with total unread count
-      await chrome.action.setBadgeText({
-        text: unread.length > 99 ? '99+' : String(unread.length),
-      });
+    // Badge always reflects the real unread count, not only when something new arrived.
+    await chrome.action.setBadgeText({ text: unread.length === 0 ? '' : unread.length > 99 ? '99+' : String(unread.length) });
 
-      // Send a single concise grouped notification digest
+    if (newToAlert.length > 0 && !silent && (await alertsEnabled())) {
       if (newToAlert.length === 1) {
         const item = newToAlert[0];
         await chrome.notifications.create(`job-${item.job_id}`, {
@@ -99,41 +101,36 @@ async function checkNewMatchesAndNotify() {
           priority: 1,
         });
       }
-
-      // Mark IDs as alerted in local storage
-      newToAlert.forEach((n) => alertedIds.add(n.id));
-      await chrome.storage.local.set({
-        alertedNotificationIds: Array.from(alertedIds),
-      });
-    } else if (unread.length === 0) {
-      await chrome.action.setBadgeText({ text: '' });
     }
+
+    // Remember what we've seen (also while silent or alerts are off) and keep the list bounded.
+    newToAlert.forEach((n) => alertedIds.add(n.id));
+    const bounded = Array.from(alertedIds).sort((a, b) => b - a).slice(0, MAX_REMEMBERED_ALERTS);
+    await chrome.storage.local.set({ alertedNotificationIds: bounded });
   } catch {
-    // Engine offline or unreachable — silently skip background alert until engine wakes up
+    // Unreachable or unexpected response: skip until the next alarm
   }
 }
 
 // Notification Click Handler
 chrome.notifications.onClicked.addListener(async (notificationId) => {
-  // Clear notification
   await chrome.notifications.clear(notificationId);
-
-  // Open options dashboard or focused tab
-  const url = chrome.runtime.getURL('options.html');
-  await chrome.tabs.create({ url });
+  await chrome.tabs.create({ url: chrome.runtime.getURL('options.html') });
 });
 
-// Runtime Message Listener
-chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
-  if (message.type === 'TRIGGER_BACKGROUND_CHECK') {
+// Runtime Message Listener (only our own extension pages may talk to the worker)
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (sender.id !== chrome.runtime.id) return;
+
+  if (message?.type === 'TRIGGER_BACKGROUND_CHECK') {
     (async () => {
       await checkNewMatchesAndNotify();
       sendResponse({ success: true });
     })();
-    return true; // Keep message channel open for async response
+    return true; // keep the message channel open for the async response
   }
 
-  if (message.type === 'CLEAR_BADGE') {
+  if (message?.type === 'CLEAR_BADGE') {
     (async () => {
       await chrome.action.setBadgeText({ text: '' });
       sendResponse({ success: true });

@@ -1,6 +1,7 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { Radio, Building2, Bookmark, Sliders } from 'lucide-react';
-import { api } from '../lib/api';
+import { api, ConnectionStatus } from '../lib/api';
+import { Notice, useNotice } from '../components/Notice';
 import { Job, Company, Preferences, RadarStats } from '../types';
 import { getInitialTheme, applyTheme, syncThemeFromStorage, Theme } from '../lib/theme';
 import { Header } from '../components/Header';
@@ -17,10 +18,12 @@ export const PopupApp: React.FC = () => {
   const [companies, setCompanies] = useState<Company[]>([]);
   const [preferences, setPreferences] = useState<Preferences | null>(null);
   const [stats, setStats] = useState<RadarStats | null>(null);
-  const [isOnline, setIsOnline] = useState<boolean>(true);
+  const [status, setStatus] = useState<ConnectionStatus>('connecting');
+  const [loadError, setLoadError] = useState<'offline' | 'server' | null>(null);
   const [isSyncing, setIsSyncing] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
   const [activeRoleFilter, setActiveRoleFilter] = useState<string>('all_matching');
+  const { notice, show: showNotice, clear: clearNotice } = useNotice();
 
   // Lifted filter state (same pattern as OptionsApp)
   const [filterHub, setFilterHub] = useState<string>('all');
@@ -31,6 +34,9 @@ export const PopupApp: React.FC = () => {
   const [filterRemoteOnly, setFilterRemoteOnly] = useState<boolean>(false);
   const [filterSearch, setFilterSearch] = useState<string>('');
   const [displayLimit, setDisplayLimit] = useState<number>(30);
+
+  // Only the newest request may update the list (a slow, older response must not overwrite a newer search).
+  const jobsSeq = useRef(0);
 
   // Apply theme on mount + sync from chrome.storage.sync
   useEffect(() => {
@@ -46,69 +52,84 @@ export const PopupApp: React.FC = () => {
 
   // Load jobs based on current active role filter and optional search query
   const fetchJobsForFilter = useCallback(async (roleFilter: string, searchQuery?: string) => {
+    const seq = ++jobsSeq.current;
     setLoading(true);
-    try {
-      const isMatchingOnly = roleFilter === 'all_matching';
-      const specificRole = !isMatchingOnly && roleFilter !== 'all' ? roleFilter : undefined;
+    const isMatchingOnly = roleFilter === 'all_matching';
+    const specificRole = !isMatchingOnly && roleFilter !== 'all' ? roleFilter : undefined;
 
-      const jobsData = await api.getJobs({
-        role: specificRole,
-        only_matching: isMatchingOnly,
-        search: searchQuery?.trim() || undefined,
-        limit: 150,
-      });
-
-      setJobs(jobsData.items);
-    } catch {
-      setIsOnline(false);
-    } finally {
-      setLoading(false);
-    }
+    const jobsData = await api.getJobs({
+      role: specificRole,
+      only_matching: isMatchingOnly,
+      search: searchQuery?.trim() || undefined,
+      limit: 150,
+    });
+    if (seq !== jobsSeq.current) return; // superseded by a newer request
+    setJobs(jobsData.items);
+    setLoadError(jobsData.error ?? null);
+    setLoading(false);
   }, []);
 
-  const loadInitialData = useCallback(async () => {
-    try {
-      const online = await api.checkHealth();
-      setIsOnline(online);
-
-      const [prefsData, companiesData, statsData, savedData] = await Promise.all([
-        api.getPreferences(),
-        api.getCompanies(),
-        api.getStats(),
-        api.getJobs({ saved_only: true, limit: 100 }),
-      ]);
-
-      setPreferences(prefsData);
-      setCompanies(companiesData);
-      setStats(statsData);
-      setSavedJobs(savedData.items);
-    } catch {
-      setIsOnline(false);
-    }
+  const loadSideData = useCallback(async () => {
+    const [prefsData, companiesData, statsData, savedData] = await Promise.all([
+      api.getPreferences(),
+      api.getCompanies(),
+      api.getStats(),
+      api.getJobs({ saved_only: true, limit: 200 }),
+    ]);
+    setPreferences(prefsData);
+    setCompanies(companiesData);
+    setStats(statsData);
+    if (!savedData.error) setSavedJobs(savedData.items);
   }, []);
 
-  useEffect(() => {
-    loadInitialData();
-  }, [loadInitialData]);
+  // Paint from the local cache immediately, then wait (patiently) for a sleeping free-tier server.
+  const connect = useCallback(async () => {
+    setStatus('connecting');
+    const online = await api.waitForBackend();
+    setStatus(online ? 'online' : 'offline');
+    if (online) await loadSideData();
+    return online;
+  }, [loadSideData]);
 
-  // Fetch jobs whenever role filter or search query changes (debounced 250ms)
   useEffect(() => {
-    if (activeTab !== 'feed') return;
+    let cancelled = false;
+    (async () => {
+      const [cachedJobs, cachedCompanies, cachedPrefs] = await Promise.all([api.getCachedJobs(), api.getCachedCompanies(), api.getCachedPreferences()]);
+      if (cancelled) return;
+      if (cachedJobs.length) { setJobs(cachedJobs); setLoading(false); }
+      if (cachedCompanies.length) setCompanies(cachedCompanies);
+      if (cachedPrefs) setPreferences(cachedPrefs);
+    })();
+    connect();
+    return () => { cancelled = true; };
+  }, [connect]);
+
+  // While offline, keep trying quietly so the popup recovers on its own once the server is back.
+  useEffect(() => {
+    if (status !== 'offline') return;
+    const id = window.setInterval(() => { connect(); }, 30000);
+    return () => window.clearInterval(id);
+  }, [status, connect]);
+
+  // Fetch jobs whenever role filter, search query or connection state changes (debounced 250ms)
+  useEffect(() => {
+    if (activeTab !== 'feed' || status === 'connecting') return;
+    if (status === 'offline') { setLoadError('offline'); setLoading(false); return; } // keep showing cached jobs
     const timer = setTimeout(() => {
       fetchJobsForFilter(activeRoleFilter, filterSearch);
     }, 250);
     return () => clearTimeout(timer);
-  }, [activeTab, activeRoleFilter, filterSearch, fetchJobsForFilter]);
+  }, [activeTab, activeRoleFilter, filterSearch, status, fetchJobsForFilter]);
 
   const handleSync = async () => {
     if (isSyncing) return;
     setIsSyncing(true);
     const startTime = Date.now();
     try {
-      // 1. Kick off background ATS sync on backend asynchronously
-      api.triggerSync().catch(() => {});
+      const result = await api.triggerSync();
+      if (!result.ok) showNotice("Couldn't reach the server to start a refresh. Showing your last results.");
 
-      // 2. Notify background service worker safely
+      // Notify background service worker safely
       if (typeof chrome !== 'undefined' && chrome.runtime?.sendMessage) {
         try {
           chrome.runtime.sendMessage({ type: 'TRIGGER_BACKGROUND_CHECK' }, () => {
@@ -117,13 +138,10 @@ export const PopupApp: React.FC = () => {
         } catch {}
       }
 
-      // 3. Immediately reload all radar data & current filtered jobs stream
-      await Promise.all([
-        loadInitialData(),
-        fetchJobsForFilter(activeRoleFilter, filterSearch),
-      ]);
-    } catch {
-      // Keep current health status
+      // Re-check the connection and reload everything
+      const online = await api.checkHealth();
+      setStatus(online ? 'online' : 'offline');
+      if (online) await Promise.all([loadSideData(), fetchJobsForFilter(activeRoleFilter, filterSearch)]);
     } finally {
       // Ensure at least 500ms spin feedback for clear visual confirmation
       const elapsed = Date.now() - startTime;
@@ -137,33 +155,40 @@ export const PopupApp: React.FC = () => {
 
   const handleToggleSave = async (targetJob: Job) => {
     const newSaved = !targetJob.is_saved;
-    setJobs((prev) =>
-      prev.map((j) => (j.id === targetJob.id ? { ...j, is_saved: newSaved } : j))
-    );
-
-    if (newSaved) {
-      setSavedJobs((prev) => [...prev, { ...targetJob, is_saved: true }]);
-      await api.saveJob(targetJob.id);
-    } else {
-      setSavedJobs((prev) => prev.filter((j) => j.id !== targetJob.id));
-      await api.unsaveJob(targetJob.id);
+    const apply = (saved: boolean) => {
+      setJobs((prev) => prev.map((j) => (j.id === targetJob.id ? { ...j, is_saved: saved } : j)));
+      setSavedJobs((prev) =>
+        saved ? (prev.some((j) => j.id === targetJob.id) ? prev : [...prev, { ...targetJob, is_saved: true }]) : prev.filter((j) => j.id !== targetJob.id)
+      );
+    };
+    apply(newSaved); // optimistic
+    const ok = newSaved ? await api.saveJob(targetJob.id) : await api.unsaveJob(targetJob.id);
+    if (!ok) {
+      apply(!newSaved); // roll back and tell the user
+      showNotice(newSaved ? "Couldn't save this job — please try again." : "Couldn't remove this job from saved — please try again.");
     }
   };
 
-  const handleSavePreferences = async (newPrefs: Preferences) => {
-    const updated = await api.updatePreferences(newPrefs);
-    setPreferences(updated);
-    await loadInitialData();
-    await fetchJobsForFilter(activeRoleFilter);
+  // Returns true when the change reached the server (the form shows "saved" vs "saved on this device only").
+  const handleSavePreferences = async (newPrefs: Preferences): Promise<boolean> => {
+    const { prefs, synced } = await api.updatePreferences(newPrefs);
+    setPreferences(prefs);
+    if (!synced) showNotice("Saved on this device only — couldn't reach the server.", 'info');
+    else await loadSideData();
+    await fetchJobsForFilter(activeRoleFilter, filterSearch);
+    return synced;
   };
 
   const handleToggleCompany = async (companyId: number) => {
-    await api.toggleCompany(companyId);
-    setCompanies((prev) =>
-      prev.map((c) => (c.id === companyId ? { ...c, is_active: !c.is_active } : c))
-    );
+    const result = await api.toggleCompany(companyId);
+    if (!result.success) {
+      showNotice(result.message ?? "Couldn't change tracking for this company.");
+      return;
+    }
+    setCompanies((prev) => prev.map((c) => (c.id === companyId ? { ...c, is_active: result.is_active } : c)));
   };
 
+  // Throws ApiError with a user-facing message; the form displays it.
   const handleAddCompany = async (data: {
     name: string;
     careers_url?: string;
@@ -197,7 +222,8 @@ export const PopupApp: React.FC = () => {
       }}
     >
       <Header
-        isOnline={isOnline}
+        status={status}
+        onRetry={() => { connect(); }}
         isSyncing={isSyncing}
         stats={stats}
         onSync={handleSync}
@@ -207,7 +233,7 @@ export const PopupApp: React.FC = () => {
       />
 
       {/* Main Content Area */}
-      <div style={{ flex: 1, overflowY: 'auto' }}>
+      <main id="main" style={{ flex: 1, overflowY: 'auto' }}>
         {activeTab === 'feed' && (
           <RadarFeed
             jobs={jobs}
@@ -215,7 +241,9 @@ export const PopupApp: React.FC = () => {
             preferences={preferences}
             onToggleSave={handleToggleSave}
             onConfigureTargets={() => setActiveTab('rules')}
-            onSavePreferences={handleSavePreferences}
+            onSavePreferences={async (p) => { await handleSavePreferences(p); }}
+            loadError={loadError}
+            onRetryLoad={() => { fetchJobsForFilter(activeRoleFilter, filterSearch); }}
             activeRoleFilter={activeRoleFilter}
             setActiveRoleFilter={(r) => { setActiveRoleFilter(r); setDisplayLimit(30); }}
             filterHub={filterHub} setFilterHub={setFilterHub}
@@ -254,10 +282,10 @@ export const PopupApp: React.FC = () => {
             onSave={handleSavePreferences}
           />
         )}
-      </div>
+      </main>
 
       {/* Bottom Navigation (Muzeeb Zero-Radius Brutalist) */}
-      <nav style={{
+      <nav aria-label="Sections" style={{
         display: 'flex',
         borderTop: '1px solid var(--border-subtle)',
         background: 'var(--bg-secondary)',
@@ -274,6 +302,9 @@ export const PopupApp: React.FC = () => {
           return (
             <button
               key={tab.id}
+              type="button"
+              aria-current={isActive ? 'page' : undefined}
+              aria-label={tab.badge ? `${tab.label}, ${tab.badge} saved` : tab.label}
               onClick={() => setActiveTab(tab.id as any)}
               style={{
                 flex: 1,
@@ -300,8 +331,8 @@ export const PopupApp: React.FC = () => {
                     top: -4,
                     right: -10,
                     background: 'var(--accent)',
-                    color: '#ffffff',
-                    fontSize: 9,
+                    color: 'var(--on-accent)',
+                    fontSize: 10,
                     fontWeight: 700,
                     borderRadius: 0,
                     padding: '0 4px',
@@ -314,7 +345,7 @@ export const PopupApp: React.FC = () => {
                 )}
               </div>
               <span style={{
-                fontSize: 9.5,
+                fontSize: 10,
                 fontWeight: isActive ? 700 : 500,
                 letterSpacing: '0.08em',
                 textTransform: 'uppercase',
@@ -326,6 +357,8 @@ export const PopupApp: React.FC = () => {
           );
         })}
       </nav>
+
+      <Notice notice={notice} onClose={clearNotice} />
     </div>
   );
 };

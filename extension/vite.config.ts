@@ -1,11 +1,34 @@
-import { defineConfig } from 'vite';
+import { defineConfig, Plugin } from 'vite';
 import react from '@vitejs/plugin-react';
 import { resolve } from 'path';
+import { readFileSync, writeFileSync } from 'fs';
 
-export default defineConfig({
-  plugins: [react()],
+// Production builds talk only to the real backend. `vite build --mode development` (npm run build:dev) also
+// allows the local API at 127.0.0.1:8000 / localhost:8000 — it must never ship to the Web Store.
+function localDevBackend(): Plugin {
+  const hosts = ['http://127.0.0.1:8000', 'http://localhost:8000'];
+  let outDir = 'dist';
+  return {
+    name: 'jobly-local-dev-backend',
+    apply: 'build',
+    configResolved(config) { outDir = config.build.outDir; },
+    closeBundle() {
+      const file = resolve(outDir, 'manifest.json');
+      const manifest = JSON.parse(readFileSync(file, 'utf8'));
+      manifest.host_permissions.push(...hosts.map((h) => `${h}/*`));
+      manifest.content_security_policy.extension_pages = manifest.content_security_policy.extension_pages.replace(
+        /connect-src ([^;]*)/, (_m: string, list: string) => `connect-src ${list} ${hosts.join(' ')}`
+      );
+      manifest.name += ' (DEV)';
+      writeFileSync(file, JSON.stringify(manifest, null, 2) + '\n');
+    },
+  };
+}
+
+export default defineConfig(({ mode }) => ({
+  plugins: [react(), ...(mode === 'development' ? [localDevBackend()] : [])],
   build: {
-    outDir: 'dist',
+    outDir: mode === 'development' ? 'dist-dev' : 'dist',
     emptyOutDir: true,
     target: 'es2022',
     rollupOptions: {
@@ -26,4 +49,4 @@ export default defineConfig({
       },
     },
   },
-});
+}));

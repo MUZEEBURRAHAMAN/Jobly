@@ -53,6 +53,7 @@ export const SavedJobsView: React.FC<SavedJobsViewProps> = ({
             type="text"
             className="input-text"
             placeholder="Search saved positions..."
+            aria-label="Search saved positions"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             style={{ paddingLeft: 30, paddingRight: search ? 30 : 12, fontSize: 12, height: 34, width: '100%' }}
@@ -91,7 +92,7 @@ export const SavedJobsView: React.FC<SavedJobsViewProps> = ({
           border: '1px solid var(--border-subtle)',
         }}>
           <Bookmark size={24} color="var(--accent)" style={{ margin: '0 auto 10px', display: 'block' }} />
-          <span className="eyebrow" style={{ fontSize: 9.5, color: 'var(--accent)', display: 'block', marginBottom: 4 }}>
+          <span className="eyebrow" style={{ fontSize: 10, color: 'var(--accent)', display: 'block', marginBottom: 4 }}>
             SHORTLIST EMPTY
           </span>
           <h4 style={{ fontSize: 13, fontWeight: 700, letterSpacing: '0.04em', textTransform: 'uppercase', marginBottom: 4, color: 'var(--text-primary)' }}>
@@ -114,7 +115,7 @@ export const SavedJobsView: React.FC<SavedJobsViewProps> = ({
           border: '1px solid var(--border-subtle)',
         }}>
           <Search size={22} color="var(--accent)" style={{ margin: '0 auto 10px', display: 'block' }} />
-          <span className="eyebrow" style={{ fontSize: 9.5, color: 'var(--accent)', display: 'block', marginBottom: 4 }}>
+          <span className="eyebrow" style={{ fontSize: 10, color: 'var(--accent)', display: 'block', marginBottom: 4 }}>
             0 SHORTLIST MATCHES
           </span>
           <h4 style={{ fontSize: 13, fontWeight: 700, letterSpacing: '0.04em', textTransform: 'uppercase', marginBottom: 4, color: 'var(--text-primary)' }}>

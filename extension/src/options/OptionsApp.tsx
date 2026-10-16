@@ -1,6 +1,10 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { Radio, Building2, Bookmark, Sliders, Bell, RefreshCw, ExternalLink, Sun, Moon, ArrowUp } from 'lucide-react';
-import { api } from '../lib/api';
+import { api, ConnectionStatus } from '../lib/api';
+import { MAX_PAGE_SIZE } from '../lib/config';
+import { safeHttpUrl } from '../lib/url';
+import { Notice, useNotice } from '../components/Notice';
+import { appVersion } from '../components/Header';
 import { Job, Company, Preferences, RadarStats, NotificationItem } from '../types';
 import { getInitialTheme, applyTheme, syncThemeFromStorage, Theme } from '../lib/theme';
 import { JobCard } from '../components/JobCard';
@@ -18,7 +22,12 @@ export const OptionsApp: React.FC = () => {
   const [preferences, setPreferences] = useState<Preferences | null>(null);
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   const [stats, setStats] = useState<RadarStats | null>(null);
-  const [isOnline, setIsOnline] = useState<boolean>(true);
+  const [status, setStatus] = useState<ConnectionStatus>('connecting');
+  const [loadError, setLoadError] = useState<'offline' | 'server' | null>(null);
+  const [jobsTotal, setJobsTotal] = useState<number>(0);
+  const { notice, show: showNotice, clear: clearNotice } = useNotice();
+  const isOnline = status === 'online';
+  const jobsSeq = useRef(0);
   const [isSyncing, setIsSyncing] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
   const [selectedRole, setSelectedRole] = useState<string>('all_matching');
@@ -51,70 +60,101 @@ export const OptionsApp: React.FC = () => {
     applyTheme(nextTheme);
   };
 
-  const loadData = useCallback(async () => {
-    setLoading(true);
-    try {
-      const online = await api.checkHealth();
-      setIsOnline(online);
-
-      // Q-2: Fetch up to 500 total (paginated in UI)
-      const [prefsData, jobsData, companiesData, statsData, notifsData] = await Promise.all([
-        api.getPreferences(),
-        api.getJobs({ limit: 500, only_matching: false }),
-        api.getCompanies(),
-        api.getStats(),
-        api.getNotifications(),
-      ]);
-
-      setPreferences(prefsData);
-      setJobs(jobsData.items);
-      // Q-5 FIX: saved jobs derived from full list so offline cache works
-      setSavedJobs(jobsData.items.filter((j) => j.is_saved));
-      setCompanies(companiesData);
-      setStats(statsData);
-      setNotifications(notifsData);
-      setDisplayLimit(30); // Reset pagination on fresh load
-    } catch {
-      setIsOnline(false);
-    } finally {
-      setLoading(false);
-    }
+  // Everything except the job list (that has its own effect so filters/search/pagination stay in one place).
+  const loadSideData = useCallback(async () => {
+    const [prefsData, companiesData, statsData, notifsData, savedData] = await Promise.all([
+      api.getPreferences(),
+      api.getCompanies(),
+      api.getStats(),
+      api.getNotifications(),
+      // Saved jobs come straight from the server. Deriving them from the newest N jobs hid older saved jobs.
+      api.getJobs({ saved_only: true, limit: MAX_PAGE_SIZE }),
+    ]);
+    setPreferences(prefsData);
+    setCompanies(companiesData);
+    setStats(statsData);
+    setNotifications(notifsData);
+    if (!savedData.error) setSavedJobs(savedData.items);
   }, []);
 
-  useEffect(() => {
-    loadData();
-  }, [loadData]);
+  const connect = useCallback(async () => {
+    setStatus('connecting');
+    const online = await api.waitForBackend();
+    setStatus(online ? 'online' : 'offline');
+    if (online) await loadSideData();
+    return online;
+  }, [loadSideData]);
 
-  // Dynamic backend search & role filtering across all 20,000+ jobs
   useEffect(() => {
-    if (activeTab !== 'feed') return;
+    let cancelled = false;
+    (async () => {
+      const [cachedJobs, cachedCompanies, cachedPrefs] = await Promise.all([api.getCachedJobs(), api.getCachedCompanies(), api.getCachedPreferences()]);
+      if (cancelled) return;
+      if (cachedJobs.length) { setJobs(cachedJobs); setLoading(false); }
+      if (cachedCompanies.length) setCompanies(cachedCompanies);
+      if (cachedPrefs) setPreferences(cachedPrefs);
+    })();
+    connect();
+    return () => { cancelled = true; };
+  }, [connect]);
+
+  // While offline, keep trying quietly so the dashboard recovers by itself.
+  useEffect(() => {
+    if (status !== 'offline') return;
+    const id = window.setInterval(() => { connect(); }, 30000);
+    return () => window.clearInterval(id);
+  }, [status, connect]);
+
+  const jobQuery = useCallback(() => {
+    const isMatchingOnly = selectedRole === 'all_matching';
+    return {
+      role: !isMatchingOnly && selectedRole !== 'all' ? selectedRole : undefined,
+      only_matching: isMatchingOnly,
+      search: filterSearch.trim() || undefined,
+    };
+  }, [selectedRole, filterSearch]);
+
+  // Dynamic backend search & role filtering. Only the newest request may update the list.
+  useEffect(() => {
+    if (activeTab !== 'feed' || status === 'connecting') return;
+    if (status === 'offline') { setLoadError('offline'); setLoading(false); return; }
     const timer = setTimeout(async () => {
+      const seq = ++jobsSeq.current;
       setLoading(true);
-      try {
-        const isMatchingOnly = selectedRole === 'all_matching';
-        const specificRole = !isMatchingOnly && selectedRole !== 'all' ? selectedRole : undefined;
-        const res = await api.getJobs({
-          role: specificRole,
-          only_matching: isMatchingOnly,
-          search: filterSearch.trim() || undefined,
-          limit: 300,
-        });
-        setJobs(res.items);
-      } catch {
-        // Fallback to offline cache
-      } finally {
-        setLoading(false);
-      }
+      const res = await api.getJobs({ ...jobQuery(), limit: MAX_PAGE_SIZE });
+      if (seq !== jobsSeq.current) return;
+      setJobs(res.items);
+      setJobsTotal(res.error ? res.items.length : res.total);
+      setLoadError(res.error ?? null);
+      setDisplayLimit(30);
+      setLoading(false);
     }, 250);
     return () => clearTimeout(timer);
-  }, [activeTab, selectedRole, filterSearch]);
+  }, [activeTab, status, jobQuery]);
+
+  // The server caps a page at MAX_PAGE_SIZE, so "load more" past that fetches the next page.
+  const [loadingMore, setLoadingMore] = useState(false);
+  const loadMoreJobs = useCallback(async () => {
+    if (loadingMore || jobs.length >= jobsTotal) return;
+    setLoadingMore(true);
+    const seq = jobsSeq.current;
+    const res = await api.getJobs({ ...jobQuery(), limit: MAX_PAGE_SIZE, offset: jobs.length });
+    if (seq === jobsSeq.current && !res.error) {
+      setJobs((prev) => {
+        const seen = new Set(prev.map((j) => j.id));
+        return [...prev, ...res.items.filter((j) => !seen.has(j.id))];
+      });
+    }
+    setLoadingMore(false);
+  }, [loadingMore, jobs.length, jobsTotal, jobQuery]);
 
   const handleSync = async () => {
     if (isSyncing) return;
     setIsSyncing(true);
     const startTime = Date.now();
     try {
-      api.triggerSync().catch(() => {});
+      const result = await api.triggerSync();
+      if (!result.ok) showNotice("Couldn't reach the server to start a refresh. Showing your last results.");
       if (typeof chrome !== 'undefined' && chrome.runtime?.sendMessage) {
         try {
           chrome.runtime.sendMessage({ type: 'TRIGGER_BACKGROUND_CHECK' }, () => {
@@ -122,9 +162,9 @@ export const OptionsApp: React.FC = () => {
           });
         } catch {}
       }
-      await loadData();
-    } catch {
-      // Keep online status
+      const online = await api.checkHealth();
+      setStatus(online ? 'online' : 'offline');
+      if (online) await loadSideData();
     } finally {
       const elapsed = Date.now() - startTime;
       if (elapsed < 500) {
@@ -137,30 +177,35 @@ export const OptionsApp: React.FC = () => {
 
   const handleToggleSave = async (targetJob: Job) => {
     const newSaved = !targetJob.is_saved;
-    setJobs((prev) =>
-      prev.map((j) => (j.id === targetJob.id ? { ...j, is_saved: newSaved } : j))
-    );
-
-    if (newSaved) {
-      setSavedJobs((prev) => [...prev, { ...targetJob, is_saved: true }]);
-      await api.saveJob(targetJob.id);
-    } else {
-      setSavedJobs((prev) => prev.filter((j) => j.id !== targetJob.id));
-      await api.unsaveJob(targetJob.id);
+    const apply = (saved: boolean) => {
+      setJobs((prev) => prev.map((j) => (j.id === targetJob.id ? { ...j, is_saved: saved } : j)));
+      setSavedJobs((prev) =>
+        saved ? (prev.some((j) => j.id === targetJob.id) ? prev : [...prev, { ...targetJob, is_saved: true }]) : prev.filter((j) => j.id !== targetJob.id)
+      );
+    };
+    apply(newSaved);
+    const ok = newSaved ? await api.saveJob(targetJob.id) : await api.unsaveJob(targetJob.id);
+    if (!ok) {
+      apply(!newSaved);
+      showNotice(newSaved ? "Couldn't save this job — please try again." : "Couldn't remove this job from saved — please try again.");
     }
   };
 
-  const handleSavePreferences = async (newPrefs: Preferences) => {
-    const updated = await api.updatePreferences(newPrefs);
-    setPreferences(updated);
-    await loadData();
+  const handleSavePreferences = async (newPrefs: Preferences): Promise<boolean> => {
+    const { prefs, synced } = await api.updatePreferences(newPrefs);
+    setPreferences(prefs);
+    if (!synced) showNotice("Saved on this device only — couldn't reach the server.", 'info');
+    else await loadSideData();
+    return synced;
   };
 
   const handleToggleCompany = async (companyId: number) => {
-    await api.toggleCompany(companyId);
-    setCompanies((prev) =>
-      prev.map((c) => (c.id === companyId ? { ...c, is_active: !c.is_active } : c))
-    );
+    const result = await api.toggleCompany(companyId);
+    if (!result.success) {
+      showNotice(result.message ?? "Couldn't change tracking for this company.");
+      return;
+    }
+    setCompanies((prev) => prev.map((c) => (c.id === companyId ? { ...c, is_active: result.is_active } : c)));
   };
 
   const handleAddCompany = async (data: {
@@ -170,12 +215,13 @@ export const OptionsApp: React.FC = () => {
     source_identifier: string;
     industry?: string;
   }) => {
-    const newComp = await api.addCompany(data);
+    const newComp = await api.addCompany(data); // throws ApiError with a user-facing message
     setCompanies((prev) => [...prev, newComp]);
   };
 
   const handleClearNotifications = async () => {
-    await api.markAllNotificationsRead();
+    const ok = await api.markAllNotificationsRead();
+    if (!ok) { showNotice("Couldn't mark alerts as read — please try again."); return; }
     if (typeof chrome !== 'undefined' && chrome.runtime?.sendMessage) {
       chrome.runtime.sendMessage({ type: 'CLEAR_BADGE' });
     }
@@ -190,7 +236,7 @@ export const OptionsApp: React.FC = () => {
         chrome.runtime.sendMessage({ type: 'CLEAR_BADGE' });
       }
       setNotifications((prev) => prev.map((n) => ({ ...n, is_read: true })));
-      api.markAllNotificationsRead().catch(() => {});
+      void api.markAllNotificationsRead();
     }
   };
 
@@ -253,7 +299,7 @@ export const OptionsApp: React.FC = () => {
               }}>
                 Jobly <span style={{ color: 'var(--text-muted)', fontWeight: 400 }}>// Find jobs. Apply smarter</span>
               </h1>
-              <span className="badge badge-accent">V2.5 BRUTALIST</span>
+              <span className="badge badge-accent">v{appVersion()}</span>
             </div>
             <div style={{
               display: 'flex',
@@ -264,22 +310,32 @@ export const OptionsApp: React.FC = () => {
               color: 'var(--text-muted)',
               marginTop: 2,
             }}>
-              {isOnline ? (
-                <>
-                  <span className="status-dot" style={{ width: 6, height: 6 }}></span>
-                  <span style={{ color: 'var(--green)', fontWeight: 600 }}>
-                    {api.getActiveBaseUrl().includes('127.0.0.1') || api.getActiveBaseUrl().includes('localhost')
-                      ? 'LOCAL DEV ENGINE ACTIVE'
-                      : 'CLOUD RADAR LIVE'}
-                  </span>
-                  <span>[{api.getActiveBaseUrl().replace('https://', '').replace('http://', '')}]</span>
-                </>
-              ) : (
-                <>
-                  <span className="status-dot offline" style={{ width: 6, height: 6 }}></span>
-                  <span style={{ color: 'var(--accent)', fontWeight: 600 }}>ENGINE SLEEPING</span>
-                </>
-              )}
+              <span role="status" aria-live="polite" style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+                {status === 'online' && (
+                  <>
+                    <span className="status-dot" style={{ width: 6, height: 6 }}></span>
+                    <span style={{ color: 'var(--green)', fontWeight: 600 }}>
+                      {api.getActiveBaseUrl().includes('127.0.0.1') || api.getActiveBaseUrl().includes('localhost')
+                        ? 'LOCAL DEV ENGINE ACTIVE'
+                        : 'CLOUD RADAR LIVE'}
+                    </span>
+                    <span>[{api.getActiveBaseUrl().replace('https://', '').replace('http://', '')}]</span>
+                  </>
+                )}
+                {status === 'connecting' && (
+                  <>
+                    <span className="status-dot offline" style={{ width: 6, height: 6 }}></span>
+                    <span style={{ color: 'var(--amber-400)', fontWeight: 600 }}>CONNECTING · WAKING SERVER</span>
+                  </>
+                )}
+                {status === 'offline' && (
+                  <>
+                    <span className="status-dot offline" style={{ width: 6, height: 6 }}></span>
+                    <span style={{ color: 'var(--amber-400)', fontWeight: 600 }}>OFFLINE · SHOWING CACHED DATA</span>
+                    <button type="button" onClick={() => { connect(); }} className="btn btn-secondary btn-sm" style={{ padding: '1px 8px', fontSize: 10 }}>RETRY</button>
+                  </>
+                )}
+              </span>
             </div>
           </div>
         </div>
@@ -333,7 +389,7 @@ export const OptionsApp: React.FC = () => {
               border: '1px solid var(--border-subtle)',
               padding: '8px 12px',
             }}>
-              <div className="eyebrow" style={{ color: 'var(--text-muted)', fontSize: 9 }}>
+              <div className="eyebrow" style={{ color: 'var(--text-muted)', fontSize: 10 }}>
                 {item.label}
               </div>
               <div style={{
@@ -405,8 +461,8 @@ export const OptionsApp: React.FC = () => {
                   {Boolean(tab.badge && tab.badge > 0) && (
                     <span style={{
                       background: 'var(--accent)',
-                      color: '#ffffff',
-                      fontSize: 9,
+                      color: 'var(--on-accent)',
+                      fontSize: 10,
                       fontWeight: 700,
                       padding: '1px 5px',
                       fontFamily: 'var(--font-mono)',
@@ -422,11 +478,11 @@ export const OptionsApp: React.FC = () => {
 
           {/* System status pinned at bottom of sidebar */}
           <div style={{ padding: '14px 20px', borderTop: '1px solid var(--border-subtle)', background: 'var(--bg-card)' }}>
-            <div style={{ fontSize: 9.5, fontFamily: 'var(--font-mono)', color: 'var(--text-muted)', letterSpacing: '0.04em' }}>
+            <div style={{ fontSize: 10, fontFamily: 'var(--font-mono)', color: 'var(--text-muted)', letterSpacing: '0.04em' }}>
               JOBLY LIVE RADAR
             </div>
             <div style={{ fontSize: 11, fontFamily: 'var(--font-mono)', fontWeight: 700, color: 'var(--green)', marginTop: 2 }}>
-              357 ATS MONITORS
+              {stats ? `${stats.active_companies} MONITORED EMPLOYERS` : 'MONITORING EMPLOYERS'}
             </div>
           </div>
         </aside>
@@ -454,7 +510,11 @@ export const OptionsApp: React.FC = () => {
                   preferences={preferences}
                   onToggleSave={handleToggleSave}
                   onConfigureTargets={() => setActiveTab('rules')}
-                  onSavePreferences={handleSavePreferences}
+                  onSavePreferences={async (p) => { await handleSavePreferences(p); }}
+                  loadError={loadError}
+                  onRetryLoad={() => { connect(); }}
+                  hasMore={jobs.length < jobsTotal}
+                  onLoadMore={loadMoreJobs}
                   activeRoleFilter={selectedRole}
                   setActiveRoleFilter={(r) => { setSelectedRole(r); setDisplayLimit(30); }}
                   // Q-3: lifted filter state passed as props
@@ -503,7 +563,7 @@ export const OptionsApp: React.FC = () => {
                     width: '100%',
                   }}>
                     <Bookmark size={24} color="var(--accent)" style={{ margin: '0 auto 10px', display: 'block' }} />
-                    <span className="eyebrow" style={{ fontSize: 9.5, color: 'var(--accent)', display: 'block', marginBottom: 4 }}>
+                    <span className="eyebrow" style={{ fontSize: 10, color: 'var(--accent)', display: 'block', marginBottom: 4 }}>
                       SHORTLIST EMPTY
                     </span>
                     <h3 style={{ fontSize: 13, fontWeight: 700, letterSpacing: '0.04em', textTransform: 'uppercase', color: 'var(--text-primary)' }}>
@@ -570,14 +630,14 @@ export const OptionsApp: React.FC = () => {
                     border: '1px solid var(--border-subtle)',
                   }}>
                     <Bell size={24} color="var(--text-muted)" style={{ margin: '0 auto 10px', display: 'block' }} />
-                    <span className="eyebrow" style={{ fontSize: 9.5, color: 'var(--accent)', display: 'block', marginBottom: 4 }}>
+                    <span className="eyebrow" style={{ fontSize: 10, color: 'var(--accent)', display: 'block', marginBottom: 4 }}>
                       DISPATCH LOG EMPTY
                     </span>
                     <h3 style={{ fontSize: 13, fontWeight: 700, letterSpacing: '0.04em', textTransform: 'uppercase', color: 'var(--text-primary)' }}>
                       No Alerts Logged Yet
                     </h3>
                     <p style={{ color: 'var(--text-muted)', fontSize: 11.5, maxWidth: 360, margin: '6px auto 14px', lineHeight: 1.4 }}>
-                      Background monitoring scans 357 employers automatically every 30 minutes. When new jobs match your target rules, instant alerts appear here.
+                      Jobly checks every monitored employer automatically in the background. When new jobs match your target rules, instant alerts appear here.
                     </p>
                     <button
                       onClick={handleSync}
@@ -608,16 +668,18 @@ export const OptionsApp: React.FC = () => {
                         </div>
                       </div>
 
-                      <a
-                        href={n.application_url}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="btn btn-accent btn-sm"
-                        style={{ textDecoration: 'none' }}
-                      >
-                        <span>VIEW</span>
-                        <ExternalLink size={11} />
-                      </a>
+                      {safeHttpUrl(n.application_url) && (
+                        <a
+                          href={safeHttpUrl(n.application_url)!}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="btn btn-accent btn-sm"
+                          style={{ textDecoration: 'none' }}
+                        >
+                          <span>VIEW</span>
+                          <ExternalLink size={11} />
+                        </a>
+                      )}
                     </div>
                   ))
                 )}
@@ -650,6 +712,7 @@ export const OptionsApp: React.FC = () => {
           )}
         </main>
       </div>
+      <Notice notice={notice} onClose={clearNotice} />
     </div>
   );
 };

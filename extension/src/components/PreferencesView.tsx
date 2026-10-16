@@ -4,13 +4,14 @@ import { Preferences } from '../types';
 
 interface PreferencesViewProps {
   preferences: Preferences;
-  onSave: (prefs: Preferences) => Promise<void>;
+  /** Resolve `false` when the change only reached this device (server unreachable). */
+  onSave: (prefs: Preferences) => Promise<boolean | void>;
 }
 
 export const PreferencesView: React.FC<PreferencesViewProps> = ({ preferences, onSave }) => {
   const [prefs, setPrefs] = useState<Preferences>(preferences);
   const [saving, setSaving] = useState(false);
-  const [savedSuccess, setSavedSuccess] = useState(false);
+  const [savedState, setSavedState] = useState<'synced' | 'local' | null>(null);
 
   const availableRoles = [
     { id: 'product_design', label: 'PRODUCT DESIGN', desc: 'UI/UX, Product Design, Design Systems, UX Research' },
@@ -46,9 +47,9 @@ export const PreferencesView: React.FC<PreferencesViewProps> = ({ preferences, o
     e.preventDefault();
     setSaving(true);
     try {
-      await onSave(prefs);
-      setSavedSuccess(true);
-      setTimeout(() => setSavedSuccess(false), 2500);
+      const synced = await onSave(prefs);
+      setSavedState(synced === false ? 'local' : 'synced');
+      setTimeout(() => setSavedState(null), 4000);
     } finally {
       setSaving(false);
     }
@@ -67,7 +68,7 @@ export const PreferencesView: React.FC<PreferencesViewProps> = ({ preferences, o
             <button
               type="button"
               onClick={() => setPrefs({ ...prefs, roles: availableRoles.map((r) => r.id) })}
-              style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', fontSize: 9.5, fontFamily: 'var(--font-mono)', cursor: 'pointer', padding: 0 }}
+              style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', fontSize: 10, fontFamily: 'var(--font-mono)', cursor: 'pointer', padding: 0 }}
             >
               SELECT ALL
             </button>
@@ -75,7 +76,7 @@ export const PreferencesView: React.FC<PreferencesViewProps> = ({ preferences, o
             <button
               type="button"
               onClick={() => setPrefs({ ...prefs, roles: [] })}
-              style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', fontSize: 9.5, fontFamily: 'var(--font-mono)', cursor: 'pointer', padding: 0 }}
+              style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', fontSize: 10, fontFamily: 'var(--font-mono)', cursor: 'pointer', padding: 0 }}
             >
               CLEAR
             </button>
@@ -108,7 +109,7 @@ export const PreferencesView: React.FC<PreferencesViewProps> = ({ preferences, o
                 type="button"
                 onClick={() => setPrefs({ ...prefs, roles: ['fullstack_engineering', 'ai_ml'] })}
                 className="btn btn-secondary btn-sm"
-                style={{ fontSize: 9.5, padding: '3px 8px' }}
+                style={{ fontSize: 10, padding: '3px 8px' }}
               >
                 RECOMMENDED (FULLSTACK & AI)
               </button>
@@ -116,7 +117,7 @@ export const PreferencesView: React.FC<PreferencesViewProps> = ({ preferences, o
                 type="button"
                 onClick={() => setPrefs({ ...prefs, roles: availableRoles.map((r) => r.id) })}
                 className="btn btn-primary btn-sm"
-                style={{ fontSize: 9.5, padding: '3px 8px' }}
+                style={{ fontSize: 10, padding: '3px 8px' }}
               >
                 SELECT ALL 5
               </button>
@@ -130,7 +131,12 @@ export const PreferencesView: React.FC<PreferencesViewProps> = ({ preferences, o
             return (
               <div
                 key={role.id}
+                role="checkbox"
+                aria-checked={isChecked}
+                aria-label={role.label}
+                tabIndex={0}
                 onClick={() => toggleRole(role.id)}
+                onKeyDown={(e) => { if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); toggleRole(role.id); } }}
                 style={{
                   display: 'flex',
                   alignItems: 'center',
@@ -165,7 +171,7 @@ export const PreferencesView: React.FC<PreferencesViewProps> = ({ preferences, o
                   alignItems: 'center',
                   justifyContent: 'center',
                 }}>
-                  {isChecked && <Check size={11} color="#ffffff" />}
+                  {isChecked && <Check size={11} color="var(--on-accent)" />}
                 </div>
               </div>
             );
@@ -184,7 +190,7 @@ export const PreferencesView: React.FC<PreferencesViewProps> = ({ preferences, o
             <button
               type="button"
               onClick={() => setPrefs({ ...prefs, seniorities: availableSeniorities.map((s) => s.id) })}
-              style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', fontSize: 9.5, fontFamily: 'var(--font-mono)', cursor: 'pointer', padding: 0 }}
+              style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', fontSize: 10, fontFamily: 'var(--font-mono)', cursor: 'pointer', padding: 0 }}
             >
               SELECT ALL
             </button>
@@ -192,7 +198,7 @@ export const PreferencesView: React.FC<PreferencesViewProps> = ({ preferences, o
             <button
               type="button"
               onClick={() => setPrefs({ ...prefs, seniorities: [] })}
-              style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', fontSize: 9.5, fontFamily: 'var(--font-mono)', cursor: 'pointer', padding: 0 }}
+              style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', fontSize: 10, fontFamily: 'var(--font-mono)', cursor: 'pointer', padding: 0 }}
             >
               CLEAR
             </button>
@@ -218,7 +224,7 @@ export const PreferencesView: React.FC<PreferencesViewProps> = ({ preferences, o
               type="button"
               onClick={() => setPrefs({ ...prefs, seniorities: availableSeniorities.map((s) => s.id) })}
               className="btn btn-primary btn-sm"
-              style={{ fontSize: 9, padding: '2px 6px' }}
+              style={{ fontSize: 10, padding: '2px 6px' }}
             >
               SELECT ALL
             </button>
@@ -267,6 +273,7 @@ export const PreferencesView: React.FC<PreferencesViewProps> = ({ preferences, o
         <input
           type="checkbox"
           checked={prefs.remote_only}
+          aria-label="Remote only"
           onChange={(e) => setPrefs({ ...prefs, remote_only: e.target.checked })}
           style={{ width: 16, height: 16, cursor: 'pointer', accentColor: 'var(--accent)' }}
         />
@@ -279,6 +286,8 @@ export const PreferencesView: React.FC<PreferencesViewProps> = ({ preferences, o
           type="text"
           className="input-text"
           placeholder="e.g. Next.js, PyTorch, Figma (comma separated)"
+          aria-label="Must-include keywords"
+          maxLength={500}
           value={prefs.custom_keywords}
           onChange={(e) => setPrefs({ ...prefs, custom_keywords: e.target.value })}
         />
@@ -291,6 +300,8 @@ export const PreferencesView: React.FC<PreferencesViewProps> = ({ preferences, o
           type="text"
           className="input-text"
           placeholder="e.g. contract, unpaid, sales, crypto"
+          aria-label="Excluded keywords"
+          maxLength={500}
           value={prefs.excluded_keywords}
           onChange={(e) => setPrefs({ ...prefs, excluded_keywords: e.target.value })}
         />
@@ -320,6 +331,7 @@ export const PreferencesView: React.FC<PreferencesViewProps> = ({ preferences, o
         <input
           type="checkbox"
           checked={prefs.notify_enabled}
+          aria-label="Desktop alerts"
           onChange={(e) => setPrefs({ ...prefs, notify_enabled: e.target.checked })}
           style={{ width: 16, height: 16, cursor: 'pointer', accentColor: 'var(--accent)' }}
         />
@@ -337,11 +349,10 @@ export const PreferencesView: React.FC<PreferencesViewProps> = ({ preferences, o
           <span>{saving ? 'SAVING RULES...' : 'SAVE TARGET PREFERENCES'}</span>
         </button>
 
-        {savedSuccess && (
-          <span style={{ fontSize: 11, color: 'var(--green)', fontFamily: 'var(--font-mono)' }}>
-            ✓ SAVED!
-          </span>
-        )}
+        <span role="status" style={{ fontSize: 11, color: savedState === 'local' ? 'var(--amber-400)' : 'var(--green)', fontFamily: 'var(--font-mono)' }}>
+          {savedState === 'synced' && '✓ SAVED!'}
+          {savedState === 'local' && 'SAVED ON THIS DEVICE ONLY'}
+        </span>
       </div>
     </form>
   );

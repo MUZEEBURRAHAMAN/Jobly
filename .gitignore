@@ -16,3 +16,6 @@ jobly-extension.zip
 # OS
 .DS_Store
 Thumbs.db
+
+# Local-dev extension build (talks to localhost; never ship)
+extension/dist-dev/

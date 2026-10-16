@@ -3,6 +3,7 @@ import { Bookmark, BookmarkCheck, ExternalLink, MapPin, Globe, Sparkles, DollarS
 import { ReportModal } from './ReportModal';
 import { Job } from '../types';
 import { getCompanyLogoUrl } from '../lib/companyLogos';
+import { hostOf, safeHttpUrl } from '../lib/url';
 
 interface JobCardProps {
   job: Job;
@@ -12,6 +13,9 @@ interface JobCardProps {
 export const JobCard: React.FC<JobCardProps> = ({ job, onToggleSave }) => {
   const [imgFailed, setImgFailed] = useState(false);
   const [showReport, setShowReport] = useState(false);
+  const [shareNote, setShareNote] = useState<string | null>(null);
+  const applyUrl = safeHttpUrl(job.application_url); // third-party data: never render javascript:/data: links
+  const applyHost = hostOf(job.application_url);
 
   const formatRelativeTime = (isoString: string) => {
     try {
@@ -28,12 +32,19 @@ export const JobCard: React.FC<JobCardProps> = ({ job, onToggleSave }) => {
 
   const handleShare = async (e: React.MouseEvent) => {
     e.stopPropagation();
-    const shareData = { title: job.title, text: `${job.title} at ${job.company_name}`, url: job.application_url };
-    if (navigator.share && navigator.canShare?.(shareData)) {
-      try { await navigator.share(shareData); } catch { /* user cancelled */ }
-    } else {
-      await navigator.clipboard.writeText(job.application_url);
+    if (!applyUrl) return;
+    const shareData = { title: job.title, text: `${job.title} at ${job.company_name}`, url: applyUrl };
+    try {
+      if (navigator.share && navigator.canShare?.(shareData)) {
+        await navigator.share(shareData);
+      } else {
+        await navigator.clipboard.writeText(applyUrl);
+        setShareNote('LINK COPIED');
+      }
+    } catch (err) {
+      if ((err as DOMException)?.name !== 'AbortError') setShareNote("COULDN'T COPY");
     }
+    window.setTimeout(() => setShareNote(null), 2000);
   };
 
   const getSourceBadgeClass = (source: string) => {
@@ -127,6 +138,8 @@ export const JobCard: React.FC<JobCardProps> = ({ job, onToggleSave }) => {
               letterSpacing: '-0.015em',
               color: 'var(--text-primary)',
               margin: 0,
+              minWidth: 0,
+              overflowWrap: 'anywhere',
             }}>
               {job.title}
             </h3>
@@ -153,7 +166,7 @@ export const JobCard: React.FC<JobCardProps> = ({ job, onToggleSave }) => {
             }}>
               {job.company_name}
             </span>
-            <span className={`badge ${getSourceBadgeClass(job.source_type)}`} style={{ fontSize: 8.5, padding: '1px 5px' }}>
+            <span className={`badge ${getSourceBadgeClass(job.source_type)}`} style={{ fontSize: 10, padding: '1px 5px' }}>
               {job.source_type}
             </span>
           </div>
@@ -233,6 +246,8 @@ export const JobCard: React.FC<JobCardProps> = ({ job, onToggleSave }) => {
               fontFamily: 'var(--font-mono)'
             }}
             title={job.is_saved ? 'Remove from saved' : 'Save opportunity'}
+            aria-pressed={job.is_saved}
+            aria-label={`${job.is_saved ? 'Remove from saved' : 'Save'}: ${job.title} at ${job.company_name}`}
           >
             {job.is_saved ? <BookmarkCheck size={12} color="var(--accent)" /> : <Bookmark size={12} />}
             <span>{job.is_saved ? 'SAVED' : 'SAVE'}</span>
@@ -244,10 +259,12 @@ export const JobCard: React.FC<JobCardProps> = ({ job, onToggleSave }) => {
             className="btn btn-secondary btn-sm"
             style={{ padding: '4px 7px', color: 'var(--text-muted)' }}
             title="Share this job"
-            aria-label="Share"
+            aria-label={`Share: ${job.title}`}
+            disabled={!applyUrl}
           >
             <Share2 size={13} />
           </button>
+          <span role="status" style={{ fontSize: 10, fontFamily: 'var(--font-mono)', color: 'var(--text-muted)' }}>{shareNote}</span>
 
           {/* Report — icon only */}
           <button
@@ -255,22 +272,30 @@ export const JobCard: React.FC<JobCardProps> = ({ job, onToggleSave }) => {
             className="btn btn-secondary btn-sm"
             style={{ padding: '4px 7px', color: 'var(--text-muted)' }}
             title="Report this listing"
-            aria-label="Report"
+            aria-label={`Report: ${job.title}`}
           >
             <Flag size={13} />
           </button>
         </div>
 
-        <a
-          href={job.application_url}
-          target="_blank"
-          rel="noreferrer"
-          className="btn btn-primary btn-sm"
-          style={{ textDecoration: 'none', gap: 6 }}
-        >
-          <span>APPLY DIRECT</span>
-          <ExternalLink size={12} />
-        </a>
+        {applyUrl ? (
+          <a
+            href={applyUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn btn-primary btn-sm"
+            style={{ textDecoration: 'none', gap: 6 }}
+            title={applyHost ? `Opens ${applyHost}` : undefined}
+            aria-label={`Apply to ${job.title} at ${job.company_name}${applyHost ? ` (opens ${applyHost})` : ''}`}
+          >
+            <span>APPLY DIRECT</span>
+            <ExternalLink size={12} />
+          </a>
+        ) : (
+          <span className="btn btn-secondary btn-sm" aria-disabled="true" style={{ opacity: 0.6, cursor: 'not-allowed' }}>
+            LINK UNAVAILABLE
+          </span>
+        )}
       </div>
 
       {/* Report Modal */}

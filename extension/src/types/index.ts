@@ -28,6 +28,10 @@ export interface JobsResponse {
   total: number;
   limit: number;
   offset: number;
+  /** Set when the request failed: 'offline' = unreachable, 'server' = the server answered with an error. */
+  error?: 'offline' | 'server';
+  /** True when `items` came from the local cache instead of the server. */
+  fromCache?: boolean;
 }
 
 export interface JobFilterParams {

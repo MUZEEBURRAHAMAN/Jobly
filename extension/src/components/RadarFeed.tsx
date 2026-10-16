@@ -47,6 +47,12 @@ interface RadarFeedProps {
   onToggleSave: (job: Job) => void;
   onConfigureTargets?: () => void;
   onSavePreferences?: (prefs: Preferences) => Promise<void>;
+  /** Set when the last load failed: don't present an outage as "no jobs match". */
+  loadError?: 'offline' | 'server' | null;
+  onRetryLoad?: () => void;
+  /** More jobs exist on the server than are loaded (server pages are capped). */
+  hasMore?: boolean;
+  onLoadMore?: () => void;
   activeRoleFilter: string;
   setActiveRoleFilter: (role: string) => void;
   // Q-3: Lifted filter state props
@@ -68,6 +74,10 @@ export const RadarFeed: React.FC<RadarFeedProps> = ({
   onToggleSave,
   onConfigureTargets,
   onSavePreferences,
+  loadError,
+  onRetryLoad,
+  hasMore,
+  onLoadMore,
   activeRoleFilter,
   setActiveRoleFilter,
   filterHub: selectedHub, setFilterHub: setSelectedHub,
@@ -498,7 +508,7 @@ export const RadarFeed: React.FC<RadarFeedProps> = ({
                       className={`filter-pill ${isActive ? 'active' : ''}`}
                       style={{
                         fontFamily: 'var(--font-mono)',
-                        fontSize: 9.5,
+                        fontSize: 10,
                         padding: '3px 8px',
                         display: 'inline-flex',
                         alignItems: 'center',
@@ -509,23 +519,23 @@ export const RadarFeed: React.FC<RadarFeedProps> = ({
                         height: 26,
                         border: isActive ? '1px solid var(--accent)' : '1px solid var(--border-subtle)',
                         background: isActive ? 'var(--accent)' : 'var(--bg-card)',
-                        color: isActive ? '#ffffff' : 'var(--text-secondary)',
+                        color: isActive ? 'var(--on-accent)' : 'var(--text-secondary)',
                         fontWeight: isActive ? 700 : 500,
                         letterSpacing: '0.03em',
                         transition: 'all 0.15s ease',
                       }}
                     >
-                      <Icon size={10} color={isActive ? '#ffffff' : 'var(--accent)'} />
+                      <Icon size={10} color={isActive ? 'var(--on-accent)' : 'var(--accent)'} />
                       <span>{tab.shortLabel}</span>
                       <span style={{
-                        fontSize: 8.5,
+                        fontSize: 10,
                         fontFamily: 'var(--font-mono)',
                         fontWeight: 700,
                         padding: '0 4px',
                         lineHeight: '13px',
                         borderRadius: 0,
                         background: isActive ? 'rgba(0, 0, 0, 0.25)' : 'var(--bg-tertiary)',
-                        color: isActive ? '#ffffff' : 'var(--accent)',
+                        color: isActive ? 'var(--on-accent)' : 'var(--accent)',
                         border: isActive ? '1px solid rgba(255, 255, 255, 0.3)' : '1px solid var(--border-subtle)',
                       }}>
                         {count}
@@ -542,7 +552,7 @@ export const RadarFeed: React.FC<RadarFeedProps> = ({
                         title="Configure Target Roles & Rules"
                         style={{
                           background: isActive ? 'var(--accent)' : 'var(--bg-card)',
-                          color: isActive ? '#ffffff' : 'var(--text-muted)',
+                          color: isActive ? 'var(--on-accent)' : 'var(--text-muted)',
                           border: '1px solid var(--border-subtle)',
                           borderLeft: 'none',
                           padding: '0 5px',
@@ -758,7 +768,7 @@ export const RadarFeed: React.FC<RadarFeedProps> = ({
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          fontSize: 9.5,
+          fontSize: 10,
           fontFamily: 'var(--font-mono)',
           color: 'var(--text-muted)',
           borderTop: '1px solid var(--border-subtle)',
@@ -785,7 +795,7 @@ export const RadarFeed: React.FC<RadarFeedProps> = ({
                   background: 'transparent',
                   border: 'none',
                   color: 'var(--accent)',
-                  fontSize: 9,
+                  fontSize: 10,
                   fontFamily: 'var(--font-mono)',
                   fontWeight: 700,
                   cursor: 'pointer',
@@ -807,7 +817,7 @@ export const RadarFeed: React.FC<RadarFeedProps> = ({
                   background: 'transparent',
                   border: 'none',
                   color: 'var(--text-muted)',
-                  fontSize: 9,
+                  fontSize: 10,
                   fontFamily: 'var(--font-mono)',
                   cursor: 'pointer',
                   padding: 0,
@@ -826,6 +836,26 @@ export const RadarFeed: React.FC<RadarFeedProps> = ({
           <div style={{ padding: '32px 0', textAlign: 'center', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)', fontSize: 12 }}>
             SCANNING LIVE ATS RADARS...
           </div>
+        ) : filteredJobs.length === 0 && loadError ? (
+          <div role="alert" style={{ padding: '36px 20px', textAlign: 'center', background: 'var(--bg-secondary)', border: '1px solid var(--border-subtle)', width: '100%' }}>
+            <span className="eyebrow" style={{ fontSize: 10, color: 'var(--amber-400)', display: 'block', marginBottom: 4 }}>
+              {loadError === 'offline' ? 'CAN\'T REACH THE SERVER' : 'SERVER ERROR'}
+            </span>
+            <h3 style={{ fontSize: 13, fontWeight: 700, letterSpacing: '0.04em', textTransform: 'uppercase', color: 'var(--text-primary)' }}>
+              Couldn&apos;t load positions
+            </h3>
+            <p style={{ fontSize: 11.5, color: 'var(--text-muted)', margin: '6px auto 14px', maxWidth: 360, lineHeight: 1.4 }}>
+              {loadError === 'offline'
+                ? 'The server may be waking up or you may be offline. Your saved settings are safe.'
+                : 'The server answered with an error. This is not a problem with your filters.'}
+            </p>
+            {onRetryLoad && (
+              <button type="button" onClick={onRetryLoad} className="btn btn-primary btn-sm" style={{ gap: 6, fontFamily: 'var(--font-mono)' }}>
+                <RotateCcw size={12} />
+                <span>TRY AGAIN</span>
+              </button>
+            )}
+          </div>
         ) : filteredJobs.length === 0 ? (
           <div style={{
             padding: '36px 20px',
@@ -838,7 +868,7 @@ export const RadarFeed: React.FC<RadarFeedProps> = ({
               // Edge Case 1: Search returned 0 results
               <>
                 <Search size={24} color="var(--accent)" style={{ margin: '0 auto 10px', display: 'block' }} />
-                <span className="eyebrow" style={{ fontSize: 9.5, color: 'var(--accent)', display: 'block', marginBottom: 4 }}>
+                <span className="eyebrow" style={{ fontSize: 10, color: 'var(--accent)', display: 'block', marginBottom: 4 }}>
                   0 SEARCH MATCHES
                 </span>
                 <h3 style={{ fontSize: 13, fontWeight: 700, letterSpacing: '0.04em', textTransform: 'uppercase', color: 'var(--text-primary)' }}>
@@ -846,7 +876,7 @@ export const RadarFeed: React.FC<RadarFeedProps> = ({
                 </h3>
                 <p style={{ fontSize: 11.5, color: 'var(--text-muted)', marginTop: 4, marginBottom: 14, maxWidth: 360, margin: '6px auto 14px', lineHeight: 1.4 }}>
                   {activeRoleFilter !== 'all'
-                    ? `Zero listings found in ${roleTabs.find((t) => t.id === activeRoleFilter)?.label || 'this role'} for "${search.trim()}". Search across all 20,000+ listings or clear your query.`
+                    ? `Zero listings found in ${roleTabs.find((t) => t.id === activeRoleFilter)?.label || 'this role'} for "${search.trim()}". Search across every listing or clear your query.`
                     : `Zero listings found matching "${search.trim()}". Try searching by another city (e.g. "Bangalore", "Noida", "Remote"), company name, or tech stack.`}
                 </p>
                 <div style={{ display: 'flex', gap: 8, justifyContent: 'center', flexWrap: 'wrap' }}>
@@ -865,7 +895,7 @@ export const RadarFeed: React.FC<RadarFeedProps> = ({
                       style={{ gap: 6, fontFamily: 'var(--font-mono)' }}
                     >
                       <Globe size={12} />
-                      <span>SEARCH ALL 20,000+ JOBS</span>
+                      <span>SEARCH ALL JOBS</span>
                     </button>
                   )}
                   {activeFilterCount > 0 && (
@@ -884,7 +914,7 @@ export const RadarFeed: React.FC<RadarFeedProps> = ({
               // Edge Case 2: Target Matches active, but 0 roles selected
               <>
                 <Sliders size={24} color="var(--accent)" style={{ margin: '0 auto 10px', display: 'block' }} />
-                <span className="eyebrow" style={{ fontSize: 9.5, color: 'var(--accent)', display: 'block', marginBottom: 4 }}>
+                <span className="eyebrow" style={{ fontSize: 10, color: 'var(--accent)', display: 'block', marginBottom: 4 }}>
                   TARGET RADAR · STANDBY
                 </span>
                 <h3 style={{ fontSize: 13, fontWeight: 700, letterSpacing: '0.04em', textTransform: 'uppercase', color: 'var(--text-primary)' }}>
@@ -911,7 +941,7 @@ export const RadarFeed: React.FC<RadarFeedProps> = ({
                     style={{ gap: 6, fontFamily: 'var(--font-mono)' }}
                   >
                     <Globe size={12} />
-                    <span>VIEW ALL 20,000+ JOBS</span>
+                    <span>VIEW ALL JOBS</span>
                   </button>
                 </div>
               </>
@@ -919,7 +949,7 @@ export const RadarFeed: React.FC<RadarFeedProps> = ({
               // Edge Case 3: Target Matches active, but no items match current rules/filters
               <>
                 <Sparkles size={24} color="var(--accent)" style={{ margin: '0 auto 10px', display: 'block' }} />
-                <span className="eyebrow" style={{ fontSize: 9.5, color: 'var(--accent)', display: 'block', marginBottom: 4 }}>
+                <span className="eyebrow" style={{ fontSize: 10, color: 'var(--accent)', display: 'block', marginBottom: 4 }}>
                   TARGET RADAR ACTIVE
                 </span>
                 <h3 style={{ fontSize: 13, fontWeight: 700, letterSpacing: '0.04em', textTransform: 'uppercase', color: 'var(--text-primary)' }}>
@@ -946,7 +976,7 @@ export const RadarFeed: React.FC<RadarFeedProps> = ({
                     style={{ gap: 6, fontFamily: 'var(--font-mono)' }}
                   >
                     <Globe size={12} />
-                    <span>VIEW ALL 20,000+ JOBS</span>
+                    <span>VIEW ALL JOBS</span>
                   </button>
                   {activeFilterCount > 0 && (
                     <button
@@ -964,7 +994,7 @@ export const RadarFeed: React.FC<RadarFeedProps> = ({
               // Edge Case 4: Active filters excluded all jobs
               <>
                 <SlidersHorizontal size={24} color="var(--accent)" style={{ margin: '0 auto 10px', display: 'block' }} />
-                <span className="eyebrow" style={{ fontSize: 9.5, color: 'var(--accent)', display: 'block', marginBottom: 4 }}>
+                <span className="eyebrow" style={{ fontSize: 10, color: 'var(--accent)', display: 'block', marginBottom: 4 }}>
                   FILTER EXCLUSION
                 </span>
                 <h3 style={{ fontSize: 13, fontWeight: 700, letterSpacing: '0.04em', textTransform: 'uppercase', color: 'var(--text-primary)' }}>
@@ -991,7 +1021,7 @@ export const RadarFeed: React.FC<RadarFeedProps> = ({
                     style={{ gap: 6, fontFamily: 'var(--font-mono)' }}
                   >
                     <Globe size={12} />
-                    <span>VIEW ALL 20,000+ JOBS</span>
+                    <span>VIEW ALL JOBS</span>
                   </button>
                 </div>
               </>
@@ -999,14 +1029,14 @@ export const RadarFeed: React.FC<RadarFeedProps> = ({
               // Edge Case 5: Empty category stream
               <>
                 <Globe size={24} color="var(--text-muted)" style={{ margin: '0 auto 10px', display: 'block' }} />
-                <span className="eyebrow" style={{ fontSize: 9.5, color: 'var(--text-muted)', display: 'block', marginBottom: 4 }}>
+                <span className="eyebrow" style={{ fontSize: 10, color: 'var(--text-muted)', display: 'block', marginBottom: 4 }}>
                   FEED STREAM EMPTY
                 </span>
                 <h3 style={{ fontSize: 13, fontWeight: 700, letterSpacing: '0.04em', textTransform: 'uppercase', color: 'var(--text-primary)' }}>
                   No Positions In Stream
                 </h3>
                 <p style={{ fontSize: 11.5, color: 'var(--text-muted)', marginTop: 4, marginBottom: 14, maxWidth: 360, margin: '6px auto 14px', lineHeight: 1.4 }}>
-                  No listings found for this category. Expand to view all 20,000+ opportunities across 357 monitored employers.
+                  No listings found for this category. Expand to view every opportunity across all monitored employers.
                 </p>
                 <div style={{ display: 'flex', gap: 8, justifyContent: 'center', flexWrap: 'wrap' }}>
                   <button
@@ -1018,7 +1048,7 @@ export const RadarFeed: React.FC<RadarFeedProps> = ({
                     style={{ gap: 6, fontFamily: 'var(--font-mono)' }}
                   >
                     <Globe size={12} />
-                    <span>VIEW ALL 20,000+ JOBS</span>
+                    <span>VIEW ALL JOBS</span>
                   </button>
                 </div>
               </>
@@ -1029,15 +1059,18 @@ export const RadarFeed: React.FC<RadarFeedProps> = ({
             {filteredJobs.slice(0, displayLimit).map((j) => (
               <JobCard key={`${j.source_type}-${j.external_id}`} job={j} onToggleSave={onToggleSave} />
             ))}
-            {/* Q-2 FIX: Load More button */}
-            {filteredJobs.length > displayLimit && (
+            {/* Q-2 FIX: Load More button (client pages through what is loaded, then asks the server for more) */}
+            {(filteredJobs.length > displayLimit || hasMore) && (
               <div style={{ textAlign: 'center', paddingTop: 8 }}>
                 <button
-                  onClick={() => setDisplayLimit(displayLimit + 30)}
+                  onClick={() => {
+                    setDisplayLimit(displayLimit + 30);
+                    if (hasMore && filteredJobs.length - (displayLimit + 30) < 30) onLoadMore?.();
+                  }}
                   className="btn btn-secondary btn-sm"
                   style={{ fontFamily: 'var(--font-mono)', width: '100%' }}
                 >
-                  LOAD MORE ({filteredJobs.length - displayLimit} REMAINING)
+                  {filteredJobs.length > displayLimit ? `LOAD MORE (${filteredJobs.length - displayLimit} LOADED)` : 'LOAD MORE'}
                 </button>
               </div>
             )}
@@ -1128,7 +1161,7 @@ export const RadarFeed: React.FC<RadarFeedProps> = ({
                           <div style={{ fontSize: 11, fontWeight: 700, color: isChecked ? 'var(--text-primary)' : 'var(--text-secondary)' }}>
                             {role.label}
                           </div>
-                          <div style={{ fontSize: 9, color: 'var(--text-muted)', marginTop: 1 }}>
+                          <div style={{ fontSize: 10, color: 'var(--text-muted)', marginTop: 1 }}>
                             {role.sub}
                           </div>
                         </div>
@@ -1144,7 +1177,7 @@ export const RadarFeed: React.FC<RadarFeedProps> = ({
                         borderRadius: 2,
                         flexShrink: 0,
                       }}>
-                        {isChecked && <Check size={11} color="#ffffff" />}
+                        {isChecked && <Check size={11} color="var(--on-accent)" />}
                       </div>
                     </div>
                   );
@@ -1167,11 +1200,11 @@ export const RadarFeed: React.FC<RadarFeedProps> = ({
                       onClick={() => toggleDraftSeniority(sen.id)}
                       style={{
                         padding: '4px 8px',
-                        fontSize: 9,
+                        fontSize: 10,
                         fontFamily: 'var(--font-mono)',
                         fontWeight: isChecked ? 700 : 400,
                         background: isChecked ? 'var(--accent)' : 'var(--bg-tertiary)',
-                        color: isChecked ? '#ffffff' : 'var(--text-secondary)',
+                        color: isChecked ? 'var(--on-accent)' : 'var(--text-secondary)',
                         border: '1px solid ' + (isChecked ? 'var(--accent)' : 'var(--border-subtle)'),
                         cursor: 'pointer',
                         borderRadius: 2,
@@ -1200,7 +1233,7 @@ export const RadarFeed: React.FC<RadarFeedProps> = ({
             >
               <div>
                 <div style={{ fontSize: 11, fontWeight: 700 }}>REMOTE ONLY</div>
-                <div style={{ fontSize: 9, color: 'var(--text-muted)' }}>Only match 100% remote positions</div>
+                <div style={{ fontSize: 10, color: 'var(--text-muted)' }}>Only match 100% remote positions</div>
               </div>
               <div style={{
                 width: 16,
@@ -1212,7 +1245,7 @@ export const RadarFeed: React.FC<RadarFeedProps> = ({
                 justifyContent: 'center',
                 borderRadius: 2,
               }}>
-                {draftRemoteOnly && <Check size={11} color="#ffffff" />}
+                {draftRemoteOnly && <Check size={11} color="var(--on-accent)" />}
               </div>
             </div>
 

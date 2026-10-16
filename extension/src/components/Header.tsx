@@ -1,9 +1,14 @@
 import React from 'react';
 import { RefreshCw, ExternalLink, Sun, Moon } from 'lucide-react';
 import { RadarStats } from '../types';
+import type { ConnectionStatus } from '../lib/api';
+
+export const appVersion = (): string =>
+  typeof chrome !== 'undefined' && chrome.runtime?.getManifest ? chrome.runtime.getManifest().version : 'dev';
 
 interface HeaderProps {
-  isOnline: boolean;
+  status: ConnectionStatus;
+  onRetry?: () => void;
   isSyncing: boolean;
   stats: RadarStats | null;
   onSync: () => void;
@@ -13,7 +18,8 @@ interface HeaderProps {
 }
 
 export const Header: React.FC<HeaderProps> = ({
-  isOnline,
+  status,
+  onRetry,
   isSyncing,
   stats,
   onSync,
@@ -21,6 +27,7 @@ export const Header: React.FC<HeaderProps> = ({
   theme,
   onToggleTheme,
 }) => {
+  const isOnline = status === 'online';
   return (
     <header style={{
       padding: '12px 16px',
@@ -57,7 +64,7 @@ export const Header: React.FC<HeaderProps> = ({
             JB
           </span>
           <div
-            className={`radar-ping ${isOnline ? '' : 'offline'}`}
+            className={`radar-ping ${status === 'online' ? '' : 'offline'}`}
             style={{
               position: 'absolute',
               top: -3,
@@ -68,7 +75,8 @@ export const Header: React.FC<HeaderProps> = ({
 
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-            <span style={{
+            <h1 style={{
+              margin: 0,
               fontWeight: 800,
               fontSize: 14,
               letterSpacing: '0.04em',
@@ -76,23 +84,39 @@ export const Header: React.FC<HeaderProps> = ({
               color: 'var(--text-primary)'
             }}>
               Jobly
-            </span>
-            <span className="badge badge-accent" style={{ fontSize: 9, padding: '1px 5px' }}>
-              v2.5
+            </h1>
+            <span className="badge badge-accent" style={{ fontSize: 10, padding: '1px 5px' }}>
+              v{appVersion()}
             </span>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11, fontFamily: 'var(--font-mono)', color: 'var(--text-muted)', marginTop: 1 }}>
-            {isOnline ? (
+          <div
+            role="status"
+            aria-live="polite"
+            style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11, fontFamily: 'var(--font-mono)', color: 'var(--text-muted)', marginTop: 1 }}
+          >
+            {status === 'online' && (
               <>
                 <span className="status-dot" />
                 <span style={{ color: 'var(--green)', fontWeight: 600 }}>ENGINE LIVE</span>
                 {stats && <span style={{ color: 'var(--text-secondary)' }}>· {stats.matched_jobs} MATCHES</span>}
               </>
-            ) : (
+            )}
+            {status === 'connecting' && (
+              <>
+                <span className="status-dot offline" />
+                <span style={{ color: 'var(--amber-400)', fontWeight: 600 }}>CONNECTING · WAKING SERVER</span>
+              </>
+            )}
+            {status === 'offline' && (
               <>
                 <span className="status-dot offline" />
                 <span style={{ color: 'var(--amber-400)', fontWeight: 600 }}>OFFLINE CACHED</span>
+                {onRetry && (
+                  <button type="button" onClick={onRetry} className="btn btn-secondary btn-sm" style={{ padding: '1px 6px', fontSize: 10 }}>
+                    RETRY
+                  </button>
+                )}
               </>
             )}
           </div>
@@ -145,12 +169,6 @@ export const Header: React.FC<HeaderProps> = ({
         )}
       </div>
 
-      <style>{`
-        @keyframes spin {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(360deg); }
-        }
-      `}</style>
     </header>
   );
 };
