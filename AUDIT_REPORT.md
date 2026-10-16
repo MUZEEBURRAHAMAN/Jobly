@@ -21,6 +21,28 @@ Every finding below was reproduced unless it says **(code review)**. Two results
 
 ---
 
+
+## Fix status (updated 2026-10-17)
+
+Backend (commits `8acd040`, `526a8f7`) and extension (`cf4292e` and the redesign commit) were fixed and re-verified in a real browser
+(45+ automated checks, axe-core clean in both themes, production build run end to end).
+
+**Fixed:** SEC-01 (limit bounds), SEC-02 (SSRF guard), SEC-03 for company/sync writes (admin token), SEC-05 (rate limits, locked company syncs),
+SEC-06, SEC-07, SEC-08, SEC-09, SEC-11 (localhost removed from production), BUG-01, BUG-02, FUNC-01…FUNC-09, COLD-1, SW-01, A11Y-01…A11Y-06, VIS-01, VIS-02,
+TEST-01/02, DEP-01 (pinned), PRIV-01 (fonts bundled; favicons documented), P3 copy/version/title/overflow items, `npm audit` (source-map-js).
+**New issue found and fixed while verifying:** the production server started with an **empty database** (Docker context had no data, no persistent
+disk on the free tier): it now seeds its company list on boot and crawls immediately.
+
+**Still open (needs you / a design decision):**
+- **SEC-04 shared state** – preferences, saved jobs and alerts are still one global set on the server. Muted companies are already per-device.
+- **OPS-01** – `api.getcatchly.com` does not resolve (DNS now at GoDaddy); point the keep-alive cron at the Render URL.
+- **SEC-10** – set `EXTENSION_IDS` on the server once the extension has a Web Store ID.
+- Free-tier hosting has no persistent disk: data is rebuilt (~1–2 min) after every restart/deploy.
+- Remaining `npm audit` findings (vite/esbuild dev server) need a major Vite upgrade and are dev-tooling only.
+- Dockerfile still runs as root (a non-root user would break writes to a mounted disk without a matching `chown`).
+
+---
+
 ## P0 — Critical
 
 | ID | Finding | Evidence | Fix |

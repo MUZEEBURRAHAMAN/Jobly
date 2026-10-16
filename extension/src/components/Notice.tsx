@@ -19,22 +19,10 @@ export function useNotice(autoDismissMs = 6000) {
 
 export const Notice: React.FC<{ notice: NoticeState | null; onClose: () => void }> = ({ notice, onClose }) => {
   if (!notice) return null;
-  const isError = notice.kind === 'error';
   return (
-    <div
-      role={isError ? 'alert' : 'status'}
-      style={{
-        position: 'fixed', left: 8, right: 8, bottom: 56, zIndex: 100000,
-        display: 'flex', alignItems: 'center', gap: 8, padding: '8px 10px',
-        background: 'var(--bg-tertiary)', color: 'var(--text-primary)',
-        border: `1px solid ${isError ? 'var(--amber-400)' : 'var(--border-strong)'}`,
-        fontSize: 12, lineHeight: 1.35,
-      }}
-    >
-      <span style={{ flex: 1 }}>{notice.message}</span>
-      <button type="button" className="btn btn-secondary btn-sm" onClick={onClose} aria-label="Dismiss message" style={{ padding: '2px 8px' }}>
-        OK
-      </button>
+    <div className={`notice ${notice.kind === 'info' ? 'info' : ''}`} role={notice.kind === 'error' ? 'alert' : 'status'}>
+      <span className="grow">{notice.message}</span>
+      <button type="button" className="btn btn-outline btn-sm" onClick={onClose} aria-label="Dismiss message">OK</button>
     </div>
   );
 };

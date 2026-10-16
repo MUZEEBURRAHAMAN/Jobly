@@ -1,4 +1,4 @@
-# Hiring Radar 🎯
+# Jobly
 
 > **Zero-Cost, Role-Based Hiring Radar Chrome Extension MVP**  
 > A proactive job-discovery engine and Chrome extension that tracks top tech companies and alerts you when positions matching your role preferences are published.
@@ -33,53 +33,55 @@
 
 ---
 
-## Quickstart (Zero-Cost Local Setup)
+## Quickstart
 
-### 1. Start the Local Python Engine
+### 1. Use the extension (production backend)
 
 ```bash
-# Activate virtual environment
-source .venv/bin/activate
+cd extension && npm ci && npm run build      # outputs extension/dist
+```
 
-# Seed curated tech companies (OpenAI, Stripe, Figma, Linear, Ramp, etc.)
-python scripts/seed_companies.py
+1. Open `chrome://extensions/`, switch on **Developer mode**, click **Load unpacked** and pick `extension/dist`.
+2. Pin **Jobly** to the toolbar. It talks to the hosted backend (`https://jobly-yd6l.onrender.com`).
+   The free server sleeps when idle: the first open can take ~30 s ("Connecting…"), then it works normally.
 
-# Sync real live job postings from ATS feeds
-python scripts/sync_jobs.py
+> `dist/` is the **production** build: it only talks to the hosted backend and never to localhost.
+> This is what you zip for the Chrome Web Store (see `CHROMEWEBSTORE.md`).
 
-# Start local FastAPI server on port 8000
+### 2. Develop against a local backend
+
+```bash
+python3 -m venv .venv && source .venv/bin/activate
+pip install -r backend/requirements.txt -r backend/requirements-dev.txt
+
+# Starts empty, seeds the bundled company list and crawls on its own (~1-2 min for ~18k jobs)
 uvicorn backend.app.main:app --reload --port 8000
+
+cd extension && npm run build:dev            # outputs extension/dist-dev (allows localhost)
 ```
 
-> **API Documentation**: Once running, visit [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs) to test interactive OpenAPI endpoints.
+Load `extension/dist-dev` instead of `dist` (the manifest is named "Jobly (DEV)").
 
----
-
-### 2. Load the Chrome Extension
-
-1. In Google Chrome, navigate to `chrome://extensions/`
-2. Enable **"Developer mode"** in the top-right corner.
-3. Click **"Load unpacked"**.
-4. Select the folder:
-   ```
-   JOB EXTENSION/extension/dist
-   ```
-5. Pin **Hiring Radar** to your Chrome toolbar!
-
----
-
-### 3. Build & Development Commands
+### 3. Tests and quality checks
 
 ```bash
-# Run tests
-.venv/bin/python -m unittest backend/tests/test_radar.py
-.venv/bin/python -m unittest backend/tests/test_api.py
-
-# Extension frontend development
-cd extension
-npm run dev     # Starts Vite dev preview
-npm run build   # Compiles TypeScript & bundles into extension/dist
+pytest                                       # 44 tests, hermetic (temp database, never your real one)
+cd extension && npx tsc --noEmit             # type-check
 ```
+
+### Server settings (environment variables)
+
+| Variable | Default | Purpose |
+| :--- | :--- | :--- |
+| `DATABASE_PATH` | `./hiring_radar.db` | SQLite file. Render's free tier has no persistent disk: the server re-seeds and re-crawls on every restart |
+| `ADMIN_TOKEN` | *(unset)* | Enables company create/toggle and `?wait_for_completion=true` via the `X-Admin-Token` header. Unset = disabled |
+| `EXTENSION_IDS` | *(any extension)* | Comma-separated Chrome extension IDs allowed by CORS. **Set this after publishing** |
+| `ENABLE_DOCS` | `false` | Serves `/docs` when `true` |
+| `AUTO_SYNC_INTERVAL_HOURS` | `2` | Background crawl interval |
+| `RATE_LIMIT_PER_MIN` / `_WRITES_PER_MIN` / `_SYNC_PER_MIN` | `120` / `30` / `3` | Per-IP limits (`0` disables) |
+
+The design system (tokens, type scale, components) lives in `extension/src/styles/index.css`; empty/error illustrations
+come from [`@lucasmarkes/hairline`](https://hairline.lucasmarkes.com) via `extension/src/components/EmptyState.tsx`.
 
 ---
 
@@ -92,21 +94,7 @@ npm run build   # Compiles TypeScript & bundles into extension/dist
 | **Lever** | Public Postings API | ₹0 | Palantir, Wealthfront |
 
 ### Adding Any New Company
-You can add any company with a public Greenhouse, Ashby, or Lever board directly from the extension's **"Companies"** tab by entering their board token (e.g. `supabase`, `datadog`).
-
----
-
-## Background Automated Ingestion (Optional Cron)
-
-On macOS/Linux, you can schedule the sync script to run automatically in the background using `cron`:
-
-```bash
-# Edit crontab
-crontab -e
-
-# Run sync every 30 minutes (adjust paths to your machine)
-*/30 * * * * cd "/Users/muzeeburrahaman/Downloads/ai agents/JOB EXTENSION" && .venv/bin/python scripts/sync_jobs.py >> /tmp/hiring_radar_sync.log 2>&1
-```
+Add it to `backend/app/data/companies.json` (or, in a dev build, use the **Companies → Add** form with `ADMIN_TOKEN` set). The server picks up new entries on its next start.
 
 ---
 
@@ -123,7 +111,10 @@ JOB EXTENSION/
 │   │   │   ├── lever.py          # Lever ATS adapter
 │   │   │   ├── ashby.py          # Ashby ATS adapter
 │   │   │   └── runner.py         # Concurrent ingestion & sync runner
-│   │   ├── config.py             # App settings & database paths
+│   │   ├── config.py             # App settings (env-driven) & database paths
+│   │   ├── security.py           # SSRF guard, URL sanitising, rate limiting, security headers
+│   │   ├── seed.py               # First-boot company seeding + initial-sync check
+│   │   ├── data/companies.json   # Bundled company list (ships in the Docker image)
 │   │   ├── db.py                 # Async SQLite connection & table schemas
 │   │   ├── matching.py           # Deterministic role & seniority matcher
 │   │   ├── schemas.py            # Pydantic models
@@ -135,11 +126,11 @@ JOB EXTENSION/
 │   │   └── manifest.json         # Manifest V3 configuration
 │   ├── src/
 │   │   ├── background/           # Service worker & notification alarm
-│   │   ├── components/           # RadarFeed, JobCard, Watchlist, Preferences
+│   │   ├── components/           # JobsFeed, JobCard, Companies, Saved, Alerts, Preferences, EmptyState
 │   │   ├── lib/                  # Local API client & storage caching
 │   │   ├── popup/                # Extension popup app
 │   │   ├── options/              # Full dashboard app
-│   │   └── styles/               # Glassmorphism dark mode design system
+│   │   └── styles/               # Design system: tokens, type scale, components (light + dark)
 │   ├── dist/                     # Production build ready for Chrome
 │   ├── package.json
 │   └── vite.config.ts

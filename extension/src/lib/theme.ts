@@ -12,7 +12,8 @@ export const getInitialTheme = (): Theme => {
   } catch {
     // restricted context
   }
-  return 'dark'; // Default dark-first per Muzeeb Design System spec
+  // First run: follow the operating system instead of forcing dark
+  return typeof window !== 'undefined' && window.matchMedia?.('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
 };
 
 export const applyTheme = (theme: Theme): void => {
