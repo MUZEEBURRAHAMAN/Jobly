@@ -80,7 +80,8 @@ async def init_db():
             "min_salary": "INTEGER",
             "max_salary": "INTEGER",
             "geo_hub": "TEXT",
-            "experience_tier": "TEXT"
+            "experience_tier": "TEXT",
+            "posted_at": "TEXT"          # real posting date from the source (NULL when unknown)
         }
         for col_name, col_type in new_cols.items():
             if col_name not in existing_cols:
@@ -90,6 +91,7 @@ async def init_db():
         await db.execute("CREATE INDEX IF NOT EXISTS idx_jobs_role ON jobs(normalized_role);")
         await db.execute("CREATE INDEX IF NOT EXISTS idx_jobs_company ON jobs(company_id);")
         await db.execute("CREATE INDEX IF NOT EXISTS idx_jobs_first_seen ON jobs(first_seen_at);")
+        await db.execute("CREATE INDEX IF NOT EXISTS idx_jobs_posted ON jobs(posted_at);")
 
         await db.execute("""
             CREATE TABLE IF NOT EXISTS preferences (

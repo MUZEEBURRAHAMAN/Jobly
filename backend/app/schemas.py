@@ -22,6 +22,8 @@ class JobOut(BaseModel):
     application_url: str
     first_seen_at: str
     last_seen_at: str
+    # Real posting date from the source (None when the source doesn't say). first_seen_at is just our crawl time.
+    posted_at: str | None = None
     status: str
     is_saved: bool = False
     is_match: bool = False

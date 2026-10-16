@@ -23,6 +23,12 @@ class Settings(BaseSettings):
     EXTENSION_IDS: str = ""
     # Interactive API docs are off in production.
     ENABLE_DOCS: bool = False
+    # Free-tier persistence: restore the newest snapshot from a GitHub release when the database is empty.
+    # Public repo: no token needed. Private repo: set SNAPSHOT_TOKEN (fine-grained token, Contents: read-only).
+    SNAPSHOT_REPO: str = "MUZEEBURRAHAMAN/Jobly"
+    SNAPSHOT_TAG: str = "snapshot"
+    SNAPSHOT_ASSET: str = "jobly.db.gz"
+    SNAPSHOT_TOKEN: str = ""
     # Per-IP, per-minute limits. 0 disables a limit.
     RATE_LIMIT_PER_MIN: int = 120
     RATE_LIMIT_WRITES_PER_MIN: int = 30

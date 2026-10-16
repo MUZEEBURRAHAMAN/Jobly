@@ -1,6 +1,7 @@
 from __future__ import annotations
 import asyncio
 import json
+from datetime import datetime, timezone
 import logging
 import re
 from typing import Any
@@ -11,7 +12,7 @@ from ..matching import (
     detect_geo_hub, detect_experience_tier, matches_preferences
 )
 from ..security import sanitize_http_url
-from .base import NormalizedJob, calculate_content_hash
+from .base import NormalizedJob, calculate_content_hash, normalize_posted_at
 from .greenhouse import fetch_greenhouse_jobs
 from .lever import fetch_lever_jobs
 from .ashby import fetch_ashby_jobs
@@ -150,6 +151,8 @@ async def upsert_job_record(
         comp_name, job.title, job.location, job.application_url
     )
 
+    posted_at = normalize_posted_at(job.source_updated_at)
+
     # Bound description length to avoid holding multi-megabyte HTML strings in memory/DB
     desc = (job.description or "").strip()
     compact_desc = desc[:1500] if desc else None
@@ -197,7 +200,8 @@ async def upsert_job_record(
                 min_salary = COALESCE(?, min_salary),
                 max_salary = COALESCE(?, max_salary),
                 geo_hub = ?,
-                experience_tier = ?
+                experience_tier = ?,
+                posted_at = COALESCE(?, posted_at)
             WHERE id = ?
         """, (
             job.title,
@@ -215,6 +219,7 @@ async def upsert_job_record(
             max_sal,
             geo_hub,
             experience_tier,
+            posted_at,
             existing["id"]
         ))
         summary["updated_jobs"] += 1
@@ -237,8 +242,8 @@ async def upsert_job_record(
                 location, description, application_url, content_hash,
                 first_seen_at, last_seen_at, status, raw_json,
                 salary_summary, min_salary, max_salary,
-                geo_hub, experience_tier
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'active', ?, ?, ?, ?, ?, ?)
+                geo_hub, experience_tier, posted_at
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'active', ?, ?, ?, ?, ?, ?, ?)
         """, (
             comp_id,
             comp_name,
@@ -259,7 +264,8 @@ async def upsert_job_record(
             min_sal,
             max_sal,
             geo_hub,
-            experience_tier
+            experience_tier,
+            posted_at
         ))
         new_job_id = cursor.lastrowid
         summary["new_jobs"] += 1
@@ -272,7 +278,8 @@ async def upsert_job_record(
             "location": job.location,
             "title": job.title,
         }
-        if preferences.get("notify_enabled") and matches_preferences(job_dict, preferences):
+        recent = bool(posted_at) and (datetime.now(timezone.utc) - datetime.fromisoformat(posted_at)).days < 3
+        if recent and preferences.get("notify_enabled") and matches_preferences(job_dict, preferences):
             try:
                 await db.execute("""
                     INSERT OR IGNORE INTO notifications (

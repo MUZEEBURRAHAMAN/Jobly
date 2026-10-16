@@ -100,6 +100,27 @@ class TestJobsList(APITestCase):
         self.assertTrue(all(not n["application_url"].startswith("javascript:") for n in notif))
 
 
+class TestPostingDates(APITestCase):
+    async def test_list_is_slim_and_ordered_by_real_posting_date(self):
+        items = (await self.client.get("/api/jobs?limit=5")).json()["items"]
+        self.assertTrue(all(i["description"] is None for i in items), "descriptions are ~70% of the payload and unused by the list")
+        self.assertEqual(items[0]["posted_at"] is not None, True)          # newest real posting first
+        self.assertTrue(items[0]["title"] == "Engineer 0")
+
+    async def test_freshness_filter_uses_posted_at_and_ignores_unknown_dates(self):
+        day = (await self.client.get("/api/jobs?freshness_days=1")).json()
+        week = (await self.client.get("/api/jobs?freshness_days=7")).json()
+        self.assertEqual([i["title"] for i in day["items"]], ["Engineer 0"])
+        self.assertEqual({i["title"] for i in week["items"]}, {"Engineer 0", "Engineer 1"})
+
+    async def test_new_today_counts_postings_not_crawl_time(self):
+        self.assertEqual((await self.client.get("/api/stats")).json()["new_jobs_today"], 1)
+
+    async def test_detail_endpoint_still_returns_the_description_field(self):
+        job_id = (await self.client.get("/api/jobs?limit=1")).json()["items"][0]["id"]
+        self.assertEqual((await self.client.get(f"/api/jobs/{job_id}")).status_code, 200)
+
+
 class TestWrites(APITestCase):
     async def test_preferences_roundtrip_and_validation(self):
         original = (await self.client.get("/api/preferences")).json()

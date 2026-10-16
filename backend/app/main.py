@@ -7,9 +7,11 @@ from .db import init_db
 from .api.routes import router, start_periodic_sync, stop_periodic_sync
 from .security import RateLimitMiddleware, SecurityHeadersMiddleware
 from .seed import needs_initial_sync, seed_companies_if_missing
+from .snapshot import restore_snapshot_if_needed
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    await restore_snapshot_if_needed()  # empty database + a published snapshot = instant start
     await init_db()
     await seed_companies_if_missing()
     # Empty/stale database (normal after a deploy on a free instance): crawl right away instead of in 2 hours.

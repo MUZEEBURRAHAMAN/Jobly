@@ -168,7 +168,7 @@ async def list_jobs(
 
         if freshness_days:
             since = (datetime.now(timezone.utc) - timedelta(days=freshness_days)).isoformat()
-            conditions.append("first_seen_at >= ?")
+            conditions.append("posted_at >= ?")  # unknown posting dates are excluded when a freshness filter is on
             params.append(since)
 
         def _like(term: str) -> str:
@@ -215,12 +215,12 @@ async def list_jobs(
         query = f"""
             SELECT id, company_id, company_name, source_type, external_id,
                    title, normalized_role, seniority, work_mode, location,
-                   description, application_url, first_seen_at, last_seen_at,
+                   application_url, first_seen_at, last_seen_at, posted_at,
                    status, is_saved, salary_summary, min_salary, max_salary,
                    geo_hub, experience_tier
             FROM jobs
             {where_clause}
-            ORDER BY first_seen_at DESC
+            ORDER BY (posted_at IS NULL) ASC, posted_at DESC, id DESC
             LIMIT ? OFFSET ?
         """
         limit_val, offset_val = limit, offset
@@ -244,10 +244,11 @@ async def list_jobs(
                     seniority=job_dict["seniority"],
                     work_mode=job_dict["work_mode"],
                     location=job_dict["location"],
-                    description=job_dict["description"],
+                    description=None,  # detail endpoint only
                     application_url=job_dict["application_url"],
                     first_seen_at=job_dict["first_seen_at"],
                     last_seen_at=job_dict["last_seen_at"],
+                    posted_at=job_dict.get("posted_at"),
                     status=job_dict["status"],
                     is_saved=bool(job_dict["is_saved"]),
                     is_match=is_match,
@@ -284,6 +285,7 @@ async def get_job(job_id: int):
             application_url=job_dict["application_url"],
             first_seen_at=job_dict["first_seen_at"],
             last_seen_at=job_dict["last_seen_at"],
+            posted_at=job_dict.get("posted_at"),
             status=job_dict["status"],
             is_saved=bool(job_dict["is_saved"]),
             is_match=False
@@ -546,7 +548,7 @@ async def get_stats():
 
         # New in last 24h
         day_ago = (datetime.now(timezone.utc) - timedelta(hours=24)).isoformat()
-        n_cur = await db.execute("SELECT COUNT(*) as count FROM jobs WHERE first_seen_at >= ?", (day_ago,))
+        n_cur = await db.execute("SELECT COUNT(*) as count FROM jobs WHERE status = 'active' AND posted_at >= ?", (day_ago,))
         new_jobs_today = (await n_cur.fetchone())["count"]
 
         # Last sync = newest job we've seen (company rows are also touched by seeding/edits)

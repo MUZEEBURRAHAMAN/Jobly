@@ -18,6 +18,7 @@ os.environ["RATE_LIMIT_WRITES_PER_MIN"] = "0"
 os.environ["RATE_LIMIT_SYNC_PER_MIN"] = "0"
 os.environ["ENABLE_DOCS"] = "0"
 os.environ["EXTENSION_IDS"] = ""
+os.environ["SNAPSHOT_REPO"] = ""        # tests never touch the network
 
 from backend.app.db import get_db_connection, get_utc_now, init_db  # noqa: E402
 
@@ -52,6 +53,10 @@ async def _seed():
             )
         # hourly rates are floats in real Ashby data
         await db.execute("UPDATE jobs SET min_salary = 60.58, max_salary = 108.17, salary_summary = '$60.58 – $108.17 per hour' WHERE external_id = 'ext-hourly'")
+        from datetime import datetime, timedelta, timezone
+        t = datetime.now(timezone.utc)
+        await db.execute("UPDATE jobs SET posted_at = ? WHERE external_id = 'ext-0'", ((t - timedelta(hours=2)).isoformat(),))
+        await db.execute("UPDATE jobs SET posted_at = ? WHERE external_id = 'ext-1'", ((t - timedelta(days=5)).isoformat(),))
         cur = await db.execute("SELECT id FROM jobs WHERE external_id = 'ext-0'")
         job_id = (await cur.fetchone())["id"]
         await db.execute(

@@ -48,7 +48,7 @@ async def fetch_lever_jobs(
                     application_url=app_url,
                     location=location or None,
                     description=clean_text(item.get("descriptionPlain")),
-                    source_updated_at=None,
+                    source_updated_at=item.get("createdAt"),
                     raw_data={
                         "team": categories.get("team"),
                         "department": categories.get("department"),

@@ -222,3 +222,38 @@ class SecurityHeadersMiddleware:
             await send(message)
 
         await self.app(scope, receive, send_wrapper)
+
+
+async def download_github_release_asset(
+    client: httpx.AsyncClient, repo: str, tag: str, name: str, dest, *, token: str = "", max_bytes: int = 200_000_000
+) -> bool:
+    """Download a release asset to `dest`. Works for public repos without a token and for private repos with one.
+    The token goes only to api.github.com: it is dropped on the redirect to the signed download host."""
+    base = {"Accept": "application/vnd.github+json", "X-GitHub-Api-Version": "2022-11-28"}
+    auth = {"Authorization": f"Bearer {token}"} if token else {}
+    meta = await client.get(f"https://api.github.com/repos/{repo}/releases/tags/{tag}", headers={**base, **auth}, timeout=20.0)
+    if meta.status_code != 200:
+        return False
+    asset = next((a for a in meta.json().get("assets", []) if a.get("name") == name), None)
+    if not asset or not asset.get("url") or asset.get("size", 0) > max_bytes:
+        return False
+
+    url, headers = asset["url"], {**auth, "Accept": "application/octet-stream"}
+    for _ in range(4):
+        url = await validate_public_url(url)
+        async with client.stream("GET", url, headers=headers, timeout=60.0, follow_redirects=False) as resp:
+            if resp.status_code in (301, 302, 303, 307, 308) and resp.headers.get("location"):
+                url = urljoin(url, resp.headers["location"])
+                headers = {"Accept": "application/octet-stream"}  # never forward the token to the storage host
+                continue
+            if resp.status_code != 200:
+                return False
+            size = 0
+            with open(dest, "wb") as fh:
+                async for chunk in resp.aiter_bytes():
+                    size += len(chunk)
+                    if size > max_bytes:
+                        return False
+                    fh.write(chunk)
+            return True
+    return False
