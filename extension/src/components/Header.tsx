@@ -13,6 +13,8 @@ interface HeaderProps {
   openOptions?: () => void;
   theme: 'dark' | 'light';
   onToggleTheme: () => void;
+  /** First-run screens: only the theme switch. */
+  minimal?: boolean;
 }
 
 export const StatusPill: React.FC<{ status: ConnectionStatus; onRetry?: () => void }> = ({ status, onRetry }) => (
@@ -29,7 +31,7 @@ export const StatusPill: React.FC<{ status: ConnectionStatus; onRetry?: () => vo
   </span>
 );
 
-export const Header: React.FC<HeaderProps> = ({ status, onRetry, isSyncing, onSync, openOptions, theme, onToggleTheme }) => (
+export const Header: React.FC<HeaderProps> = ({ status, onRetry, isSyncing, onSync, openOptions, theme, onToggleTheme, minimal }) => (
   <header className="topbar">
     <div className="row" style={{ gap: 10, minWidth: 0 }}>
       <div className="brand-mark" aria-hidden="true">J</div>
@@ -42,10 +44,10 @@ export const Header: React.FC<HeaderProps> = ({ status, onRetry, isSyncing, onSy
       <button type="button" className="btn btn-ghost btn-icon" onClick={onToggleTheme} title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`} aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}>
         {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
       </button>
-      <button type="button" className="btn btn-ghost btn-icon" onClick={onSync} disabled={isSyncing} title="Refresh jobs" aria-label="Refresh jobs">
+      {!minimal && <button type="button" className="btn btn-ghost btn-icon" onClick={onSync} disabled={isSyncing} title="Refresh jobs" aria-label="Refresh jobs">
         <RefreshCw size={16} className={isSyncing ? 'spin' : ''} />
-      </button>
-      {openOptions && (
+      </button>}
+      {!minimal && openOptions && (
         <button type="button" className="btn btn-ghost btn-icon" onClick={openOptions} title="Open full dashboard" aria-label="Open full dashboard">
           <ExternalLink size={16} />
         </button>

@@ -48,6 +48,8 @@ void ensureAlarm();
 chrome.runtime.onInstalled.addListener(async (details) => {
   await chrome.action.setBadgeBackgroundColor({ color: '#06b6d4' });
   await ensureAlarm();
+  // First install: greet the user with the welcome tour (it also explains alerts and privacy).
+  if (details.reason === 'install') await chrome.tabs.create({ url: chrome.runtime.getURL('options.html#welcome') });
   // First install: remember everything that already exists instead of announcing a backlog of old alerts.
   await checkNewMatchesAndNotify({ silent: details.reason === 'install' });
 });
@@ -115,7 +117,7 @@ async function checkNewMatchesAndNotify({ silent = false }: { silent?: boolean }
 // Notification Click Handler
 chrome.notifications.onClicked.addListener(async (notificationId) => {
   await chrome.notifications.clear(notificationId);
-  await chrome.tabs.create({ url: chrome.runtime.getURL('options.html') });
+  await chrome.tabs.create({ url: chrome.runtime.getURL('options.html#alerts') });
 });
 
 // Runtime Message Listener (only our own extension pages may talk to the worker)

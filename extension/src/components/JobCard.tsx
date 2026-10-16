@@ -31,7 +31,7 @@ export const JobCard: React.FC<JobCardProps> = ({ job, onToggleSave }) => {
   };
 
   const place = job.location || null;
-  const posted = timeAgo(job.first_seen_at);
+  const posted = job.posted_at ? timeAgo(job.posted_at) : '';
 
   return (
     <article className="card job" aria-label={`${job.title} at ${job.company_name}`}>

@@ -33,7 +33,7 @@ export function passesFilters(job: Job, f: JobFilters, mutedCompanyIds: number[]
   if (f.exp !== 'all' && job.experience_tier !== f.exp) return false;
   if (f.salaryOnly && !job.salary_summary) return false;
   if (f.minBudget > 0 && (job.max_salary || 0) < f.minBudget) return false;
-  if (f.freshnessDays > 0 && new Date(job.first_seen_at).getTime() < Date.now() - f.freshnessDays * 86400000) return false;
+  if (f.freshnessDays > 0 && !(job.posted_at && new Date(job.posted_at).getTime() >= Date.now() - f.freshnessDays * 86400000)) return false;
   const query = f.search.trim().toLowerCase();
   if (query) {
     const corpus = `${job.title} ${job.company_name} ${job.location || ''} ${job.geo_hub || ''} ${job.normalized_role || ''} ${job.salary_summary || ''}`.toLowerCase();

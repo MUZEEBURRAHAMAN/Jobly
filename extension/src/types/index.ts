@@ -13,6 +13,8 @@ export interface Job {
   application_url: string;
   first_seen_at: string;
   last_seen_at: string;
+  /** Real posting date from the source; null when the source doesn't say. */
+  posted_at?: string | null;
   status: string;
   is_saved: boolean;
   is_match: boolean;
@@ -29,9 +31,11 @@ export interface JobsResponse {
   limit: number;
   offset: number;
   /** Set when the request failed: 'offline' = unreachable, 'server' = the server answered with an error. */
-  error?: 'offline' | 'server';
+  error?: 'offline' | 'server' | 'busy';
   /** True when `items` came from the local cache instead of the server. */
   fromCache?: boolean;
+  /** When the cached items were saved (ms since epoch). */
+  cachedAt?: number | null;
 }
 
 export interface JobFilterParams {
@@ -97,4 +101,5 @@ export interface RadarStats {
   saved_jobs: number;
   new_jobs_today: number;
   last_sync_time: string | null;
+  is_syncing?: boolean;
 }

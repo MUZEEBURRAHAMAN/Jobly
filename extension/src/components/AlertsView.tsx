@@ -9,9 +9,13 @@ interface AlertsViewProps {
   notifications: NotificationItem[];
   onMarkAllRead: () => void;
   large?: boolean;
+  offline?: boolean;
 }
 
-export const AlertsView: React.FC<AlertsViewProps> = ({ notifications, onMarkAllRead, large }) => {
+export const AlertsView: React.FC<AlertsViewProps> = ({ notifications, onMarkAllRead, large, offline }) => {
+  if (notifications.length === 0 && offline) {
+    return <EmptyState art="offline" large={large} title="Can't load alerts" description="Jobly can't reach the server right now. New alerts appear as soon as it reconnects." />;
+  }
   if (notifications.length === 0) {
     return <EmptyState art="alerts" large={large} title="No alerts yet" description="When a new job matches your preferences, it shows up here and as a desktop notification (if alerts are on)." />;
   }
@@ -22,7 +26,7 @@ export const AlertsView: React.FC<AlertsViewProps> = ({ notifications, onMarkAll
         <div><h2>Alerts</h2><p className="text-sm">{unread > 0 ? `${unread} new` : 'All caught up'}</p></div>
         {unread > 0 && <button type="button" className="btn btn-outline btn-sm" onClick={onMarkAllRead}><Check size={14} aria-hidden="true" /> Mark all read</button>}
       </div>
-      <ul className="stack" style={{ listStyle: 'none', gap: 8 }}>
+      <ul className={large ? 'cols' : 'stack'} style={{ listStyle: 'none', gap: 8 }}>
         {notifications.map((n) => {
           const url = safeHttpUrl(n.application_url);
           return (

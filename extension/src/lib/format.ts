@@ -1,5 +1,5 @@
-export function timeAgo(iso: string | null | undefined): string {
-  if (!iso) return '';
+export function timeAgo(iso: string | number | null | undefined): string {
+  if (iso === null || iso === undefined || iso === '') return '';
   const t = new Date(iso).getTime();
   if (Number.isNaN(t)) return '';
   const minutes = Math.floor((Date.now() - t) / 60000);

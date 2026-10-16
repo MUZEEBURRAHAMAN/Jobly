@@ -15,6 +15,9 @@ interface CompaniesViewProps {
   canManage: boolean;
   onAddCompany: (data: { name: string; careers_url?: string; source_type: string; source_identifier: string; industry?: string }) => Promise<void>;
   large?: boolean;
+  /** Connection state: lets an empty list say "can't reach Jobly" instead of "no companies". */
+  offline?: boolean;
+  loading?: boolean;
 }
 
 const Row: React.FC<{ company: Company; muted: boolean; onToggle: () => void }> = ({ company, muted, onToggle }) => {
@@ -40,7 +43,7 @@ const Row: React.FC<{ company: Company; muted: boolean; onToggle: () => void }> 
   );
 };
 
-export const CompaniesView: React.FC<CompaniesViewProps> = ({ companies, mutedCompanyIds, onToggleMuted, canManage, onAddCompany, large }) => {
+export const CompaniesView: React.FC<CompaniesViewProps> = ({ companies, mutedCompanyIds, onToggleMuted, canManage, onAddCompany, large, offline, loading }) => {
   const [query, setQuery] = useState('');
   const [visible, setVisible] = useState(PAGE);
   const [showAdd, setShowAdd] = useState(false);
@@ -92,17 +95,25 @@ export const CompaniesView: React.FC<CompaniesViewProps> = ({ companies, mutedCo
         </form>
       )}
 
+      {mutedCompanyIds.length > 0 && <p className="text-sm" role="status">{mutedCompanyIds.length} compan{mutedCompanyIds.length === 1 ? 'y is' : 'ies are'} hidden from your jobs.</p>}
+
       <div className="search">
         <Search size={16} aria-hidden="true" />
         <input className="input" type="search" value={query} onChange={(e) => setQuery(e.target.value)} placeholder={`Search ${companies.length} companies…`} aria-label="Search companies" />
       </div>
 
-      {list.length === 0 ? (
+      {companies.length === 0 && loading ? (
+        <ul className="stack" style={{ listStyle: 'none', gap: 8 }} aria-busy="true" aria-label="Loading companies">
+          {[0, 1, 2, 3, 4].map((i) => <li key={i} className="card row" style={{ padding: 12 }}><div className="skeleton" style={{ width: 40, height: 40 }} /><div className="grow stack" style={{ gap: 6 }}><div className="skeleton" style={{ height: 14, width: '50%' }} /><div className="skeleton" style={{ height: 12, width: '30%' }} /></div></li>)}
+        </ul>
+      ) : companies.length === 0 && offline ? (
+        <EmptyState art="offline" large={large} title="Can't load companies" description="Jobly can't reach the server right now. The company list appears as soon as it reconnects." />
+      ) : list.length === 0 ? (
         <EmptyState art="companies" large={large} title={companies.length === 0 ? 'No companies yet' : `No companies match "${query}"`} description={companies.length === 0 ? 'The company list loads when Jobly connects.' : 'Try another name or industry.'}
           actions={q ? <button type="button" className="btn" onClick={() => setQuery('')}>Clear search</button> : undefined} />
       ) : (
         <>
-          <ul className="stack" style={{ listStyle: 'none', gap: 8 }}>
+          <ul className={large ? 'cols' : 'stack'} style={{ listStyle: 'none', gap: 8 }}>
             {list.slice(0, visible).map((c) => <Row key={c.id} company={c} muted={mutedCompanyIds.includes(c.id)} onToggle={() => onToggleMuted(c.id)} />)}
           </ul>
           {list.length > visible && <button type="button" className="btn btn-outline" onClick={() => setVisible(visible + PAGE)}>Show more ({list.length - visible} left)</button>}

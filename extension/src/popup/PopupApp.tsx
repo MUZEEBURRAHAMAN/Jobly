@@ -5,6 +5,7 @@ import { IS_DEV_BUILD } from '../lib/config';
 import { DEFAULT_FILTERS, JobFilters } from '../lib/filters';
 import { useMutedCompanies } from '../lib/mutedCompanies';
 import { useSavedOverlay } from '../lib/useSavedOverlay';
+import { useOnboarded } from '../lib/onboarding';
 import { applyTheme, getInitialTheme, syncThemeFromStorage, Theme } from '../lib/theme';
 import { Company, Job, Preferences, RadarStats } from '../types';
 import { Header } from '../components/Header';
@@ -13,6 +14,7 @@ import { CompaniesView } from '../components/CompaniesView';
 import { SavedJobsView } from '../components/SavedJobsView';
 import { PreferencesView } from '../components/PreferencesView';
 import { Notice, useNotice } from '../components/Notice';
+import { Welcome } from '../components/Welcome';
 
 type Tab = 'jobs' | 'companies' | 'saved' | 'preferences';
 
@@ -25,7 +27,8 @@ export const PopupApp: React.FC = () => {
   const [preferences, setPreferences] = useState<Preferences | null>(null);
   const [stats, setStats] = useState<RadarStats | null>(null);
   const [status, setStatus] = useState<ConnectionStatus>('connecting');
-  const [loadError, setLoadError] = useState<'offline' | 'server' | null>(null);
+  const [loadError, setLoadError] = useState<'offline' | 'server' | 'busy' | null>(null);
+  const [cachedAt, setCachedAt] = useState<number | null>(null);
   const [isSyncing, setIsSyncing] = useState(false);
   const [loading, setLoading] = useState(true);
   const [jobsTotal, setJobsTotal] = useState(0);
@@ -37,6 +40,7 @@ export const PopupApp: React.FC = () => {
   const savedJobs = overlay.saved;
   const { muted, toggle: toggleMuted } = useMutedCompanies();
   const { notice, show: showNotice, clear: clearNotice } = useNotice();
+  const { onboarded, complete: completeOnboarding, reset: resetOnboarding } = useOnboarded();
   const jobsSeq = useRef(0); // only the newest request may update the list
 
   useEffect(() => {
@@ -64,6 +68,7 @@ export const PopupApp: React.FC = () => {
     setJobs(data.items);
     setJobsTotal(data.error ? data.items.length : data.total);
     setLoadError(data.error ?? null);
+    if (data.error) setCachedAt(data.cachedAt ?? null);
     setLoading(false);
   }, [jobQuery]);
 
@@ -91,17 +96,19 @@ export const PopupApp: React.FC = () => {
     const online = await api.waitForBackend();
     setStatus(online ? 'online' : 'offline');
     if (online) await loadSideData();
+    else api.getLocalPreferences().then((lp) => setPreferences((cur) => cur ?? lp));
     return online;
   }, [loadSideData]);
 
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      const [cj, cc, cp] = await Promise.all([api.getCachedJobs(), api.getCachedCompanies(), api.getCachedPreferences()]);
+      const [cj, cc, cp, cs, at] = await Promise.all([api.getCachedJobs(), api.getCachedCompanies(), api.getCachedPreferences(), api.getCachedSaved(), api.getCachedJobsAt()]);
       if (cancelled) return;
-      if (cj.length) { setJobs(cj); setLoading(false); }
+      if (cj.length) { setJobs(cj); setLoading(false); setCachedAt(at); }
       if (cc.length) setCompanies(cc);
       if (cp) setPreferences(cp);
+      if (cs.length) setServerSaved((cur) => (cur.length ? cur : cs));
     })();
     connect();
     return () => { cancelled = true; };
@@ -117,7 +124,7 @@ export const PopupApp: React.FC = () => {
   // Fetch jobs when the category / search / connection changes (debounced)
   useEffect(() => {
     if (tab !== 'jobs' || status === 'connecting') return;
-    if (status === 'offline') { setLoadError('offline'); setLoading(false); return; } // keep showing cached jobs
+    if (status === 'offline') { setLoadError('offline'); setLoading(false); api.getLocalPreferences().then((p) => setPreferences((cur) => cur ?? p)); return; } // keep showing cached jobs
     const timer = setTimeout(fetchJobs, 250);
     return () => clearTimeout(timer);
   }, [tab, status, fetchJobs]);
@@ -183,6 +190,18 @@ export const PopupApp: React.FC = () => {
     { id: 'preferences', label: 'Preferences', icon: SlidersHorizontal },
   ];
 
+  const finishWelcome = async (p: Preferences) => { const synced = await handleSavePreferences(p); completeOnboarding(); return synced; };
+
+  if (onboarded === null) return <div className="popup" data-theme={theme} aria-busy="true" />;
+  if (onboarded === false) {
+    return (
+      <div className="popup" data-theme={theme}>
+        <Header status={status} onRetry={() => { connect(); }} isSyncing={false} onSync={() => {}} theme={theme} onToggleTheme={toggleTheme} minimal />
+        <main id="main" className="popup-main"><Welcome compact initial={preferences} onFinish={finishWelcome} onSkip={completeOnboarding} /></main>
+      </div>
+    );
+  }
+
   return (
     <div className="popup" data-theme={theme}>
       <Header status={status} onRetry={() => { connect(); }} isSyncing={isSyncing} onSync={handleSync} openOptions={openOptions} theme={theme} onToggleTheme={toggleTheme} />
@@ -193,16 +212,21 @@ export const PopupApp: React.FC = () => {
             jobs={overlay.jobs} loading={loading} preferences={preferences} mutedCompanyIds={muted}
             onToggleSave={handleToggleSave} onOpenPreferences={() => setTab('preferences')}
             loadError={loadError} onRetryLoad={() => { status === 'online' ? fetchJobs() : connect(); }} gathering={gathering}
-            hasMore={jobs.length < jobsTotal} onLoadMore={loadMoreJobs}
+            hasMore={jobs.length < jobsTotal} onLoadMore={loadMoreJobs} loadingMore={loadingMore} cachedAt={cachedAt}
+            onOpenCompanies={() => setTab('companies')}
             roleFilter={roleFilter} onRoleFilterChange={(r) => { setRoleFilter(r); setDisplayLimit(30); }}
             filters={filters} onFiltersChange={(f) => { setFilters(f); setDisplayLimit(30); }}
             displayLimit={displayLimit} onDisplayLimitChange={setDisplayLimit}
           />
         )}
-        {tab === 'companies' && <CompaniesView companies={companies} mutedCompanyIds={muted} onToggleMuted={toggleMuted} canManage={IS_DEV_BUILD} onAddCompany={handleAddCompany} />}
-        {tab === 'saved' && <SavedJobsView savedJobs={savedJobs} onToggleSave={handleToggleSave} onBrowseJobs={() => setTab('jobs')} />}
-        {tab === 'preferences' && preferences && <PreferencesView preferences={preferences} onSave={handleSavePreferences} />}
-        {tab === 'preferences' && !preferences && <p className="section text-sm" role="status">Loading your preferences…</p>}
+        {tab === 'companies' && <CompaniesView companies={companies} mutedCompanyIds={muted} onToggleMuted={toggleMuted} canManage={IS_DEV_BUILD} onAddCompany={handleAddCompany} offline={status === 'offline'} loading={status === 'connecting'} />}
+        {tab === 'saved' && <SavedJobsView savedJobs={savedJobs} onToggleSave={handleToggleSave} onBrowseJobs={() => setTab('jobs')} offline={status === 'offline'} />}
+        {tab === 'preferences' && preferences && <PreferencesView preferences={preferences} onSave={handleSavePreferences} onReplayWelcome={resetOnboarding} />}
+        {tab === 'preferences' && !preferences && (
+          <div className="section" aria-busy="true" aria-label="Loading your preferences">
+            {[0, 1, 2, 3].map((i) => <div key={i} className="skeleton" style={{ height: i ? 56 : 28, width: i ? '100%' : '40%' }} />)}
+          </div>
+        )}
       </main>
 
       <nav className="nav" aria-label="Sections">

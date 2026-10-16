@@ -5,6 +5,7 @@ import { IS_DEV_BUILD, MAX_PAGE_SIZE } from '../lib/config';
 import { DEFAULT_FILTERS, JobFilters } from '../lib/filters';
 import { useMutedCompanies } from '../lib/mutedCompanies';
 import { useSavedOverlay } from '../lib/useSavedOverlay';
+import { useOnboarded } from '../lib/onboarding';
 import { applyTheme, getInitialTheme, syncThemeFromStorage, Theme } from '../lib/theme';
 import { Company, Job, NotificationItem, Preferences, RadarStats } from '../types';
 import { StatusPill, appVersion } from '../components/Header';
@@ -15,13 +16,16 @@ import { PreferencesView } from '../components/PreferencesView';
 import { AlertsView } from '../components/AlertsView';
 import { ErrorBoundary } from '../components/ErrorBoundary';
 import { Notice, useNotice } from '../components/Notice';
+import { Welcome } from '../components/Welcome';
 
 type Tab = 'jobs' | 'companies' | 'saved' | 'alerts' | 'preferences';
 const n = (v: number | undefined) => (v ?? 0).toLocaleString();
+const TABS: Tab[] = ['jobs', 'companies', 'saved', 'alerts', 'preferences'];
+const tabFromHash = (): Tab => { const h = window.location.hash.replace('#', ''); return (TABS as string[]).includes(h) ? (h as Tab) : 'jobs'; };
 
 export const OptionsApp: React.FC = () => {
   const [theme, setTheme] = useState<Theme>(getInitialTheme());
-  const [tab, setTab] = useState<Tab>('jobs');
+  const [tab, setTab] = useState<Tab>(tabFromHash);
   const [jobs, setJobs] = useState<Job[]>([]);
   const [jobsTotal, setJobsTotal] = useState(0);
   const [serverSaved, setServerSaved] = useState<Job[]>([]);
@@ -30,7 +34,8 @@ export const OptionsApp: React.FC = () => {
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   const [stats, setStats] = useState<RadarStats | null>(null);
   const [status, setStatus] = useState<ConnectionStatus>('connecting');
-  const [loadError, setLoadError] = useState<'offline' | 'server' | null>(null);
+  const [loadError, setLoadError] = useState<'offline' | 'server' | 'busy' | null>(null);
+  const [cachedAt, setCachedAt] = useState<number | null>(null);
   const [isSyncing, setIsSyncing] = useState(false);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -41,6 +46,7 @@ export const OptionsApp: React.FC = () => {
   const savedJobs = overlay.saved;
   const { muted, toggle: toggleMuted } = useMutedCompanies();
   const { notice, show: showNotice, clear: clearNotice } = useNotice();
+  const { onboarded, complete: completeOnboarding, reset: resetOnboarding } = useOnboarded();
   const jobsSeq = useRef(0);
 
   useEffect(() => {
@@ -70,17 +76,19 @@ export const OptionsApp: React.FC = () => {
     const online = await api.waitForBackend();
     setStatus(online ? 'online' : 'offline');
     if (online) await loadSideData();
+    else api.getLocalPreferences().then((lp) => setPreferences((cur) => cur ?? lp));
     return online;
   }, [loadSideData]);
 
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      const [cj, cc, cp] = await Promise.all([api.getCachedJobs(), api.getCachedCompanies(), api.getCachedPreferences()]);
+      const [cj, cc, cp, cs, at] = await Promise.all([api.getCachedJobs(), api.getCachedCompanies(), api.getCachedPreferences(), api.getCachedSaved(), api.getCachedJobsAt()]);
       if (cancelled) return;
-      if (cj.length) { setJobs(cj); setLoading(false); }
+      if (cj.length) { setJobs(cj); setLoading(false); setCachedAt(at); }
       if (cc.length) setCompanies(cc);
       if (cp) setPreferences(cp);
+      if (cs.length) setServerSaved((cur) => (cur.length ? cur : cs));
     })();
     connect();
     return () => { cancelled = true; };
@@ -106,6 +114,7 @@ export const OptionsApp: React.FC = () => {
     setJobs(res.items);
     setJobsTotal(res.error ? res.items.length : res.total);
     setLoadError(res.error ?? null);
+    if (res.error) setCachedAt(res.cachedAt ?? null);
     setDisplayLimit(30);
     setLoading(false);
   }, [jobQuery]);
@@ -193,6 +202,8 @@ export const OptionsApp: React.FC = () => {
     { id: 'preferences', label: 'Preferences', icon: SlidersHorizontal },
   ];
 
+  const finishWelcome = async (p: Preferences) => { const synced = await handleSavePreferences(p); completeOnboarding(); window.location.hash = ''; return synced; };
+
   return (
     <div className="dash" data-theme={theme}>
       <header className="topbar" style={{ padding: '12px 24px' }}>
@@ -209,6 +220,9 @@ export const OptionsApp: React.FC = () => {
         </div>
       </header>
 
+      {onboarded === false ? (
+        <main id="main" className="content"><Welcome initial={preferences} onFinish={finishWelcome} onSkip={completeOnboarding} /></main>
+      ) : onboarded === null ? <div className="dash-body" aria-busy="true" /> : (
       <div className="dash-body">
         <nav className="side" aria-label="Sections">
           {tabs.map(({ id, label, icon: Icon, badge }) => (
@@ -221,7 +235,7 @@ export const OptionsApp: React.FC = () => {
         </nav>
 
         <main id="main" className="content">
-          <div className="content-inner">
+          <div className={`content-inner${tab === 'preferences' ? ' narrow' : ''}`}>
             {tab === 'jobs' && stats && (
               <div className="stats">
                 {[['For you', stats.matched_jobs], ['Open jobs', stats.total_jobs], ['Companies', stats.active_companies], ['New today', stats.new_jobs_today]].map(([label, value]) => (
@@ -236,21 +250,23 @@ export const OptionsApp: React.FC = () => {
                     large jobs={overlay.jobs} loading={loading} preferences={preferences} mutedCompanyIds={muted}
                     onToggleSave={handleToggleSave} onOpenPreferences={() => setTab('preferences')}
                     loadError={loadError} onRetryLoad={() => { status === 'online' ? fetchJobs() : connect(); }} gathering={gathering}
-                    hasMore={jobs.length < jobsTotal} onLoadMore={loadMoreJobs}
+                    hasMore={jobs.length < jobsTotal} onLoadMore={loadMoreJobs} loadingMore={loadingMore} cachedAt={cachedAt} onOpenCompanies={() => setTab('companies')}
                     roleFilter={roleFilter} onRoleFilterChange={(r) => { setRoleFilter(r); setDisplayLimit(30); }}
                     filters={filters} onFiltersChange={(f) => { setFilters(f); setDisplayLimit(30); }}
                     displayLimit={displayLimit} onDisplayLimitChange={setDisplayLimit}
                   />
                 </div>
               )}
-              {tab === 'companies' && <CompaniesView large companies={companies} mutedCompanyIds={muted} onToggleMuted={toggleMuted} canManage={IS_DEV_BUILD} onAddCompany={handleAddCompany} />}
-              {tab === 'saved' && <SavedJobsView large savedJobs={savedJobs} onToggleSave={handleToggleSave} onBrowseJobs={() => setTab('jobs')} />}
-              {tab === 'alerts' && <AlertsView large notifications={notifications} onMarkAllRead={markAlertsRead} />}
-              {tab === 'preferences' && preferences && <PreferencesView preferences={preferences} onSave={handleSavePreferences} />}
+              {tab === 'companies' && <CompaniesView large companies={companies} mutedCompanyIds={muted} onToggleMuted={toggleMuted} canManage={IS_DEV_BUILD} onAddCompany={handleAddCompany} offline={status === 'offline'} loading={status === 'connecting'} />}
+              {tab === 'saved' && <SavedJobsView large savedJobs={savedJobs} onToggleSave={handleToggleSave} onBrowseJobs={() => setTab('jobs')} offline={status === 'offline'} />}
+              {tab === 'alerts' && <AlertsView large notifications={notifications} onMarkAllRead={markAlertsRead} offline={status === 'offline'} />}
+              {tab === 'preferences' && preferences && <PreferencesView preferences={preferences} onSave={handleSavePreferences} onReplayWelcome={resetOnboarding} />}
+              {tab === 'preferences' && !preferences && <div className="section" aria-busy="true" aria-label="Loading your preferences">{[0, 1, 2, 3].map((i) => <div key={i} className="skeleton" style={{ height: i ? 56 : 28, width: i ? '100%' : '40%' }} />)}</div>}
             </ErrorBoundary>
           </div>
         </main>
       </div>
+      )}
 
       <Notice notice={notice} onClose={clearNotice} />
     </div>

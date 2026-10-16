@@ -115,8 +115,15 @@ class ApiClient {
 
   // ----------------------------------------------------------------- cached reads (instant paint)
   getCachedJobs = () => this.readCache<Job[]>('cachedJobs').then((v) => v ?? []);
+  getCachedJobsAt = () => this.readCache<number>('cachedJobsAt').then((v) => v ?? null);
+  getCachedSaved = () => this.readCache<Job[]>('cachedSaved').then((v) => v ?? []);
   getCachedCompanies = () => this.readCache<Company[]>('cachedCompanies').then((v) => v ?? []);
   getCachedPreferences = () => this.readCache<Preferences>('cachedPreferences');
+
+  /** Cached preferences, or the defaults: never touches the network (used when offline). */
+  async getLocalPreferences(): Promise<Preferences> {
+    return (await this.getCachedPreferences()) ?? this.defaultPreferences();
+  }
 
   // ----------------------------------------------------------------- preferences
   private defaultPreferences(): Preferences {
@@ -190,16 +197,19 @@ class ApiClient {
     if (res) {
       try {
         const data: JobsResponse = await res.json();
-        if (!params.saved_only && !params.search && !params.offset) this.writeCache('cachedJobs', data.items);
+        if (params.saved_only) this.writeCache('cachedSaved', data.items);
+        else if (!params.search && !params.offset) { this.writeCache('cachedJobs', data.items); this.writeCache('cachedJobsAt', Date.now()); }
         return data;
       } catch {
         // fall through to cache
       }
     }
 
-    const error: 'offline' | 'server' = this.lastFailure?.kind === 'http' ? 'server' : 'offline';
-    const items = (await this.readCache<Job[]>('cachedJobs')) ?? [];
-    return { items, total: items.length, limit, offset: params.offset ?? 0, error, fromCache: true };
+    const f = this.lastFailure;
+    const error: 'offline' | 'server' | 'busy' = f?.kind === 'http' ? (f.status === 429 ? 'busy' : 'server') : 'offline';
+    const items = (await this.readCache<Job[]>(params.saved_only ? 'cachedSaved' : 'cachedJobs')) ?? [];
+    const cachedAt = params.saved_only ? null : await this.getCachedJobsAt();
+    return { items, total: items.length, limit, offset: params.offset ?? 0, error, fromCache: true, cachedAt };
   }
 
   // ----------------------------------------------------------------- companies

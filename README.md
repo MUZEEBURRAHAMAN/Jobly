@@ -78,7 +78,16 @@ cd extension && npx tsc --noEmit             # type-check
 | `EXTENSION_IDS` | *(any extension)* | Comma-separated Chrome extension IDs allowed by CORS. **Set this after publishing** |
 | `ENABLE_DOCS` | `false` | Serves `/docs` when `true` |
 | `AUTO_SYNC_INTERVAL_HOURS` | `2` | Background crawl interval |
+| `SNAPSHOT_REPO` / `SNAPSHOT_TAG` / `SNAPSHOT_ASSET` | `MUZEEBURRAHAMAN/Jobly` / `snapshot` / `jobly.db.gz` | Where an empty server restores a database snapshot from (set `SNAPSHOT_REPO=` empty to disable) |
+| `SNAPSHOT_TOKEN` | *(unset)* | Read-only GitHub token; **required while the repo is private** |
 | `RATE_LIMIT_PER_MIN` / `_WRITES_PER_MIN` / `_SYNC_PER_MIN` | `120` / `30` / `3` | Per-IP limits (`0` disables) |
+
+### Warm starts (free tier has no disk)
+
+`.github/workflows/snapshot.yml` crawls every 6 hours and publishes a ~4 MB database snapshot to the `snapshot` release.
+An empty server downloads it on boot and serves jobs in under a second instead of re-crawling for ~2 minutes
+(it then refreshes in the background). Run it once with **Actions → Publish job snapshot → Run workflow**.
+With a private repo, create a fine-grained token (this repo, *Contents: read-only*) and set it as `SNAPSHOT_TOKEN` on Render.
 
 The design system (tokens, type scale, components) lives in `extension/src/styles/index.css`; empty/error illustrations
 come from [`@lucasmarkes/hairline`](https://hairline.lucasmarkes.com) via `extension/src/components/EmptyState.tsx`.

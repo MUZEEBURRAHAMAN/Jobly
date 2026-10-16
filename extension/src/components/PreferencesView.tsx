@@ -7,9 +7,11 @@ interface PreferencesViewProps {
   preferences: Preferences;
   /** Resolve `false` when the change only reached this device (server unreachable). */
   onSave: (prefs: Preferences) => Promise<boolean | void>;
+  /** Re-open the first-run welcome tour. */
+  onReplayWelcome?: () => void;
 }
 
-export const PreferencesView: React.FC<PreferencesViewProps> = ({ preferences, onSave }) => {
+export const PreferencesView: React.FC<PreferencesViewProps> = ({ preferences, onSave, onReplayWelcome }) => {
   const [prefs, setPrefs] = useState<Preferences>(preferences);
   const [saving, setSaving] = useState(false);
   const [savedState, setSavedState] = useState<'synced' | 'local' | null>(null);
@@ -54,7 +56,7 @@ export const PreferencesView: React.FC<PreferencesViewProps> = ({ preferences, o
             </button>
           );
         })}
-        {prefs.roles.length === 0 && <p className="hint" role="status">No roles selected: "For you" will be empty.</p>}
+        {prefs.roles.length === 0 && <p className="hint" role="status">No roles selected: "For you" will show every role.</p>}
       </fieldset>
 
       <fieldset style={{ border: 0 }}>
@@ -89,6 +91,7 @@ export const PreferencesView: React.FC<PreferencesViewProps> = ({ preferences, o
       <div className="row">
         <button type="submit" className="btn grow" disabled={saving}><Save size={14} aria-hidden="true" /> {saving ? 'Saving…' : 'Save preferences'}</button>
       </div>
+      {onReplayWelcome && <button type="button" className="btn btn-ghost btn-sm" style={{ alignSelf: 'flex-start' }} onClick={onReplayWelcome}>Show the welcome tour again</button>}
       <p role="status" className="text-sm" style={{ color: savedState === 'local' ? 'var(--warning)' : 'var(--success)' }}>
         {savedState === 'synced' && 'Saved.'}
         {savedState === 'local' && "Saved on this device only. We couldn't reach the server."}

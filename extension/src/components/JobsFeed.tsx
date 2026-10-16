@@ -3,7 +3,7 @@ import { RotateCcw, Search, SlidersHorizontal, X } from 'lucide-react';
 import { Job, Preferences } from '../types';
 import { JobCard } from './JobCard';
 import { EmptyState } from './EmptyState';
-import { ROLES, DEFAULT_ROLE_IDS, EXPERIENCE_LABELS, HUB_LABELS } from '../lib/format';
+import { ROLES, DEFAULT_ROLE_IDS, EXPERIENCE_LABELS, HUB_LABELS, timeAgo } from '../lib/format';
 import { DEFAULT_FILTERS, JobFilters, activeFilterCount, chipCounts, filterJobs } from '../lib/filters';
 
 interface JobsFeedProps {
@@ -14,8 +14,13 @@ interface JobsFeedProps {
   onToggleSave: (job: Job) => void;
   onOpenPreferences: () => void;
   /** Set when the last load failed: don't present an outage as "no jobs match". */
-  loadError?: 'offline' | 'server' | null;
+  loadError?: 'offline' | 'server' | 'busy' | null;
   onRetryLoad?: () => void;
+  /** When the jobs on screen were cached (ms), to say how old they are while offline. */
+  cachedAt?: number | null;
+  loadingMore?: boolean;
+  /** Lets the "you hid these companies" messages link to the Companies screen. */
+  onOpenCompanies?: () => void;
   /** The server is still collecting jobs for the first time. */
   gathering?: boolean;
   /** More jobs exist on the server than are loaded (server pages are capped). */
@@ -33,7 +38,7 @@ interface JobsFeedProps {
 const PAGE = 30;
 
 export const JobsFeed: React.FC<JobsFeedProps> = ({
-  jobs, loading, preferences, mutedCompanyIds, onToggleSave, onOpenPreferences, loadError, onRetryLoad, gathering,
+  jobs, loading, preferences, mutedCompanyIds, onToggleSave, onOpenPreferences, loadError, onRetryLoad, cachedAt, loadingMore, onOpenCompanies, gathering,
   hasMore, onLoadMore, roleFilter, onRoleFilterChange, filters, onFiltersChange, displayLimit, onDisplayLimitChange, large,
 }) => {
   const [showFilters, setShowFilters] = useState(false);
@@ -43,6 +48,7 @@ export const JobsFeed: React.FC<JobsFeedProps> = ({
   const hasSearch = filters.search.trim().length > 0;
 
   const counts = useMemo(() => chipCounts(jobs, filters, targetRoles, mutedCompanyIds, ROLES.map((r) => r.id)), [jobs, filters, targetRoles, mutedCompanyIds]);
+  const mutedHidden = useMemo(() => (mutedCompanyIds.length ? jobs.filter((j) => mutedCompanyIds.includes(j.company_id)).length : 0), [jobs, mutedCompanyIds]);
   const visible = useMemo(() => filterJobs(jobs, filters, roleFilter, targetRoles, mutedCompanyIds), [jobs, filters, roleFilter, targetRoles, mutedCompanyIds]);
 
   const chips = [{ id: 'all_matching', label: 'For you' }, ...ROLES.map((r) => ({ id: r.id, label: r.short })), { id: 'all', label: 'All' }];
@@ -68,16 +74,17 @@ export const JobsFeed: React.FC<JobsFeedProps> = ({
       );
     }
     if (visible.length === 0 && loadError) {
-      return loadError === 'offline' ? (
-        <EmptyState art="offline" large={large} title="Can't reach Jobly" description="The server may be waking up, or you may be offline. Your preferences are safe. This page keeps trying on its own."
-          actions={onRetryLoad && <button type="button" className="btn" onClick={onRetryLoad}><RotateCcw size={14} aria-hidden="true" /> Try again</button>} />
-      ) : (
-        <EmptyState art="error" role="alert" large={large} title="Something went wrong on our side" description="The server answered with an error. This isn't caused by your filters."
-          actions={onRetryLoad && <button type="button" className="btn" onClick={onRetryLoad}><RotateCcw size={14} aria-hidden="true" /> Try again</button>} />
-      );
+      const retry = onRetryLoad && <button type="button" className="btn" onClick={onRetryLoad}><RotateCcw size={14} aria-hidden="true" /> Try again</button>;
+      if (loadError === 'offline') return <EmptyState art="offline" large={large} title="Can't reach Jobly" description="The server may be waking up, or you may be offline. Your preferences are safe. This page keeps trying on its own." actions={retry} />;
+      if (loadError === 'busy') return <EmptyState art="error" large={large} title="Too many requests" description="Jobly asked the server for a lot in a short time. Wait a minute, then try again." actions={retry} />;
+      return <EmptyState art="error" role="alert" large={large} title="Something went wrong on our side" description="The server answered with an error. This isn't caused by your filters." actions={retry} />;
     }
     if (visible.length === 0 && gathering) {
       return <EmptyState art="gathering" play large={large} title="Gathering jobs for the first time" description="Jobly is reading hundreds of company career pages. This takes a minute or two; jobs appear here as soon as they're ready." />;
+    }
+    if (visible.length === 0 && mutedHidden > 0 && !hasSearch && filterCount === 0) {
+      return <EmptyState art="companies" large={large} title="You've hidden every company in this list" description={`${mutedHidden} job${mutedHidden === 1 ? ' is' : 's are'} hidden because you turned those companies off.`}
+        actions={onOpenCompanies && <button type="button" className="btn" onClick={onOpenCompanies}>Manage companies</button>} />;
     }
     if (visible.length === 0 && hasSearch) {
       return (
@@ -107,13 +114,14 @@ export const JobsFeed: React.FC<JobsFeedProps> = ({
           <button
             type="button"
             className="btn btn-outline"
-            style={{ width: '100%', marginTop: 12 }}
+            disabled={loadingMore}
+            style={{ width: '100%', marginTop: 12, gridColumn: '1 / -1' }}
             onClick={() => {
               onDisplayLimitChange(displayLimit + PAGE);
               if (hasMore && visible.length - (displayLimit + PAGE) < PAGE) onLoadMore?.();
             }}
           >
-            Show more jobs
+            {loadingMore ? 'Loading…' : 'Show more jobs'}
           </button>
         )}
       </>
@@ -188,8 +196,18 @@ export const JobsFeed: React.FC<JobsFeedProps> = ({
         </div>
       </div>
 
-      <div className="list">
-        {visible.length > 0 && <p className="text-sm" style={{ marginBottom: 12 }} aria-live="polite">{visible.length}{hasMore ? '+' : ''} job{visible.length === 1 ? '' : 's'}{roleFilter === 'all_matching' ? ' that fit your preferences' : ''}</p>}
+      <div className={`list${large ? ' grid' : ''}`}>
+        {loadError && jobs.length > 0 && (
+          <div className="banner" role="status">
+            <span className="grow">
+              {loadError === 'offline' && `You're offline. Showing jobs saved ${cachedAt ? timeAgo(cachedAt).toLowerCase() : 'on this device'}.`}
+              {loadError === 'server' && "Jobly's server had a problem. Showing jobs saved earlier."}
+              {loadError === 'busy' && 'Too many requests. Showing jobs saved earlier; try again in a minute.'}
+            </span>
+          </div>
+        )}
+        {visible.length > 0 && <p className="text-sm" style={{ marginBottom: large ? 0 : 12 }} aria-live="polite">{visible.length}{hasMore ? '+' : ''} job{visible.length === 1 ? '' : 's'}{roleFilter === 'all_matching' ? ' that fit your preferences' : ''}
+          {mutedHidden > 0 && <> · {mutedHidden} hidden from companies you turned off{onOpenCompanies && <> (<button type="button" className="link" onClick={onOpenCompanies}>manage</button>)</>}</>}</p>}
         {renderBody()}
       </div>
     </div>
