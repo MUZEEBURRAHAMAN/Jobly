@@ -100,7 +100,7 @@ function mountLiveArt(menuRoot: HTMLElement) {
   const host = menuRoot.querySelector<HTMLElement>('[data-live-art]');
   if (!host || artMounted) return;
   artMounted = true;
-  import('@lucasmarkes/hairline')
+  import('./figures')
     .then(({ phosphor }) => phosphor(host, { play: true, intensity: 0.6 }))
     .catch(() => { artMounted = false; });
 }

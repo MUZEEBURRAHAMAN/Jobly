@@ -28,7 +28,7 @@ const figureWatcher = new IntersectionObserver((entries) => {
     const fig = figs.get(host);
     if (fig) { fig.update({ play: e.isIntersecting && host.dataset.autoplay !== 'false' }); continue; }
     if (!e.isIntersecting) continue;
-    lib ??= import('@lucasmarkes/hairline') as unknown as Promise<Record<string, (el: HTMLElement, o?: object) => Fig>>;
+    lib ??= import('./figures') as unknown as Promise<Record<string, (el: HTMLElement, o?: object) => Fig>>;
     lib.then((m) => {
       if (figs.has(host)) return;
       const make = m[host.dataset.figure!];
