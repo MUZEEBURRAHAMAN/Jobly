@@ -27,10 +27,10 @@ function chromiumPath() {
   throw new Error('No Chromium found. Run `npx playwright install chromium` or set CHROMIUM_PATH.');
 }
 
-export async function launch({ onboarded = true, blockProd = true, colorScheme = 'light', dist = BUILD } = {}) {
+export async function launch({ onboarded = true, blockProd = true, colorScheme = 'light', dist = BUILD, scale = 1 } = {}) {
   const userDataDir = fs.mkdtempSync(path.join(os.tmpdir(), 'jobly-e2e-'));
   const ctx = await chromium.launchPersistentContext(userDataDir, {
-    executablePath: chromiumPath(), headless: false, colorScheme, viewport: { width: 1280, height: 800 },
+    executablePath: chromiumPath(), headless: false, colorScheme, viewport: { width: 1280, height: 800 }, deviceScaleFactor: scale,
     ignoreDefaultArgs: ['--disable-extensions'],
     args: ['--headless=new', `--disable-extensions-except=${dist}`, `--load-extension=${dist}`],
   });

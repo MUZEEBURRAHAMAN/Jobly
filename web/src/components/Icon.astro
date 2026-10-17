@@ -1,0 +1,14 @@
+---
+// Inlines a Lucide icon at build time (no icon font, no runtime JavaScript).
+const icons = import.meta.glob('/node_modules/lucide-static/icons/*.svg', { query: '?raw', import: 'default', eager: true }) as Record<string, string>;
+interface Props { name: string; size?: number; class?: string; label?: string }
+const { name, size = 16, class: cls = '', label } = Astro.props;
+const raw = icons[`/node_modules/lucide-static/icons/${name}.svg`];
+if (!raw) throw new Error(`Unknown icon: ${name}`);
+const a11y = label ? `role="img" aria-label="${label}"` : 'aria-hidden="true" focusable="false"';
+// Only touch the outer <svg> tag: inner shapes (e.g. <rect>) have their own width/height.
+const svg = raw
+  .replace(/<!--[\s\S]*?-->/g, '')
+  .replace(/<svg[^>]*>/, (tag) => tag.replace(/\s(width|height|class)="[^"]*"/g, '').replace('<svg', `<svg width="${size}" height="${size}" class="icon ${cls}" ${a11y}`));
+---
+<Fragment set:html={svg} />

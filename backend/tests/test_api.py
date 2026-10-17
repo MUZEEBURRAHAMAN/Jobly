@@ -284,6 +284,14 @@ class TestCORS(APITestCase):
     async def preflight(self, origin):
         return await self.client.options("/api/jobs", headers={"Origin": origin, "Access-Control-Request-Method": "GET"})
 
+    async def test_the_website_may_read_jobs(self):
+        site = "https://joblyextension.netlify.app"
+        res = await self.client.get("/api/jobs", params={"limit": 1}, headers={"Origin": site})
+        self.assertEqual(res.headers.get("access-control-allow-origin"), site)
+        self.assertEqual((await self.preflight(site)).headers.get("access-control-allow-origin"), site)
+        lookalike = "https://joblyextension.netlify.app.evil.example"
+        self.assertIsNone((await self.preflight(lookalike)).headers.get("access-control-allow-origin"))
+
     async def test_extension_origin_allowed_web_origin_blocked(self):
         ok = await self.preflight(EXT_ORIGIN)
         self.assertEqual(ok.headers.get("access-control-allow-origin"), EXT_ORIGIN)

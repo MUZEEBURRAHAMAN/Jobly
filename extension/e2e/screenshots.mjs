@@ -10,7 +10,8 @@ import { fileURLToPath, pathToFileURL } from 'url';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const SITE = path.join(root, 'site', 'assets');
 const STORE = path.join(root, 'store-assets');
-fs.mkdirSync(SITE, { recursive: true }); fs.mkdirSync(STORE, { recursive: true });
+const WEB = path.join(root, 'web', 'public', 'img');
+fs.mkdirSync(SITE, { recursive: true }); fs.mkdirSync(STORE, { recursive: true }); fs.mkdirSync(WEB, { recursive: true });
 const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'jobly-shots-'));
 const fontUrl = (w) => pathToFileURL(path.join(root, 'site', 'assets', 'fonts', `archivo-latin-${w}-normal.woff2`)).href;
 const iconUrl = pathToFileURL(path.join(root, 'site', 'assets', 'icon-128.png')).href;
@@ -62,6 +63,15 @@ await h.ctx.close();
 
 // Web Store wants 24-bit PNGs without alpha: flatten everything we wrote
 const py = process.env.PYTHON || path.join(root, '.venv', 'bin', 'python');
+// website hero: the dashboard at 1440x900, retina, light and dark (converted to WebP below)
+const hi = await launch({ scale: 2 }); await hi.ctx.route(/t2\.gstatic\.com/, (r) => r.abort());
+for (const theme of ['light', 'dark']) {
+  const p = await open(hi, 'options.html', { theme, width: 1440, height: 900 }); await settle(p);
+  await p.screenshot({ path: path.join(WEB, `dashboard-${theme}.png`) }); console.log('wrote', `web/public/img/dashboard-${theme}.png`); await p.close();
+}
+await hi.ctx.close();
+
 execFileSync(py, ['-c', `import glob,sys\nfrom PIL import Image\nfor f in glob.glob(r"${STORE}/*.png")+glob.glob(r"${SITE}/shot-*.png"):\n    Image.open(f).convert("RGB").save(f, optimize=True)`]);
+execFileSync(py, ['-c', `import glob,os\nfrom PIL import Image\nfor f in glob.glob(r"${WEB}/dashboard-*.png"):\n    Image.open(f).convert("RGB").save(f[:-4] + ".webp", quality=82, method=6)\n    os.remove(f)`]);
 console.log('done');
 process.exit(0);

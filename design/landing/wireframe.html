@@ -1,0 +1,245 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Jobly landing page wireframe</title>
+<style>
+  :root { --ink:#111; --mute:#555; --line:#b9b9b9; --box:#ececec; --panel:#f7f7f7; --page:#dcdcdc; --note:#b83a0a; }
+  * { box-sizing:border-box; margin:0; }
+  body { font:16px/1.5 ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif; color:var(--ink); background:var(--page); padding:24px 16px 80px; }
+  .legend { max-width:1240px; margin:0 auto 20px; font-size:14px; color:var(--mute); display:flex; gap:20px; flex-wrap:wrap; align-items:center; }
+  .legend b { color:var(--ink); }
+  .tag { display:inline-block; font-size:11px; font-weight:700; letter-spacing:.04em; text-transform:uppercase; color:#fff; background:var(--note); padding:2px 8px; border-radius:99px; }
+  .wrap { max-width:1240px; margin:0 auto; display:flex; flex-direction:column; gap:16px; }
+  section { position:relative; background:var(--panel); border-radius:28px; padding:64px 56px; }
+  section.tint { background:linear-gradient(135deg,#f3e3da 0%,#f7f7f7 45%,#fbeee6 100%); }
+  .badge { position:absolute; top:16px; left:16px; width:28px; height:28px; border-radius:50%; background:var(--ink); color:#fff; font-size:13px; font-weight:700; display:grid; place-items:center; }
+  .note { position:absolute; top:16px; right:20px; max-width:330px; font-size:12px; line-height:1.4; color:var(--note); text-align:right; }
+  h1 { font-size:58px; line-height:1.02; font-weight:500; letter-spacing:-.03em; }
+  h2 { font-size:44px; line-height:1.08; font-weight:500; letter-spacing:-.03em; }
+  h3 { font-size:20px; font-weight:600; letter-spacing:-.01em; }
+  p.lead { font-size:17px; line-height:28px; color:var(--mute); max-width:640px; }
+  .center { text-align:center; display:flex; flex-direction:column; align-items:center; gap:18px; }
+  .center p.lead { margin-inline:auto; }
+  .btn { display:inline-block; font-size:14px; font-weight:500; padding:10px 18px; border-radius:8px; border:1px solid var(--ink); }
+  .btn.fill { background:var(--ink); color:#fff; }
+  .btn.ghost { background:#fff; }
+  .small { font-size:13px; color:var(--mute); }
+  .ph { background:var(--box); border:1.5px dashed var(--line); border-radius:12px; display:grid; place-items:center; color:#888; font-size:13px; text-align:center; padding:12px; }
+  .row { display:flex; gap:12px; align-items:center; flex-wrap:wrap; }
+  .chip { font-size:13px; background:#fff; border:1px solid var(--line); border-radius:99px; padding:4px 12px; }
+  .grid2 { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+  .grid3 { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; }
+  .grid4 { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; }
+  .card { background:#fff; border:1px solid #ddd; border-radius:12px; padding:24px; display:flex; flex-direction:column; gap:10px; }
+  .card.gray { background:#f1f1f1; border:0; }
+  .eyebrow { font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:#777; font-weight:600; }
+  nav.top { display:flex; align-items:center; justify-content:space-between; padding:14px 24px; background:#fff; border-radius:16px; font-size:14px; }
+  nav.top .links { display:flex; gap:22px; color:var(--mute); }
+  .bar-announce { text-align:center; font-size:13px; background:#fff; border-radius:10px; padding:8px; color:var(--mute); }
+  .input { width:min(680px,100%); background:#fff; border:1px solid var(--line); border-radius:14px; padding:14px 18px; display:flex; justify-content:space-between; align-items:center; text-align:left; }
+  .input span.l { font-size:12px; color:#888; display:block; }
+  .input span.v { font-size:16px; }
+  .bars { background:#fff; border-radius:12px; padding:20px 24px; display:flex; flex-direction:column; gap:14px; margin-top:28px; }
+  .bars .r { display:grid; grid-template-columns:140px 1fr 70px; gap:16px; align-items:center; font-size:14px; }
+  .bars .t { background:#eee; height:8px; border-radius:99px; overflow:hidden; } .bars .t i { display:block; height:100%; background:#555; border-radius:99px; }
+  .stat b { font-size:36px; letter-spacing:-.02em; display:block; line-height:1.1; } .stat span { font-size:13px; color:var(--mute); }
+  .tabs { display:flex; gap:8px; justify-content:center; margin:8px 0 20px; }
+  .tabs .tab { font-size:14px; padding:8px 16px; border-radius:99px; background:#fff; border:1px solid var(--line); } .tabs .tab.on { background:var(--ink); color:#fff; border-color:var(--ink); }
+  .faq { background:#fff; border-radius:16px; padding:8px 28px; max-width:760px; margin:24px auto 0; }
+  .faq div { border-bottom:1px solid #e6e6e6; padding:16px 0; font-size:15px; display:flex; justify-content:space-between; gap:16px; } .faq div:last-child { border:0; }
+  .faq .open { display:block; } .faq .open p { color:var(--mute); font-size:14px; margin-top:8px; line-height:1.55; }
+  footer { background:var(--panel); border-radius:28px; padding:48px 56px 0; position:relative; overflow:hidden; }
+  footer .cols { display:grid; grid-template-columns:1.2fr repeat(4,1fr); gap:24px; font-size:14px; } footer .cols b { display:block; margin-bottom:8px; font-size:13px; } footer .cols span { display:block; color:var(--mute); margin:4px 0; }
+  footer .wm { font-size:200px; font-weight:600; letter-spacing:-.05em; line-height:.8; color:#e3e3e3; margin:36px 0 -28px; text-align:center; }
+  .mobile { display:flex; gap:24px; flex-wrap:wrap; justify-content:center; }
+  .phone { width:300px; background:#fff; border-radius:28px; border:2px solid var(--ink); padding:18px 16px; display:flex; flex-direction:column; gap:12px; font-size:13px; }
+  .phone h1 { font-size:32px; } .phone .card { padding:14px; } .phone .ph { height:90px; }
+  @media (max-width:900px){ section{padding:56px 20px} h1{font-size:38px} h2{font-size:30px} .grid2,.grid3,.grid4{grid-template-columns:1fr} .note{position:static;text-align:left;max-width:none;margin-bottom:12px} footer .cols{grid-template-columns:1fr 1fr} footer .wm{font-size:90px} nav.top .links{display:none} }
+</style>
+</head>
+<body>
+<div class="legend">
+  <b>Jobly landing page, wireframe draft 1</b>
+  <span>Grayscale boxes = real screenshots go there. Orange notes are for you, not for the page.</span>
+  <span class="tag">Reference</span><span>layout from wrangle.ai · steps and privacy block from rea.tools</span>
+</div>
+
+<div class="wrap">
+
+  <div class="bar-announce">New: jobs older than 2 months never show up. See how we check dates →</div>
+  <nav class="top"><b style="font-size:18px">▍Jobly</b><div class="links"><span>How it works</span><span>Features</span><span>Privacy</span><span>FAQ</span></div><span class="btn fill">Add to Chrome</span></nav>
+
+  <!-- 1 HERO -->
+  <section class="tint" style="padding-bottom:0;overflow:hidden">
+    <div class="badge">1</div><div class="note">Hero. Same idea as Wrangle: big headline on a soft gradient panel, a "try it" box, then the product rising from the bottom.</div>
+    <div class="center" style="padding-top:24px">
+      <h1>Find jobs posted this week,<br>not last year.</h1>
+      <p class="lead">Jobly lists openings from company career pages with their real posting date, hides anything older than two months, and tells you when a new one matches. No account. Your preferences stay in your browser.</p>
+      <div class="input"><div><span class="l">Tell Jobly what you're looking for</span><span class="v">Product designer · Remote · Past week</span></div><span class="btn fill">Search</span></div>
+      <div class="row" style="justify-content:center"><span class="chip">Product designer</span><span class="chip">Frontend engineer</span><span class="chip">Product manager</span><span class="chip">AI / ML</span><span class="chip">Fullstack</span></div>
+      <div class="row" style="justify-content:center;margin-top:6px"><span class="btn fill">Add to Chrome, it's free</span><span class="btn ghost">See how it works</span></div>
+      <span class="small">Free · No account · Works in Chrome</span>
+    </div>
+    <div class="ph" style="height:360px;margin:40px 40px 0;border-radius:16px 16px 0 0;background:#fff;border-bottom:0">[ Real dashboard screenshot (light mode), cropped at the bottom of the panel ]</div>
+  </section>
+
+  <!-- 2 SOURCES -->
+  <section style="padding:32px 56px">
+    <div class="badge">2</div><div class="note">Replaces Wrangle's customer-logo strip. These are the sources Jobly reads, so nothing implies an endorsement.</div>
+    <div class="center" style="gap:14px"><span class="small">Reads public job boards on</span>
+    <div class="row" style="justify-content:center;gap:28px;font-weight:600;color:#777"><span>Greenhouse</span><span>Ashby</span><span>Lever</span><span>Workday</span><span>Amazon Jobs</span><span>We Work Remotely</span><span>Remotive</span><span>Himalayas</span><span>Arbeitnow</span></div></div>
+  </section>
+
+  <!-- 3 FACTS -->
+  <section>
+    <div class="badge">3</div><div class="note">Replaces Wrangle's testimonials (big quote card + two smaller). Three product facts, because there are no real users to quote yet.</div>
+    <div style="display:grid;grid-template-columns:2fr 1fr 1fr;gap:16px;margin-top:12px">
+      <div class="card gray" style="min-height:320px;justify-content:space-between"><div><h3 style="font-size:30px;letter-spacing:-.02em;font-weight:500">Every job shows when it was posted.</h3><p class="lead" style="margin-top:12px">Jobly reads the date from the employer's own listing. If a source gives no date, the job appears without one, and the Date posted filter leaves it out.</p></div><span class="small"><u>How we handle dates →</u></span></div>
+      <div class="card gray" style="justify-content:space-between"><div class="ph" style="height:90px">icon</div><div><h3>Your data stays in your browser.</h3><p class="small" style="margin-top:8px">Preferences, saved jobs and alerts live on your device. Nothing goes in an account because there is no account.</p></div></div>
+      <div class="card gray" style="justify-content:space-between"><div class="ph" style="height:90px">icon</div><div><h3>You apply on the employer's site.</h3><p class="small" style="margin-top:8px">Every Apply button opens the company's own application page.</p></div></div>
+    </div>
+  </section>
+
+  <!-- 4 HOW IT WORKS -->
+  <section>
+    <div class="badge">4</div><div class="note">From rea.tools: three plain steps.</div>
+    <div class="center"><h2>Set up in a minute.</h2></div>
+    <div class="grid3" style="margin-top:36px">
+      <div class="card"><span class="eyebrow">Step 1</span><h3>Add Jobly to Chrome.</h3><p class="small">One click from the Chrome Web Store.</p><div class="ph" style="height:120px">[ Web Store button sketch ]</div></div>
+      <div class="card"><span class="eyebrow">Step 2</span><h3>Choose your roles.</h3><p class="small">Product design, frontend, product management, AI/ML or fullstack. Add experience level, location and keywords if you want.</p><div class="ph" style="height:120px">[ Welcome screen: role picker ]</div></div>
+      <div class="card"><span class="eyebrow">Step 3</span><h3>Open the toolbar icon.</h3><p class="small">See the freshest matches first. Jobly sends a notification when a new one appears.</p><div class="ph" style="height:120px">[ Popup screenshot ]</div></div>
+    </div>
+  </section>
+
+  <!-- 5 NUMBERS -->
+  <section>
+    <div class="badge">5</div><div class="note">Copies Wrangle's benchmark block (four big numbers, then a bar chart). Ours shows real job counts by age, which backs up the "fresh" promise. Counts are from the live server.</div>
+    <h2>A feed that stays fresh.</h2>
+    <p class="lead" style="margin-top:12px">Live counts from Jobly's database, refreshed every two hours.</p>
+    <div class="grid4" style="margin-top:36px">
+      <div class="stat"><b>560</b><span>posted in the last 24 hours</span></div>
+      <div class="stat"><b>1,409</b><span>in the last 3 days</span></div>
+      <div class="stat"><b>2,053</b><span>in the last week</span></div>
+      <div class="stat"><b>11,355</b><span>in the last 2 months, the oldest we show</span></div>
+    </div>
+    <div class="bars"><span class="eyebrow">Open jobs by posting date</span>
+      <div class="r"><span>Past 24 hours</span><div class="t"><i style="width:5%"></i></div><span>560</span></div>
+      <div class="r"><span>Past 3 days</span><div class="t"><i style="width:12.4%"></i></div><span>1,409</span></div>
+      <div class="r"><span>Past week</span><div class="t"><i style="width:18%"></i></div><span>2,053</span></div>
+      <div class="r"><span>Past 2 weeks</span><div class="t"><i style="width:33%"></i></div><span>3,762</span></div>
+      <div class="r"><span>Past month</span><div class="t"><i style="width:62%"></i></div><span>7,065</span></div>
+      <div class="r"><span>Past 2 months</span><div class="t"><i style="width:100%"></i></div><span>11,355</span></div>
+      <span class="small">Jobs older than 60 days are removed.</span>
+    </div>
+  </section>
+
+  <!-- 6 FEATURES -->
+  <section>
+    <div class="badge">6</div><div class="note">Wrangle's "Agents / Collections / Sequences": two cards on top, one wide card below, each with a small product mock.</div>
+    <h2>Set it once. Jobly keeps watching.</h2>
+    <p class="lead" style="margin-top:12px">Pick your roles one time. Jobly checks for new matches in the background and tells you when one shows up.</p>
+    <div class="grid2" style="margin-top:36px">
+      <div class="card gray" style="gap:14px"><span class="eyebrow">Alerts</span><h3>A heads-up when a match appears</h3><p class="small">Jobly checks every hour or so and sends one grouped notification, not a flood. Turn alerts off any time in Preferences.</p>
+        <div class="ph" style="height:220px;background:#fff">[ Mock: desktop notification "3 new matches: Northwind, Copperfield and 1 other" above a short list ]</div></div>
+      <div class="card gray" style="gap:14px"><span class="eyebrow">Saved</span><h3>A shortlist that stays on your device</h3><p class="small">Save a job with one click. Jobly keeps a copy in your browser, so it stays on your list after the company takes the posting down.</p>
+        <div class="ph" style="height:220px;background:#fff">[ Mock: two job cards, one showing "Saved" ]</div></div>
+    </div>
+    <div class="card gray" style="margin-top:16px;gap:14px"><span class="eyebrow">Filters</span><h3>Filter the way you do on LinkedIn</h3><p class="small">Date posted, experience, salary, location and remote only. Add words to include or leave out.</p>
+      <div class="ph" style="height:200px;background:#fff">[ Mock: filter panel with "Date posted: Past week" selected ]</div></div>
+  </section>
+
+  <!-- 7 CAPABILITIES -->
+  <section>
+    <div class="badge">7</div><div class="note">Wrangle's 3×2 grid: a small icon card on top, title and two lines of text underneath.</div>
+    <div class="center"><h2>What you get</h2><p class="lead">Each part works alone. Together they replace a dozen career-page tabs.</p></div>
+    <div class="grid3" style="margin-top:40px;gap:28px 16px">
+      <div><div class="ph" style="height:150px;background:#fff">icon + mini mock</div><h3 style="margin-top:14px">Real posting dates</h3><p class="small">The date comes from the employer's listing, shown on every card.</p></div>
+      <div><div class="ph" style="height:150px;background:#fff">icon + mini mock</div><h3 style="margin-top:14px">A two-month limit</h3><p class="small">Nothing older than 60 days appears, so ghost listings stay out.</p></div>
+      <div><div class="ph" style="height:150px;background:#fff">icon + mini mock</div><h3 style="margin-top:14px">Direct apply links</h3><p class="small">Apply opens the company's own page. Jobly never sits between you and the application.</p></div>
+      <div><div class="ph" style="height:150px;background:#fff">icon + mini mock</div><h3 style="margin-top:14px">Matched to you</h3><p class="small">Your roles, level, location and keywords fill the "For you" tab and the "Matches you" badge.</p></div>
+      <div><div class="ph" style="height:150px;background:#fff">icon + mini mock</div><h3 style="margin-top:14px">Hide companies</h3><p class="small">Turn off employers you don't want to see. The choice stays on your device.</p></div>
+      <div><div class="ph" style="height:150px;background:#fff">icon + mini mock</div><h3 style="margin-top:14px">Report a bad listing</h3><p class="small">Flag a fake, expired or spammy job in two clicks.</p></div>
+    </div>
+  </section>
+
+  <!-- 8 PRODUCT TABS -->
+  <section>
+    <div class="badge">8</div><div class="note">Wrangle's tabbed big screenshot (Search / Agents / Collections / Sequences). Ours: one screenshot per tab.</div>
+    <div class="center"><h2>Jobly does the checking.<br>You do the applying.</h2></div>
+    <div class="tabs" style="margin-top:28px"><span class="tab on">Jobs</span><span class="tab">Companies</span><span class="tab">Saved</span><span class="tab">Alerts</span></div>
+    <div class="ph" style="height:420px;background:#fff;border-radius:16px">[ Large dashboard screenshot. Changes with the selected tab ]</div>
+    <div class="grid4" style="margin-top:20px;font-size:14px">
+      <div><b>Jobs.</b> <span class="small">The freshest matches first, with the date on every card.</span></div>
+      <div><b>Companies.</b> <span class="small">See which employers Jobly watches and how many roles each has open. Hide the ones you don't want.</span></div>
+      <div><b>Saved.</b> <span class="small">Your shortlist, searchable, stored on your device.</span></div>
+      <div><b>Alerts.</b> <span class="small">Every new match since your last visit, newest first.</span></div>
+    </div>
+  </section>
+
+  <!-- 9 PRIVACY -->
+  <section>
+    <div class="badge">9</div><div class="note">Not on Wrangle. Added because Web Store reviewers and careful users look for it, and it is a real selling point.</div>
+    <h2>Your job search stays yours.</h2>
+    <p class="lead" style="margin-top:12px">No account, no email, no analytics.</p>
+    <div class="grid4" style="margin-top:32px">
+      <div class="card"><h3>On your device</h3><p class="small">Preferences, saved jobs, alerts and hidden companies.</p></div>
+      <div class="card"><h3>What the server sees</h3><p class="small">Your search words and filters, only to answer that request. They are not saved in a database.</p></div>
+      <div class="card"><h3>Other services</h3><p class="small">Company logos come from Google's favicon service. Render and Cloudflare keep ordinary request logs.</p></div>
+      <div class="card"><h3>Permissions</h3><p class="small">Storage, notifications and alarms. No tabs, no browsing history.</p></div>
+    </div>
+    <p class="small" style="margin-top:20px"><u>Read the full privacy policy →</u></p>
+  </section>
+
+  <!-- 10 FAQ -->
+  <section class="tint">
+    <div class="badge">10</div><div class="note">Accordion on a gradient panel, like Wrangle. First answer open.</div>
+    <div class="center"><h2>Frequently asked questions</h2></div>
+    <div class="faq">
+      <div class="open"><div style="display:flex;justify-content:space-between"><b>How is Jobly different from LinkedIn or Indeed?</b><span>×</span></div><p>Jobly reads postings from company career pages and shows the real posting date. It hides anything older than two months. It has no promoted jobs, no account and no messaging. LinkedIn and Indeed list far more jobs across every industry and offer things Jobly does not, such as Easy Apply and recruiter messages.</p></div>
+      <div><span>How much does Jobly cost?</span><span>+</span></div>
+      <div><span>How do I get started?</span><span>+</span></div>
+      <div><span>Which jobs does it cover?</span><span>+</span></div>
+      <div><span>How often does it update?</span><span>+</span></div>
+      <div><span>Why do some jobs have no date?</span><span>+</span></div>
+      <div><span>What do you store about me?</span><span>+</span></div>
+      <div><span>Does it work outside Chrome?</span><span>+</span></div>
+    </div>
+  </section>
+
+  <!-- 11 CLOSING -->
+  <section class="tint">
+    <div class="badge">11</div><div class="note">Wrangle's "Ready to get started?" panel: headline and two buttons on the left, two small cards on the right.</div>
+    <div style="display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:32px;align-items:start">
+      <div><h2 style="font-size:40px">Ready to see what's new?</h2><p class="lead" style="margin:12px 0 20px">Add Jobly to Chrome, pick your roles, and open the icon. It takes a minute.</p><div class="row"><span class="btn fill">Add to Chrome</span><span class="btn ghost">Read the privacy policy</span></div></div>
+      <div class="card" style="background:rgba(255,255,255,.6)"><h3>Start with your roles.</h3><p class="small">Product design, frontend, product management, AI/ML, fullstack.</p><span class="btn ghost" style="align-self:flex-start;margin-top:8px">Choose roles →</span></div>
+      <div class="card" style="background:rgba(255,255,255,.6)"><h3>Want a look first?</h3><p class="small">See how many jobs went up today.</p><span class="btn ghost" style="align-self:flex-start;margin-top:8px">See today's numbers →</span></div>
+    </div>
+  </section>
+
+  <!-- 12 FOOTER -->
+  <footer>
+    <div class="badge" style="top:16px">12</div><div class="note">Footer columns, a live status dot, and the giant faded wordmark Wrangle uses.</div>
+    <div class="cols" style="margin-top:24px"><div><b style="font-size:20px">▍Jobly</b></div>
+      <div><b>Product</b><span>How it works</span><span>Features</span><span>FAQ</span></div>
+      <div><b>Roles</b><span>Product design</span><span>Frontend</span><span>Product management</span><span>AI / ML</span><span>Fullstack</span></div>
+      <div><b>Legal</b><span>Privacy policy</span><span>Terms</span><span>Contact</span></div>
+      <div><b>Get it</b><span>Chrome Web Store</span></div></div>
+    <div class="row" style="justify-content:space-between;margin-top:36px;font-size:13px;color:var(--mute)"><span>© 2026 Jobly</span><span>● Jobs updated 2 hours ago</span></div>
+    <div class="wm">Jobly</div>
+  </footer>
+
+  <!-- MOBILE -->
+  <section style="background:#cfcfcf">
+    <div class="note" style="position:static;text-align:left;max-width:none;margin-bottom:16px">Phone layout (375 px). Everything stacks into one column; the four-up and three-up grids become single cards; the tabs scroll sideways; the nav collapses to a logo and an "Add to Chrome" button.</div>
+    <div class="mobile">
+      <div class="phone"><b>▍Jobly <span style="float:right" class="btn fill">Add</span></b><h1>Find jobs posted this week, not last year.</h1><p class="small">Real posting dates. Nothing older than two months. Alerts when a new one matches.</p><span class="btn fill" style="text-align:center">Add to Chrome</span><div class="ph" style="height:150px">dashboard screenshot</div></div>
+      <div class="phone"><span class="eyebrow">Numbers</span><h2 style="font-size:28px">A feed that stays fresh.</h2><div class="stat"><b>560</b><span>posted in the last 24 hours</span></div><div class="stat"><b>1,409</b><span>in the last 3 days</span></div><div class="card"><span class="eyebrow">Alerts</span><b>A heads-up when a match appears</b><div class="ph">mock</div></div></div>
+      <div class="phone"><span class="eyebrow">FAQ</span><div class="card"><b>How is Jobly different from LinkedIn or Indeed?</b></div><div class="card"><b>How much does Jobly cost?</b></div><div class="card"><b>What do you store about me?</b></div><h2 style="font-size:28px">Ready to see what's new?</h2><span class="btn fill" style="text-align:center">Add to Chrome</span></div>
+    </div>
+  </section>
+
+</div>
+</body>
+</html>

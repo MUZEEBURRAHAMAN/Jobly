@@ -38,7 +38,9 @@ ALLOWED_ORIGINS = [
     "http://127.0.0.1:3000",
     "http://localhost:5173",
     "http://127.0.0.1:5173",
-]
+    "http://localhost:4321",      # website dev server (web/)
+    "http://127.0.0.1:4321",
+] + [o.strip() for o in settings.SITE_ORIGINS.split(",") if o.strip()]
 
 _ext_ids = [i.strip() for i in settings.EXTENSION_IDS.split(",") if i.strip()]
 # Pin CORS to the published extension ID(s) in production (EXTENSION_IDS); any extension only when unset (dev).
