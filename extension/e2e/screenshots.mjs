@@ -70,7 +70,7 @@ const all = (await (await fetch('http://127.0.0.1:8000/api/jobs?limit=200')).jso
 const demo = all.filter((j) => j.title.length < 40 && j.application_url.startsWith('https'));
 // Everything the fixture has counts as seen, so the background check can't add a flood of alerts on top of these.
 const seedUserData = () => hi.sw.evaluate(({ demo, all }) => chrome.storage.local.set({
-  savedJobs: demo.slice(0, 4).map((j) => ({ ...j, is_saved: true })),
+  savedJobs: demo.slice(8, 12).map((j) => ({ ...j, is_saved: true })), // not the first jobs in the feed, so the feed shows a natural mix
   alerts: demo.slice(4, 10).map((j, i) => ({ id: j.application_url, title: j.title, company_name: j.company_name, location: j.location, application_url: j.application_url, sent_at: new Date(Date.now() - [6, 38, 95, 180, 300, 420][i] * 60000).toISOString(), is_read: i > 1 })),
   seenAlertKeys: all.map((j) => j.application_url),
 }), { demo, all });

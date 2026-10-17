@@ -1,16 +1,7 @@
 ---
 import Icon from './Icon.astro';
+import HeroShowcase from './HeroShowcase.astro';
 import { installHref } from '../lib/site';
-
-const chips = [
-  { label: 'Product designer', role: 'product_design' },
-  { label: 'Frontend engineer', role: 'frontend_engineering' },
-  { label: 'Product manager', role: 'product_management' },
-  { label: 'AI / ML', role: 'ai_ml' },
-  { label: 'Fullstack', role: 'fullstack_engineering' },
-];
-// Searches that return real results on the live data (checked 17 Oct 2026).
-const examples = ['Product designer', 'Machine learning', 'Product manager', 'Engineer Berlin', 'Data scientist', 'Staff engineer'];
 ---
 <section class="shell hero-section" aria-labelledby="hero-title">
   <div class="panel hero">
@@ -21,128 +12,45 @@ const examples = ['Product designer', 'Machine learning', 'Product manager', 'En
     <div class="hero-inner">
       <h1 id="hero-title" class="display rise">Find jobs posted this week,<br class="br-wide" /> not last year.</h1>
       <p class="lead hero-lead rise d1">Jobly lists openings from company career pages with their real posting date, hides anything older than two months, and tells you when a new one matches. No account. Your preferences stay in your browser.</p>
-
-      <form class="search rise d2" role="search" data-hero-search data-examples={JSON.stringify(examples)}>
-        <label class="sr-only" for="hero-q">Search open jobs by title, skill or city</label>
-        <div class="search-field">
-          <Icon name="search" size={18} class="search-icon" />
-          <input id="hero-q" name="q" type="search" autocomplete="off" spellcheck="false" maxlength="100"
-            placeholder="Try “Product designer”" aria-describedby="hero-result" />
-        </div>
-        <div class="search-tools">
-          <div class="tools-left">
-            <label class="pill-select">
-              <span class="sr-only">Date posted</span>
-              <Icon name="calendar-clock" size={14} />
-              <select name="days">
-                <option value="">Any time</option>
-                <option value="1">Past 24 hours</option>
-                <option value="7">Past week</option>
-                <option value="30">Past month</option>
-              </select>
-              <Icon name="chevron-down" size={14} class="sel-chev" />
-            </label>
-            <label class="pill-check">
-              <input type="checkbox" name="remote" />
-              <span class="box" aria-hidden="true"><Icon name="check" size={12} /></span>
-              Remote only
-            </label>
-          </div>
-          <button class="btn btn-ink btn-sm" type="submit">Search live jobs <Icon name="arrow-right" size={14} class="arrow" /></button>
-        </div>
-      </form>
-
-      <div class="chips rise d3" role="group" aria-label="Popular roles">
-        {chips.map((c) => <button type="button" class="chip" data-role={c.role}>{c.label}</button>)}
-      </div>
-
-      <div class="result" id="hero-result" aria-live="polite" data-result></div>
-
-      <div class="ctas rise d3">
+      <div class="ctas rise d2">
         <a class="btn btn-ink btn-lg" href={installHref}><Icon name="chrome" size={18} />Add to Chrome, it's free</a>
         <a class="btn btn-outline btn-lg" href="#how-it-works">See how it works</a>
       </div>
-      <p class="small fine rise d3">Free · No account · Works in Chrome</p>
+      <p class="small fine rise d2">Free · No account · Works in Chrome</p>
     </div>
 
+    <div class="rise d3"><HeroShowcase /></div>
   </div>
 </section>
 
-<script>
-  import '../scripts/hero';
-</script>
-
 <style>
   .hero-section { padding-top: 8px; }
-  .hero { isolation: isolate; padding: clamp(56px, 8vw, 96px) 24px clamp(56px, 7vw, 88px); text-align: center; }
+  .hero { isolation: isolate; padding-top: clamp(56px, 8vw, 104px); text-align: center; }
 
   /* soft gradient that fades in and drifts slowly (still under "reduce motion") */
   .hero-bg { position: absolute; inset: 0; z-index: -1; opacity: 0; animation: bg-in 1.4s var(--ease-out) 0.1s forwards; }
   .blob { position: absolute; border-radius: 50%; filter: blur(70px); opacity: var(--blob-opacity); will-change: transform; }
-  .b1 { width: 56%; height: 70%; left: -10%; top: 18%; background: var(--blob-1); animation: drift-a 22s ease-in-out infinite alternate; }
-  .b2 { width: 50%; height: 60%; right: -8%; top: -10%; background: var(--blob-2); animation: drift-b 26s ease-in-out infinite alternate; }
-  .b3 { width: 46%; height: 50%; right: 4%; bottom: -14%; background: var(--blob-3); animation: drift-a 30s ease-in-out infinite alternate-reverse; }
-  .hero-bg::after { content: ''; position: absolute; inset: 0; background: radial-gradient(60% 50% at 50% 30%, color-mix(in srgb, var(--panel) 55%, transparent), transparent 70%); }
+  .b1 { width: 56%; height: 55%; left: -10%; top: 4%; background: var(--blob-1); animation: drift-a 22s ease-in-out infinite alternate; }
+  .b2 { width: 50%; height: 50%; right: -8%; top: -12%; background: var(--blob-2); animation: drift-b 26s ease-in-out infinite alternate; }
+  .b3 { width: 46%; height: 40%; right: 4%; top: 30%; background: var(--blob-3); animation: drift-a 30s ease-in-out infinite alternate-reverse; }
+  .hero-bg::after { content: ''; position: absolute; inset: 0; background: radial-gradient(60% 40% at 50% 22%, color-mix(in srgb, var(--panel) 55%, transparent), transparent 70%); }
   @keyframes bg-in { to { opacity: 1; } }
   @keyframes drift-a { to { transform: translate3d(6%, -4%, 0) scale(1.06); } }
   @keyframes drift-b { to { transform: translate3d(-5%, 6%, 0) scale(0.96); } }
 
   /* entrance */
   .rise { opacity: 0; transform: translateY(14px); animation: rise 0.8s var(--ease-out) forwards; }
-  .d1 { animation-delay: 0.08s; } .d2 { animation-delay: 0.16s; } .d3 { animation-delay: 0.24s; } .d4 { animation-delay: 0.36s; }
+  .d1 { animation-delay: 0.08s; } .d2 { animation-delay: 0.16s; } .d3 { animation-delay: 0.3s; }
   @keyframes rise { to { opacity: 1; transform: none; } }
 
-  .hero-inner { max-width: 760px; margin-inline: auto; display: flex; flex-direction: column; align-items: center; }
+  .hero-inner { max-width: 780px; margin-inline: auto; padding-inline: 24px; display: flex; flex-direction: column; align-items: center; }
   .hero-lead { margin-top: 20px; max-width: 640px; }
-
-  /* search card, like Wrangle's prompt box */
-  .search { width: 100%; max-width: 640px; margin-top: 32px; text-align: left; background: var(--card); border: 1px solid var(--border); border-radius: 16px;
-    box-shadow: var(--shadow-md); transition: border-color var(--dur-fast) ease, box-shadow var(--dur-fast) ease; }
-  .search:focus-within { border-color: var(--border-strong); box-shadow: var(--shadow-md), var(--ring); }
-  .search-field { display: flex; align-items: center; gap: 12px; padding: 16px 18px 10px; }
-  .search-field :global(.search-icon) { color: var(--subtle); }
-  .search-field input { flex: 1; min-width: 0; border: 0; outline: 0; background: transparent; font-size: 1.0625rem; color: var(--fg); padding: 6px 0; }
-  .search-field input::placeholder { color: var(--subtle); }
-  .search-field input::-webkit-search-cancel-button { display: none; }
-  .search-tools { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 8px 10px 10px 14px; flex-wrap: wrap; }
-  .tools-left { display: flex; gap: 6px; flex-wrap: wrap; }
-  .pill-select, .pill-check { position: relative; display: inline-flex; align-items: center; gap: 6px; height: 30px; padding: 0 10px; border-radius: var(--radius-full);
-    background: var(--panel); border: 1px solid var(--border); font-size: var(--text-sm); color: var(--muted); cursor: pointer; transition: color var(--dur-fast) ease, border-color var(--dur-fast) ease; }
-  .pill-select:hover, .pill-check:hover { color: var(--fg); border-color: var(--border-strong); }
-  .pill-select select { appearance: none; border: 0; background: transparent; font-size: var(--text-sm); color: inherit; padding-right: 18px; margin-right: -18px; cursor: pointer; outline: 0; }
-  .pill-select:focus-within, .pill-check:focus-within { box-shadow: var(--ring); }
-  .pill-select :global(.sel-chev) { pointer-events: none; }
-  .pill-check input { position: absolute; opacity: 0; width: 1px; height: 1px; }
-  .box { width: 14px; height: 14px; border-radius: 4px; border: 1px solid var(--border-strong); display: grid; place-items: center; background: var(--card); color: transparent; transition: background-color var(--dur-fast) ease, border-color var(--dur-fast) ease; }
-  .pill-check:has(input:checked) { color: var(--fg); border-color: var(--border-strong); }
-  .pill-check:has(input:checked) .box { background: var(--brand); border-color: var(--brand); color: var(--on-brand); }
-
-  .chips { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-top: 16px; }
-  .chip { height: 32px; padding: 0 14px; border-radius: var(--radius-full); font-size: var(--text-sm); color: var(--muted); background: color-mix(in srgb, var(--card) 70%, transparent);
-    border: 1px solid var(--border); transition: color var(--dur-fast) ease, background-color var(--dur-fast) ease, border-color var(--dur-fast) ease; }
-  .chip:hover { color: var(--fg); background: var(--card); border-color: var(--border-strong); }
-  .chip[aria-pressed='true'] { color: var(--on-ink); background: var(--ink); border-color: var(--ink); }
-
-  /* live result line */
-  .result { min-height: 0; max-width: 640px; font-size: var(--text-md); color: var(--muted); line-height: 1.5; transition: margin var(--dur) var(--ease-out); }
-  .result:not(:empty) { margin-top: 18px; }
-  .result :global(strong) { color: var(--fg); font-weight: 600; font-variant-numeric: tabular-nums; }
-  .result :global(.res-row) { display: inline-flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: center; }
-  .result :global(.res-link) { color: var(--brand); font-weight: 500; text-decoration: underline; text-underline-offset: 3px; }
-  .result :global(.spin) { animation: spin 0.9s linear infinite; }
-  .result :global(.res-error) { color: var(--danger); }
-  @keyframes spin { to { transform: rotate(360deg); } }
-
-  .ctas { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 28px; }
+  .ctas { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 32px; }
   .fine { margin-top: 14px; }
-  .ctas :global(.arrow) { transition: transform var(--dur) var(--ease-out); }
-  .ctas a:hover :global(.arrow) { transform: translateX(2px); }
 
   @media (max-width: 640px) {
     .br-wide { display: none; }
-    .hero { padding-inline: 16px; }
-    .search-tools { flex-direction: column; align-items: stretch; }
-    .search-tools .btn { width: 100%; }
+    .hero-inner { padding-inline: 16px; }
     .ctas { width: 100%; flex-direction: column; }
     .ctas .btn { width: 100%; }
   }

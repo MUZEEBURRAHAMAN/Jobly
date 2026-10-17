@@ -34,6 +34,7 @@ const figureWatcher = new IntersectionObserver((entries) => {
       const make = m[host.dataset.figure!];
       if (!make) return;
       figs.set(host, make(host, { play: host.dataset.autoplay !== 'false', intensity: Number(host.dataset.intensity ?? 0.6), label: host.dataset.label }));
+      if (host.dataset.drive) drive(host, host.dataset.drive);
       // Decorative figures stay out of the reading order; figures that take the keyboard keep their name.
       if (!host.hasAttribute('tabindex')) host.setAttribute('aria-hidden', 'true');
     }).catch(() => { /* the figure is decoration: the page works without it */ });
@@ -82,4 +83,34 @@ if (countEls.length || sinceEls.length) {
       sinceEls.forEach((el) => { el.textContent = `Jobs updated ${text}`; el.closest('[data-status]')?.setAttribute('data-status', 'ok'); });
     }
   }).catch(() => { /* keep the rounded numbers already on the page */ });
+}
+
+// ---------- driven figures: the card, not the pointer, decides the figure's state
+// The package's figures answer the pointer's position. For two of them the meaning should follow the card instead:
+// the padlock locks when you hover the privacy card, the plug reaches for the socket when you hover "Apply".
+// Real pointer events are kept from the figure (capture phase, before the figure's own listener) and the figure is
+// driven with synthetic pointer positions around its own box.
+function drive(host: HTMLElement, kind: string) {
+  const trigger = host.closest<HTMLElement>('.ill-trigger') ?? host;
+  const block = (e: Event) => { if (e.isTrusted) e.stopImmediatePropagation(); };
+  for (const t of ['pointermove', 'pointerdown', 'pointerleave', 'pointerenter']) host.addEventListener(t, block, { capture: true });
+  const at = (fx: number, fy: number) => {
+    const r = host.getBoundingClientRect();
+    host.dispatchEvent(new PointerEvent('pointermove', { clientX: r.left + r.width * fx, clientY: r.top + r.height * fy, pointerType: 'mouse' }));
+  };
+  const rest = () => (kind === 'lock' ? at(0.5, 0.5) : host.dispatchEvent(new PointerEvent('pointerleave', { pointerType: 'mouse' })));
+  // lock: far away from the padlock = shut. plug: well past the socket (up and to the left) = as far in as it goes.
+  const answer = () => (kind === 'lock' ? at(-3, -3) : at(-2, -2));
+  let on = false;
+  const set = (v: boolean) => { if (v === on) return; on = v; v ? answer() : rest(); };
+  rest();
+  if (window.matchMedia('(hover: hover)').matches) {
+    trigger.addEventListener('pointerenter', () => set(true));
+    trigger.addEventListener('pointerleave', () => set(false));
+  } else {
+    // touch screens: show the answer once, shortly after the card comes into view
+    new IntersectionObserver(([e], obs) => { if (e.isIntersecting) { window.setTimeout(() => set(true), 700); obs.disconnect(); } }, { threshold: 0.6 }).observe(trigger);
+  }
+  trigger.addEventListener('focusin', () => set(true));
+  trigger.addEventListener('focusout', (e) => { if (!trigger.contains((e as FocusEvent).relatedTarget as Node | null)) set(false); });
 }

@@ -1,6 +1,8 @@
 ---
 // A hairline illustration, mounted by scripts/motion.ts when it nears the viewport.
-interface Props { name: string; intensity?: number; autoplay?: boolean; class?: string }
-const { name, intensity = 0.6, autoplay = true, class: cls } = Astro.props;
+// `drive` hands the figure to its card instead of the pointer: hovering/focusing the nearest `.ill-trigger`
+// moves it to its "answer" (padlock: locked; plug: up to the socket).
+interface Props { name: string; intensity?: number; autoplay?: boolean; drive?: 'lock' | 'plug'; class?: string }
+const { name, intensity = 0.6, autoplay = true, drive, class: cls } = Astro.props;
 ---
-<div class={cls} data-figure={name} data-intensity={intensity} data-autoplay={autoplay ? undefined : 'false'}></div>
+<div class={cls} data-figure={name} data-intensity={intensity} data-autoplay={autoplay && !drive ? undefined : 'false'} data-drive={drive}></div>
