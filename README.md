@@ -149,6 +149,15 @@ JOB EXTENSION/
 │   ├── seed_companies.py         # Seed companies into SQLite
 │   ├── sync_jobs.py              # Ingestion CLI trigger
 │   └── generate_icons.py         # PNG icon generator
+├── site/                         # Free static landing + privacy pages (Netlify/Vercel)
+├── store-assets/                 # Web Store screenshots + promo tile (npm run e2e:screens)
 ├── CHROMEWEBSTORE.md             # Chrome Web Store listing metadata & disclosures
 └── README.md
 ```
+
+## Freshness and testing
+
+- Jobs older than `MAX_JOB_AGE_DAYS` (default **60**) are never stored or shown; closed postings are removed.
+  The dashboard has a LinkedIn-style **Date posted** filter (24 h / 3 days / week / 2 weeks / month).
+- Backend tests: `.venv/bin/python -m pytest -q`
+- End-to-end + accessibility tests in real Chromium: `cd extension && npm run e2e` (screenshots: `npm run e2e:screens`)

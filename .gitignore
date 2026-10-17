@@ -19,3 +19,4 @@ Thumbs.db
 
 # Local-dev extension build (talks to localhost; never ship)
 extension/dist-dev/
+

@@ -104,7 +104,8 @@ export const OptionsApp: React.FC = () => {
     role: roleFilter !== 'all_matching' && roleFilter !== 'all' ? roleFilter : undefined,
     only_matching: roleFilter === 'all_matching',
     search: filters.search.trim() || undefined,
-  }), [roleFilter, filters.search]);
+    freshness_days: filters.freshnessDays || undefined,
+  }), [roleFilter, filters.search, filters.freshnessDays]);
 
   const fetchJobs = useCallback(async () => {
     const seq = ++jobsSeq.current;

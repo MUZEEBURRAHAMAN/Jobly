@@ -172,13 +172,16 @@ export const JobsFeed: React.FC<JobsFeedProps> = ({
               </select>
             </div>
             <div>
-              <label className="label" htmlFor="f-new">Posted</label>
+              <label className="label" htmlFor="f-new">Date posted</label>
               <select id="f-new" className="select" value={filters.freshnessDays} onChange={(e) => set({ freshnessDays: Number(e.target.value) })}>
                 <option value={0}>Any time</option>
-                <option value={1}>Last 24 hours</option>
-                <option value={3}>Last 3 days</option>
-                <option value={7}>Last 7 days</option>
+                <option value={1}>Past 24 hours</option>
+                <option value={3}>Past 3 days</option>
+                <option value={7}>Past week</option>
+                <option value={14}>Past 2 weeks</option>
+                <option value={30}>Past month</option>
               </select>
+              <p className="hint">Jobs older than 2 months are never shown.</p>
             </div>
             <label className="row wide text-sm"><input type="checkbox" className="switch" role="switch" checked={filters.remoteOnly} onChange={(e) => set({ remoteOnly: e.target.checked })} /> Remote jobs only</label>
             <label className="row wide text-sm"><input type="checkbox" className="switch" role="switch" checked={filters.salaryOnly} onChange={(e) => set({ salaryOnly: e.target.checked })} /> Only jobs that list a salary</label>
@@ -206,7 +209,7 @@ export const JobsFeed: React.FC<JobsFeedProps> = ({
             </span>
           </div>
         )}
-        {visible.length > 0 && <p className="text-sm" style={{ marginBottom: large ? 0 : 12 }} aria-live="polite">{visible.length}{hasMore ? '+' : ''} job{visible.length === 1 ? '' : 's'}{roleFilter === 'all_matching' ? ' that fit your preferences' : ''}
+        {visible.length > 0 && <p className="text-sm" style={{ marginBottom: large ? 0 : 12 }} aria-live="polite">{visible.length}{hasMore ? '+' : ''} job{visible.length === 1 ? '' : 's'}{roleFilter === 'all_matching' ? ' that fit your preferences' : ''}{filters.freshnessDays === 0 ? ' · posted in the last 2 months' : ''}
           {mutedHidden > 0 && <> · {mutedHidden} hidden from companies you turned off{onOpenCompanies && <> (<button type="button" className="link" onClick={onOpenCompanies}>manage</button>)</>}</>}</p>}
         {renderBody()}
       </div>

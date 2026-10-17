@@ -33,9 +33,11 @@ TEST-01/02, DEP-01 (pinned), PRIV-01 (fonts bundled; favicons documented), P3 co
 **New issue found and fixed while verifying:** the production server started with an **empty database** (Docker context had no data, no persistent
 disk on the free tier): it now seeds its company list on boot and crawls immediately.
 
+**Also done since:** 60-day maximum job age (ingestion + read), real posting dates, closed-job removal, "Date posted" filter, welcome tour, full empty/error states, Playwright e2e suite (`extension/e2e`, 69 checks incl. axe), landing + privacy pages (`site/`), store assets.
+
 **Still open (needs you / a design decision):**
 - **SEC-04 shared state** – preferences, saved jobs and alerts are still one global set on the server. Muted companies are already per-device.
-- **OPS-01** – `api.getcatchly.com` does not resolve (DNS now at GoDaddy); point the keep-alive cron at the Render URL.
+- **OPS-01** – resolved in code (getcatchly removed from Jobly; it belongs to another project). Remaining user step: point the keep-alive cron at `https://jobly-yd6l.onrender.com/health` (GET).
 - **SEC-10** – set `EXTENSION_IDS` on the server once the extension has a Web Store ID.
 - Free-tier hosting has no persistent disk: data is rebuilt (~1–2 min) after every restart/deploy.
 - Remaining `npm audit` findings (vite/esbuild dev server) need a major Vite upgrade and are dev-tooling only.

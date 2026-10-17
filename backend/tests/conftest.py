@@ -57,6 +57,8 @@ async def _seed():
         t = datetime.now(timezone.utc)
         await db.execute("UPDATE jobs SET posted_at = ? WHERE external_id = 'ext-0'", ((t - timedelta(hours=2)).isoformat(),))
         await db.execute("UPDATE jobs SET posted_at = ? WHERE external_id = 'ext-1'", ((t - timedelta(days=5)).isoformat(),))
+        await db.execute("UPDATE jobs SET posted_at = ? WHERE external_id = 'ext-2'", ((t - timedelta(days=29)).isoformat(),))
+        await db.execute("UPDATE jobs SET posted_at = ? WHERE external_id = 'ext-3'", ((t - timedelta(days=75)).isoformat(),))   # outside the 60-day window
         cur = await db.execute("SELECT id FROM jobs WHERE external_id = 'ext-0'")
         job_id = (await cur.fetchone())["id"]
         await db.execute(

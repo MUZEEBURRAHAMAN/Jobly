@@ -17,6 +17,7 @@ from ..schemas import (
 )
 from ..matching import matches_preferences
 from ..ingestion.runner import sync_all_sources
+from ..ingestion.runner import age_cutoff_iso
 from ..security import UnsafeURL, require_admin, validate_public_url
 
 logger = logging.getLogger(__name__)
@@ -166,10 +167,12 @@ async def list_jobs(
         if has_salary:
             conditions.append("salary_summary IS NOT NULL")
 
-        if freshness_days:
-            since = (datetime.now(timezone.utc) - timedelta(days=freshness_days)).isoformat()
-            conditions.append("posted_at >= ?")  # unknown posting dates are excluded when a freshness filter is on
-            params.append(since)
+        # Never show anything older than MAX_JOB_AGE_DAYS. An explicit "date posted" filter narrows it further and
+        # (like LinkedIn) only keeps jobs whose posting date is known; without one, unknown dates are still shown.
+        window = min(freshness_days, settings.MAX_JOB_AGE_DAYS) if freshness_days else settings.MAX_JOB_AGE_DAYS
+        since = age_cutoff_iso(window)
+        conditions.append("posted_at >= ?" if freshness_days else "(posted_at IS NULL OR posted_at >= ?)")
+        params.append(since)
 
         def _like(term: str) -> str:
             escaped = term.lower().replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
@@ -535,7 +538,8 @@ async def mark_notifications_read():
 async def get_stats():
     async with get_db_connection() as db:
         # Total jobs
-        j_cur = await db.execute("SELECT COUNT(*) as count FROM jobs WHERE status = 'active'")
+        window = age_cutoff_iso(settings.MAX_JOB_AGE_DAYS)  # same window as the job list: counts must match what you can see
+        j_cur = await db.execute("SELECT COUNT(*) as count FROM jobs WHERE status = 'active' AND (posted_at IS NULL OR posted_at >= ?)", (window,))
         total_jobs = (await j_cur.fetchone())["count"]
 
         # Active companies
@@ -564,8 +568,8 @@ async def get_stats():
             if roles:
                 placeholders = ",".join("?" for _ in roles)
                 m_cur = await db.execute(
-                    f"SELECT COUNT(*) as count FROM jobs WHERE status = 'active' AND normalized_role IN ({placeholders})",
-                    roles
+                    f"SELECT COUNT(*) as count FROM jobs WHERE status = 'active' AND (posted_at IS NULL OR posted_at >= ?) AND normalized_role IN ({placeholders})",
+                    [window, *roles]
                 )
                 matched_jobs = (await m_cur.fetchone())["count"]
 

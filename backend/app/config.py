@@ -17,6 +17,9 @@ class Settings(BaseSettings):
     # which was an unreliable way to trigger real background work from a 3rd-party watchdog.
     AUTO_SYNC_INTERVAL_HOURS: float = 2
 
+    # Jobs posted longer ago than this are never stored or shown (stale/ghost listings; keeps the DB small).
+    MAX_JOB_AGE_DAYS: int = 60
+
     # Required (X-Admin-Token header) for company create/toggle. Empty = those endpoints are disabled.
     ADMIN_TOKEN: str = ""
     # Comma-separated Chrome extension IDs allowed by CORS. Empty = any extension (dev only; set after publishing).

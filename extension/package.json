@@ -7,7 +7,9 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "build:dev": "tsc && vite build --mode development"
+    "build:dev": "tsc && vite build --mode development",
+    "e2e": "bash e2e/run.sh suite",
+    "e2e:screens": "bash e2e/run.sh screenshots"
   },
   "dependencies": {
     "@fontsource/archivo": "^5.3.0",
@@ -19,11 +21,13 @@
     "react-dom": "^18.3.1"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.14.0",
     "@types/chrome": "^0.0.280",
     "@types/node": "^22.5.5",
     "@types/react": "^18.3.10",
     "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react": "^4.3.2",
+    "playwright": "^1.64.1",
     "typescript": "^5.6.2",
     "vite": "^5.4.8"
   }

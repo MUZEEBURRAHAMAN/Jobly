@@ -1,7 +1,7 @@
 from __future__ import annotations
 import asyncio
 import json
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 import logging
 import re
 from typing import Any
@@ -11,6 +11,7 @@ from ..matching import (
     detect_role, detect_seniority, detect_work_mode,
     detect_geo_hub, detect_experience_tier, matches_preferences
 )
+from ..config import settings
 from ..security import sanitize_http_url
 from .base import NormalizedJob, calculate_content_hash, normalize_posted_at
 from .greenhouse import fetch_greenhouse_jobs
@@ -75,6 +76,11 @@ async def get_or_create_company(
     if cache is not None:
         cache[cache_key] = comp_id
     return comp_id
+
+
+def age_cutoff_iso(days: int | None = None) -> str:
+    """ISO timestamp of the oldest posting date we keep."""
+    return (datetime.now(timezone.utc) - timedelta(days=days or settings.MAX_JOB_AGE_DAYS)).isoformat()
 
 
 def _as_int(value: Any) -> int | None:
@@ -152,6 +158,9 @@ async def upsert_job_record(
     )
 
     posted_at = normalize_posted_at(job.source_updated_at)
+    if posted_at and posted_at < age_cutoff_iso():
+        summary["skipped_old"] = summary.get("skipped_old", 0) + 1   # older than MAX_JOB_AGE_DAYS: never stored
+        return
 
     # Bound description length to avoid holding multi-megabyte HTML strings in memory/DB
     desc = (job.description or "").strip()
@@ -343,6 +352,8 @@ async def sync_all_sources(company_id_filter: int | None = None, include_aggrega
         "new_jobs": 0,
         "updated_jobs": 0,
         "board_jobs_fetched": 0,
+        "skipped_old": 0,
+        "closed_jobs": 0,
         "errors": []
     }
 
@@ -411,6 +422,14 @@ async def sync_all_sources(company_id_filter: int | None = None, include_aggrega
 
                     for job in jobs:
                         await upsert_job_record(db, job, comp_id, comp_name, preferences, now, summary)
+
+                    if jobs:
+                        # The board answered with jobs: anything of this company we did NOT see this time is gone.
+                        closed = await db.execute(
+                            "UPDATE jobs SET status = 'closed' WHERE company_id = ? AND status = 'active' AND last_seen_at < ?",
+                            (comp_id, now),
+                        )
+                        summary["closed_jobs"] += max(closed.rowcount, 0)
 
                     await db.execute(
                         "UPDATE companies SET updated_at = ? WHERE id = ?",
@@ -490,6 +509,10 @@ async def sync_all_sources(company_id_filter: int | None = None, include_aggrega
                 except Exception as rss_err:
                     logger.error(f"[Ingestion] RSS sync error: {rss_err}")
                     summary["errors"].append({"source": "rss", "error": str(rss_err)})
+
+        # Purge what we'd never show anyway: postings older than the age limit and long-closed jobs
+        await db.execute("DELETE FROM jobs WHERE posted_at IS NOT NULL AND posted_at < ?", (age_cutoff_iso(),))
+        await db.execute("DELETE FROM jobs WHERE status = 'closed' AND last_seen_at < ?", (age_cutoff_iso(14),))
 
         # Final commit and garbage collection
         await db.commit()

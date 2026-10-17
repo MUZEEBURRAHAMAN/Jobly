@@ -134,3 +134,48 @@ class TestReleaseDownload(unittest.IsolatedAsyncioTestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestCrawlerAgeAndClosure(unittest.IsolatedAsyncioTestCase):
+    """The crawler must not store stale postings and must close jobs a company has taken down."""
+
+    async def asyncSetUp(self):
+        import tempfile as _t
+        self.tmp = _t.TemporaryDirectory()
+        self.patch = patch.object(settings, "DATABASE_PATH", Path(self.tmp.name) / "c.db")
+        self.patch.start()
+        await init_db()
+
+    async def asyncTearDown(self):
+        self.patch.stop()
+        self.tmp.cleanup()
+
+    def job(self, ext, posted):
+        from backend.app.ingestion.base import NormalizedJob
+        return NormalizedJob(company_name="A", source_type="greenhouse", external_id=ext, title=f"Role {ext}",
+                             application_url="https://example.com/" + ext, source_updated_at=posted)
+
+    async def test_stale_postings_are_skipped_and_vanished_jobs_closed(self):
+        from backend.app.ingestion import runner
+        now = datetime.now(timezone.utc)
+        fresh, stale = (now - timedelta(days=3)).isoformat(), (now - timedelta(days=90)).isoformat()
+        companies = [{"id": 1, "name": "A", "slug": "a", "source_type": "greenhouse", "source_identifier": "a", "careers_url": None, "is_active": 1}]
+        async with get_db_connection() as db:
+            await db.execute("INSERT INTO companies (name, slug, source_type, source_identifier, created_at, updated_at) VALUES ('A','a','greenhouse','a',?,?)", (get_utc_now(),) * 2)
+            await db.commit()
+
+        async def fake_fetch(comp, client):
+            return comp, self.batch.pop(0), None
+
+        async def run(batch):
+            self.batch = [batch]
+            with patch.object(runner, "fetch_company_jobs", fake_fetch):
+                return await runner.sync_all_sources(include_aggregators=False)
+
+        s1 = await run([self.job("keep", fresh), self.job("gone-later", fresh), self.job("old", stale)])
+        self.assertEqual((s1["new_jobs"], s1["skipped_old"]), (2, 1))
+        s2 = await run([self.job("keep", fresh)])                       # "gone-later" vanished from the board
+        self.assertEqual(s2["closed_jobs"], 1)
+        async with get_db_connection() as db:
+            rows = {r["external_id"]: r["status"] for r in await (await db.execute("SELECT external_id, status FROM jobs")).fetchall()}
+        self.assertEqual(rows, {"keep": "active", "gone-later": "closed"})

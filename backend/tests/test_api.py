@@ -121,6 +121,32 @@ class TestPostingDates(APITestCase):
         self.assertEqual((await self.client.get(f"/api/jobs/{job_id}")).status_code, 200)
 
 
+class TestAgeWindow(APITestCase):
+    async def titles(self, query=""):
+        data = (await self.client.get(f"/api/jobs?limit=200{query}")).json()
+        return {i["title"] for i in data["items"]}, data["total"]
+
+    async def test_jobs_older_than_60_days_are_never_listed(self):
+        titles, _ = await self.titles()
+        self.assertNotIn("Engineer 3", titles)             # posted 75 days ago
+        self.assertIn("Engineer 2", titles)                # 29 days ago
+        self.assertIn("Engineer 5", titles)                # unknown date: still shown (sorted last)
+
+    async def test_the_window_cannot_be_widened_by_the_client(self):
+        titles, _ = await self.titles("&freshness_days=3650")
+        self.assertNotIn("Engineer 3", titles)
+
+    async def test_date_posted_filter_steps(self):
+        for days, expected in ((1, {"Engineer 0"}), (7, {"Engineer 0", "Engineer 1"}), (30, {"Engineer 0", "Engineer 1", "Engineer 2"})):
+            titles, _ = await self.titles(f"&freshness_days={days}")
+            self.assertEqual(titles, expected, f"past {days} days")
+
+    async def test_stats_count_only_what_the_list_shows(self):
+        stats = (await self.client.get("/api/stats")).json()
+        _, total = await self.titles()
+        self.assertEqual(stats["total_jobs"], total)
+
+
 class TestWrites(APITestCase):
     async def test_preferences_roundtrip_and_validation(self):
         original = (await self.client.get("/api/preferences")).json()

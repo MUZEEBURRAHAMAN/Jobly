@@ -46,7 +46,8 @@ async def fetch_greenhouse_jobs(
                     application_url=app_url,
                     location=location or None,
                     description=None,
-                    source_updated_at=item.get("updated_at"),
+                    # first_published is when the job went live; updated_at changes on every edit
+                    source_updated_at=item.get("first_published") or item.get("updated_at"),
                     raw_data={
                         "departments": item.get("departments", []),
                         "offices": item.get("offices", []),
