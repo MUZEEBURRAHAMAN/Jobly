@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Bookmark, BookmarkCheck, ExternalLink, Flag, MapPin, Share2, Sparkles } from 'lucide-react';
+import { Bookmark, BookmarkCheck, ExternalLink, Flag, MapPin, Share2, Sparkles } from '../lib/icons';
 import { ReportModal } from './ReportModal';
 import { Job } from '../types';
 import { getCompanyLogoUrl } from '../lib/companyLogos';
@@ -54,7 +54,7 @@ export const JobCard: React.FC<JobCardProps> = ({ job, onToggleSave }) => {
       </div>
 
       <div className="row wrap" style={{ gap: 6 }}>
-        {job.is_match && <span className="badge badge-brand"><Sparkles size={12} aria-hidden="true" /> Matches you</span>}
+        {job.is_match && <span className="badge badge-brand"><Sparkles size={12} duo aria-hidden="true" /> Matches you</span>}
         {job.work_mode === 'remote' && <span className="badge badge-success">Remote</span>}
         {job.experience_tier && EXPERIENCE_LABELS[job.experience_tier] && <span className="badge badge-outline">{EXPERIENCE_LABELS[job.experience_tier]}</span>}
         {job.salary_summary && <span className="badge badge-outline">{job.salary_summary.split('•')[0].trim()}</span>}

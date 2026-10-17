@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { ExternalLink, Plus, Search, X } from 'lucide-react';
+import { ExternalLink, Plus, Search, X } from '../lib/icons';
 import { Company } from '../types';
 import { getCompanyLogoUrl } from '../lib/companyLogos';
 import { safeHttpUrl } from '../lib/url';

@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { RotateCcw, Search, SlidersHorizontal, X } from 'lucide-react';
+import { RotateCcw, Search, SlidersHorizontal, X } from '../lib/icons';
 import { Job, Preferences } from '../types';
 import { JobCard } from './JobCard';
 import { EmptyState } from './EmptyState';

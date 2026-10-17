@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Bell, Bookmark, Briefcase, Building2, Moon, RefreshCw, SlidersHorizontal, Sun } from 'lucide-react';
+import { Bell, Bookmark, Briefcase, Building2, Moon, RefreshCw, SlidersHorizontal, Sun } from '../lib/icons';
 import { api, ConnectionStatus } from '../lib/api';
 import { IS_DEV_BUILD, MAX_PAGE_SIZE } from '../lib/config';
 import { DEFAULT_FILTERS, JobFilters } from '../lib/filters';
@@ -219,7 +219,7 @@ export const OptionsApp: React.FC = () => {
           {tabs.map(({ id, label, icon: Icon, badge }) => (
             <button key={id} type="button" className="nav-link" aria-current={tab === id ? 'page' : undefined}
               onClick={() => { setTab(id); if (id === 'alerts' && unreadAlerts > 0) void markAlertsRead(); }}>
-              <Icon size={16} aria-hidden="true" /> {label}
+              <Icon size={16} duo={tab === id} aria-hidden="true" /> {label}
               {badge ? <span className="nav-badge">{badge}</span> : null}
             </button>
           ))}

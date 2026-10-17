@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ArrowLeft, ArrowRight, Check } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Check } from '../lib/icons';
 import { Exploded, Padlock, Sieve } from '@lucasmarkes/hairline/react';
 import { Preferences } from '../types';
 import { DEFAULT_ROLE_IDS, ROLES, SENIORITIES } from '../lib/format';

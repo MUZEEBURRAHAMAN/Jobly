@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Check, Save } from 'lucide-react';
+import { Check, Save } from '../lib/icons';
 import { Preferences } from '../types';
 import { ROLES, SENIORITIES } from '../lib/format';
 

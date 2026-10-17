@@ -13,7 +13,8 @@ const STORE = path.join(root, 'store-assets');
 const WEB = path.join(root, 'web', 'public', 'img');
 fs.mkdirSync(SITE, { recursive: true }); fs.mkdirSync(STORE, { recursive: true }); fs.mkdirSync(WEB, { recursive: true });
 const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'jobly-shots-'));
-const fontUrl = (w) => pathToFileURL(path.join(root, 'site', 'assets', 'fonts', `archivo-latin-${w}-normal.woff2`)).href;
+const SWITZER = { 400: 'Regular', 500: 'Medium', 600: 'Semibold', 700: 'Bold' };
+const fontUrl = (w) => pathToFileURL(path.join(root, 'web', 'public', 'fonts', 'switzer', `Switzer-${SWITZER[w]}.woff2`)).href;
 const iconUrl = pathToFileURL(path.join(root, 'site', 'assets', 'icon-128.png')).href;
 const b64 = (f) => 'data:image/png;base64,' + fs.readFileSync(f).toString('base64');
 

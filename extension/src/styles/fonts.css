@@ -1,37 +1,6 @@
-/* Self-hosted fonts (latin, woff2 only). The old Google Fonts @import was blocked by the extension CSP
-   and leaked each user's IP to Google. Vite copies these files into dist/assets. */
-@font-face {
-  font-family: 'Archivo';
-  font-style: normal;
-  font-display: swap;
-  font-weight: 400;
-  src: url('../../node_modules/@fontsource/archivo/files/archivo-latin-400-normal.woff2') format('woff2');
-}
-@font-face {
-  font-family: 'Archivo';
-  font-style: normal;
-  font-display: swap;
-  font-weight: 500;
-  src: url('../../node_modules/@fontsource/archivo/files/archivo-latin-500-normal.woff2') format('woff2');
-}
-@font-face {
-  font-family: 'Archivo';
-  font-style: normal;
-  font-display: swap;
-  font-weight: 600;
-  src: url('../../node_modules/@fontsource/archivo/files/archivo-latin-600-normal.woff2') format('woff2');
-}
-@font-face {
-  font-family: 'Archivo';
-  font-style: normal;
-  font-display: swap;
-  font-weight: 700;
-  src: url('../../node_modules/@fontsource/archivo/files/archivo-latin-700-normal.woff2') format('woff2');
-}
-@font-face {
-  font-family: 'JetBrains Mono';
-  font-style: normal;
-  font-display: swap;
-  font-weight: 500;
-  src: url('../../node_modules/@fontsource/jetbrains-mono/files/jetbrains-mono-latin-500-normal.woff2') format('woff2');
-}
+/* Switzer by Jérémie Hornus / Indian Type Foundry, ITF Free Font License 2.0 (embedding in applications is permitted;
+   official WOFF2 files, unmodified; license in assets/fonts/switzer). Bundled, so nothing loads from a font CDN. */
+@font-face { font-family: 'Switzer'; font-style: normal; font-display: swap; font-weight: 400; src: url('../assets/fonts/switzer/Switzer-Regular.woff2') format('woff2'); }
+@font-face { font-family: 'Switzer'; font-style: normal; font-display: swap; font-weight: 500; src: url('../assets/fonts/switzer/Switzer-Medium.woff2') format('woff2'); }
+@font-face { font-family: 'Switzer'; font-style: normal; font-display: swap; font-weight: 600; src: url('../assets/fonts/switzer/Switzer-Semibold.woff2') format('woff2'); }
+@font-face { font-family: 'Switzer'; font-style: normal; font-display: swap; font-weight: 700; src: url('../assets/fonts/switzer/Switzer-Bold.woff2') format('woff2'); }

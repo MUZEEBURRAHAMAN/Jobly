@@ -1,5 +1,5 @@
 import React from 'react';
-import { Check, ExternalLink } from 'lucide-react';
+import { Check, ExternalLink } from '../lib/icons';
 import { AlertItem } from '../types';
 import { EmptyState } from './EmptyState';
 import { safeHttpUrl } from '../lib/url';

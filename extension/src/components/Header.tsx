@@ -1,5 +1,5 @@
 import React from 'react';
-import { RefreshCw, ExternalLink, Sun, Moon } from 'lucide-react';
+import { RefreshCw, ExternalLink, Sun, Moon } from '../lib/icons';
 import type { ConnectionStatus } from '../lib/api';
 
 export const appVersion = (): string =>

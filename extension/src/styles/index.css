@@ -86,8 +86,8 @@
 
 /* ---------- Scale ---------- */
 :root {
-  --font-sans: 'Archivo', system-ui, -apple-system, 'Segoe UI', sans-serif;
-  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  --font-sans: 'Switzer', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: var(--font-sans); /* one typeface everywhere; numbers use tabular figures instead of a monospace font */
 
   /* Type scale (px / line-height). Nothing smaller than 12px. */
   --text-xs: 12px;   --leading-xs: 16px;
@@ -164,7 +164,7 @@ a { color: inherit; }
 .text-2xl { font-size: var(--text-2xl); line-height: var(--leading-2xl); letter-spacing: -0.02em; }
 .font-medium { font-weight: 500; }
 .font-semibold { font-weight: 600; }
-.mono { font-family: var(--font-mono); font-weight: 500; }
+.mono { font-family: var(--font-mono); font-weight: 500; font-variant-numeric: tabular-nums; }
 .break { overflow-wrap: anywhere; }
 .truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
@@ -363,3 +363,8 @@ a { color: inherit; }
 .content-inner.narrow { max-width: 720px; margin: 0; }
 
 .link { background: none; border: 0; padding: 0; color: var(--brand); text-decoration: underline; cursor: pointer; font: inherit; }
+
+/* Hugeicons: outline by default; .hi-duo gives the duotone look (light fill of the icon colour on closed shapes) */
+.hi { flex: none; }
+.hi-duo .hi-tone { fill: currentColor; fill-opacity: 0.18; }
+[data-theme='dark'] .hi-duo .hi-tone { fill-opacity: 0.28; }

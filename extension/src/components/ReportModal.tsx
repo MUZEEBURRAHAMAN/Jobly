@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { CheckCircle2, X } from 'lucide-react';
+import { CheckCircle2, X } from '../lib/icons';
 import { Job } from '../types';
 import { api } from '../lib/api';
 

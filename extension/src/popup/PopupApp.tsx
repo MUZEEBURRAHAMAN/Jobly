@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Bookmark, Briefcase, Building2, SlidersHorizontal } from 'lucide-react';
+import { Bookmark, Briefcase, Building2, SlidersHorizontal } from '../lib/icons';
 import { api, ConnectionStatus } from '../lib/api';
 import { IS_DEV_BUILD } from '../lib/config';
 import { DEFAULT_FILTERS, JobFilters } from '../lib/filters';
@@ -231,7 +231,7 @@ export const PopupApp: React.FC = () => {
         {tabs.map(({ id, label, icon: Icon, badge }) => (
           <button key={id} type="button" className="nav-item" aria-current={tab === id ? 'page' : undefined} onClick={() => setTab(id)}
             aria-label={badge ? `${label}, ${badge} saved` : label}>
-            <Icon size={18} aria-hidden="true" />
+            <Icon size={18} duo={tab === id} aria-hidden="true" />
             <span>{label}{badge ? <span className="nav-badge"> {badge}</span> : null}</span>
           </button>
         ))}

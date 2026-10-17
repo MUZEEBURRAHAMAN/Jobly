@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Search } from 'lucide-react';
+import { Search } from '../lib/icons';
 import { Job } from '../types';
 import { JobCard } from './JobCard';
 import { EmptyState } from './EmptyState';
