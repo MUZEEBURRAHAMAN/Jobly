@@ -161,3 +161,18 @@ JOB EXTENSION/
   The dashboard has a LinkedIn-style **Date posted** filter (24 h / 3 days / week / 2 weeks / month).
 - Backend tests: `.venv/bin/python -m pytest -q`
 - End-to-end + accessibility tests in real Chromium: `cd extension && npm run e2e` (screenshots: `npm run e2e:screens`)
+
+## Capacity (free Render instance: 0.1 CPU, 512 MB)
+
+Most traffic is the extension's background check (every 60-90 minutes per browser). To keep that cheap:
+
+- `backend/app/cache.py` answers identical `/api/jobs`, `/api/stats` and `/api/companies` queries from memory for
+  `RESPONSE_CACHE_TTL_SECONDS` (120; 0 turns it off). Identical requests that arrive together are computed once, and the cache
+  is cleared when a crawl finishes. It is bounded (400 entries / 24 MB).
+- Responses carry an `ETag`; the browser revalidates and gets an empty `304` when nothing changed.
+- At most `MAX_CONCURRENT_QUERIES` (6) database-heavy requests run at once; extra ones wait up to
+  `QUERY_QUEUE_TIMEOUT_SECONDS` (8) and then get a quick `503` (the extension shows "Jobly is busy right now" and keeps its cached list)
+  instead of piling up until the instance runs out of memory.
+- Local load test on a 20k-job database with 40% of simulated users having unique preferences (cache cannot help them):
+  throughput 34-45 → 76-133 requests/s, median latency 26 ms → 1.4 ms, memory after 50 concurrent clients 395 MB → 86 MB.
+  Render's free CPU is roughly 10x slower than a laptop core, so scale those numbers down accordingly.

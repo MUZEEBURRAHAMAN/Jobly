@@ -32,6 +32,10 @@ class Settings(BaseSettings):
     SNAPSHOT_TAG: str = "snapshot"
     SNAPSHOT_ASSET: str = "jobly.db.gz"
     SNAPSHOT_TOKEN: str = ""
+    # Read-path protection for the small free instance (see cache.py).
+    RESPONSE_CACHE_TTL_SECONDS: int = 120      # identical job/stat/company queries are answered from memory; 0 disables
+    MAX_CONCURRENT_QUERIES: int = 6            # database-heavy requests running at once (each holds several MB)
+    QUERY_QUEUE_TIMEOUT_SECONDS: float = 8     # how long an extra request waits before a quick 503
     # Per-IP, per-minute limits. 0 disables a limit.
     RATE_LIMIT_PER_MIN: int = 120
     RATE_LIMIT_WRITES_PER_MIN: int = 30

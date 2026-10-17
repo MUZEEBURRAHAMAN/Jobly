@@ -18,6 +18,7 @@ os.environ["RATE_LIMIT_WRITES_PER_MIN"] = "0"
 os.environ["RATE_LIMIT_SYNC_PER_MIN"] = "0"
 os.environ["ENABLE_DOCS"] = "0"
 os.environ["EXTENSION_IDS"] = ""
+os.environ["RESPONSE_CACHE_TTL_SECONDS"] = "0"  # off by default so tests see fresh data; test_cache.py turns it on
 os.environ["SNAPSHOT_REPO"] = ""        # tests never touch the network
 
 from backend.app.db import get_db_connection, get_utc_now, init_db  # noqa: E402

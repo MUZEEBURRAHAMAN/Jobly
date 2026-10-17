@@ -162,7 +162,7 @@ class ApiClient {
     }
 
     const f = this.lastFailure;
-    const error: 'offline' | 'server' | 'busy' = f?.kind === 'http' ? (f.status === 429 ? 'busy' : 'server') : 'offline';
+    const error: 'offline' | 'server' | 'busy' = f?.kind === 'http' ? (f.status === 429 || f.status === 503 ? 'busy' : 'server') : 'offline';
     const items = (await this.readCache<Job[]>('cachedJobs')) ?? [];
     const cachedAt = await this.getCachedJobsAt();
     return { items, total: items.length, limit, offset: params.offset ?? 0, error, fromCache: true, cachedAt };

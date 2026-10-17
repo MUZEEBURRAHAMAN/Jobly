@@ -9,6 +9,7 @@ from datetime import datetime, timezone, timedelta
 from typing import Any
 from fastapi import APIRouter, BackgroundTasks, Depends, Header, HTTPException, Query
 from pydantic import ValidationError
+from ..cache import clear_response_cache
 from ..config import settings
 from ..db import get_db_connection, get_utc_now
 from ..schemas import (
@@ -405,6 +406,7 @@ async def _guarded_sync_once(company_id: int | None = None):
         except Exception as e:
             logger.error(f"[Sync] Error in guarded sync: {e}")
         finally:
+            clear_response_cache()  # the job list changed: don't keep serving the old one
             gc.collect()
 
 async def _periodic_sync_loop(initial_delay: float | None = None):
@@ -464,6 +466,7 @@ async def trigger_sync(
             try:
                 result = await sync_all_sources()
             finally:
+                clear_response_cache()
                 gc.collect()
             return {"status": "completed", "result": result}
     else:

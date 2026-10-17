@@ -121,6 +121,27 @@ await step('on-device data: preferences, saved jobs, alerts', async () => {
   await h.ctx.close();
 });
 
+await step('efficiency: repeat visits are cached and revalidated', async () => {
+  const h = await launch({ blockProd: false }); const seen = []; // no request interception: Playwright switches the HTTP cache off when routes are active
+  h.ctx.on('requestfinished', async (r) => {
+    if (!LOCAL.test(r.url()) || !/\/api\/(jobs|companies)/.test(r.url())) return;
+    const res = await r.response(); const sizes = await r.sizes();
+    seen.push({ revalidated: !!(await r.allHeaders())['if-none-match'], body: sizes.responseBodySize, cache: res.headers()['x-cache'] });
+  });
+  let p = await open(h); await firstCard(p); await sleep(1500); await p.close();
+  p = await open(h); await firstCard(p); await sleep(1500);
+  ok(seen.some((r) => r.revalidated && r.body === 0), `a repeat visit asks "has it changed?" and gets an empty "not modified" answer (${seen.filter((r) => r.revalidated && r.body === 0).length} of ${seen.length} requests)`);
+  ok(seen.some((r) => r.cache === 'HIT'), 'the server answered the repeat from memory');
+  ok(await cards(p) > 0, 'the list still renders after a "not modified" answer'); await h.ctx.close();
+  const g = await launch(); const a = await open(g); await firstCard(a);
+  const period = await g.sw.evaluate(async () => (await chrome.alarms.get('jobly-sync'))?.periodInMinutes);
+  ok(period >= 60 && period <= 90, `background check runs every ${period} minutes (60-90)`);
+  await g.sw.evaluate(async () => { await chrome.alarms.clear('jobly-sync'); await chrome.alarms.create('jobly-sync', { periodInMinutes: 30 }); });
+  await g.sw.evaluate(() => new Promise((res) => { chrome.runtime.onInstalled.dispatch({ reason: 'update' }); setTimeout(res, 1500); }));
+  const migrated = await g.sw.evaluate(async () => (await chrome.alarms.get('jobly-sync'))?.periodInMinutes);
+  ok(migrated >= 60 && migrated <= 90, `an old 30-minute schedule is replaced after an update (now ${migrated})`); await g.ctx.close();
+});
+
 await step('states: offline, 429, 500, gathering, empty, hidden', async () => {
   // offline, nothing cached
   let h = await launch(); await h.ctx.route(LOCAL, (r) => r.abort('connectionrefused')); let p = await open(h); await p.getByText("Can't reach Jobly").waitFor({ timeout: 70000 });
@@ -133,7 +154,7 @@ await step('states: offline, 429, 500, gathering, empty, hidden', async () => {
   h = await launch(); p = await open(h); await firstCard(p); await sleep(1500); await p.close(); await h.ctx.route(LOCAL, (r) => r.abort('connectionrefused'));
   p = await open(h); await p.getByText(/You're offline/).waitFor({ timeout: 70000 }); ok(await cards(p) > 0, 'offline with cache: saved jobs stay visible + banner'); await h.ctx.close();
   // 429 / 500
-  for (const [status, expect] of [[429, 'Too many requests'], [500, 'Something went wrong on our side']]) {
+  for (const [status, expect] of [[429, 'Jobly is busy right now'], [503, 'Jobly is busy right now'], [500, 'Something went wrong on our side']]) {
     h = await launch(); await h.ctx.route(LOCAL, (r) => (r.request().url().includes('/api/jobs?') ? r.fulfill({ status, headers: JSON_HEADERS, body: '{}' }) : r.continue()));
     p = await open(h); await p.getByText(expect).first().waitFor({ timeout: 40000 }); ok(await art(p) === 1, `${status}: "${expect}" state`); await h.ctx.close();
   }

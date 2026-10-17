@@ -76,7 +76,7 @@ export const JobsFeed: React.FC<JobsFeedProps> = ({
     if (visible.length === 0 && loadError) {
       const retry = onRetryLoad && <button type="button" className="btn" onClick={onRetryLoad}><RotateCcw size={14} aria-hidden="true" /> Try again</button>;
       if (loadError === 'offline') return <EmptyState art="offline" large={large} title="Can't reach Jobly" description="The server may be waking up, or you may be offline. Your preferences are safe. This page keeps trying on its own." actions={retry} />;
-      if (loadError === 'busy') return <EmptyState art="error" large={large} title="Too many requests" description="Jobly asked the server for a lot in a short time. Wait a minute, then try again." actions={retry} />;
+      if (loadError === 'busy') return <EmptyState art="error" large={large} title="Jobly is busy right now" description="The server is handling a lot of requests. Wait a minute, then try again." actions={retry} />;
       return <EmptyState art="error" role="alert" large={large} title="Something went wrong on our side" description="The server answered with an error. This isn't caused by your filters." actions={retry} />;
     }
     if (visible.length === 0 && gathering) {
@@ -205,7 +205,7 @@ export const JobsFeed: React.FC<JobsFeedProps> = ({
             <span className="grow">
               {loadError === 'offline' && `You're offline. Showing jobs saved ${cachedAt ? timeAgo(cachedAt).toLowerCase() : 'on this device'}.`}
               {loadError === 'server' && "Jobly's server had a problem. Showing jobs saved earlier."}
-              {loadError === 'busy' && 'Too many requests. Showing jobs saved earlier; try again in a minute.'}
+              {loadError === 'busy' && 'Jobly is busy right now. Showing jobs saved earlier; try again in a minute.'}
             </span>
           </div>
         )}

@@ -35,6 +35,8 @@ disk on the free tier): it now seeds its company list on boot and crawls immedia
 
 **SEC-04 fixed:** preferences, saved jobs and alerts are stored per device in `chrome.storage.local`; the server keeps no user state (preferences are a validated `prefs` query parameter; `/api/preferences`, `/api/notifications` and save endpoints were removed; alerts are computed by the service worker).
 
+**Scalability (10,000 installs):** response cache with single-flight + ETag, a cap on concurrent database work (quick 503 instead of running out of memory), and a 60-90 minute background check; see README "Capacity".
+
 **Also done since:** 60-day maximum job age (ingestion + read), real posting dates, closed-job removal, "Date posted" filter, welcome tour, full empty/error states, Playwright e2e suite (`extension/e2e`, 69 checks incl. axe), landing + privacy pages (`site/`), store assets.
 
 **Still open (needs you / a design decision):**

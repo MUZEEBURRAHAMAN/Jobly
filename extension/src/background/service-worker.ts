@@ -6,6 +6,9 @@ import {
 
 const ALARM_NAME = 'jobly-sync';
 const RECENT_DAYS = 3; // only jobs posted this recently are worth an alert
+// New jobs arrive in batches every couple of hours, so checking more often than this only costs the free server load.
+const POLL_MIN_MINUTES = 60;
+const POLL_SPREAD_MINUTES = 30; // each install picks its own period (60-90 min) so checks don't arrive together
 
 // The background check is not user-facing, so it can afford to wait for a sleeping free-tier server.
 // Alerts are worked out here on the device: ask the server for fresh jobs that fit this user's preferences
@@ -37,14 +40,15 @@ async function fetchRecentMatches(): Promise<Job[] | null> {
 // re-create the alarm every time the worker starts, not only in onInstalled.
 async function ensureAlarm() {
   if (await chrome.alarms.get(ALARM_NAME)) return;
-  // Staggered period (30-45 min) spreads load across users
-  const period = 30 + Math.floor(Math.random() * 15);
+  const period = POLL_MIN_MINUTES + Math.floor(Math.random() * POLL_SPREAD_MINUTES);
   await chrome.alarms.create(ALARM_NAME, { delayInMinutes: 1, periodInMinutes: period });
 }
 void ensureAlarm();
 
 chrome.runtime.onInstalled.addListener(async (details) => {
   await chrome.action.setBadgeBackgroundColor({ color: '#06b6d4' });
+  // Updates replace the old 30-45 minute schedule with the slower one.
+  if (details.reason === 'update') await chrome.alarms.clear(ALARM_NAME);
   await ensureAlarm();
   // Before alerts moved onto the device the worker remembered server notification ids: that list is obsolete.
   await chrome.storage.local.remove(['alertedNotificationIds']);
