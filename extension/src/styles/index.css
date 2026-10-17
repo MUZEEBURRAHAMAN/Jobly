@@ -368,3 +368,7 @@ a { color: inherit; }
 .hi { flex: none; }
 .hi-duo .hi-tone { fill: currentColor; fill-opacity: 0.18; }
 [data-theme='dark'] .hi-duo .hi-tone { fill-opacity: 0.28; }
+
+/* theme switch: the new theme is revealed by a growing circle (lib/theme.ts) */
+::view-transition-old(root), ::view-transition-new(root) { animation: none; mix-blend-mode: normal; }
+::view-transition-new(root) { z-index: 2; }

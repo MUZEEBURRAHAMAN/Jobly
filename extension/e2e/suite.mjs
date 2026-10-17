@@ -116,7 +116,8 @@ await step('on-device data: preferences, saved jobs, alerts', async () => {
   const dash = await open(h, 'options.html', { width: 1280, height: 860 }); await firstCard(dash);
   ok(await dash.getByRole('button', { name: /^Alerts/ }).innerText().then((t) => /\d/.test(t)), 'the Alerts tab shows an unread count');
   await dash.getByRole('button', { name: /^Alerts/ }).click(); await dash.getByText(/\d+ new/).waitFor({ timeout: 5000 }); await axe(dash, 'alerts with items');
-  await sleep(800); ok(await dash.getByText('All caught up').count() === 1 || await dash.getByRole('button', { name: 'Mark all read' }).count() === 0, 'opening Alerts marks them read');
+  await sleep(800); ok((await h.sw.evaluate(() => chrome.storage.local.get('alerts'))).alerts.every((a) => a.is_read), 'opening Alerts stores them as read (the badge clears)');
+  ok(await dash.getByText(/new since your last visit/).count() === 1 && await dash.locator('.badge', { hasText: 'New' }).count() > 0, 'but they stay highlighted as new for this visit');
   ok(writes.every((w) => w.startsWith('POST /api/jobs/') && w.endsWith('/report')), `the server only ever receives reports: ${writes.length ? writes.join(', ') : 'no writes at all'}`);
   await h.ctx.close();
 });

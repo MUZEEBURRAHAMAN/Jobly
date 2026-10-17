@@ -31,8 +31,8 @@ import { MENUS, NAV_LINKS, installHref } from '../lib/site';
                 <div class="mega-preview" aria-hidden="true">
                   {menu.id === 'product' ? (
                     <div class="preview-shot">
-                      <img class="only-light" src="/img/dashboard-light.webp" alt="" width="1440" height="900" loading="lazy" decoding="async" />
-                      <img class="only-dark" src="/img/dashboard-dark.webp" alt="" width="1440" height="900" loading="lazy" decoding="async" />
+                      <img class="only-light" src="/img/dashboard-jobs-light.webp" alt="" width="1440" height="900" loading="lazy" decoding="async" />
+                      <img class="only-dark" src="/img/dashboard-jobs-dark.webp" alt="" width="1440" height="900" loading="lazy" decoding="async" />
                     </div>
                   ) : (
                     <div class="preview-live">
@@ -130,7 +130,11 @@ import { MENUS, NAV_LINKS, installHref } from '../lib/site';
   .actions { display: flex; align-items: center; gap: 6px; }
   .icon-btn { width: 34px; height: 34px; display: grid; place-items: center; border-radius: var(--radius-btn); color: var(--muted); transition: color var(--dur-fast) ease, background-color var(--dur-fast) ease; }
   .icon-btn:hover { color: var(--fg); background: var(--card-muted); }
-  :global([data-theme='light']) .icon-btn :global(.when-dark), :global([data-theme='dark']) .icon-btn :global(.when-light) { display: none; }
+  /* sun and moon cross over with a quarter turn */
+  [data-theme-toggle] { position: relative; }
+  [data-theme-toggle] :global(.when-light), [data-theme-toggle] :global(.when-dark) { position: absolute; transition: transform 0.5s var(--ease-out), opacity 0.3s ease; }
+  :global([data-theme='light']) [data-theme-toggle] :global(.when-dark) { opacity: 0; transform: rotate(-90deg) scale(0.4); }
+  :global([data-theme='dark']) [data-theme-toggle] :global(.when-light) { opacity: 0; transform: rotate(90deg) scale(0.4); }
   .menu-toggle { display: none; }
   .menu-toggle :global(.when-open) { display: none; }
   .menu-toggle[aria-expanded='true'] :global(.when-open) { display: block; }

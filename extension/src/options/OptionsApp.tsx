@@ -7,7 +7,8 @@ import { useMutedCompanies } from '../lib/mutedCompanies';
 import { useSavedJobs } from '../lib/useSavedJobs';
 import { useAlerts } from '../lib/useAlerts';
 import { useOnboarded } from '../lib/onboarding';
-import { applyTheme, getInitialTheme, syncThemeFromStorage, Theme } from '../lib/theme';
+import { applyTheme, getInitialTheme, switchThemeWithReveal, syncThemeFromStorage, Theme } from '../lib/theme';
+import { flushSync } from 'react-dom';
 import { Company, Job, Preferences, RadarStats } from '../types';
 import { StatusPill, appVersion } from '../components/Header';
 import { JobsFeed } from '../components/JobsFeed';
@@ -44,6 +45,9 @@ export const OptionsApp: React.FC = () => {
   const savedStore = useSavedJobs(jobs);
   const savedJobs = savedStore.saved;
   const { alerts, unread: unreadAlerts, markAllRead } = useAlerts();
+  // Alerts that were unread when this visit opened the tab stay highlighted until the page closes,
+  // even though they are stored as read straight away (so the badge clears).
+  const [newThisVisit, setNewThisVisit] = useState<Set<string>>(() => new Set());
   const { muted, toggle: toggleMuted } = useMutedCompanies();
   const { notice, show: showNotice, clear: clearNotice } = useNotice();
   const { onboarded, complete: completeOnboarding, reset: resetOnboarding } = useOnboarded();
@@ -54,10 +58,9 @@ export const OptionsApp: React.FC = () => {
     syncThemeFromStorage((synced) => setTheme(synced));
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const toggleTheme = () => {
+  const toggleTheme = (e?: React.MouseEvent<HTMLElement>) => {
     const next: Theme = theme === 'dark' ? 'light' : 'dark';
-    setTheme(next);
-    applyTheme(next);
+    switchThemeWithReveal(e?.currentTarget, () => flushSync(() => { setTheme(next); applyTheme(next); }));
   };
 
   // Preferences, saved jobs and alerts are on this device, so they are there instantly (even offline).
@@ -218,7 +221,7 @@ export const OptionsApp: React.FC = () => {
         <nav className="side" aria-label="Sections">
           {tabs.map(({ id, label, icon: Icon, badge }) => (
             <button key={id} type="button" className="nav-link" aria-current={tab === id ? 'page' : undefined}
-              onClick={() => { setTab(id); if (id === 'alerts' && unreadAlerts > 0) void markAlertsRead(); }}>
+              onClick={() => { setTab(id); if (id === 'alerts' && unreadAlerts > 0) { setNewThisVisit((s) => new Set([...s, ...alerts.filter((a) => !a.is_read).map((a) => a.id)])); void markAlertsRead(); } }}>
               <Icon size={16} duo={tab === id} aria-hidden="true" /> {label}
               {badge ? <span className="nav-badge">{badge}</span> : null}
             </button>
@@ -250,7 +253,7 @@ export const OptionsApp: React.FC = () => {
               )}
               {tab === 'companies' && <CompaniesView large companies={companies} mutedCompanyIds={muted} onToggleMuted={toggleMuted} canManage={IS_DEV_BUILD} onAddCompany={handleAddCompany} offline={status === 'offline'} loading={status === 'connecting'} />}
               {tab === 'saved' && <SavedJobsView large savedJobs={savedJobs} onToggleSave={handleToggleSave} onBrowseJobs={() => setTab('jobs')} />}
-              {tab === 'alerts' && <AlertsView large alerts={alerts} onMarkAllRead={markAlertsRead} />}
+              {tab === 'alerts' && <AlertsView large alerts={alerts} newIds={newThisVisit} onMarkAllRead={markAlertsRead} />}
               {tab === 'preferences' && preferences && <PreferencesView preferences={preferences} onSave={handleSavePreferences} onReplayWelcome={resetOnboarding} />}
               {tab === 'preferences' && !preferences && <div className="section" aria-busy="true" aria-label="Loading your preferences">{[0, 1, 2, 3].map((i) => <div key={i} className="skeleton" style={{ height: i ? 56 : 28, width: i ? '100%' : '40%' }} />)}</div>}
             </ErrorBoundary>

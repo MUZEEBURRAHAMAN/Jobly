@@ -6,7 +6,8 @@ import { DEFAULT_FILTERS, JobFilters } from '../lib/filters';
 import { useMutedCompanies } from '../lib/mutedCompanies';
 import { useSavedJobs } from '../lib/useSavedJobs';
 import { useOnboarded } from '../lib/onboarding';
-import { applyTheme, getInitialTheme, syncThemeFromStorage, Theme } from '../lib/theme';
+import { applyTheme, getInitialTheme, switchThemeWithReveal, syncThemeFromStorage, Theme } from '../lib/theme';
+import { flushSync } from 'react-dom';
 import { Company, Job, Preferences, RadarStats } from '../types';
 import { Header } from '../components/Header';
 import { JobsFeed } from '../components/JobsFeed';
@@ -47,10 +48,9 @@ export const PopupApp: React.FC = () => {
     syncThemeFromStorage((synced) => setTheme(synced));
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const toggleTheme = () => {
+  const toggleTheme = (e?: React.MouseEvent<HTMLElement>) => {
     const next: Theme = theme === 'dark' ? 'light' : 'dark';
-    setTheme(next);
-    applyTheme(next);
+    switchThemeWithReveal(e?.currentTarget, () => flushSync(() => { setTheme(next); applyTheme(next); }));
   };
 
   const jobQuery = useCallback(() => ({

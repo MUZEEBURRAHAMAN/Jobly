@@ -1,0 +1,131 @@
+---
+import Icon from './Icon.astro';
+import { installHref } from '../lib/site';
+
+// ---- pixel-dithered landscape band (Ferndesk-style), generated at build time ----
+// Each row is one repeating 4-cell pattern (ordered/Bayer dithering between two colours), so the SVG stays tiny.
+const CELL = 8, ROWS = 84, W = 1440;
+const BAYER = [[0, 8, 2, 10], [12, 4, 14, 6], [3, 11, 1, 9], [15, 7, 13, 5]];
+function band(stops: [number, string][], id: string) {
+  const defs: string[] = [], rects: string[] = [];
+  for (let r = 0; r < ROWS; r++) {
+    const t = r / (ROWS - 1);
+    let k = 0; while (k < stops.length - 2 && t > stops[k + 1][0]) k++;
+    const [t0, c0] = stops[k], [t1, c1] = stops[k + 1];
+    const f = Math.min(1, Math.max(0, (t - t0) / (t1 - t0 || 1)));
+    const cells = [0, 1, 2, 3].map((x) => (BAYER[r % 4][x] / 16 < f ? c1 : c0));
+    const pid = `${id}${r}`;
+    defs.push(`<pattern id="${pid}" width="${CELL * 4}" height="${CELL}" patternUnits="userSpaceOnUse">${cells.map((c, x) => `<rect x="${x * CELL}" width="${CELL}" height="${CELL}" fill="${c}"/>`).join('')}</pattern>`);
+    rects.push(`<rect y="${r * CELL}" width="${W}" height="${CELL}" fill="url(#${pid})"/>`);
+  }
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${ROWS * CELL}" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false"><defs>${defs.join('')}</defs>${rects.join('')}</svg>`;
+}
+// sky → haze → warm hills → deep ground, in the brand's oranges
+const light = band([[0, '#fbf6f1'], [0.18, '#fbf6f1'], [0.34, '#fde7d6'], [0.5, '#fbcaa6'], [0.64, '#f6a374'], [0.78, '#ea7a4c'], [0.9, '#cf5a33'], [1, '#a9432a']], 'l');
+const dark = band([[0, '#121112'], [0.2, '#121112'], [0.36, '#1d1512'], [0.52, '#3a1d12'], [0.66, '#5d2814'], [0.8, '#7f3416'], [0.92, '#9a3f1a'], [1, '#6b2a12']], 'd');
+
+const tabs = [
+  { id: 'jobs', label: 'Jobs feed', icon: 'briefcase', alt: 'The Jobly dashboard: job cards with company, location, posting time, a Matches you badge, and Save and Apply buttons.' },
+  { id: 'filters', label: 'Filters', icon: 'sliders-horizontal', alt: 'The filters panel open with Date posted set to Past week.' },
+  { id: 'saved', label: 'Saved jobs', icon: 'bookmark', alt: 'Saved jobs: four job cards marked Saved.' },
+  { id: 'alerts', label: 'Alerts', icon: 'bell', alt: 'Alerts: new matching jobs with how long ago each was found.' },
+];
+---
+<section class="shell showcase-wrap stack-next" aria-label="Product tour">
+  <div class="panel showcase" data-showcase>
+    <div class="art only-light"><Fragment set:html={light} /></div>
+    <div class="art only-dark"><Fragment set:html={dark} /></div>
+
+    <div class="window" data-reveal="scale">
+      <div class="win-bar">
+        <div class="win-tabs" role="tablist" aria-label="Parts of Jobly">
+          {tabs.map((t, i) => (
+            <button type="button" role="tab" id={`tab-${t.id}`} aria-controls={`panel-${t.id}`} aria-selected={i === 0 ? 'true' : 'false'} tabindex={i === 0 ? 0 : -1} class="win-tab" data-tab={t.id}>
+              <Icon name={t.icon} size={15} />{t.label}<span class="progress" aria-hidden="true"></span>
+            </button>
+          ))}
+        </div>
+        <a class="btn btn-outline btn-sm win-cta" href={installHref}><Icon name="chrome" size={15} />Add to Chrome</a>
+      </div>
+      <div class="win-body">
+        {tabs.map((t, i) => (
+          <div class="win-panel" role="tabpanel" id={`panel-${t.id}`} aria-labelledby={`tab-${t.id}`} hidden={i !== 0} data-panel={t.id}>
+            <img class="only-light" src={`/img/dashboard-${t.id}-light.webp`} width="1440" height="900" alt={t.alt} decoding="async" loading={i === 0 ? 'eager' : 'lazy'} fetchpriority={i === 0 ? 'high' : 'auto'} />
+            <img class="only-dark" src={`/img/dashboard-${t.id}-dark.webp`} width="1440" height="900" alt={t.alt} decoding="async" loading="lazy" />
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  // Accessible tabs that advance on their own every few seconds until the visitor picks one.
+  const root = document.querySelector<HTMLElement>('[data-showcase]');
+  if (root) {
+    const tabs = [...root.querySelectorAll<HTMLButtonElement>('[role="tab"]')];
+    const panels = [...root.querySelectorAll<HTMLElement>('[role="tabpanel"]')];
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const STEP = 5000;
+    let index = 0, timer = 0, auto = !reduce, visible = false;
+
+    const select = (i: number, focus = false) => {
+      index = (i + tabs.length) % tabs.length;
+      tabs.forEach((t, k) => { const on = k === index; t.setAttribute('aria-selected', String(on)); t.tabIndex = on ? 0 : -1; });
+      panels.forEach((p, k) => { p.hidden = k !== index; });
+      if (focus) tabs[index].focus();
+      root.style.setProperty('--step', `${STEP}ms`);
+      root.classList.remove('ticking'); void root.offsetWidth; if (auto && visible) root.classList.add('ticking');
+    };
+    const schedule = () => { window.clearTimeout(timer); if (auto && visible) timer = window.setTimeout(() => { select(index + 1); schedule(); }, STEP); };
+    const stop = () => { auto = false; window.clearTimeout(timer); root.classList.remove('ticking'); };
+
+    tabs.forEach((t, i) => t.addEventListener('click', () => { stop(); select(i); }));
+    root.querySelector('[role="tablist"]')!.addEventListener('keydown', (e) => {
+      const k = (e as KeyboardEvent).key;
+      const move = k === 'ArrowRight' ? 1 : k === 'ArrowLeft' ? -1 : 0;
+      if (move) { e.preventDefault(); stop(); select(index + move, true); }
+      if (k === 'Home') { e.preventDefault(); stop(); select(0, true); }
+      if (k === 'End') { e.preventDefault(); stop(); select(tabs.length - 1, true); }
+    });
+    root.addEventListener('pointerenter', () => { window.clearTimeout(timer); root.classList.add('paused'); });
+    root.addEventListener('pointerleave', () => { root.classList.remove('paused'); select(index); schedule(); });
+    new IntersectionObserver(([e]) => { visible = e.isIntersecting; if (visible) { select(index); schedule(); } else { window.clearTimeout(timer); root.classList.remove('ticking'); } }, { threshold: 0.35 }).observe(root);
+  }
+</script>
+
+<style>
+  .showcase { position: relative; height: clamp(360px, 46vw, 660px); isolation: isolate; }
+  .art { position: absolute; inset: 0; z-index: -1; }
+  .art :global(svg) { width: 100%; height: 100%; display: block; image-rendering: pixelated; }
+  /* soften the band right behind the window so the edges stay calm */
+  .showcase::after { content: ''; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+    background: radial-gradient(60% 55% at 50% 30%, color-mix(in srgb, var(--panel) 70%, transparent), transparent 70%); }
+
+  .window { position: absolute; left: 50%; translate: -50% 0; top: clamp(40px, 5vw, 64px); width: min(1120px, calc(100% - 2 * clamp(16px, 4vw, 64px)));
+    border-radius: 12px 12px 0 0; border: 1px solid var(--border-strong); border-bottom: 0; background: var(--card); overflow: hidden;
+    box-shadow: 0 1px 0 rgb(255 255 255 / 0.4) inset, 0 30px 80px -30px rgb(60 20 0 / 0.45); }
+  :global([data-theme='dark']) .window { box-shadow: 0 30px 80px -30px rgb(0 0 0 / 0.8); }
+  .win-bar { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 8px 10px; border-bottom: 1px solid var(--border); background: var(--panel); }
+  .win-tabs { display: flex; gap: 2px; min-width: 0; overflow-x: auto; scrollbar-width: none; }
+  .win-tab { position: relative; display: inline-flex; align-items: center; gap: 7px; height: 34px; padding: 0 12px; border-radius: 8px; font-size: var(--text-sm); color: var(--muted); white-space: nowrap;
+    transition: color var(--dur-fast) ease, background-color var(--dur-fast) ease; }
+  .win-tab:hover { color: var(--fg); }
+  .win-tab[aria-selected='true'] { color: var(--fg); background: var(--card); box-shadow: var(--shadow-sm), 0 0 0 1px var(--border); }
+  .win-tab[aria-selected='true'] :global(.icon) { color: var(--brand); }
+  .progress { position: absolute; left: 10px; right: 10px; bottom: 3px; height: 2px; border-radius: 2px; background: var(--brand); transform: scaleX(0); transform-origin: left; opacity: 0; }
+  :global(.ticking) .win-tab[aria-selected='true'] .progress { opacity: 0.8; animation: fill var(--step, 5s) linear forwards; }
+  :global(.paused) .win-tab[aria-selected='true'] .progress { animation-play-state: paused; }
+  @keyframes fill { to { transform: scaleX(1); } }
+  .win-cta { flex: none; }
+  .win-body { position: relative; background: var(--card); }
+  .win-panel img { width: 100%; height: auto; vertical-align: top; } /* no display rule: the light/dark switch decides which one shows */
+  .win-panel:not([hidden]) { animation: swap 0.45s var(--ease-out); }
+  @keyframes swap { from { opacity: 0; transform: translateY(6px) scale(0.995); } to { opacity: 1; transform: none; } }
+
+  @media (max-width: 760px) {
+    .win-cta { display: none; }
+    .win-tab { padding: 0 10px; }
+  }
+  @media (prefers-reduced-motion: reduce) { .win-panel:not([hidden]) { animation: none; } }
+</style>

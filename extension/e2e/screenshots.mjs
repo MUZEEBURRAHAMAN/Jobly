@@ -64,11 +64,26 @@ await h.ctx.close();
 
 // Web Store wants 24-bit PNGs without alpha: flatten everything we wrote
 const py = process.env.PYTHON || path.join(root, '.venv', 'bin', 'python');
-// website hero: the dashboard at 1440x900, retina, light and dark (converted to WebP below)
+// website hero showcase: four views of the dashboard at 1440x900, retina, light and dark (converted to WebP below)
 const hi = await launch({ scale: 2 }); await hi.ctx.route(/t2\.gstatic\.com/, (r) => r.abort());
+const all = (await (await fetch('http://127.0.0.1:8000/api/jobs?limit=200')).json()).items;
+const demo = all.filter((j) => j.title.length < 40 && j.application_url.startsWith('https'));
+// Everything the fixture has counts as seen, so the background check can't add a flood of alerts on top of these.
+const seedUserData = () => hi.sw.evaluate(({ demo, all }) => chrome.storage.local.set({
+  savedJobs: demo.slice(0, 4).map((j) => ({ ...j, is_saved: true })),
+  alerts: demo.slice(4, 10).map((j, i) => ({ id: j.application_url, title: j.title, company_name: j.company_name, location: j.location, application_url: j.application_url, sent_at: new Date(Date.now() - [6, 38, 95, 180, 300, 420][i] * 60000).toISOString(), is_read: i > 1 })),
+  seenAlertKeys: all.map((j) => j.application_url),
+}), { demo, all });
+await seedUserData();
 for (const theme of ['light', 'dark']) {
   const p = await open(hi, 'options.html', { theme, width: 1440, height: 900 }); await settle(p);
-  await p.screenshot({ path: path.join(WEB, `dashboard-${theme}.png`) }); console.log('wrote', `web/public/img/dashboard-${theme}.png`); await p.close();
+  const snap = async (name) => { await sleep(700); await p.screenshot({ path: path.join(WEB, `dashboard-${name}-${theme}.png`) }); console.log('wrote', `web/public/img/dashboard-${name}-${theme}.png`); };
+  await snap('jobs');
+  await p.getByRole('button', { name: /Filters/ }).click(); await p.locator('#f-new').selectOption('7'); await sleep(900); await snap('filters');
+  await p.getByRole('button', { name: /^Saved/ }).click(); await p.locator('article').first().waitFor(); await snap('saved');
+  await seedUserData(); await p.reload(); await settle(p);
+  await p.getByRole('button', { name: /^Alerts/ }).click(); await snap('alerts');
+  await p.close();
 }
 await hi.ctx.close();
 

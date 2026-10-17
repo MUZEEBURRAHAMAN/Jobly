@@ -12,7 +12,7 @@ interface HeaderProps {
   onSync: () => void;
   openOptions?: () => void;
   theme: 'dark' | 'light';
-  onToggleTheme: () => void;
+  onToggleTheme: (e?: React.MouseEvent<HTMLElement>) => void;
   /** First-run screens: only the theme switch. */
   minimal?: boolean;
 }

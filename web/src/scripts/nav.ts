@@ -67,11 +67,28 @@ const themeBtn = document.querySelector<HTMLButtonElement>('[data-theme-toggle]'
 const root = document.documentElement;
 const label = () => themeBtn?.setAttribute('aria-label', root.dataset.theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme');
 label();
-themeBtn?.addEventListener('click', () => {
+// Switching reveals the new theme in a circle that grows out of the button (View Transitions API, like Magic UI's
+// animated theme toggler). Browsers without it, and visitors who prefer less motion, get an instant switch.
+themeBtn?.addEventListener('click', async () => {
   const next = root.dataset.theme === 'dark' ? 'light' : 'dark';
-  root.dataset.theme = next;
-  try { localStorage.setItem('jobly-theme', next); } catch { /* private mode: still switches for this page */ }
-  label();
+  const apply = () => {
+    root.dataset.theme = next;
+    try { localStorage.setItem('jobly-theme', next); } catch { /* private mode: still switches for this page */ }
+    label();
+  };
+  const doc = document as Document & { startViewTransition?: (cb: () => void) => { ready: Promise<void> } };
+  if (!doc.startViewTransition || window.matchMedia('(prefers-reduced-motion: reduce)').matches) { apply(); return; }
+  const r = themeBtn.getBoundingClientRect();
+  const x = r.left + r.width / 2, y = r.top + r.height / 2;
+  const radius = Math.hypot(Math.max(x, window.innerWidth - x), Math.max(y, window.innerHeight - y));
+  const transition = doc.startViewTransition(apply);
+  try {
+    await transition.ready;
+    root.animate(
+      { clipPath: [`circle(0px at ${x}px ${y}px)`, `circle(${radius}px at ${x}px ${y}px)`] },
+      { duration: 550, easing: 'cubic-bezier(0.22, 1, 0.36, 1)', pseudoElement: '::view-transition-new(root)' },
+    );
+  } catch { /* the theme has already switched; only the animation was skipped */ }
 });
 window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
   let saved: string | null = null;

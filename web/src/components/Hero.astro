@@ -65,15 +65,6 @@ const examples = ['Product designer', 'Machine learning', 'Product manager', 'En
       <p class="small fine rise d3">Free · No account · Works in Chrome</p>
     </div>
 
-    <div class="shot rise d4">
-      <div class="frame">
-        <div class="frame-bar" aria-hidden="true"><span></span><span></span><span></span><em>Jobly dashboard</em></div>
-        <img class="only-light" src="/img/dashboard-light.webp" width="1440" height="900" decoding="async" fetchpriority="high"
-          alt="The Jobly dashboard: job cards with company, location, posting time, a Matches you badge, and Save and Apply buttons." />
-        <img class="only-dark" src="/img/dashboard-dark.webp" width="1440" height="900" decoding="async" loading="lazy"
-          alt="The Jobly dashboard in dark mode: job cards with company, location, posting time, a Matches you badge, and Save and Apply buttons." />
-      </div>
-    </div>
   </div>
 </section>
 
@@ -83,7 +74,7 @@ const examples = ['Product designer', 'Machine learning', 'Product manager', 'En
 
 <style>
   .hero-section { padding-top: 8px; }
-  .hero { isolation: isolate; padding: clamp(56px, 8vw, 96px) 24px 0; text-align: center; }
+  .hero { isolation: isolate; padding: clamp(56px, 8vw, 96px) 24px clamp(56px, 7vw, 88px); text-align: center; }
 
   /* soft gradient that fades in and drifts slowly (still under "reduce motion") */
   .hero-bg { position: absolute; inset: 0; z-index: -1; opacity: 0; animation: bg-in 1.4s var(--ease-out) 0.1s forwards; }
@@ -146,15 +137,6 @@ const examples = ['Product designer', 'Machine learning', 'Product manager', 'En
   .fine { margin-top: 14px; }
   .ctas :global(.arrow) { transition: transform var(--dur) var(--ease-out); }
   .ctas a:hover :global(.arrow) { transform: translateX(2px); }
-
-  /* product rising out of the bottom of the panel */
-  .shot { max-width: 1080px; margin: clamp(48px, 7vw, 72px) auto 0; padding-inline: clamp(0px, 2vw, 24px); }
-  .frame { border-radius: 14px 14px 0 0; border: 1px solid var(--border); border-bottom: 0; background: var(--card); box-shadow: var(--shadow-lg); overflow: hidden;
-    height: clamp(220px, 38vw, 470px); }
-  .frame-bar { display: flex; align-items: center; gap: 6px; height: 34px; padding: 0 14px; border-bottom: 1px solid var(--border); background: var(--panel); }
-  .frame-bar span { width: 10px; height: 10px; border-radius: 50%; background: var(--border-strong); }
-  .frame-bar em { font-style: normal; font-size: var(--text-xs); color: var(--subtle); margin-left: 10px; }
-  .frame img { width: 100%; height: auto; }
 
   @media (max-width: 640px) {
     .br-wide { display: none; }

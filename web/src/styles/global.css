@@ -193,3 +193,8 @@ a { color: inherit; text-decoration: none; }
 /* Hugeicons duotone: the closed shapes get a light fill of the icon's own colour */
 .icon-duo .duo { fill: currentColor; fill-opacity: var(--duo-opacity, 0.16); }
 [data-theme='dark'] .icon-duo .duo { --duo-opacity: 0.24; }
+
+/* theme switch: the new theme is revealed by a growing circle (see scripts/nav.ts) */
+::view-transition-old(root), ::view-transition-new(root) { animation: none; mix-blend-mode: normal; }
+::view-transition-old(root) { z-index: 1; }
+::view-transition-new(root) { z-index: 2; }

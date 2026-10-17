@@ -1,0 +1,53 @@
+---
+// A plug and a wall socket in the hairline style. Unplugged at rest; when its card (.ill-trigger) is hovered or
+// focused (or once it scrolls into view on touch screens) the plug slides home and the socket's light comes on.
+---
+<svg class="plug" viewBox="0 0 320 200" aria-hidden="true" focusable="false">
+  <ellipse class="shadow" cx="150" cy="186" rx="120" ry="7" />
+  <!-- prongs sit behind the plate, so once inserted they disappear into the socket -->
+  <g class="mover">
+    <rect class="prong" x="130" y="86" width="26" height="7" rx="3.5" />
+    <rect class="prong" x="130" y="107" width="26" height="7" rx="3.5" />
+  </g>
+  <rect class="depth" x="48" y="42" width="104" height="128" rx="22" />
+  <rect class="face" x="40" y="34" width="104" height="128" rx="22" />
+  <circle class="recess" cx="92" cy="98" r="34" />
+  <rect class="slot" x="78" y="87" width="28" height="5" rx="2.5" />
+  <rect class="slot" x="78" y="108" width="28" height="5" rx="2.5" />
+  <circle class="led-glow" cx="62" cy="52" r="9" /><circle class="led" cx="62" cy="52" r="3.5" />
+  <g class="mover">
+    <path class="cable" d="M206 100 C 246 100, 252 150, 300 152 S 420 150, 560 150" />
+    <rect class="body-depth" x="158" y="80" width="54" height="48" rx="13" />
+    <rect class="body" x="152" y="74" width="54" height="48" rx="13" />
+    <path class="grip" d="M170 86 v24 M180 86 v24 M190 86 v24" />
+  </g>
+</svg>
+
+<style>
+  .plug { width: 100%; height: auto; display: block; overflow: visible;
+    --ln: color-mix(in srgb, var(--fg) 42%, transparent); --plate: var(--card); --shade: var(--card-muted); }
+  .shadow { fill: color-mix(in srgb, var(--fg) 7%, transparent); }
+  .depth, .body-depth { fill: var(--shade); stroke: var(--ln); stroke-width: 1; }
+  .face, .body { fill: var(--plate); stroke: var(--ln); stroke-width: 1; }
+  .recess { fill: var(--shade); stroke: var(--ln); stroke-width: 1; transition: stroke 0.35s ease; }
+  .slot { fill: var(--ln); }
+  .prong { fill: var(--plate); stroke: var(--brand); stroke-width: 1.2; }
+  .cable { fill: none; stroke: var(--ln); stroke-width: 7; stroke-linecap: round; }
+  .grip { stroke: color-mix(in srgb, var(--fg) 18%, transparent); stroke-width: 1.4; stroke-linecap: round; }
+  .led { fill: var(--border-strong); transition: fill 0.3s ease 0.35s; }
+  .led-glow { fill: var(--success); opacity: 0; transform-box: fill-box; transform-origin: center; }
+
+  /* unplugged (rest) → plugged: the plug and its prongs travel left together and the plug seats over the socket */
+  .mover { transform: translateX(44px); transition: transform 0.7s cubic-bezier(0.34, 1.25, 0.64, 1); }
+  :global(.ill-trigger:hover) .mover, :global(.ill-trigger:focus-within) .mover { transform: translateX(-87px); }
+  :global(.ill-trigger:hover) .led, :global(.ill-trigger:focus-within) .led { fill: var(--success); }
+  :global(.ill-trigger:hover) .led-glow, :global(.ill-trigger:focus-within) .led-glow { animation: plug-glow 1.6s ease-out 0.4s infinite; }
+  :global(.ill-trigger:hover) .recess, :global(.ill-trigger:focus-within) .recess { stroke: var(--brand); }
+  @keyframes plug-glow { 0% { opacity: 0.45; transform: scale(0.6); } 100% { opacity: 0; transform: scale(1.8); } }
+  @media (hover: none) {
+    :global(.ill-trigger.in) .mover { transform: translateX(-87px); transition-delay: 0.6s; }
+    :global(.ill-trigger.in) .led { fill: var(--success); transition-delay: 1s; }
+    :global(.ill-trigger.in) .recess { stroke: var(--brand); transition-delay: 1s; }
+  }
+  @media (prefers-reduced-motion: reduce) { .mover, .led, .recess { transition: none; } .led-glow { animation: none !important; } }
+</style>

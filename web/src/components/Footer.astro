@@ -28,7 +28,7 @@ const cols = [
       <span class="status" data-status="unknown"><span class="s-dot" aria-hidden="true"></span><span data-updated>Jobs update every 2 hours</span></span>
       <a class="mail" href={`mailto:${SITE.email}`}><Icon name="mail" size={14} />{SITE.email}</a>
     </div></div>
-    <div class="wordmark" aria-hidden="true">Jobly</div>
+    <div class="container wm-wrap" aria-hidden="true"><div class="wordmark">Jobly</div></div>
   </div>
 </footer>
 
@@ -50,9 +50,12 @@ const cols = [
   .status[data-status='ok'] .s-dot { background: var(--success); }
   .mail { display: inline-flex; align-items: center; gap: 6px; color: var(--muted); }
   .mail:hover { color: var(--fg); }
-  /* the whole word, sized to the content width, fading into the panel instead of being cut off */
-  .wordmark { font-size: clamp(5.5rem, 21vw, 18rem); font-weight: 600; letter-spacing: -0.065em; line-height: 0.95; text-align: center; padding: 24px 0 clamp(16px, 2vw, 28px);
-    background: linear-gradient(180deg, color-mix(in srgb, var(--fg) 14%, transparent) 0%, color-mix(in srgb, var(--fg) 6%, transparent) 55%, transparent 100%);
-    -webkit-background-clip: text; background-clip: text; color: transparent; user-select: none; }
+  /* Wrangle-style: a huge wordmark on the content edge, in a warm brand gradient, cut off by the bottom of the panel */
+  .wm-wrap { margin-top: clamp(28px, 4vw, 48px); }
+  .wordmark { font-size: clamp(7.5rem, 29vw, 26rem); font-weight: 600; letter-spacing: -0.07em; line-height: 0.8; margin-left: -0.05em; margin-bottom: -0.17em;
+    background: linear-gradient(100deg, #e9764c 0%, #f39a6c 30%, #f8bd97 62%, #fcdcc8 100%);
+    -webkit-background-clip: text; background-clip: text; color: transparent; user-select: none;
+    -webkit-mask-image: linear-gradient(180deg, #000 45%, rgb(0 0 0 / 0.45) 100%); mask-image: linear-gradient(180deg, #000 45%, rgb(0 0 0 / 0.45) 100%); }
+  :global([data-theme='dark']) .wordmark { background-image: linear-gradient(100deg, #8a3517 0%, #a8461f 35%, #c26038 70%, #7a3216 100%); }
   @media (max-width: 860px) { .top { grid-template-columns: 1fr 1fr; } .brand { grid-column: 1 / -1; } }
 </style>

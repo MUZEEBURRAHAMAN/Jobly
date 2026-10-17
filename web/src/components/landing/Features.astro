@@ -1,6 +1,7 @@
 ---
 import SectionHead from '../SectionHead.astro';
 import Figure from '../Figure.astro';
+import Plug from '../illustrations/Plug.astro';
 import Icon from '../Icon.astro';
 
 // Demo rows use the same fictional companies as the extension's screenshots.
@@ -10,12 +11,12 @@ const rows = [
   { l: 'S', title: 'Product Manager', co: 'Skylark', when: '5 days ago', tone: '' },
 ];
 const extras = [
-  { icon: 'eye-off', text: 'Hide companies you don’t want' },
-  { icon: 'flag', text: 'Report a fake or expired listing' },
-  { icon: 'share-2', text: 'Share a job in one click' },
-  { icon: 'wifi-off', text: 'Shows your last results offline' },
-  { icon: 'moon', text: 'Light and dark mode' },
-  { icon: 'keyboard', text: 'Works fully with the keyboard' },
+  { icon: 'eye-off', title: 'Hide companies', text: 'Mute employers you don’t want to see.' },
+  { icon: 'flag', title: 'Report listings', text: 'Flag a fake or expired job in two clicks.' },
+  { icon: 'share-2', title: 'Share a job', text: 'Copy a clean link to send to a friend.' },
+  { icon: 'wifi-off', title: 'Works offline', text: 'Your last results stay on screen.' },
+  { icon: 'moon', title: 'Light and dark', text: 'Follows your system, or pick one.' },
+  { icon: 'command', title: 'Keyboard friendly', text: 'Every action works without a mouse.' },
 ];
 ---
 <section class="shell features-wrap" id="features" aria-labelledby="features-title">
@@ -29,10 +30,11 @@ const extras = [
         <article class="tile t-dates" data-reveal data-play>
           <div class="visual">
             <div class="mock list" aria-hidden="true">
+              <div class="slot incoming"><div><div class="row new"><span class="logo">T</span><span class="who"><b>UX Designer</b><small>Tidewater</small></span><span class="when fresh">Just now</span></div></div></div>
               {rows.map((r) => (
-                <div class="row"><span class="logo">{r.l}</span><span class="who"><b>{r.title}</b><small>{r.co}</small></span><span class:list={['when', r.tone]}>{r.when}</span></div>
+                <div class="slot"><div><div class="row"><span class="logo">{r.l}</span><span class="who"><b>{r.title}</b><small>{r.co}</small></span><span class:list={['when', r.tone]}>{r.when}</span></div></div></div>
               ))}
-              <div class="row stale"><span class="logo">O</span><span class="who"><b>Senior Designer</b><small>Old Mill Co</small></span><span class="when old">74 days ago</span><span class="removed">Removed: older than 60 days</span></div>
+              <div class="slot outgoing"><div><div class="row stale"><span class="logo">O</span><span class="who"><b>Senior Designer</b><small>Old Mill Co</small></span><span class="tag-slot"><span class="when old">74 days ago</span><span class="removed">Older than 60 days</span></span></div></div></div>
             </div>
           </div>
           <h3>Real posting dates</h3>
@@ -91,8 +93,8 @@ const extras = [
         </article>
 
         <!-- 6. Direct apply -->
-        <article class="tile t-apply" data-reveal>
-          <div class="visual fig"><Figure name="plug" intensity={0.7} /></div>
+        <article class="tile t-apply ill-trigger" data-reveal>
+          <div class="visual"><div class="plug-box"><Plug /></div></div>
           <h3>Apply on the employer’s site</h3>
           <p>The Apply button opens the company’s own page. Jobly never stands between you and the application.</p>
         </article>
@@ -100,8 +102,11 @@ const extras = [
         <!-- extras -->
         <article class="tile t-extras" data-reveal>
           <h3>And the small things</h3>
+          <p class="x-lead">Details that make a daily habit pleasant.</p>
           <ul class="extras">
-            {extras.map((x) => <li><span class="x-icon"><Icon name={x.icon} size={15} /></span>{x.text}</li>)}
+            {extras.map((x) => (
+              <li><span class="x-icon"><Icon name={x.icon} size={18} /></span><span><strong>{x.title}</strong><span>{x.text}</span></span></li>
+            ))}
           </ul>
         </article>
       </div>
@@ -114,9 +119,10 @@ const extras = [
   .tile { background: var(--card); border: 1px solid var(--border); border-radius: 18px; padding: 6px 6px 24px; display: flex; flex-direction: column; min-width: 0; }
   .t-dates { grid-column: span 4; } .t-alerts { grid-column: span 2; }
   .t-filters, .t-match, .t-saved { grid-column: span 2; }
-  .t-apply { grid-column: span 3; } .t-extras { grid-column: span 3; padding: 28px 24px; justify-content: center; }
+  .t-apply { grid-column: span 3; } .t-extras { grid-column: span 3; padding: 26px 22px 22px; justify-content: flex-start; }
   .visual { position: relative; border-radius: 13px; background: var(--panel); min-height: 240px; display: grid; place-items: center; overflow: hidden; padding: 20px; }
   .visual.fig :global([data-figure]) { width: 78%; max-width: 280px; }
+  .plug-box { width: min(80%, 360px); }
   h3 { margin: 22px 18px 0; font-size: 1.1875rem; font-weight: 500; letter-spacing: -0.015em; color: var(--fg); }
   .tile > p { margin: 8px 18px 0; font-size: var(--text-md); line-height: 1.6; color: var(--muted); }
   .t-extras h3 { margin: 0; }
@@ -131,18 +137,36 @@ const extras = [
   .when { font-size: 12px; color: var(--subtle); white-space: nowrap; }
   .when.fresh { color: var(--success); }
 
-  /* 1. dates: the stale row gets struck through, labelled, then folds away */
-  .list { display: flex; flex-direction: column; gap: 8px; max-width: 520px; }
-  .stale { position: relative; transform-origin: top; }
+  /* 1. dates: a fresh job slides in at the top while the stale one is tagged, slides out and folds away.
+     Each row sits in a grid track that animates 1fr ↔ 0fr, so nothing overlaps while heights change. */
+  .list { display: flex; flex-direction: column; max-width: 520px; width: 100%; }
+  .slot { display: grid; grid-template-rows: 1fr; }
+  .slot > div { min-height: 0; overflow: hidden; }
+  .slot .row { margin-bottom: 8px; }
+  .incoming { grid-template-rows: 0fr; }
+  .incoming .row { opacity: 0; transform: translateY(-10px); }
+  .row.new { border-color: color-mix(in srgb, var(--success) 40%, var(--border)); }
+  .tag-slot { display: grid; justify-items: end; }
+  .tag-slot > * { grid-area: 1 / 1; }
   .when.old { color: var(--danger); }
-  .removed { position: absolute; right: 10px; top: 50%; translate: 0 -50%; font-size: 11px; font-weight: 500; padding: 3px 8px; border-radius: 999px;
-    background: color-mix(in srgb, var(--danger) 12%, var(--card)); color: var(--danger); opacity: 0; }
-  [data-playing] .stale { animation: stale 7s var(--ease-out) infinite; }
-  [data-playing] .removed { animation: removed 7s var(--ease-out) infinite; }
-  [data-playing] .stale .who b { animation: strike 7s linear infinite; }
-  @keyframes stale { 0%, 30% { opacity: 1; max-height: 60px; } 52% { opacity: 1; } 64%, 86% { opacity: 0; max-height: 0; padding-block: 0; margin-top: -8px; border-width: 0; } 100% { opacity: 1; max-height: 60px; } }
-  @keyframes removed { 0%, 30% { opacity: 0; } 36%, 52% { opacity: 1; } 60%, 100% { opacity: 0; } }
-  @keyframes strike { 0%, 30% { text-decoration: none; } 31%, 60% { text-decoration: line-through; } 61%, 100% { text-decoration: none; } }
+  .removed { font-size: 11px; font-weight: 500; padding: 3px 8px; border-radius: 999px; white-space: nowrap;
+    background: color-mix(in srgb, var(--danger) 12%, var(--card)); color: var(--danger); opacity: 0; transform: scale(0.9); }
+  [data-playing] .outgoing { animation: fold-out 8s var(--ease-out) infinite; }
+  [data-playing] .stale { animation: leave 8s var(--ease-out) infinite; }
+  [data-playing] .stale .when.old { animation: label-out 8s ease infinite; }
+  [data-playing] .removed { animation: tag-in 8s var(--ease-out) infinite; }
+  [data-playing] .incoming { animation: fold-in 8s var(--ease-out) infinite; }
+  [data-playing] .incoming .row { animation: arrive 8s var(--ease-out) infinite; }
+  [data-playing] .list { animation: settle 8s ease infinite; }
+  @keyframes label-out { 0%, 22% { opacity: 1; } 26%, 100% { opacity: 0; } }
+  @keyframes tag-in { 0%, 22% { opacity: 0; transform: scale(0.9); } 27%, 44% { opacity: 1; transform: none; } 50%, 100% { opacity: 0; } }
+  @keyframes leave { 0%, 20% { background: var(--card); } 26%, 40% { background: color-mix(in srgb, var(--danger) 6%, var(--card)); opacity: 1; transform: none; }
+    50%, 100% { opacity: 0; transform: translateX(28px); background: color-mix(in srgb, var(--danger) 6%, var(--card)); } }
+  @keyframes fold-out { 0%, 50% { grid-template-rows: 1fr; } 62%, 100% { grid-template-rows: 0fr; } }
+  @keyframes fold-in { 0%, 52% { grid-template-rows: 0fr; } 64%, 100% { grid-template-rows: 1fr; } }
+  @keyframes arrive { 0%, 56% { opacity: 0; transform: translateY(-10px); } 68%, 100% { opacity: 1; transform: none; } }
+  /* the list fades for a moment while the loop resets, so the restart never jumps */
+  @keyframes settle { 0%, 90% { opacity: 1; } 95% { opacity: 0; } 100% { opacity: 1; } }
 
   /* 2. alerts: a notification drops in and the badge counts */
   .alerts-visual { place-items: center stretch; align-content: center; }
@@ -187,15 +211,21 @@ const extras = [
   .apply { background: var(--ink); color: var(--on-ink); }
   .device { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: var(--subtle); }
   [data-playing] .s-off { animation: off 4.5s infinite; } [data-playing] .s-on { animation: on 4.5s infinite; }
-  [data-playing] .save { animation: press 4.5s infinite; }
+  [data-playing] .save { animation: save-press 4.5s infinite; }
   @keyframes off { 0%, 30% { opacity: 1; } 34%, 86% { opacity: 0; } 90%, 100% { opacity: 1; } }
   @keyframes on { 0%, 30% { opacity: 0; } 34%, 86% { opacity: 1; } 90%, 100% { opacity: 0; } }
-  @keyframes press { 0%, 28% { transform: none; border-color: var(--border-strong); } 31% { transform: scale(0.94); } 35%, 86% { transform: none; border-color: var(--brand); } 90%, 100% { border-color: var(--border-strong); } }
+  @keyframes save-press { 0%, 28% { transform: none; border-color: var(--border-strong); } 31% { transform: scale(0.94); } 35%, 86% { transform: none; border-color: var(--brand); } 90%, 100% { border-color: var(--border-strong); } }
 
-  /* extras */
-  .extras { list-style: none; padding: 0; margin-top: 20px; display: grid; grid-template-columns: 1fr; gap: 14px; }
-  .extras li { display: flex; align-items: center; gap: 10px; font-size: var(--text-md); color: var(--muted); }
-  .x-icon { width: 30px; height: 30px; flex: none; display: grid; place-items: center; border-radius: 8px; background: var(--panel); color: var(--fg); border: 1px solid var(--border); }
+  /* extras: six small tiles that fill the card */
+  .tile > .x-lead { margin: 6px 0 0; font-size: var(--text-md); color: var(--muted); }
+  .extras { list-style: none; padding: 0; margin-top: 22px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .extras li { display: flex; gap: 12px; align-items: flex-start; padding: 14px; border-radius: 14px; background: var(--panel); border: 1px solid transparent;
+    transition: border-color var(--dur-fast) ease, background-color var(--dur-fast) ease, transform var(--dur) var(--ease-out); }
+  .extras li:hover { border-color: var(--border); background: var(--card); transform: translateY(-1px); }
+  .extras li > span:last-child { display: flex; flex-direction: column; line-height: 1.35; min-width: 0; }
+  .extras strong { font-size: var(--text-md); font-weight: 600; color: var(--fg); }
+  .extras li > span:last-child > span { font-size: var(--text-sm); color: var(--subtle); margin-top: 3px; }
+  .x-icon { width: 36px; height: 36px; flex: none; display: grid; place-items: center; border-radius: 10px; background: var(--brand-soft); color: var(--brand); }
 
   @media (max-width: 1000px) {
     .bento { grid-template-columns: repeat(2, 1fr); }

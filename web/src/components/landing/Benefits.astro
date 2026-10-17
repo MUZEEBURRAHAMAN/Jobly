@@ -1,6 +1,6 @@
 ---
 import SectionHead from '../SectionHead.astro';
-import Figure from '../Figure.astro';
+import Lock from '../illustrations/Lock.astro';
 import Icon from '../Icon.astro';
 
 const benefits = [
@@ -32,8 +32,8 @@ const stats = [
           </ul>
         </div>
 
-        <aside class="privacy" data-reveal="scale" aria-labelledby="privacy-title">
-          <div class="p-art"><Figure name="padlock" intensity={0.7} /></div>
+        <aside class="privacy ill-trigger" data-reveal="scale" aria-labelledby="privacy-title">
+          <div class="p-art"><div class="lock-box"><Lock /></div><span class="p-hint" aria-hidden="true">Hover to lock</span></div>
           <h3 id="privacy-title">Nobody builds a profile on you</h3>
           <p>No account, no email, no tracking. Your preferences, saved jobs and alerts stay in your browser. Uninstall Jobly and they’re gone.</p>
           <a class="p-link" href="/privacy">Read the privacy policy <Icon name="arrow-right" size={14} /></a>
@@ -67,7 +67,11 @@ const stats = [
 
   .privacy { background: var(--card); border: 1px solid var(--border); border-radius: 24px; padding: 16px 16px 28px; box-shadow: var(--shadow-md); }
   .p-art { aspect-ratio: 5 / 4; border-radius: 16px; background: var(--panel); display: grid; place-items: center; margin-bottom: 20px; overflow: hidden; }
-  .p-art :global([data-figure]) { width: 70%; }
+  .p-art { position: relative; }
+  .lock-box { width: min(64%, 260px); }
+  .p-hint { position: absolute; left: 14px; bottom: 12px; font-size: var(--text-xs); color: var(--subtle); transition: opacity 0.3s ease; }
+  .privacy:hover .p-hint, .privacy:focus-within .p-hint { opacity: 0; }
+  @media (hover: none) { .p-hint { display: none; } }
   .privacy h3 { font-size: 1.375rem; font-weight: 500; letter-spacing: -0.02em; padding-inline: 12px; }
   .privacy p { color: var(--muted); line-height: 1.6; padding-inline: 12px; margin-top: 8px; }
   .p-link { display: inline-flex; align-items: center; gap: 6px; margin: 16px 12px 0; font-weight: 500; color: var(--brand); }
