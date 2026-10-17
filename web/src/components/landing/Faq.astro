@@ -17,7 +17,7 @@ const faqs = [
       <div class="intro" data-stagger>
         <span class="eyebrow" data-reveal>FAQ</span>
         <h2 class="title" id="faq-title" data-reveal>Questions, answered.</h2>
-        <p class="lead" data-reveal>Can’t find yours? <a href="/support">Write to us</a> and a person replies.</p>
+        <p class="lead" data-reveal>Can’t find yours? <a href="/support">Write to us</a> and we’ll get back to you.</p>
         <div class="q-art" data-reveal><Figure name="query" intensity={0.7} /></div>
       </div>
       <div class="list" data-stagger>
@@ -38,7 +38,7 @@ const faqs = [
       radial-gradient(55% 70% at 0% 100%, color-mix(in srgb, var(--blob-1) 50%, transparent), transparent 70%),
       radial-gradient(45% 60% at 100% 0%, color-mix(in srgb, var(--blob-3) 40%, transparent), transparent 70%),
       var(--panel); }
-  .layout { display: grid; grid-template-columns: 1fr 1.4fr; gap: clamp(32px, 6vw, 80px); padding-inline: 0; align-items: start; }
+  .layout { display: grid; grid-template-columns: 1fr 1.4fr; gap: clamp(32px, 6vw, 80px); align-items: start; }
   .intro { display: flex; flex-direction: column; gap: 16px; position: sticky; top: calc(var(--nav-h) + 32px); }
   .lead a { color: var(--brand); text-decoration: underline; text-underline-offset: 3px; }
   .q-art { width: 100%; max-width: 300px; aspect-ratio: 5 / 4; border-radius: 20px; background: var(--card); border: 1px solid var(--border); display: grid; place-items: center; margin-top: 16px; overflow: hidden; }

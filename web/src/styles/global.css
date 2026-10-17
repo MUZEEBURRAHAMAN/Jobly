@@ -58,8 +58,11 @@
   --radius-card: 12px;
   --radius-btn: 8px;
   --radius-full: 999px;
-  --gutter: 16px;
-  --container: 1200px;
+  --gutter: 16px;                                         /* panels sit this far from the window edge */
+  --container: 1152px;                                    /* width of the content column */
+  --edge: max(40px, calc((100vw - var(--container)) / 2)); /* content edge, the same in every section */
+  --section-y: clamp(80px, 9vw, 128px);                   /* vertical space of a section */
+  --stack: 16px;                                          /* space between adjacent panels */
   --nav-h: 64px;
 
   /* motion */
@@ -118,8 +121,11 @@ a { color: inherit; text-decoration: none; }
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
 .skip { position: absolute; left: 16px; top: -48px; z-index: 100; padding: 8px 14px; border-radius: var(--radius-btn); background: var(--ink); color: var(--on-ink); font-size: var(--text-sm); }
 .skip:focus { top: 12px; }
-.container { width: 100%; max-width: var(--container); margin-inline: auto; padding-inline: 24px; }
 .shell { padding-inline: var(--gutter); }
+/* One content edge everywhere: plain sections pad by --edge; inside a panel (already --gutter in) by --edge minus --gutter. */
+.container { width: 100%; padding-inline: var(--edge); }
+.shell .container, .shell.container { padding-inline: calc(var(--edge) - var(--gutter)); }
+.stack-next { margin-top: var(--stack); }
 .icon { flex: none; }
 
 /* ---------- type ---------- */
@@ -147,6 +153,10 @@ a { color: inherit; text-decoration: none; }
 /* ---------- panels ---------- */
 .panel { position: relative; border-radius: var(--radius-panel); background: var(--panel); overflow: clip; }
 
+@media (max-width: 640px) {
+  :root { --gutter: 10px; --edge: 26px; --section-y: 72px; --stack: 10px; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
@@ -156,13 +166,13 @@ a { color: inherit; text-decoration: none; }
 [data-theme='light'] .only-dark, [data-theme='dark'] .only-light { display: none; }
 
 /* ---------- sections ---------- */
-.section { padding-block: clamp(72px, 9vw, 128px); }
+.section { padding-block: var(--section-y); }
 .section-tight { padding-block: clamp(56px, 7vw, 96px); }
 .section-head { max-width: 720px; display: flex; flex-direction: column; gap: 16px; }
 .section-head.center { margin-inline: auto; text-align: center; align-items: center; }
 .eyebrow { display: inline-flex; align-items: center; gap: 8px; font-size: var(--text-sm); font-weight: 500; color: var(--brand); letter-spacing: 0.01em; }
 .eyebrow::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
-.panel-pad { padding: clamp(48px, 7vw, 96px) clamp(20px, 5vw, 64px); }
+.panel-pad { padding-block: var(--section-y); }
 
 /* ---------- scroll reveal (only when JavaScript runs; content is visible without it) ---------- */
 .js [data-reveal] { opacity: 0; transform: translateY(18px); transition: opacity 0.7s var(--ease-out), transform 0.8s var(--ease-out); }

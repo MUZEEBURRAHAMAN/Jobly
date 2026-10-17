@@ -8,7 +8,7 @@ const cols = [
   { title: 'Company', links: [['Support', '/support'], ['Privacy', '/privacy'], ['Security', '/security'], ['Terms', '/terms']] },
 ];
 ---
-<footer class="shell site-footer">
+<footer class="shell site-footer stack-next">
   <div class="panel foot">
     <div class="container top">
       <div class="brand">
@@ -33,7 +33,7 @@ const cols = [
 </footer>
 
 <style>
-  .site-footer { margin-top: 16px; padding-bottom: 16px; }
+  .site-footer { padding-bottom: var(--gutter); }
   .foot { padding-top: clamp(48px, 6vw, 72px); }
   .top { display: grid; grid-template-columns: 1.6fr repeat(3, 1fr); gap: 32px; }
   .brand { display: flex; flex-direction: column; gap: 14px; align-items: flex-start; max-width: 280px; }

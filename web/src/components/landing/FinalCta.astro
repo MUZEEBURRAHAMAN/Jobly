@@ -3,8 +3,8 @@ import Figure from '../Figure.astro';
 import Icon from '../Icon.astro';
 import { installHref } from '../../lib/site';
 ---
-<section class="shell cta-wrap" aria-labelledby="cta-title">
-  <div class="panel cta">
+<section class="shell cta-wrap stack-next" aria-labelledby="cta-title">
+  <div class="panel cta container">
     <div class="glow" aria-hidden="true"></div>
     <div class="copy" data-stagger>
       <p class="live" data-reveal><span class="dot" aria-hidden="true"></span><span data-count="new_jobs_today">500+</span>&nbsp;jobs posted in the last 24 hours</p>
@@ -20,8 +20,7 @@ import { installHref } from '../../lib/site';
 </section>
 
 <style>
-  .cta-wrap { margin-top: clamp(72px, 9vw, 120px); }
-  .cta { display: grid; grid-template-columns: 1.2fr 1fr; align-items: center; gap: 32px; padding: clamp(48px, 7vw, 88px) clamp(24px, 6vw, 80px); isolation: isolate; }
+  .cta { display: grid; grid-template-columns: 1.2fr 1fr; align-items: center; gap: 32px; padding-block: var(--section-y); isolation: isolate; }
   .glow { position: absolute; inset: 0; z-index: -1; background:
       radial-gradient(50% 80% at 85% 50%, color-mix(in srgb, var(--blob-1) 75%, transparent), transparent 70%),
       radial-gradient(40% 60% at 10% 0%, color-mix(in srgb, var(--blob-2) 70%, transparent), transparent 70%); }

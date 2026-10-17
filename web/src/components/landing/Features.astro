@@ -110,17 +110,16 @@ const extras = [
 </section>
 
 <style>
-  .inner { padding-inline: 0; }
-  .bento { display: grid; grid-template-columns: repeat(6, 1fr); gap: 16px; margin-top: 56px; }
-  .tile { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 12px 12px 24px; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+  .bento { display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px; margin-top: 48px; }
+  .tile { background: var(--card); border: 1px solid var(--border); border-radius: 18px; padding: 6px 6px 24px; display: flex; flex-direction: column; min-width: 0; }
   .t-dates { grid-column: span 4; } .t-alerts { grid-column: span 2; }
   .t-filters, .t-match, .t-saved { grid-column: span 2; }
-  .t-apply { grid-column: span 3; } .t-extras { grid-column: span 3; padding: 28px; justify-content: center; }
-  .visual { position: relative; border-radius: 14px; background: var(--panel); min-height: 220px; display: grid; place-items: center; overflow: hidden; margin-bottom: 12px; padding: 20px; }
+  .t-apply { grid-column: span 3; } .t-extras { grid-column: span 3; padding: 28px 24px; justify-content: center; }
+  .visual { position: relative; border-radius: 13px; background: var(--panel); min-height: 240px; display: grid; place-items: center; overflow: hidden; padding: 20px; }
   .visual.fig :global([data-figure]) { width: 78%; max-width: 280px; }
-  h3 { font-size: 1.125rem; font-weight: 500; letter-spacing: -0.015em; padding-inline: 12px; color: var(--fg); }
-  .tile > p { font-size: var(--text-md); line-height: 1.6; color: var(--muted); padding-inline: 12px; }
-  .t-extras h3 { padding: 0; }
+  h3 { margin: 22px 18px 0; font-size: 1.1875rem; font-weight: 500; letter-spacing: -0.015em; color: var(--fg); }
+  .tile > p { margin: 8px 18px 0; font-size: var(--text-md); line-height: 1.6; color: var(--muted); }
+  .t-extras h3 { margin: 0; }
 
   /* shared mock bits, drawn like the extension */
   .mock { width: 100%; font-size: 13px; color: var(--fg); }
@@ -146,7 +145,7 @@ const extras = [
   @keyframes strike { 0%, 30% { text-decoration: none; } 31%, 60% { text-decoration: line-through; } 61%, 100% { text-decoration: none; } }
 
   /* 2. alerts: a notification drops in and the badge counts */
-  .alerts-visual { place-items: start stretch; }
+  .alerts-visual { place-items: center stretch; align-content: center; }
   .toolbar { display: flex; justify-content: flex-end; padding: 2px 4px 16px; }
   .ext { position: relative; }
   .j { width: 24px; height: 24px; display: grid; place-items: center; border-radius: 7px; background: var(--brand); color: var(--on-brand); font-size: 12px; font-weight: 700; }

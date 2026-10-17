@@ -5,13 +5,13 @@ import Icon from '../Icon.astro';
 
 const problems = [
   { figure: 'slow', title: 'Old jobs look new', text: 'A repost or a paid boost can push an old listing back to the top. The date you see may say when the post was refreshed, not when the job opened.' },
-  { figure: 'cabinet', title: 'Twenty career pages, every morning', text: 'Many companies post roles on their own career page first. Checking those pages one by one eats your morning.' },
+  { figure: 'cabinet', title: 'Twenty career pages, every morning', text: 'Many companies post roles on their own career pages. Checking them one by one eats your morning.' },
   { figure: 'router', title: 'Alerts full of noise', text: 'Daily digests mix in promoted jobs and loose matches, so the good ones get lost between them.' },
 ];
 ---
 <section class="section container problem" aria-labelledby="problem-title">
   <SectionHead eyebrow="The problem" id="problem-title" title="Job hunting shouldn't feel like digging through an archive."
-    lead="You find a role that looks new, apply, and never hear back. Often the job was filled weeks before you saw it." />
+    lead="You find a role that looks new, apply, and never hear back. Sometimes the job was filled weeks before you saw it." />
 
   <div class="cards" data-stagger>
     {problems.map((p) => (
@@ -23,21 +23,25 @@ const problems = [
     ))}
   </div>
 
-  <p class="bridge" data-reveal>
-    <span class="bridge-mark" aria-hidden="true"><Icon name="sparkles" size={16} /></span>
-    Jobly reads the career pages for you, keeps only recent jobs, and tells you when one fits.
-  </p>
+  <div class="bridge" data-reveal>
+    <span class="bridge-line" aria-hidden="true"></span>
+    <p><span class="bridge-tag"><Icon name="sparkles" size={14} /> The fix</span>
+      Jobly reads the career pages for you, keeps only recent jobs, and tells you when one fits.</p>
+  </div>
 </section>
 
 <style>
-  .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 56px; }
-  .card { background: var(--panel); border-radius: 20px; padding: 12px 12px 28px; display: flex; flex-direction: column; gap: 10px; }
-  .art { aspect-ratio: 5 / 4; border-radius: 14px; background: var(--card); border: 1px solid var(--border); display: grid; place-items: center; margin-bottom: 14px; overflow: hidden; }
-  .art :global([data-figure]) { width: 82%; }
-  h3 { font-size: 1.25rem; font-weight: 500; letter-spacing: -0.02em; padding-inline: 12px; color: var(--fg); }
-  p { font-size: var(--text-md); line-height: 1.6; color: var(--muted); padding-inline: 12px; }
-  .bridge { margin: 48px auto 0; max-width: 640px; display: flex; gap: 12px; align-items: center; justify-content: center; text-align: left;
-    font-size: 1.125rem; line-height: 1.5; color: var(--fg); font-weight: 500; letter-spacing: -0.01em; }
-  .bridge-mark { width: 36px; height: 36px; flex: none; display: grid; place-items: center; border-radius: 50%; background: var(--brand-soft); color: var(--brand); }
+  .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 48px; }
+  /* same card system as How it works and Features: white card, hairline border, media inset by 6px */
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 18px; padding: 6px 6px 24px; display: flex; flex-direction: column; }
+  .art { height: 240px; border-radius: 13px; background: var(--panel); display: grid; place-items: center; overflow: hidden; }
+  .art :global([data-figure]) { width: 72%; max-width: 280px; }
+  h3 { margin: 22px 18px 0; font-size: 1.1875rem; font-weight: 500; letter-spacing: -0.015em; color: var(--fg); }
+  .card > p { margin: 8px 18px 0; font-size: var(--text-md); line-height: 1.6; color: var(--muted); }
+  .bridge { margin-top: 64px; display: flex; flex-direction: column; align-items: center; gap: 20px; text-align: center; }
+  .bridge-line { width: 1px; height: 48px; background: linear-gradient(var(--border-strong), transparent); }
+  .bridge p { max-width: 640px; font-size: clamp(1.25rem, 1rem + 0.9vw, 1.625rem); line-height: 1.4; font-weight: 500; letter-spacing: -0.02em; color: var(--fg); text-wrap: balance; }
+  .bridge-tag { display: flex; width: max-content; margin: 0 auto 12px; align-items: center; gap: 6px; font-size: var(--text-sm); font-weight: 500; letter-spacing: 0; color: var(--brand);
+    padding: 4px 10px; border-radius: 999px; background: var(--brand-soft); }
   @media (max-width: 900px) { .cards { grid-template-columns: 1fr; max-width: 520px; margin-inline: auto; } }
 </style>
