@@ -9,19 +9,15 @@ interface SavedJobsViewProps {
   onToggleSave: (job: Job) => void;
   onBrowseJobs: () => void;
   large?: boolean;
-  offline?: boolean;
 }
 
-export const SavedJobsView: React.FC<SavedJobsViewProps> = ({ savedJobs, onToggleSave, onBrowseJobs, large, offline }) => {
+export const SavedJobsView: React.FC<SavedJobsViewProps> = ({ savedJobs, onToggleSave, onBrowseJobs, large }) => {
   const [query, setQuery] = useState('');
   const q = query.trim().toLowerCase();
   const list = savedJobs.filter((j) => !q || `${j.title} ${j.company_name} ${j.location || ''}`.toLowerCase().includes(q));
 
-  if (savedJobs.length === 0 && offline) {
-    return <EmptyState art="offline" large={large} title="Can't load your saved jobs" description="Jobly can't reach the server right now. Your saved jobs appear as soon as it reconnects." />;
-  }
   if (savedJobs.length === 0) {
-    return <EmptyState art="saved" large={large} title="Nothing saved yet" description="Tap Save on any job to keep it here for later."
+    return <EmptyState art="saved" large={large} title="Nothing saved yet" description="Tap Save on any job to keep it here for later. Saved jobs stay on this device."
       actions={<button type="button" className="btn" onClick={onBrowseJobs}>Browse jobs</button>} />;
   }
   return (

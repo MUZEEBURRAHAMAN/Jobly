@@ -1,5 +1,6 @@
-import { Job, JobsResponse, Company, Preferences, RadarStats, NotificationItem } from '../types';
+import { Job, JobsResponse, Company, Preferences, RadarStats } from '../types';
 import { API_BASES, MAX_PAGE_SIZE, WAKE_TIMEOUTS_MS } from './config';
+import { loadPreferences, prefsParam, storePreferences } from './userData';
 
 export type ConnectionStatus = 'connecting' | 'online' | 'offline';
 
@@ -116,61 +117,16 @@ class ApiClient {
   // ----------------------------------------------------------------- cached reads (instant paint)
   getCachedJobs = () => this.readCache<Job[]>('cachedJobs').then((v) => v ?? []);
   getCachedJobsAt = () => this.readCache<number>('cachedJobsAt').then((v) => v ?? null);
-  getCachedSaved = () => this.readCache<Job[]>('cachedSaved').then((v) => v ?? []);
   getCachedCompanies = () => this.readCache<Company[]>('cachedCompanies').then((v) => v ?? []);
-  getCachedPreferences = () => this.readCache<Preferences>('cachedPreferences');
 
-  /** Cached preferences, or the defaults: never touches the network (used when offline). */
-  async getLocalPreferences(): Promise<Preferences> {
-    return (await this.getCachedPreferences()) ?? this.defaultPreferences();
+  // ----------------------------------------------------------------- preferences (on this device only)
+  getPreferences(): Promise<Preferences> {
+    return loadPreferences();
   }
 
-  // ----------------------------------------------------------------- preferences
-  private defaultPreferences(): Preferences {
-    return {
-      roles: ['product_design', 'frontend_engineering', 'product_management', 'ai_ml', 'fullstack_engineering'],
-      seniorities: ['intern', 'junior', 'mid', 'senior', 'lead'],
-      locations: [],
-      remote_only: false,
-      custom_keywords: '',
-      excluded_keywords: '',
-      notify_enabled: true,
-      sync_interval_mins: 30,
-    };
-  }
-
-  async getPreferences(): Promise<Preferences> {
-    const res = await this.safeFetch('/api/preferences');
-    if (res) {
-      try {
-        const data = await res.json();
-        this.writeCache('cachedPreferences', data);
-        return data;
-      } catch {
-        // fall through to cache
-      }
-    }
-    return (await this.getCachedPreferences()) ?? this.defaultPreferences();
-  }
-
-  /** `synced:false` means the change is saved locally only; the UI must say so instead of "saved". */
-  async updatePreferences(prefs: Preferences): Promise<{ prefs: Preferences; synced: boolean }> {
-    const res = await this.safeFetch('/api/preferences', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(prefs),
-    });
-    if (res) {
-      try {
-        const data = (await res.json()) as Preferences;
-        this.writeCache('cachedPreferences', data);
-        return { prefs: data, synced: true };
-      } catch {
-        // fall through
-      }
-    }
-    this.writeCache('cachedPreferences', prefs);
-    return { prefs, synced: false };
+  /** Resolves false only if the browser refused to store them. */
+  async updatePreferences(prefs: Preferences): Promise<{ prefs: Preferences; stored: boolean }> {
+    return { prefs, stored: await storePreferences(prefs) };
   }
 
   // ----------------------------------------------------------------- jobs
@@ -189,7 +145,8 @@ class ApiClient {
     if (params.has_salary) query.set('has_salary', 'true');
     if (params.freshness_days) query.set('freshness_days', String(params.freshness_days));
     if (params.only_matching) query.set('only_matching', 'true');
-    if (params.saved_only) query.set('saved_only', 'true');
+    // Preferences are sent only so the server can pick matching jobs; it does not keep them.
+    query.set('prefs', prefsParam(await loadPreferences()));
     query.set('limit', String(limit));
     if (params.offset) query.set('offset', String(params.offset));
 
@@ -197,8 +154,7 @@ class ApiClient {
     if (res) {
       try {
         const data: JobsResponse = await res.json();
-        if (params.saved_only) this.writeCache('cachedSaved', data.items);
-        else if (!params.search && !params.offset) { this.writeCache('cachedJobs', data.items); this.writeCache('cachedJobsAt', Date.now()); }
+        if (!params.search && !params.offset) { this.writeCache('cachedJobs', data.items); this.writeCache('cachedJobsAt', Date.now()); }
         return data;
       } catch {
         // fall through to cache
@@ -207,8 +163,8 @@ class ApiClient {
 
     const f = this.lastFailure;
     const error: 'offline' | 'server' | 'busy' = f?.kind === 'http' ? (f.status === 429 ? 'busy' : 'server') : 'offline';
-    const items = (await this.readCache<Job[]>(params.saved_only ? 'cachedSaved' : 'cachedJobs')) ?? [];
-    const cachedAt = params.saved_only ? null : await this.getCachedJobsAt();
+    const items = (await this.readCache<Job[]>('cachedJobs')) ?? [];
+    const cachedAt = await this.getCachedJobsAt();
     return { items, total: items.length, limit, offset: params.offset ?? 0, error, fromCache: true, cachedAt };
   }
 
@@ -261,17 +217,9 @@ class ApiClient {
     return `${prefix}: can't reach the server. Check your connection and try again.`;
   }
 
-  // ----------------------------------------------------------------- saved jobs / reports / notifications
-  async saveJob(jobId: number): Promise<boolean> {
-    return (await this.safeFetch(`/api/jobs/${jobId}/save`, { method: 'POST' })) !== null;
-  }
-
-  async unsaveJob(jobId: number): Promise<boolean> {
-    return (await this.safeFetch(`/api/jobs/${jobId}/save`, { method: 'DELETE' })) !== null;
-  }
-
+  // ----------------------------------------------------------------- stats / reports
   async getStats(): Promise<RadarStats> {
-    const res = await this.safeFetch('/api/stats');
+    const res = await this.safeFetch(`/api/stats?${new URLSearchParams({ prefs: prefsParam(await loadPreferences()) })}`);
     if (res) {
       try {
         return await res.json();
@@ -279,7 +227,7 @@ class ApiClient {
         // fall through
       }
     }
-    return { total_jobs: 0, active_companies: 0, matched_jobs: 0, saved_jobs: 0, new_jobs_today: 0, last_sync_time: null };
+    return { total_jobs: 0, active_companies: 0, matched_jobs: 0, new_jobs_today: 0, last_sync_time: null };
   }
 
   async triggerSync(): Promise<{ status: string; ok: boolean }> {
@@ -290,22 +238,6 @@ class ApiClient {
     } catch {
       return { status: 'enqueued', ok: true };
     }
-  }
-
-  async getNotifications(): Promise<NotificationItem[]> {
-    const res = await this.safeFetch('/api/notifications');
-    if (res) {
-      try {
-        return await res.json();
-      } catch {
-        // fall through
-      }
-    }
-    return [];
-  }
-
-  async markAllNotificationsRead(): Promise<boolean> {
-    return (await this.safeFetch('/api/notifications/read-all', { method: 'POST' })) !== null;
   }
 
   async reportJob(jobId: number, reason: string, details = ''): Promise<boolean> {

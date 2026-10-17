@@ -51,7 +51,6 @@ export interface JobFilterParams {
   has_salary?: boolean;
   freshness_days?: number;
   only_matching?: boolean;
-  saved_only?: boolean;
   limit?: number;
   offset?: number;
 }
@@ -82,14 +81,15 @@ export interface Preferences {
   sync_interval_mins: number;
 }
 
-export interface NotificationItem {
-  id: number;
-  job_id: number;
+/** A new matching job found by the background check. Kept on this device only. */
+export interface AlertItem {
+  /** The job's key on this device (its apply link). */
+  id: string;
   title: string;
   company_name: string;
-  role: string;
   location: string | null;
   application_url: string;
+  /** When Jobly noticed it (ISO). */
   sent_at: string;
   is_read: boolean;
 }
@@ -98,7 +98,6 @@ export interface RadarStats {
   total_jobs: number;
   active_companies: number;
   matched_jobs: number;
-  saved_jobs: number;
   new_jobs_today: number;
   last_sync_time: string | null;
   is_syncing?: boolean;

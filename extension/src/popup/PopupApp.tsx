@@ -4,7 +4,7 @@ import { api, ConnectionStatus } from '../lib/api';
 import { IS_DEV_BUILD } from '../lib/config';
 import { DEFAULT_FILTERS, JobFilters } from '../lib/filters';
 import { useMutedCompanies } from '../lib/mutedCompanies';
-import { useSavedOverlay } from '../lib/useSavedOverlay';
+import { useSavedJobs } from '../lib/useSavedJobs';
 import { useOnboarded } from '../lib/onboarding';
 import { applyTheme, getInitialTheme, syncThemeFromStorage, Theme } from '../lib/theme';
 import { Company, Job, Preferences, RadarStats } from '../types';
@@ -22,7 +22,6 @@ export const PopupApp: React.FC = () => {
   const [theme, setTheme] = useState<Theme>(getInitialTheme());
   const [tab, setTab] = useState<Tab>('jobs');
   const [jobs, setJobs] = useState<Job[]>([]);
-  const [serverSaved, setServerSaved] = useState<Job[]>([]);
   const [companies, setCompanies] = useState<Company[]>([]);
   const [preferences, setPreferences] = useState<Preferences | null>(null);
   const [stats, setStats] = useState<RadarStats | null>(null);
@@ -36,8 +35,8 @@ export const PopupApp: React.FC = () => {
   const [roleFilter, setRoleFilter] = useState('all_matching');
   const [filters, setFilters] = useState<JobFilters>(DEFAULT_FILTERS);
   const [displayLimit, setDisplayLimit] = useState(30);
-  const overlay = useSavedOverlay(jobs, serverSaved);
-  const savedJobs = overlay.saved;
+  const savedStore = useSavedJobs(jobs);
+  const savedJobs = savedStore.saved;
   const { muted, toggle: toggleMuted } = useMutedCompanies();
   const { notice, show: showNotice, clear: clearNotice } = useNotice();
   const { onboarded, complete: completeOnboarding, reset: resetOnboarding } = useOnboarded();
@@ -85,10 +84,12 @@ export const PopupApp: React.FC = () => {
     setLoadingMore(false);
   }, [loadingMore, jobs.length, jobsTotal, jobQuery]);
 
+  // Preferences and saved jobs are on this device, so they are there instantly (even offline).
+  useEffect(() => { api.getPreferences().then(setPreferences); }, []);
+
   const loadSideData = useCallback(async () => {
-    const [prefs, comps, st, saved] = await Promise.all([api.getPreferences(), api.getCompanies(), api.getStats(), api.getJobs({ saved_only: true, limit: 200 })]);
-    setPreferences(prefs); setCompanies(comps); setStats(st);
-    if (!saved.error) setServerSaved(saved.items);
+    const [comps, st] = await Promise.all([api.getCompanies(), api.getStats()]);
+    setCompanies(comps); setStats(st);
   }, []);
 
   // Paint from the local cache immediately, then wait (patiently) for a sleeping free-tier server.
@@ -97,19 +98,16 @@ export const PopupApp: React.FC = () => {
     const online = await api.waitForBackend();
     setStatus(online ? 'online' : 'offline');
     if (online) await loadSideData();
-    else api.getLocalPreferences().then((lp) => setPreferences((cur) => cur ?? lp));
     return online;
   }, [loadSideData]);
 
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      const [cj, cc, cp, cs, at] = await Promise.all([api.getCachedJobs(), api.getCachedCompanies(), api.getCachedPreferences(), api.getCachedSaved(), api.getCachedJobsAt()]);
+      const [cj, cc, at] = await Promise.all([api.getCachedJobs(), api.getCachedCompanies(), api.getCachedJobsAt()]);
       if (cancelled) return;
       if (cj.length) { setJobs(cj); setLoading(false); setCachedAt(at); }
       if (cc.length) setCompanies(cc);
-      if (cp) setPreferences(cp);
-      if (cs.length) setServerSaved((cur) => (cur.length ? cur : cs));
     })();
     connect();
     return () => { cancelled = true; };
@@ -125,7 +123,7 @@ export const PopupApp: React.FC = () => {
   // Fetch jobs when the category / search / connection changes (debounced)
   useEffect(() => {
     if (tab !== 'jobs' || status === 'connecting') return;
-    if (status === 'offline') { setLoadError('offline'); setLoading(false); api.getLocalPreferences().then((p) => setPreferences((cur) => cur ?? p)); return; } // keep showing cached jobs
+    if (status === 'offline') { setLoadError('offline'); setLoading(false); return; } // keep showing cached jobs
     const timer = setTimeout(fetchJobs, 250);
     return () => clearTimeout(timer);
   }, [tab, status, fetchJobs]);
@@ -159,19 +157,18 @@ export const PopupApp: React.FC = () => {
   };
 
   const handleToggleSave = async (target: Job) => {
-    const next = !target.is_saved;
-    overlay.set(target.id, next); // instant, and immune to responses that were already in flight
-    const ok = next ? await api.saveJob(target.id) : await api.unsaveJob(target.id);
-    if (!ok) { overlay.clear(target.id); showNotice(next ? "Couldn't save this job. Please try again." : "Couldn't remove this job from saved. Please try again."); }
+    const problem = await savedStore.toggle(target);
+    if (problem) showNotice(problem);
   };
 
-  const handleSavePreferences = async (p: Preferences): Promise<boolean> => {
-    const { prefs, synced } = await api.updatePreferences(p);
+  const handleSavePreferences = async (p: Preferences): Promise<void> => {
+    const { prefs, stored } = await api.updatePreferences(p);
     setPreferences(prefs);
-    if (!synced) showNotice("Saved on this device only. We couldn't reach the server.", 'info');
-    else await loadSideData();
+    if (!stored) { showNotice("Couldn't save your preferences. Your browser storage may be full.", 'error'); return; }
+    // Re-baseline alerts so a new preference doesn't announce everything that already exists.
+    try { chrome.runtime?.sendMessage({ type: 'TRIGGER_BACKGROUND_CHECK', silent: true }, () => void chrome.runtime?.lastError); } catch { /* not in an extension context */ }
+    if (status === 'online') await loadSideData();
     await fetchJobs();
-    return synced;
   };
 
   const handleAddCompany = async (data: Parameters<typeof api.addCompany>[0]) => {
@@ -191,7 +188,7 @@ export const PopupApp: React.FC = () => {
     { id: 'preferences', label: 'Preferences', icon: SlidersHorizontal },
   ];
 
-  const finishWelcome = async (p: Preferences) => { const synced = await handleSavePreferences(p); completeOnboarding(); return synced; };
+  const finishWelcome = async (p: Preferences) => { await handleSavePreferences(p); completeOnboarding(); };
 
   if (onboarded === null) return <div className="popup" data-theme={theme} aria-busy="true" />;
   if (onboarded === false) {
@@ -210,7 +207,7 @@ export const PopupApp: React.FC = () => {
       <main id="main" className="popup-main">
         {tab === 'jobs' && (
           <JobsFeed
-            jobs={overlay.jobs} loading={loading} preferences={preferences} mutedCompanyIds={muted}
+            jobs={savedStore.jobs} loading={loading} preferences={preferences} mutedCompanyIds={muted}
             onToggleSave={handleToggleSave} onOpenPreferences={() => setTab('preferences')}
             loadError={loadError} onRetryLoad={() => { status === 'online' ? fetchJobs() : connect(); }} gathering={gathering}
             hasMore={jobs.length < jobsTotal} onLoadMore={loadMoreJobs} loadingMore={loadingMore} cachedAt={cachedAt}
@@ -221,7 +218,7 @@ export const PopupApp: React.FC = () => {
           />
         )}
         {tab === 'companies' && <CompaniesView companies={companies} mutedCompanyIds={muted} onToggleMuted={toggleMuted} canManage={IS_DEV_BUILD} onAddCompany={handleAddCompany} offline={status === 'offline'} loading={status === 'connecting'} />}
-        {tab === 'saved' && <SavedJobsView savedJobs={savedJobs} onToggleSave={handleToggleSave} onBrowseJobs={() => setTab('jobs')} offline={status === 'offline'} />}
+        {tab === 'saved' && <SavedJobsView savedJobs={savedJobs} onToggleSave={handleToggleSave} onBrowseJobs={() => setTab('jobs')} />}
         {tab === 'preferences' && preferences && <PreferencesView preferences={preferences} onSave={handleSavePreferences} onReplayWelcome={resetOnboarding} />}
         {tab === 'preferences' && !preferences && (
           <div className="section" aria-busy="true" aria-label="Loading your preferences">

@@ -1,25 +1,21 @@
 import React from 'react';
 import { Check, ExternalLink } from 'lucide-react';
-import { NotificationItem } from '../types';
+import { AlertItem } from '../types';
 import { EmptyState } from './EmptyState';
 import { safeHttpUrl } from '../lib/url';
 import { timeAgo } from '../lib/format';
 
 interface AlertsViewProps {
-  notifications: NotificationItem[];
+  alerts: AlertItem[];
   onMarkAllRead: () => void;
   large?: boolean;
-  offline?: boolean;
 }
 
-export const AlertsView: React.FC<AlertsViewProps> = ({ notifications, onMarkAllRead, large, offline }) => {
-  if (notifications.length === 0 && offline) {
-    return <EmptyState art="offline" large={large} title="Can't load alerts" description="Jobly can't reach the server right now. New alerts appear as soon as it reconnects." />;
+export const AlertsView: React.FC<AlertsViewProps> = ({ alerts, onMarkAllRead, large }) => {
+  if (alerts.length === 0) {
+    return <EmptyState art="alerts" large={large} title="No alerts yet" description="When a new job that matches your preferences is posted, it shows up here and as a desktop notification (if alerts are on). Alerts are checked in the background and stay on this device." />;
   }
-  if (notifications.length === 0) {
-    return <EmptyState art="alerts" large={large} title="No alerts yet" description="When a new job matches your preferences, it shows up here and as a desktop notification (if alerts are on)." />;
-  }
-  const unread = notifications.filter((n) => !n.is_read).length;
+  const unread = alerts.filter((n) => !n.is_read).length;
   return (
     <div className="section">
       <div className="row" style={{ justifyContent: 'space-between' }}>
@@ -27,7 +23,7 @@ export const AlertsView: React.FC<AlertsViewProps> = ({ notifications, onMarkAll
         {unread > 0 && <button type="button" className="btn btn-outline btn-sm" onClick={onMarkAllRead}><Check size={14} aria-hidden="true" /> Mark all read</button>}
       </div>
       <ul className={large ? 'cols' : 'stack'} style={{ listStyle: 'none', gap: 8 }}>
-        {notifications.map((n) => {
+        {alerts.map((n) => {
           const url = safeHttpUrl(n.application_url);
           return (
             <li key={n.id} className="card row" style={{ padding: 12, gap: 12, borderColor: n.is_read ? undefined : 'var(--brand)' }}>

@@ -4,10 +4,11 @@ import { api, ConnectionStatus } from '../lib/api';
 import { IS_DEV_BUILD, MAX_PAGE_SIZE } from '../lib/config';
 import { DEFAULT_FILTERS, JobFilters } from '../lib/filters';
 import { useMutedCompanies } from '../lib/mutedCompanies';
-import { useSavedOverlay } from '../lib/useSavedOverlay';
+import { useSavedJobs } from '../lib/useSavedJobs';
+import { useAlerts } from '../lib/useAlerts';
 import { useOnboarded } from '../lib/onboarding';
 import { applyTheme, getInitialTheme, syncThemeFromStorage, Theme } from '../lib/theme';
-import { Company, Job, NotificationItem, Preferences, RadarStats } from '../types';
+import { Company, Job, Preferences, RadarStats } from '../types';
 import { StatusPill, appVersion } from '../components/Header';
 import { JobsFeed } from '../components/JobsFeed';
 import { CompaniesView } from '../components/CompaniesView';
@@ -28,10 +29,8 @@ export const OptionsApp: React.FC = () => {
   const [tab, setTab] = useState<Tab>(tabFromHash);
   const [jobs, setJobs] = useState<Job[]>([]);
   const [jobsTotal, setJobsTotal] = useState(0);
-  const [serverSaved, setServerSaved] = useState<Job[]>([]);
   const [companies, setCompanies] = useState<Company[]>([]);
   const [preferences, setPreferences] = useState<Preferences | null>(null);
-  const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   const [stats, setStats] = useState<RadarStats | null>(null);
   const [status, setStatus] = useState<ConnectionStatus>('connecting');
   const [loadError, setLoadError] = useState<'offline' | 'server' | 'busy' | null>(null);
@@ -42,8 +41,9 @@ export const OptionsApp: React.FC = () => {
   const [roleFilter, setRoleFilter] = useState('all_matching');
   const [filters, setFilters] = useState<JobFilters>(DEFAULT_FILTERS);
   const [displayLimit, setDisplayLimit] = useState(30);
-  const overlay = useSavedOverlay(jobs, serverSaved);
-  const savedJobs = overlay.saved;
+  const savedStore = useSavedJobs(jobs);
+  const savedJobs = savedStore.saved;
+  const { alerts, unread: unreadAlerts, markAllRead } = useAlerts();
   const { muted, toggle: toggleMuted } = useMutedCompanies();
   const { notice, show: showNotice, clear: clearNotice } = useNotice();
   const { onboarded, complete: completeOnboarding, reset: resetOnboarding } = useOnboarded();
@@ -60,15 +60,13 @@ export const OptionsApp: React.FC = () => {
     applyTheme(next);
   };
 
-  // Everything except the job list (that has its own effect so filters/search/pagination stay in one place).
+  // Preferences, saved jobs and alerts are on this device, so they are there instantly (even offline).
+  useEffect(() => { api.getPreferences().then(setPreferences); }, []);
+
+  // Everything from the server except the job list (that has its own effect so filters/search/pagination stay in one place).
   const loadSideData = useCallback(async () => {
-    const [prefs, comps, st, notifs, saved] = await Promise.all([
-      api.getPreferences(), api.getCompanies(), api.getStats(), api.getNotifications(),
-      // Saved jobs come straight from the server; deriving them from the newest N jobs hid older saved jobs.
-      api.getJobs({ saved_only: true, limit: MAX_PAGE_SIZE }),
-    ]);
-    setPreferences(prefs); setCompanies(comps); setStats(st); setNotifications(notifs);
-    if (!saved.error) setServerSaved(saved.items);
+    const [comps, st] = await Promise.all([api.getCompanies(), api.getStats()]);
+    setCompanies(comps); setStats(st);
   }, []);
 
   const connect = useCallback(async () => {
@@ -76,19 +74,16 @@ export const OptionsApp: React.FC = () => {
     const online = await api.waitForBackend();
     setStatus(online ? 'online' : 'offline');
     if (online) await loadSideData();
-    else api.getLocalPreferences().then((lp) => setPreferences((cur) => cur ?? lp));
     return online;
   }, [loadSideData]);
 
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      const [cj, cc, cp, cs, at] = await Promise.all([api.getCachedJobs(), api.getCachedCompanies(), api.getCachedPreferences(), api.getCachedSaved(), api.getCachedJobsAt()]);
+      const [cj, cc, at] = await Promise.all([api.getCachedJobs(), api.getCachedCompanies(), api.getCachedJobsAt()]);
       if (cancelled) return;
       if (cj.length) { setJobs(cj); setLoading(false); setCachedAt(at); }
       if (cc.length) setCompanies(cc);
-      if (cp) setPreferences(cp);
-      if (cs.length) setServerSaved((cur) => (cur.length ? cur : cs));
     })();
     connect();
     return () => { cancelled = true; };
@@ -167,19 +162,18 @@ export const OptionsApp: React.FC = () => {
   };
 
   const handleToggleSave = async (target: Job) => {
-    const next = !target.is_saved;
-    overlay.set(target.id, next); // instant, and immune to responses that were already in flight
-    const ok = next ? await api.saveJob(target.id) : await api.unsaveJob(target.id);
-    if (!ok) { overlay.clear(target.id); showNotice(next ? "Couldn't save this job. Please try again." : "Couldn't remove this job from saved. Please try again."); }
+    const problem = await savedStore.toggle(target);
+    if (problem) showNotice(problem);
   };
 
-  const handleSavePreferences = async (p: Preferences): Promise<boolean> => {
-    const { prefs, synced } = await api.updatePreferences(p);
+  const handleSavePreferences = async (p: Preferences): Promise<void> => {
+    const { prefs, stored } = await api.updatePreferences(p);
     setPreferences(prefs);
-    if (!synced) showNotice("Saved on this device only. We couldn't reach the server.", 'info');
-    else await loadSideData();
+    if (!stored) { showNotice("Couldn't save your preferences. Your browser storage may be full.", 'error'); return; }
+    // Re-baseline alerts so a new preference doesn't announce everything that already exists.
+    try { chrome.runtime?.sendMessage({ type: 'TRIGGER_BACKGROUND_CHECK', silent: true }, () => void chrome.runtime?.lastError); } catch { /* not in an extension context */ }
+    if (status === 'online') await loadSideData();
     await fetchJobs();
-    return synced;
   };
 
   const handleAddCompany = async (data: Parameters<typeof api.addCompany>[0]) => {
@@ -188,13 +182,9 @@ export const OptionsApp: React.FC = () => {
   };
 
   const markAlertsRead = async () => {
-    const ok = await api.markAllNotificationsRead();
-    if (!ok) { showNotice("Couldn't mark alerts as read. Please try again."); return; }
-    try { chrome.runtime?.sendMessage({ type: 'CLEAR_BADGE' }); } catch { /* not in an extension context */ }
-    setNotifications((p) => p.map((x) => ({ ...x, is_read: true })));
+    if (!(await markAllRead())) showNotice("Couldn't mark alerts as read. Please try again.");
   };
 
-  const unreadAlerts = notifications.filter((x) => !x.is_read).length;
   const tabs: { id: Tab; label: string; icon: React.ElementType; badge?: number }[] = [
     { id: 'jobs', label: 'Jobs', icon: Briefcase },
     { id: 'companies', label: 'Companies', icon: Building2 },
@@ -203,7 +193,7 @@ export const OptionsApp: React.FC = () => {
     { id: 'preferences', label: 'Preferences', icon: SlidersHorizontal },
   ];
 
-  const finishWelcome = async (p: Preferences) => { const synced = await handleSavePreferences(p); completeOnboarding(); window.location.hash = ''; return synced; };
+  const finishWelcome = async (p: Preferences) => { await handleSavePreferences(p); completeOnboarding(); window.location.hash = ''; };
 
   return (
     <div className="dash" data-theme={theme}>
@@ -248,7 +238,7 @@ export const OptionsApp: React.FC = () => {
               {tab === 'jobs' && (
                 <div className="card" style={{ overflow: 'clip' }}>
                   <JobsFeed
-                    large jobs={overlay.jobs} loading={loading} preferences={preferences} mutedCompanyIds={muted}
+                    large jobs={savedStore.jobs} loading={loading} preferences={preferences} mutedCompanyIds={muted}
                     onToggleSave={handleToggleSave} onOpenPreferences={() => setTab('preferences')}
                     loadError={loadError} onRetryLoad={() => { status === 'online' ? fetchJobs() : connect(); }} gathering={gathering}
                     hasMore={jobs.length < jobsTotal} onLoadMore={loadMoreJobs} loadingMore={loadingMore} cachedAt={cachedAt} onOpenCompanies={() => setTab('companies')}
@@ -259,8 +249,8 @@ export const OptionsApp: React.FC = () => {
                 </div>
               )}
               {tab === 'companies' && <CompaniesView large companies={companies} mutedCompanyIds={muted} onToggleMuted={toggleMuted} canManage={IS_DEV_BUILD} onAddCompany={handleAddCompany} offline={status === 'offline'} loading={status === 'connecting'} />}
-              {tab === 'saved' && <SavedJobsView large savedJobs={savedJobs} onToggleSave={handleToggleSave} onBrowseJobs={() => setTab('jobs')} offline={status === 'offline'} />}
-              {tab === 'alerts' && <AlertsView large notifications={notifications} onMarkAllRead={markAlertsRead} offline={status === 'offline'} />}
+              {tab === 'saved' && <SavedJobsView large savedJobs={savedJobs} onToggleSave={handleToggleSave} onBrowseJobs={() => setTab('jobs')} />}
+              {tab === 'alerts' && <AlertsView large alerts={alerts} onMarkAllRead={markAlertsRead} />}
               {tab === 'preferences' && preferences && <PreferencesView preferences={preferences} onSave={handleSavePreferences} onReplayWelcome={resetOnboarding} />}
               {tab === 'preferences' && !preferences && <div className="section" aria-busy="true" aria-label="Loading your preferences">{[0, 1, 2, 3].map((i) => <div key={i} className="skeleton" style={{ height: i ? 56 : 28, width: i ? '100%' : '40%' }} />)}</div>}
             </ErrorBoundary>

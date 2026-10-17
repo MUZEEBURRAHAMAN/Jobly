@@ -1,30 +1,28 @@
 import { API_BASES } from '../lib/config';
+import { AlertItem, Job } from '../types';
+import {
+  jobKey, loadAlerts, loadPreferences, loadSeenKeys, prefsParam, readKey, storeAlerts, storeSeenKeys,
+} from '../lib/userData';
 
 const ALARM_NAME = 'jobly-sync';
-const MAX_REMEMBERED_ALERTS = 200;
-
-interface NotificationData {
-  id: number;
-  job_id: number;
-  title: string;
-  company_name: string;
-  role: string;
-  location: string | null;
-  application_url: string;
-  sent_at: string;
-  is_read: boolean;
-}
+const RECENT_DAYS = 3; // only jobs posted this recently are worth an alert
 
 // The background check is not user-facing, so it can afford to wait for a sleeping free-tier server.
-async function fetchNotifications(): Promise<NotificationData[] | null> {
+// Alerts are worked out here on the device: ask the server for fresh jobs that fit this user's preferences
+// (sent with the request, never stored there) and compare them with what was already seen.
+async function fetchRecentMatches(): Promise<Job[] | null> {
+  const query = new URLSearchParams({
+    only_matching: 'true', freshness_days: String(RECENT_DAYS), limit: '50',
+    prefs: prefsParam(await loadPreferences()),
+  });
   for (const base of API_BASES) {
     const ctrl = new AbortController();
     const timer = setTimeout(() => ctrl.abort(), 20000);
     try {
-      const res = await fetch(`${base}/api/notifications`, { signal: ctrl.signal });
+      const res = await fetch(`${base}/api/jobs?${query}`, { signal: ctrl.signal });
       if (res.ok) {
         const data = await res.json();
-        return Array.isArray(data) ? data : null;
+        return Array.isArray(data?.items) ? data.items : null;
       }
     } catch {
       /* try the next candidate */
@@ -48,10 +46,12 @@ void ensureAlarm();
 chrome.runtime.onInstalled.addListener(async (details) => {
   await chrome.action.setBadgeBackgroundColor({ color: '#06b6d4' });
   await ensureAlarm();
+  // Before alerts moved onto the device the worker remembered server notification ids: that list is obsolete.
+  await chrome.storage.local.remove(['alertedNotificationIds']);
   // First install: greet the user with the welcome tour (it also explains alerts and privacy).
   if (details.reason === 'install') await chrome.tabs.create({ url: chrome.runtime.getURL('options.html#welcome') });
-  // First install: remember everything that already exists instead of announcing a backlog of old alerts.
-  await checkNewMatchesAndNotify({ silent: details.reason === 'install' });
+  // The first check only records what already exists, so nobody gets a backlog of old alerts.
+  await checkNewMatchesAndNotify();
 });
 
 chrome.runtime.onStartup.addListener(() => { void ensureAlarm(); });
@@ -62,56 +62,73 @@ chrome.alarms.onAlarm.addListener(async (alarm) => {
   }
 });
 
-async function alertsEnabled(): Promise<boolean> {
-  // Respect the "Desktop alerts" setting (it used to be saved but never read here).
-  const { cachedPreferences } = await chrome.storage.local.get('cachedPreferences');
-  return cachedPreferences?.notify_enabled !== false;
+async function updateBadge(alerts: AlertItem[]) {
+  const unread = alerts.filter((a) => !a.is_read).length;
+  await chrome.action.setBadgeText({ text: unread === 0 ? '' : unread > 99 ? '99+' : String(unread) });
 }
 
-// Check for newly published matched jobs and dispatch a notification
+async function mutedCompanyIds(): Promise<Set<number>> {
+  return new Set((await readKey<number[]>('mutedCompanyIds')) ?? []);
+}
+
+// Check for newly published matched jobs, remember them as alerts and show a desktop notification.
+// `silent` (or the very first run) records the current jobs as already seen without announcing them.
 async function checkNewMatchesAndNotify({ silent = false }: { silent?: boolean } = {}) {
   try {
-    const notifs = await fetchNotifications();
-    if (!notifs) return; // server unreachable: try again at the next alarm
+    const jobs = await fetchRecentMatches();
+    if (!jobs) return; // server unreachable: try again at the next alarm
 
-    const unread = notifs.filter((n) => !n.is_read);
-    const stored = await chrome.storage.local.get(['alertedNotificationIds']);
-    const alertedIds = new Set<number>(stored.alertedNotificationIds || []);
-    const newToAlert = unread.filter((n) => !alertedIds.has(n.id));
+    const stored = await loadSeenKeys();
+    const quiet = silent || !Array.isArray(stored);
+    const seen = new Set<string>(stored ?? []);
+    const muted = await mutedCompanyIds();
+    const fresh = jobs.filter((j) => {
+      const key = jobKey(j);
+      return !!key && !!j.application_url && !seen.has(key) && !muted.has(j.company_id);
+    });
 
-    // Badge always reflects the real unread count, not only when something new arrived.
-    await chrome.action.setBadgeText({ text: unread.length === 0 ? '' : unread.length > 99 ? '99+' : String(unread.length) });
-
-    if (newToAlert.length > 0 && !silent && (await alertsEnabled())) {
-      if (newToAlert.length === 1) {
-        const item = newToAlert[0];
-        await chrome.notifications.create(`job-${item.job_id}`, {
-          type: 'basic',
-          iconUrl: 'icons/icon-128.png',
-          title: `New Role at ${item.company_name}`,
-          message: `${item.title} · ${item.location || 'Remote'}`,
-          priority: 1,
-        });
-      } else {
-        const companies = Array.from(new Set(newToAlert.map((n) => n.company_name)));
-        const companyStr = companies.slice(0, 2).join(', ') + (companies.length > 2 ? ` and ${companies.length - 2} others` : '');
-        await chrome.notifications.create(`digest-${Date.now()}`, {
-          type: 'basic',
-          iconUrl: 'icons/icon-128.png',
-          title: `Jobly: ${newToAlert.length} New Matches Found`,
-          message: `${companyStr} published new opportunities matching your preferences.`,
-          priority: 1,
-        });
-      }
+    const alerts = await loadAlerts();
+    if (!quiet && fresh.length > 0) {
+      const now = new Date().toISOString();
+      const added: AlertItem[] = fresh.map((j) => ({
+        id: jobKey(j), title: j.title, company_name: j.company_name, location: j.location,
+        application_url: j.application_url, sent_at: now, is_read: false,
+      }));
+      alerts.unshift(...added);
+      await storeAlerts(alerts);
+      if ((await loadPreferences()).notify_enabled !== false) await announce(fresh).catch(() => {}); // a refused popup must not lose the alert
     }
 
-    // Remember what we've seen (also while silent or alerts are off) and keep the list bounded.
-    newToAlert.forEach((n) => alertedIds.add(n.id));
-    const bounded = Array.from(alertedIds).sort((a, b) => b - a).slice(0, MAX_REMEMBERED_ALERTS);
-    await chrome.storage.local.set({ alertedNotificationIds: bounded });
+    // Remember everything that was returned (also while silent or muted) so nothing is announced twice.
+    jobs.forEach((j) => seen.add(jobKey(j)));
+    await storeSeenKeys([...seen]);
+    await updateBadge(alerts);
   } catch {
     // Unreachable or unexpected response: skip until the next alarm
   }
+}
+
+async function announce(fresh: Job[]) {
+  if (fresh.length === 1) {
+    const item = fresh[0];
+    await chrome.notifications.create(`job-${item.id}`, {
+      type: 'basic',
+      iconUrl: 'icons/icon-128.png',
+      title: `New Role at ${item.company_name}`,
+      message: `${item.title} · ${item.location || 'Remote'}`,
+      priority: 1,
+    });
+    return;
+  }
+  const companies = Array.from(new Set(fresh.map((j) => j.company_name)));
+  const companyStr = companies.slice(0, 2).join(', ') + (companies.length > 2 ? ` and ${companies.length - 2} others` : '');
+  await chrome.notifications.create(`digest-${Date.now()}`, {
+    type: 'basic',
+    iconUrl: 'icons/icon-128.png',
+    title: `Jobly: ${fresh.length} New Matches Found`,
+    message: `${companyStr} published new opportunities matching your preferences.`,
+    priority: 1,
+  });
 }
 
 // Notification Click Handler
@@ -126,7 +143,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
   if (message?.type === 'TRIGGER_BACKGROUND_CHECK') {
     (async () => {
-      await checkNewMatchesAndNotify();
+      await checkNewMatchesAndNotify({ silent: message.silent === true });
       sendResponse({ success: true });
     })();
     return true; // keep the message channel open for the async response

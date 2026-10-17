@@ -25,7 +25,6 @@ class JobOut(BaseModel):
     # Real posting date from the source (None when the source doesn't say). first_seen_at is just our crawl time.
     posted_at: str | None = None
     status: str
-    is_saved: bool = False
     is_match: bool = False
     salary_summary: str | None = None
     # Hourly rates (e.g. 60.58) exist in the data; `int` made the whole endpoint 500.
@@ -109,28 +108,10 @@ class PreferencesSchema(BaseModel):
     sync_interval_mins: int = Field(default=30, ge=5, le=1440)
 
 
-class NotificationOut(BaseModel):
-    id: int
-    job_id: int
-    title: str
-    company_name: str
-    role: str
-    location: str | None = None
-    application_url: str
-    sent_at: str
-    is_read: bool = False
-
-    @field_validator("application_url", mode="before")
-    @classmethod
-    def _only_http_urls(cls, v):
-        return sanitize_http_url(v) or ""
-
-
 class StatsOut(BaseModel):
     total_jobs: int
     active_companies: int
     matched_jobs: int
-    saved_jobs: int
     new_jobs_today: int
     last_sync_time: str | None = None
     # True while a crawl is running (the client shows "gathering jobs" instead of an empty list)

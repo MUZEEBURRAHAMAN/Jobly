@@ -76,12 +76,57 @@ await step('report dialog + failure handling', async () => {
   await p.keyboard.press('Escape'); await sleep(300); ok(await p.getByRole('dialog').count() === 0, 'Escape closes the dialog'); await h.ctx.close();
 });
 
+await step('on-device data: preferences, saved jobs, alerts', async () => {
+  const h = await launch();
+  const writes = []; const jobReqs = [];
+  h.ctx.on('request', (r) => { if (LOCAL.test(r.url())) { if (!['GET', 'HEAD', 'OPTIONS'].includes(r.method())) writes.push(`${r.method()} ${new URL(r.url()).pathname}`); if (/\/api\/(jobs|stats)\?/.test(r.url())) jobReqs.push(r.url()); } });
+  let p = await open(h); await firstCard(p);
+  // saving a job
+  const card = p.locator('article').first(); const label = await card.getAttribute('aria-label');
+  await card.getByRole('button', { name: /^Save:/ }).click(); await sleep(500);
+  ok(await card.getByRole('button', { name: /^Remove from saved:/ }).count() === 1, 'Save is instant');
+  ok((await h.sw.evaluate(() => chrome.storage.local.get('savedJobs'))).savedJobs?.length === 1, 'the saved job is stored on the device');
+  // it survives a restart of the page, even with the server down, and shows in the dashboard
+  await p.close(); await h.ctx.route(LOCAL, (r) => r.abort('connectionrefused'));
+  const d = await open(h, 'options.html', { width: 1280, height: 860 });
+  await d.getByRole('button', { name: /^Saved/ }).click(); await d.locator('article').first().waitFor({ timeout: 10000 });
+  ok((await d.locator('article').first().getAttribute('aria-label')) === label, 'saved jobs are there with the server unreachable');
+  await d.locator('article').first().getByRole('button', { name: /^Remove from saved:/ }).click(); await d.getByText('Nothing saved yet').waitFor({ timeout: 5000 });
+  ok((await h.sw.evaluate(() => chrome.storage.local.get('savedJobs'))).savedJobs?.length === 0, 'removing it clears the device copy'); await d.close();
+  await h.ctx.unroute(LOCAL);
+  // preferences
+  p = await open(h); await firstCard(p); await p.getByRole('button', { name: /^Preferences/ }).click(); await sleep(600);
+  await p.getByRole('checkbox', { name: /Product design/ }).click(); await p.getByRole('button', { name: 'Save preferences' }).click(); await p.getByText('Saved on this device.').waitFor({ timeout: 5000 });
+  const stored = (await h.sw.evaluate(() => chrome.storage.local.get('userPreferences'))).userPreferences; ok(stored && !stored.roles.includes('product_design'), 'preferences are stored on the device');
+  await p.getByRole('button', { name: /^Jobs/ }).click(); await sleep(1500);
+  const last = jobReqs.filter((u) => /\/api\/jobs\?/.test(u)).pop(); const prefs = JSON.parse(new URL(last).searchParams.get('prefs')); ok(!prefs.roles.includes('product_design') && prefs.roles.length === 4, 'the job request carries the new preferences');
+  ok(await p.locator('article').first().getAttribute('aria-label').then((l) => !!l), 'the list still renders after changing preferences');
+  // alerts: computed on the device
+  await h.sw.evaluate(() => chrome.storage.local.set({ alerts: [], seenAlertKeys: [] }));
+  await p.evaluate(() => new Promise((res) => chrome.runtime.sendMessage({ type: 'TRIGGER_BACKGROUND_CHECK' }, res))); await sleep(500);
+  const a1 = (await h.sw.evaluate(() => chrome.storage.local.get('alerts'))).alerts; ok(a1.length > 0 && a1.length <= 50 && a1.every((a) => !a.is_read), `new matching jobs become alerts (${a1.length})`);
+  await p.evaluate(() => new Promise((res) => chrome.runtime.sendMessage({ type: 'TRIGGER_BACKGROUND_CHECK' }, res))); await sleep(500);
+  ok((await h.sw.evaluate(() => chrome.storage.local.get('alerts'))).alerts.length === a1.length, 'the same job is never announced twice');
+  const first = (await h.sw.evaluate(() => chrome.storage.local.get('seenAlertKeys'))).seenAlertKeys.length; ok(first >= a1.length, 'seen jobs are remembered');
+  await h.sw.evaluate(() => chrome.storage.local.set({ alerts: [], seenAlertKeys: [] }));
+  await p.evaluate(() => new Promise((res) => chrome.runtime.sendMessage({ type: 'TRIGGER_BACKGROUND_CHECK', silent: true }, res))); await sleep(500);
+  ok((await h.sw.evaluate(() => chrome.storage.local.get('alerts'))).alerts.length === 0, 'a silent check (after changing preferences) announces nothing');
+  await h.sw.evaluate(() => chrome.storage.local.set({ alerts: [], seenAlertKeys: [] }));
+  await p.evaluate(() => new Promise((res) => chrome.runtime.sendMessage({ type: 'TRIGGER_BACKGROUND_CHECK' }, res))); await sleep(500); await p.close();
+  const dash = await open(h, 'options.html', { width: 1280, height: 860 }); await firstCard(dash);
+  ok(await dash.getByRole('button', { name: /^Alerts/ }).innerText().then((t) => /\d/.test(t)), 'the Alerts tab shows an unread count');
+  await dash.getByRole('button', { name: /^Alerts/ }).click(); await dash.getByText(/\d+ new/).waitFor({ timeout: 5000 }); await axe(dash, 'alerts with items');
+  await sleep(800); ok(await dash.getByText('All caught up').count() === 1 || await dash.getByRole('button', { name: 'Mark all read' }).count() === 0, 'opening Alerts marks them read');
+  ok(writes.every((w) => w.startsWith('POST /api/jobs/') && w.endsWith('/report')), `the server only ever receives reports: ${writes.length ? writes.join(', ') : 'no writes at all'}`);
+  await h.ctx.close();
+});
+
 await step('states: offline, 429, 500, gathering, empty, hidden', async () => {
   // offline, nothing cached
   let h = await launch(); await h.ctx.route(LOCAL, (r) => r.abort('connectionrefused')); let p = await open(h); await p.getByText("Can't reach Jobly").waitFor({ timeout: 70000 });
   ok(await art(p) === 1, 'offline: plug illustration'); await axe(p, 'offline');
   await p.getByRole('button', { name: /^Companies/ }).click(); ok(await p.getByText("Can't load companies").count() === 1, 'offline: companies');
-  await p.getByRole('button', { name: /^Saved/ }).click(); ok(await p.getByText("Can't load your saved jobs").count() === 1, 'offline: saved');
+  await p.getByRole('button', { name: /^Saved/ }).click(); ok(await p.getByText('Nothing saved yet').count() === 1, 'offline: saved jobs live on the device, so the page still works');
   await p.getByRole('button', { name: /^Preferences/ }).click(); await sleep(800); ok(await p.getByRole('button', { name: 'Save preferences' }).count() === 1, 'offline: preferences still usable');
   await h.ctx.close();
   // offline with cache
@@ -94,7 +139,7 @@ await step('states: offline, 429, 500, gathering, empty, hidden', async () => {
   }
   // brand-new server
   h = await launch();
-  await h.ctx.route(/\/api\/stats/, (r) => r.fulfill({ status: 200, headers: JSON_HEADERS, body: JSON.stringify({ total_jobs: 0, active_companies: 1, matched_jobs: 0, saved_jobs: 0, new_jobs_today: 0, last_sync_time: null, is_syncing: true }) }));
+  await h.ctx.route(/\/api\/stats/, (r) => r.fulfill({ status: 200, headers: JSON_HEADERS, body: JSON.stringify({ total_jobs: 0, active_companies: 1, matched_jobs: 0, new_jobs_today: 0, last_sync_time: null, is_syncing: true }) }));
   await h.ctx.route(/\/api\/jobs\?/, (r) => r.fulfill({ status: 200, headers: JSON_HEADERS, body: JSON.stringify({ items: [], total: 0, limit: 100, offset: 0 }) }));
   p = await open(h); await p.getByText('Gathering jobs for the first time').waitFor({ timeout: 40000 }); ok(await art(p) === 1, 'brand-new server: gathering state'); await h.ctx.close();
   // empty search, narrow filters, hidden companies

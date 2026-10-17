@@ -6,8 +6,7 @@ import { DEFAULT_ROLE_IDS, ROLES, SENIORITIES } from '../lib/format';
 
 interface WelcomeProps {
   initial: Preferences | null;
-  /** Saves the preferences; resolves false when they only reached this device. */
-  onFinish: (prefs: Preferences) => Promise<boolean | void>;
+  onFinish: (prefs: Preferences) => Promise<void>;
   /** Leave without choosing (defaults stay). */
   onSkip: () => void;
   compact?: boolean;
@@ -23,7 +22,6 @@ export const Welcome: React.FC<WelcomeProps> = ({ initial, onFinish, onSkip, com
   const [step, setStep] = useState(0);
   const [prefs, setPrefs] = useState<Preferences>(initial ?? DEFAULTS);
   const [saving, setSaving] = useState(false);
-  const [note, setNote] = useState<string | null>(null);
   const Figure = FIGURES[step];
   const toggle = (list: string[], id: string) => (list.includes(id) ? list.filter((x) => x !== id) : [...list, id]);
   const last = step === 2;
@@ -31,8 +29,7 @@ export const Welcome: React.FC<WelcomeProps> = ({ initial, onFinish, onSkip, com
   const finish = async () => {
     setSaving(true);
     try {
-      const synced = await onFinish(prefs);
-      if (synced === false) setNote("Saved on this device. We couldn't reach the server yet; your choices will apply once it's back.");
+      await onFinish(prefs);
     } finally {
       setSaving(false);
     }
@@ -95,9 +92,8 @@ export const Welcome: React.FC<WelcomeProps> = ({ initial, onFinish, onSkip, com
           </label>
           <div className="card" style={{ padding: 12 }}>
             <h2 className="text-lg">Your privacy</h2>
-            <p className="text-sm" style={{ marginTop: 4 }}>No account, no email, no tracking, no ads. Your search words and preferences are sent to Jobly's server only to find matching jobs. Company logos come from Google's favicon service.</p>
+            <p className="text-sm" style={{ marginTop: 4 }}>No account, no email, no tracking, no ads. Your preferences, saved jobs and alerts stay on this device. Your preferences and search words are sent with each request only to pick matching jobs; the server doesn't keep them. Company logos come from Google's favicon service.</p>
           </div>
-          {note && <p role="status" className="text-sm" style={{ color: 'var(--warning)' }}>{note}</p>}
         </div>
       )}
 

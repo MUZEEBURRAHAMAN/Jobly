@@ -13,7 +13,7 @@ from ..config import settings
 from ..db import get_db_connection, get_utc_now
 from ..schemas import (
     JobOut, JobsResponse, CompanyOut, CompanyCreate,
-    PreferencesSchema, NotificationOut, StatsOut
+    PreferencesSchema, StatsOut
 )
 from ..matching import matches_preferences
 from ..ingestion.runner import sync_all_sources
@@ -33,7 +33,7 @@ _periodic_sync_task: asyncio.Task | None = None
 # Q-6 FIX: Column name allowlist — prevents any future f-string SQL injection via column names
 ALLOWED_FILTER_COLUMNS = {
     "normalized_role", "geo_hub", "experience_tier", "work_mode",
-    "status", "is_saved", "company_id", "seniority",
+    "status", "company_id", "seniority",
     "salary_summary", "max_salary", "first_seen_at", "location", "title", "company_name"
 }
 
@@ -45,60 +45,57 @@ async def health():
         "timestamp": get_utc_now()
     }
 
-def _prefs_from_row(row) -> PreferencesSchema:
-    """Build preferences from a DB row; rows written before input validation existed fall back to defaults."""
-    if not row:
-        return PreferencesSchema()
+def _like(term: str) -> str:
+    escaped = term.lower().replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
+    return f"%{escaped}%"
+
+
+def prefs_param(
+    prefs: str | None = Query(
+        default=None, max_length=2500,
+        description="The visitor's preferences as JSON. They live on the device; the server never stores them.",
+    ),
+) -> dict[str, Any]:
+    """Parse and validate the per-request preferences ({} when absent = no personalisation)."""
+    if not prefs:
+        return {}
     try:
-        return PreferencesSchema(
-            roles=json.loads(row["roles"] or "[]"),
-            seniorities=json.loads(row["seniorities"] or "[]"),
-            locations=json.loads(row["locations"] or "[]"),
-            remote_only=bool(row["remote_only"]),
-            custom_keywords=row["custom_keywords"] or "",
-            excluded_keywords=row["excluded_keywords"] or "",
-            notify_enabled=bool(row["notify_enabled"]),
-            sync_interval_mins=row["sync_interval_mins"] or 30
-        )
-    except (ValidationError, ValueError, TypeError):
-        logger.warning("[Prefs] Stored preferences failed validation; serving defaults")
-        return PreferencesSchema()
+        return PreferencesSchema.model_validate_json(prefs).model_dump()
+    except ValidationError:
+        raise HTTPException(status_code=422, detail="prefs must be valid preferences JSON")
 
-@router.get("/api/preferences", response_model=PreferencesSchema)
-async def get_preferences():
-    async with get_db_connection() as db:
-        cursor = await db.execute("SELECT * FROM preferences LIMIT 1;")
-        return _prefs_from_row(await cursor.fetchone())
 
-@router.post("/api/preferences", response_model=PreferencesSchema)
-async def update_preferences(prefs: PreferencesSchema):
-    now = get_utc_now()
-    async with get_db_connection() as db:
-        await db.execute("""
-            UPDATE preferences SET
-                roles = ?,
-                seniorities = ?,
-                locations = ?,
-                remote_only = ?,
-                custom_keywords = ?,
-                excluded_keywords = ?,
-                notify_enabled = ?,
-                sync_interval_mins = ?,
-                updated_at = ?
-            WHERE id = (SELECT id FROM preferences LIMIT 1)
-        """, (
-            json.dumps(prefs.roles),
-            json.dumps(prefs.seniorities),
-            json.dumps(prefs.locations),
-            1 if prefs.remote_only else 0,
-            prefs.custom_keywords,
-            prefs.excluded_keywords,
-            1 if prefs.notify_enabled else 0,
-            prefs.sync_interval_mins,
-            now
-        ))
-        await db.commit()
-    return prefs
+def _csv(text: str) -> list[str]:
+    return [t.strip().lower() for t in text.split(",") if t.strip()]
+
+
+def pref_conditions(prefs: dict[str, Any], skip_roles: bool = False) -> tuple[list[str], list[Any]]:
+    """SQL equivalent of matching.matches_preferences, so counts and pages agree with the 'Matches you' badge."""
+    conds: list[str] = []
+    params: list[Any] = []
+    if prefs.get("roles") and not skip_roles:
+        conds.append(f"normalized_role IN ({','.join('?' for _ in prefs['roles'])})")
+        params.extend(prefs["roles"])
+    if prefs.get("seniorities"):
+        conds.append(f"COALESCE(seniority, 'mid') IN ({','.join('?' for _ in prefs['seniorities'])})")
+        params.extend(prefs["seniorities"])
+    if prefs.get("remote_only"):
+        conds.append("work_mode = 'remote'")
+    if prefs.get("locations"):
+        likes = " OR ".join("LOWER(COALESCE(location, '')) LIKE ? ESCAPE '\\'" for _ in prefs["locations"])
+        conds.append(f"(work_mode = 'remote' OR {likes})")
+        params.extend(_like(loc) for loc in prefs["locations"])
+    text_expr = "LOWER(title || ' ' || COALESCE(location, ''))"
+    keywords = _csv(prefs.get("custom_keywords", ""))
+    if keywords:
+        conds.append("(" + " OR ".join(f"{text_expr} LIKE ? ESCAPE '\\'" for _ in keywords) + ")")
+        params.extend(_like(k) for k in keywords)
+    excluded = _csv(prefs.get("excluded_keywords", ""))
+    if excluded:
+        conds.append("NOT (" + " OR ".join(f"{text_expr} LIKE ? ESCAPE '\\'" for _ in excluded) + ")")
+        params.extend(_like(k) for k in excluded)
+    return conds, params
+
 
 @router.get("/api/jobs", response_model=JobsResponse)
 async def list_jobs(
@@ -114,23 +111,13 @@ async def list_jobs(
     has_salary: bool = False,
     freshness_days: int | None = Query(default=None, ge=0, le=3650),
     only_matching: bool = False,
-    saved_only: bool = False,
     limit: int = Query(default=30, ge=1, le=200),
-    offset: int = Query(default=0, ge=0, le=1_000_000)
+    offset: int = Query(default=0, ge=0, le=1_000_000),
+    prefs_dict: dict[str, Any] = Depends(prefs_param),
 ):
     async with get_db_connection() as db:
-        # Load preferences
-        pref_cursor = await db.execute("SELECT * FROM preferences LIMIT 1;")
-        pref_row = await pref_cursor.fetchone()
-        prefs_dict = {}
-        if pref_row:
-            prefs_dict = _prefs_from_row(pref_row).model_dump()
-
         conditions = ["status = 'active'"]
         params = []
-
-        if saved_only:
-            conditions.append("is_saved = 1")
 
         if company_id:
             conditions.append("company_id = ?")
@@ -139,10 +126,10 @@ async def list_jobs(
         if role:
             conditions.append("normalized_role = ?")
             params.append(role)
-        elif only_matching and prefs_dict.get("roles"):
-            role_placeholders = ",".join("?" for _ in prefs_dict["roles"])
-            conditions.append(f"normalized_role IN ({role_placeholders})")
-            params.extend(prefs_dict["roles"])
+        if only_matching and prefs_dict:
+            pref_conds, pref_params = pref_conditions(prefs_dict, skip_roles=bool(role))
+            conditions.extend(pref_conds)
+            params.extend(pref_params)
 
         if seniority:
             conditions.append("seniority = ?")
@@ -173,10 +160,6 @@ async def list_jobs(
         since = age_cutoff_iso(window)
         conditions.append("posted_at >= ?" if freshness_days else "(posted_at IS NULL OR posted_at >= ?)")
         params.append(since)
-
-        def _like(term: str) -> str:
-            escaped = term.lower().replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
-            return f"%{escaped}%"
 
         if location:
             conditions.append("LOWER(location) LIKE ? ESCAPE '\\'")
@@ -219,7 +202,7 @@ async def list_jobs(
             SELECT id, company_id, company_name, source_type, external_id,
                    title, normalized_role, seniority, work_mode, location,
                    application_url, first_seen_at, last_seen_at, posted_at,
-                   status, is_saved, salary_summary, min_salary, max_salary,
+                   status, salary_summary, min_salary, max_salary,
                    geo_hub, experience_tier
             FROM jobs
             {where_clause}
@@ -253,7 +236,6 @@ async def list_jobs(
                     last_seen_at=job_dict["last_seen_at"],
                     posted_at=job_dict.get("posted_at"),
                     status=job_dict["status"],
-                    is_saved=bool(job_dict["is_saved"]),
                     is_match=is_match,
                     salary_summary=job_dict.get("salary_summary"),
                     min_salary=job_dict.get("min_salary"),
@@ -290,23 +272,8 @@ async def get_job(job_id: int):
             last_seen_at=job_dict["last_seen_at"],
             posted_at=job_dict.get("posted_at"),
             status=job_dict["status"],
-            is_saved=bool(job_dict["is_saved"]),
             is_match=False
         )
-
-@router.post("/api/jobs/{job_id}/save")
-async def save_job(job_id: int):
-    async with get_db_connection() as db:
-        await db.execute("UPDATE jobs SET is_saved = 1 WHERE id = ?", (job_id,))
-        await db.commit()
-    return {"success": True, "job_id": job_id, "is_saved": True}
-
-@router.delete("/api/jobs/{job_id}/save")
-async def unsave_job(job_id: int):
-    async with get_db_connection() as db:
-        await db.execute("UPDATE jobs SET is_saved = 0 WHERE id = ?", (job_id,))
-        await db.commit()
-    return {"success": True, "job_id": job_id, "is_saved": False}
 
 # S-3 FIX: Report endpoint — persists user reports to the reports table
 ALLOWED_REPORT_REASONS = {"fake", "expired", "misinfo", "spam", "other"}
@@ -503,39 +470,8 @@ async def trigger_sync(
         background_tasks.add_task(_guarded_sync_once)
         return {"status": "enqueued", "message": "Background sync started"}
 
-@router.get("/api/notifications", response_model=list[NotificationOut])
-async def list_notifications():
-    async with get_db_connection() as db:
-        cursor = await db.execute("""
-            SELECT * FROM notifications
-            ORDER BY sent_at DESC
-            LIMIT 50
-        """)
-        rows = await cursor.fetchall()
-        return [
-            NotificationOut(
-                id=r["id"],
-                job_id=r["job_id"],
-                title=r["title"],
-                company_name=r["company_name"],
-                role=r["role"],
-                location=r["location"],
-                application_url=r["application_url"],
-                sent_at=r["sent_at"],
-                is_read=bool(r["is_read"])
-            )
-            for r in rows
-        ]
-
-@router.post("/api/notifications/read-all")
-async def mark_notifications_read():
-    async with get_db_connection() as db:
-        await db.execute("UPDATE notifications SET is_read = 1")
-        await db.commit()
-    return {"success": True}
-
 @router.get("/api/stats", response_model=StatsOut)
-async def get_stats():
+async def get_stats(prefs_dict: dict[str, Any] = Depends(prefs_param)):
     async with get_db_connection() as db:
         # Total jobs
         window = age_cutoff_iso(settings.MAX_JOB_AGE_DAYS)  # same window as the job list: counts must match what you can see
@@ -546,10 +482,6 @@ async def get_stats():
         c_cur = await db.execute("SELECT COUNT(*) as count FROM companies WHERE is_active = 1")
         active_companies = (await c_cur.fetchone())["count"]
 
-        # Saved jobs
-        s_cur = await db.execute("SELECT COUNT(*) as count FROM jobs WHERE is_saved = 1")
-        saved_jobs = (await s_cur.fetchone())["count"]
-
         # New in last 24h
         day_ago = (datetime.now(timezone.utc) - timedelta(hours=24)).isoformat()
         n_cur = await db.execute("SELECT COUNT(*) as count FROM jobs WHERE status = 'active' AND posted_at >= ?", (day_ago,))
@@ -559,25 +491,18 @@ async def get_stats():
         comp_cur = await db.execute("SELECT MAX(last_seen_at) as last_sync FROM jobs")
         last_sync = (await comp_cur.fetchone())["last_sync"]
 
-        # Matched jobs count according to preferences
-        pref_cursor = await db.execute("SELECT * FROM preferences LIMIT 1;")
-        pref_row = await pref_cursor.fetchone()
+        # Jobs that fit the visitor's preferences (sent with the request; nothing is stored)
         matched_jobs = 0
-        if pref_row and pref_row["roles"]:
-            roles = json.loads(pref_row["roles"])
-            if roles:
-                placeholders = ",".join("?" for _ in roles)
-                m_cur = await db.execute(
-                    f"SELECT COUNT(*) as count FROM jobs WHERE status = 'active' AND (posted_at IS NULL OR posted_at >= ?) AND normalized_role IN ({placeholders})",
-                    [window, *roles]
-                )
-                matched_jobs = (await m_cur.fetchone())["count"]
+        if prefs_dict:
+            pref_conds, pref_params = pref_conditions(prefs_dict)
+            where = " AND ".join(["status = 'active'", "(posted_at IS NULL OR posted_at >= ?)", *pref_conds])
+            m_cur = await db.execute(f"SELECT COUNT(*) as count FROM jobs WHERE {where}", [window, *pref_params])
+            matched_jobs = (await m_cur.fetchone())["count"]
 
         return StatsOut(
             total_jobs=total_jobs,
             active_companies=active_companies,
             matched_jobs=matched_jobs,
-            saved_jobs=saved_jobs,
             new_jobs_today=new_jobs_today,
             last_sync_time=last_sync,
             is_syncing=_sync_lock.locked()

@@ -5,8 +5,7 @@ import { ROLES, SENIORITIES } from '../lib/format';
 
 interface PreferencesViewProps {
   preferences: Preferences;
-  /** Resolve `false` when the change only reached this device (server unreachable). */
-  onSave: (prefs: Preferences) => Promise<boolean | void>;
+  onSave: (prefs: Preferences) => Promise<void>;
   /** Re-open the first-run welcome tour. */
   onReplayWelcome?: () => void;
 }
@@ -14,12 +13,12 @@ interface PreferencesViewProps {
 export const PreferencesView: React.FC<PreferencesViewProps> = ({ preferences, onSave, onReplayWelcome }) => {
   const [prefs, setPrefs] = useState<Preferences>(preferences);
   const [saving, setSaving] = useState(false);
-  const [savedState, setSavedState] = useState<'synced' | 'local' | null>(null);
+  const [justSaved, setJustSaved] = useState(false);
 
-  // Pick up the server/cached values when they arrive after first paint (don't clobber unsaved edits otherwise)
+  // Pick up the stored values when they arrive after first paint (don't clobber unsaved edits otherwise)
   const [dirty, setDirty] = useState(false);
   useEffect(() => { if (!dirty) setPrefs(preferences); }, [preferences, dirty]);
-  const edit = (patch: Partial<Preferences>) => { setDirty(true); setSavedState(null); setPrefs((p) => ({ ...p, ...patch })); };
+  const edit = (patch: Partial<Preferences>) => { setDirty(true); setJustSaved(false); setPrefs((p) => ({ ...p, ...patch })); };
 
   const toggle = (list: string[], id: string) => (list.includes(id) ? list.filter((x) => x !== id) : [...list, id]);
 
@@ -27,8 +26,8 @@ export const PreferencesView: React.FC<PreferencesViewProps> = ({ preferences, o
     e.preventDefault();
     setSaving(true);
     try {
-      const synced = await onSave(prefs);
-      setSavedState(synced === false ? 'local' : 'synced');
+      await onSave(prefs);
+      setJustSaved(true);
       setDirty(false);
     } finally {
       setSaving(false);
@@ -92,10 +91,7 @@ export const PreferencesView: React.FC<PreferencesViewProps> = ({ preferences, o
         <button type="submit" className="btn grow" disabled={saving}><Save size={14} aria-hidden="true" /> {saving ? 'Saving…' : 'Save preferences'}</button>
       </div>
       {onReplayWelcome && <button type="button" className="btn btn-ghost btn-sm" style={{ alignSelf: 'flex-start' }} onClick={onReplayWelcome}>Show the welcome tour again</button>}
-      <p role="status" className="text-sm" style={{ color: savedState === 'local' ? 'var(--warning)' : 'var(--success)' }}>
-        {savedState === 'synced' && 'Saved.'}
-        {savedState === 'local' && "Saved on this device only. We couldn't reach the server."}
-      </p>
+      <p role="status" className="text-sm" style={{ color: 'var(--success)' }}>{justSaved && 'Saved on this device.'}</p>
     </form>
   );
 };

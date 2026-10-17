@@ -47,8 +47,8 @@ async def _seed():
         for r in rows:
             await db.execute(
                 """INSERT INTO jobs (company_id, company_name, source_type, external_id, title, normalized_role, seniority,
-                                     work_mode, location, application_url, content_hash, first_seen_at, last_seen_at, status, is_saved)
-                   VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?, 'active', 0)""",
+                                     work_mode, location, application_url, content_hash, first_seen_at, last_seen_at, status)
+                   VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?, 'active')""",
                 (r[0], r[1], r[2], r[3], r[4], r[5], r[6], r[7], r[8], r[9], r[3], r[10], r[11]),
             )
         # hourly rates are floats in real Ashby data
@@ -59,12 +59,6 @@ async def _seed():
         await db.execute("UPDATE jobs SET posted_at = ? WHERE external_id = 'ext-1'", ((t - timedelta(days=5)).isoformat(),))
         await db.execute("UPDATE jobs SET posted_at = ? WHERE external_id = 'ext-2'", ((t - timedelta(days=29)).isoformat(),))
         await db.execute("UPDATE jobs SET posted_at = ? WHERE external_id = 'ext-3'", ((t - timedelta(days=75)).isoformat(),))   # outside the 60-day window
-        cur = await db.execute("SELECT id FROM jobs WHERE external_id = 'ext-0'")
-        job_id = (await cur.fetchone())["id"]
-        await db.execute(
-            "INSERT INTO notifications (job_id, title, company_name, role, location, application_url, sent_at, is_read) VALUES (?,?,?,?,?,?,?,0)",
-            (job_id, "Engineer 0", "Acme", "product_design", "Remote", "javascript:alert(2)", now),
-        )
         await db.commit()
 
 

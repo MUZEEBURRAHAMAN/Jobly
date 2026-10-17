@@ -9,7 +9,7 @@ import httpx
 from ..db import get_db_connection, get_utc_now
 from ..matching import (
     detect_role, detect_seniority, detect_work_mode,
-    detect_geo_hub, detect_experience_tier, matches_preferences
+    detect_geo_hub, detect_experience_tier
 )
 from ..config import settings
 from ..security import sanitize_http_url
@@ -138,7 +138,6 @@ async def upsert_job_record(
     job: NormalizedJob,
     comp_id: int,
     comp_name: str,
-    preferences: dict[str, Any],
     now: str,
     summary: dict[str, Any],
 ) -> None:
@@ -276,35 +275,7 @@ async def upsert_job_record(
             experience_tier,
             posted_at
         ))
-        new_job_id = cursor.lastrowid
         summary["new_jobs"] += 1
-
-        # Check notification match
-        job_dict = {
-            "normalized_role": role,
-            "seniority": seniority,
-            "work_mode": work_mode,
-            "location": job.location,
-            "title": job.title,
-        }
-        recent = bool(posted_at) and (datetime.now(timezone.utc) - datetime.fromisoformat(posted_at)).days < 3
-        if recent and preferences.get("notify_enabled") and matches_preferences(job_dict, preferences):
-            try:
-                await db.execute("""
-                    INSERT OR IGNORE INTO notifications (
-                        job_id, title, company_name, role, location, application_url, sent_at, is_read
-                    ) VALUES (?, ?, ?, ?, ?, ?, ?, 0)
-                """, (
-                    new_job_id,
-                    job.title,
-                    comp_name,
-                    role or "matched_role",
-                    job.location or "Remote / Global",
-                    job.application_url,
-                    now
-                ))
-            except Exception as notif_err:
-                logger.error(f"Error queueing notification: {notif_err}")
 
 
 async def fetch_company_jobs(
@@ -358,20 +329,6 @@ async def sync_all_sources(company_id_filter: int | None = None, include_aggrega
     }
 
     async with get_db_connection() as db:
-        # Load user preferences
-        pref_cursor = await db.execute("SELECT * FROM preferences LIMIT 1;")
-        pref_row = await pref_cursor.fetchone()
-        preferences = {}
-        if pref_row:
-            preferences = {
-                "roles": json.loads(pref_row["roles"] or "[]"),
-                "seniorities": json.loads(pref_row["seniorities"] or "[]"),
-                "locations": json.loads(pref_row["locations"] or "[]"),
-                "remote_only": bool(pref_row["remote_only"]),
-                "custom_keywords": pref_row["custom_keywords"] or "",
-                "excluded_keywords": pref_row["excluded_keywords"] or "",
-                "notify_enabled": bool(pref_row["notify_enabled"]),
-            }
 
         # Cache company names
         cursor = await db.execute("SELECT id, name FROM companies;")
@@ -421,7 +378,7 @@ async def sync_all_sources(company_id_filter: int | None = None, include_aggrega
                     comp_name = comp["name"]
 
                     for job in jobs:
-                        await upsert_job_record(db, job, comp_id, comp_name, preferences, now, summary)
+                        await upsert_job_record(db, job, comp_id, comp_name, now, summary)
 
                     if jobs:
                         # The board answered with jobs: anything of this company we did NOT see this time is gone.
@@ -460,7 +417,7 @@ async def sync_all_sources(company_id_filter: int | None = None, include_aggrega
                             db, company_name=b_comp_name, source_type=b_job.source_type,
                             careers_url=b_job.application_url, logo_url=b_logo, cache=company_cache
                         )
-                        await upsert_job_record(db, b_job, comp_id, b_comp_name, preferences, now, summary)
+                        await upsert_job_record(db, b_job, comp_id, b_comp_name, now, summary)
                     await db.commit()
                     del remotive_jobs
                     gc.collect()
@@ -481,7 +438,7 @@ async def sync_all_sources(company_id_filter: int | None = None, include_aggrega
                             db, company_name=b_comp_name, source_type=b_job.source_type,
                             careers_url=b_job.application_url, logo_url=b_logo, cache=company_cache
                         )
-                        await upsert_job_record(db, b_job, comp_id, b_comp_name, preferences, now, summary)
+                        await upsert_job_record(db, b_job, comp_id, b_comp_name, now, summary)
                     await db.commit()
                     del wwr_jobs
                     gc.collect()
@@ -502,7 +459,7 @@ async def sync_all_sources(company_id_filter: int | None = None, include_aggrega
                             db, company_name=b_comp_name, source_type=b_job.source_type,
                             careers_url=b_job.application_url, logo_url=b_logo, cache=company_cache
                         )
-                        await upsert_job_record(db, b_job, comp_id, b_comp_name, preferences, now, summary)
+                        await upsert_job_record(db, b_job, comp_id, b_comp_name, now, summary)
                     await db.commit()
                     del rss_jobs
                     gc.collect()
@@ -533,19 +490,6 @@ async def sync_board_sources() -> dict[str, Any]:
     }
 
     async with get_db_connection() as db:
-        pref_cursor = await db.execute("SELECT * FROM preferences LIMIT 1;")
-        pref_row = await pref_cursor.fetchone()
-        preferences = {}
-        if pref_row:
-            preferences = {
-                "roles": json.loads(pref_row["roles"] or "[]"),
-                "seniorities": json.loads(pref_row["seniorities"] or "[]"),
-                "locations": json.loads(pref_row["locations"] or "[]"),
-                "remote_only": bool(pref_row["remote_only"]),
-                "custom_keywords": pref_row["custom_keywords"] or "",
-                "excluded_keywords": pref_row["excluded_keywords"] or "",
-                "notify_enabled": bool(pref_row["notify_enabled"]),
-            }
 
         cursor = await db.execute("SELECT id, name FROM companies;")
         company_cache: dict[str, int] = {
@@ -565,7 +509,7 @@ async def sync_board_sources() -> dict[str, Any]:
                         db, company_name=b_comp_name, source_type=b_job.source_type,
                         careers_url=b_job.application_url, logo_url=b_logo, cache=company_cache
                     )
-                    await upsert_job_record(db, b_job, comp_id, b_comp_name, preferences, now, summary)
+                    await upsert_job_record(db, b_job, comp_id, b_comp_name, now, summary)
                 await db.commit()
                 del remotive_jobs
                 gc.collect()
@@ -583,7 +527,7 @@ async def sync_board_sources() -> dict[str, Any]:
                         db, company_name=b_comp_name, source_type=b_job.source_type,
                         careers_url=b_job.application_url, logo_url=b_logo, cache=company_cache
                     )
-                    await upsert_job_record(db, b_job, comp_id, b_comp_name, preferences, now, summary)
+                    await upsert_job_record(db, b_job, comp_id, b_comp_name, now, summary)
                 await db.commit()
                 del wwr_jobs
                 gc.collect()
@@ -601,7 +545,7 @@ async def sync_board_sources() -> dict[str, Any]:
                         db, company_name=b_comp_name, source_type=b_job.source_type,
                         careers_url=b_job.application_url, logo_url=b_logo, cache=company_cache
                     )
-                    await upsert_job_record(db, b_job, comp_id, b_comp_name, preferences, now, summary)
+                    await upsert_job_record(db, b_job, comp_id, b_comp_name, now, summary)
                 await db.commit()
                 del rss_jobs
                 gc.collect()

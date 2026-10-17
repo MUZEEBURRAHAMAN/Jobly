@@ -1,3 +1,4 @@
+import json
 import unittest
 from unittest.mock import AsyncMock, patch
 
@@ -96,8 +97,6 @@ class TestJobsList(APITestCase):
     async def test_non_http_apply_links_are_never_emitted(self):
         item = (await self.client.get("/api/jobs", params={"search": "bad link"})).json()["items"][0]
         self.assertEqual(item["application_url"], "")
-        notif = (await self.client.get("/api/notifications")).json()
-        self.assertTrue(all(not n["application_url"].startswith("javascript:") for n in notif))
 
 
 class TestPostingDates(APITestCase):
@@ -147,25 +146,87 @@ class TestAgeWindow(APITestCase):
         self.assertEqual(stats["total_jobs"], total)
 
 
-class TestWrites(APITestCase):
-    async def test_preferences_roundtrip_and_validation(self):
-        original = (await self.client.get("/api/preferences")).json()
-        changed = dict(original, custom_keywords="Figma, React")
-        res = await self.client.post("/api/preferences", json=changed)
-        self.assertEqual(res.status_code, 200)
-        self.assertEqual((await self.client.get("/api/preferences")).json()["custom_keywords"], "Figma, React")
-        await self.client.post("/api/preferences", json=original)
-        for bad in (dict(original, roles=["x"] * 21), dict(original, custom_keywords="A" * 501),
-                    dict(original, sync_interval_mins=0), dict(original, roles=["<script>"])):
-            self.assertEqual((await self.client.post("/api/preferences", json=bad)).status_code, 422)
+def prefs_json(**over):
+    base = {"roles": [], "seniorities": [], "locations": [], "remote_only": False, "custom_keywords": "", "excluded_keywords": ""}
+    return json.dumps({**base, **over})
 
-    async def test_save_then_unsave_job(self):
-        job_id = (await self.client.get("/api/jobs?limit=1")).json()["items"][0]["id"]
-        saved = await self.client.post(f"/api/jobs/{job_id}/save")
-        self.assertTrue(saved.json()["is_saved"])
-        self.assertEqual((await self.client.get("/api/jobs?saved_only=true")).json()["total"], 1)
-        unsaved = await self.client.request("DELETE", f"/api/jobs/{job_id}/save")
-        self.assertFalse(unsaved.json()["is_saved"])
+
+class TestStatelessPreferences(APITestCase):
+    """Preferences arrive with each request (`prefs=` JSON); nothing is stored on the server."""
+
+    async def jobs(self, prefs=None, **extra):
+        params = {"limit": 200, **extra}
+        if prefs is not None:
+            params["prefs"] = prefs
+        res = await self.client.get("/api/jobs", params=params)
+        self.assertEqual(res.status_code, 200, res.text)
+        return res.json()
+
+    async def test_without_prefs_nothing_is_marked_as_a_match(self):
+        data = await self.jobs()
+        self.assertTrue(data["items"])
+        self.assertFalse(any(j["is_match"] for j in data["items"]))
+        self.assertTrue(all("is_saved" not in j for j in data["items"]))
+
+    async def test_roles_filter_and_match_flag(self):
+        everything = await self.jobs()
+        data = await self.jobs(prefs_json(roles=["product_management"]), only_matching="true")
+        self.assertGreater(len(data["items"]), 0)
+        self.assertLess(len(data["items"]), len(everything["items"]))
+        self.assertTrue(all(j["normalized_role"] == "product_management" and j["is_match"] for j in data["items"]))
+        flagged = await self.jobs(prefs_json(roles=["product_management"]))
+        self.assertEqual(sum(j["is_match"] for j in flagged["items"]), len(data["items"]))
+
+    async def test_explicit_role_overrides_preferred_roles(self):
+        data = await self.jobs(prefs_json(roles=["product_management"]), only_matching="true", role="ai_ml")
+        self.assertTrue(data["items"])
+        self.assertTrue(all(j["normalized_role"] == "ai_ml" for j in data["items"]))
+
+    async def test_keywords_and_exclusions(self):
+        wanted = await self.jobs(prefs_json(custom_keywords="hourly, nothing-like-this"), only_matching="true")
+        self.assertEqual([j["title"] for j in wanted["items"]], ["Hourly Contractor Designer"])
+        dropped = await self.jobs(prefs_json(excluded_keywords="engineer"), only_matching="true")
+        self.assertTrue(dropped["items"])
+        self.assertFalse(any("engineer" in j["title"].lower() for j in dropped["items"]))
+
+    async def test_location_and_remote_rules(self):
+        # every fixture job is remote, so a location the jobs don't mention still matches them
+        self.assertTrue((await self.jobs(prefs_json(locations=["Atlantis"]), only_matching="true"))["items"])
+        self.assertTrue((await self.jobs(prefs_json(remote_only=True), only_matching="true"))["items"])
+
+    async def test_sql_filter_agrees_with_the_python_matcher(self):
+        prefs = {"roles": ["frontend_engineering", "ai_ml"], "seniorities": ["mid"], "locations": [], "remote_only": True,
+                 "custom_keywords": "engineer, remote", "excluded_keywords": "wildcard"}
+        flagged = await self.jobs(json.dumps(prefs))
+        via_sql = await self.jobs(json.dumps(prefs), only_matching="true")
+        self.assertEqual({j["id"] for j in via_sql["items"]}, {j["id"] for j in flagged["items"] if j["is_match"]})
+
+    async def test_matched_count_in_stats(self):
+        prefs = prefs_json(roles=["product_management"])
+        stats = (await self.client.get("/api/stats", params={"prefs": prefs})).json()
+        listed = await self.jobs(prefs, only_matching="true")
+        self.assertEqual(stats["matched_jobs"], listed["total"])
+        self.assertNotIn("saved_jobs", stats)
+        self.assertEqual((await self.client.get("/api/stats")).json()["matched_jobs"], 0)
+
+    async def test_bad_prefs_are_rejected(self):
+        for bad in ("not json", prefs_json(roles=["x"] * 21), prefs_json(custom_keywords="A" * 501), prefs_json(roles=["<script>"]), "A" * 2501):
+            res = await self.client.get("/api/jobs", params={"prefs": bad})
+            self.assertEqual(res.status_code, 422, bad[:40])
+            self.assertEqual((await self.client.get("/api/stats", params={"prefs": bad})).status_code, 422)
+
+    async def test_sql_wildcards_in_keywords_are_literal(self):
+        data = await self.jobs(prefs_json(custom_keywords="100%"), only_matching="true")
+        self.assertEqual([j["title"] for j in data["items"]], ["100% Remote Wildcard Role"])
+
+
+class TestWrites(APITestCase):
+    async def test_user_state_endpoints_are_gone(self):
+        # Preferences, saved jobs and alerts live on the user's device; the server must not store them.
+        for method, path in (("GET", "/api/preferences"), ("POST", "/api/preferences"), ("GET", "/api/notifications"),
+                             ("POST", "/api/notifications/read-all"), ("POST", "/api/jobs/1/save"), ("DELETE", "/api/jobs/1/save")):
+            res = await self.client.request(method, path)
+            self.assertIn(res.status_code, (404, 405), f"{method} {path}")
 
     async def test_report_valid_and_invalid(self):
         job_id = (await self.client.get("/api/jobs?limit=1")).json()["items"][0]["id"]
@@ -221,7 +282,7 @@ class TestCompanyManagement(APITestCase):
 
 class TestCORS(APITestCase):
     async def preflight(self, origin):
-        return await self.client.options("/api/preferences", headers={"Origin": origin, "Access-Control-Request-Method": "POST"})
+        return await self.client.options("/api/jobs", headers={"Origin": origin, "Access-Control-Request-Method": "GET"})
 
     async def test_extension_origin_allowed_web_origin_blocked(self):
         ok = await self.preflight(EXT_ORIGIN)
