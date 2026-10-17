@@ -14,7 +14,7 @@ const cols = [
       <div class="brand">
         <a class="logo" href="/"><span class="mark" aria-hidden="true">J</span>Jobly</a>
         <p>Fresh jobs from company career pages, in your toolbar.</p>
-        <a class="btn btn-ink btn-sm" href={installHref}>Add to Chrome</a>
+        <a class="btn btn-ink btn-sm" href={installHref}><Icon name="chrome" size={16} />Add to Chrome</a>
       </div>
       {cols.map((c) => (
         <nav aria-label={c.title}>
@@ -23,11 +23,11 @@ const cols = [
         </nav>
       ))}
     </div>
-    <div class="container bottom">
+    <div class="container"><div class="bottom">
       <span>© {new Date().getFullYear()} Jobly. Not affiliated with the employers or job boards it lists.</span>
       <span class="status" data-status="unknown"><span class="s-dot" aria-hidden="true"></span><span data-updated>Jobs update every 2 hours</span></span>
       <a class="mail" href={`mailto:${SITE.email}`}><Icon name="mail" size={14} />{SITE.email}</a>
-    </div>
+    </div></div>
     <div class="wordmark" aria-hidden="true">Jobly</div>
   </div>
 </footer>
@@ -50,7 +50,9 @@ const cols = [
   .status[data-status='ok'] .s-dot { background: var(--success); }
   .mail { display: inline-flex; align-items: center; gap: 6px; color: var(--muted); }
   .mail:hover { color: var(--fg); }
-  .wordmark { font-size: clamp(6rem, 22vw, 20rem); font-weight: 600; letter-spacing: -0.06em; line-height: 0.78; text-align: center; margin-top: 32px; margin-bottom: -0.12em;
-    background: linear-gradient(180deg, color-mix(in srgb, var(--fg) 9%, transparent), transparent 85%); -webkit-background-clip: text; background-clip: text; color: transparent; user-select: none; }
+  /* the whole word, sized to the content width, fading into the panel instead of being cut off */
+  .wordmark { font-size: clamp(5.5rem, 21vw, 18rem); font-weight: 600; letter-spacing: -0.065em; line-height: 0.95; text-align: center; padding: 24px 0 clamp(16px, 2vw, 28px);
+    background: linear-gradient(180deg, color-mix(in srgb, var(--fg) 14%, transparent) 0%, color-mix(in srgb, var(--fg) 6%, transparent) 55%, transparent 100%);
+    -webkit-background-clip: text; background-clip: text; color: transparent; user-select: none; }
   @media (max-width: 860px) { .top { grid-template-columns: 1fr 1fr; } .brand { grid-column: 1 / -1; } }
 </style>

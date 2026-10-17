@@ -12,12 +12,12 @@
     "astro": "astro"
   },
   "dependencies": {
+    "@hugeicons/core-free-icons": "^4.3.5",
     "@lucasmarkes/hairline": "^0.5.1",
     "astro": "^7.4.0"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.10",
-    "lucide-static": "^1.59.0",
     "typescript": "^6.0.3"
   }
 }

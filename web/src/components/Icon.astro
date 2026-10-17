@@ -1,14 +1,37 @@
 ---
-// Inlines a Lucide icon at build time (no icon font, no runtime JavaScript).
-const icons = import.meta.glob('/node_modules/lucide-static/icons/*.svg', { query: '?raw', import: 'default', eager: true }) as Record<string, string>;
-interface Props { name: string; size?: number; class?: string; label?: string }
-const { name, size = 16, class: cls = '', label } = Astro.props;
-const raw = icons[`/node_modules/lucide-static/icons/${name}.svg`];
-if (!raw) throw new Error(`Unknown icon: ${name}`);
+// Hugeicons (free Stroke Rounded set, MIT), inlined at build time. No icon font, no runtime JavaScript.
+// `duo` (default on the website) adds a soft second tone: closed shapes get a light fill in the same colour,
+// which gives the duotone look without the paid Pro set.
+import * as H from '@hugeicons/core-free-icons';
+
+// The names used across the site → Hugeicons.
+const MAP: Record<string, string> = {
+  'arrow-right': 'ArrowRight01Icon', 'arrow-left': 'ArrowLeft01Icon', 'chevron-down': 'ArrowDown01Icon', search: 'Search01Icon',
+  'calendar-clock': 'Calendar03Icon', check: 'Tick02Icon', sparkles: 'SparklesIcon', menu: 'Menu01Icon', x: 'Cancel01Icon',
+  moon: 'Moon02Icon', sun: 'Sun03Icon', briefcase: 'Briefcase01Icon', bell: 'Notification03Icon', bookmark: 'Bookmark02Icon',
+  'bookmark-check': 'BookmarkCheck02Icon', 'sliders-horizontal': 'FilterHorizontalIcon', 'book-open': 'Book02Icon',
+  scale: 'BalanceScaleIcon', 'building-2': 'Building06Icon', 'git-branch': 'GitBranchIcon', 'circle-help': 'HelpCircleIcon',
+  'life-buoy': 'CustomerSupportIcon', plus: 'Add01Icon', minus: 'MinusSignIcon', 'eye-off': 'ViewOffIcon', flag: 'Flag02Icon',
+  'share-2': 'Share08Icon', 'wifi-off': 'WifiOff01Icon', keyboard: 'KeyboardIcon', 'external-link': 'SquareArrowUpRightIcon',
+  laptop: 'LaptopIcon', timer: 'Clock01Icon', 'filter-x': 'FilterIcon', layers: 'Layers01Icon', server: 'ServerStack01Icon',
+  mail: 'Mail01Icon', chrome: 'ChromeIcon', lock: 'SquareLock02Icon', shield: 'SecurityCheckIcon',
+};
+
+type Node = [string, Record<string, string>];
+interface Props { name: string; size?: number; class?: string; label?: string; duo?: boolean }
+const { name, size = 16, class: cls = '', label, duo = true } = Astro.props;
+const data = (H as unknown as Record<string, Node[]>)[MAP[name] ?? name];
+if (!data) throw new Error(`Unknown icon: ${name}`);
+
+const kebab = (k: string) => k.replace(/[A-Z]/g, (c) => '-' + c.toLowerCase());
+const isClosed = (tag: string, a: Record<string, string>) =>
+  ['circle', 'rect', 'ellipse', 'polygon'].includes(tag) || (tag === 'path' && /z\s*$/i.test(a.d ?? ''));
+const body = data.map(([tag, attrs]) => {
+  const a = Object.entries(attrs).filter(([k]) => k !== 'key').map(([k, v]) => `${kebab(k)}="${v}"`).join(' ');
+  const tone = duo && isClosed(tag, attrs) ? ' class="duo"' : '';
+  return `<${tag} ${a}${tone}/>`;
+}).join('');
 const a11y = label ? `role="img" aria-label="${label}"` : 'aria-hidden="true" focusable="false"';
-// Only touch the outer <svg> tag: inner shapes (e.g. <rect>) have their own width/height.
-const svg = raw
-  .replace(/<!--[\s\S]*?-->/g, '')
-  .replace(/<svg[^>]*>/, (tag) => tag.replace(/\s(width|height|class)="[^"]*"/g, '').replace('<svg', `<svg width="${size}" height="${size}" class="icon ${cls}" ${a11y}`));
+const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" class="icon ${duo ? 'icon-duo ' : ''}${cls}" ${a11y}>${body}</svg>`;
 ---
 <Fragment set:html={svg} />

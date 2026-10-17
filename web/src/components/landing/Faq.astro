@@ -17,8 +17,14 @@ const faqs = [
       <div class="intro" data-stagger>
         <span class="eyebrow" data-reveal>FAQ</span>
         <h2 class="title" id="faq-title" data-reveal>Questions, answered.</h2>
-        <p class="lead" data-reveal>Can’t find yours? <a href="/support">Write to us</a> and we’ll get back to you.</p>
-        <div class="q-art" data-reveal><Figure name="query" intensity={0.7} /></div>
+        <p class="lead" data-reveal>Short answers to what people ask before installing.</p>
+        <div class="q-card" data-reveal>
+          <div class="q-art"><Figure name="query" intensity={0.7} /></div>
+          <div class="q-foot">
+            <span><strong>Still curious?</strong><span>We read every message.</span></span>
+            <a class="btn btn-outline btn-sm" href="/support"><Icon name="mail" size={15} />Write to us</a>
+          </div>
+        </div>
       </div>
       <div class="list" data-stagger>
         {faqs.map((f, i) => (
@@ -38,11 +44,16 @@ const faqs = [
       radial-gradient(55% 70% at 0% 100%, color-mix(in srgb, var(--blob-1) 50%, transparent), transparent 70%),
       radial-gradient(45% 60% at 100% 0%, color-mix(in srgb, var(--blob-3) 40%, transparent), transparent 70%),
       var(--panel); }
-  .layout { display: grid; grid-template-columns: 1fr 1.4fr; gap: clamp(32px, 6vw, 80px); align-items: start; }
-  .intro { display: flex; flex-direction: column; gap: 16px; position: sticky; top: calc(var(--nav-h) + 32px); }
-  .lead a { color: var(--brand); text-decoration: underline; text-underline-offset: 3px; }
-  .q-art { width: 100%; max-width: 300px; aspect-ratio: 5 / 4; border-radius: 20px; background: var(--card); border: 1px solid var(--border); display: grid; place-items: center; margin-top: 16px; overflow: hidden; }
-  .q-art :global([data-figure]) { width: 74%; }
+  /* both columns are the same height: the illustration card grows so its bottom meets the question list's bottom */
+  .layout { display: grid; grid-template-columns: 1fr 1.4fr; gap: clamp(24px, 4vw, 48px); align-items: stretch; }
+  .intro { display: flex; flex-direction: column; gap: 16px; }
+  .q-card { flex: 1; min-height: 300px; margin-top: 16px; display: flex; flex-direction: column; border-radius: 20px; background: var(--card); border: 1px solid var(--border); padding: 6px; box-shadow: var(--shadow-sm); }
+  .q-art { flex: 1; border-radius: 15px; display: grid; place-items: center; overflow: hidden;
+    background: radial-gradient(60% 70% at 50% 45%, var(--brand-soft), transparent 70%), radial-gradient(circle, var(--border) 1px, transparent 1.2px) 0 0 / 18px 18px, var(--panel); }
+  .q-art :global([data-figure]) { width: min(68%, 260px); }
+  .q-foot { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 16px 14px 10px; }
+  .q-foot > span { display: flex; flex-direction: column; line-height: 1.35; }
+  .q-foot strong { font-weight: 600; color: var(--fg); } .q-foot > span > span { font-size: var(--text-sm); color: var(--subtle); }
 
   .list { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 6px 24px; box-shadow: var(--shadow-sm); }
   details { border-bottom: 1px solid var(--border); interpolate-size: allow-keywords; }
@@ -60,8 +71,9 @@ const faqs = [
 
   @media (max-width: 900px) {
     .layout { grid-template-columns: 1fr; }
-    .intro { position: static; }
+    .q-card { min-height: 0; flex: none; }
     .q-art { display: none; }
+    .q-foot { padding: 10px 8px; }
     .list { padding: 4px 18px; }
   }
   @media (prefers-reduced-motion: reduce) { details::details-content { transition: none; } }

@@ -58,7 +58,7 @@ import { MENUS, NAV_LINKS, installHref } from '../lib/site';
           <Icon name="sun" size={16} class="when-dark" />
         </button>
         <a class="btn btn-ghost btn-sm hide-sm" href="/support">Support</a>
-        <a class="btn btn-ink btn-sm" href={installHref}>Add to Chrome</a>
+        <a class="btn btn-ink btn-sm" href={installHref}><Icon name="chrome" size={16} />Add to Chrome</a>
         <button class="icon-btn menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu" aria-label="Open menu" data-mobile-toggle>
           <Icon name="menu" size={18} class="when-closed" />
           <Icon name="x" size={18} class="when-open" />
@@ -78,7 +78,7 @@ import { MENUS, NAV_LINKS, installHref } from '../lib/site';
       <section class="m-group" aria-label="More">
         <ul>{NAV_LINKS.map((l) => <li><a class="m-link" href={l.href}><Icon name="building-2" size={16} />{l.label}</a></li>)}</ul>
       </section>
-      <a class="btn btn-ink btn-lg m-cta" href={installHref}>Add to Chrome, it's free</a>
+      <a class="btn btn-ink btn-lg m-cta" href={installHref}><Icon name="chrome" size={18} />Add to Chrome, it's free</a>
     </div>
   </div>
 </header>
