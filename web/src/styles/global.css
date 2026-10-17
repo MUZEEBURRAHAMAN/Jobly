@@ -154,3 +154,27 @@ a { color: inherit; text-decoration: none; }
 
 /* show the screenshot that matches the current theme */
 [data-theme='light'] .only-dark, [data-theme='dark'] .only-light { display: none; }
+
+/* ---------- sections ---------- */
+.section { padding-block: clamp(72px, 9vw, 128px); }
+.section-tight { padding-block: clamp(56px, 7vw, 96px); }
+.section-head { max-width: 720px; display: flex; flex-direction: column; gap: 16px; }
+.section-head.center { margin-inline: auto; text-align: center; align-items: center; }
+.eyebrow { display: inline-flex; align-items: center; gap: 8px; font-size: var(--text-sm); font-weight: 500; color: var(--brand); letter-spacing: 0.01em; }
+.eyebrow::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+.panel-pad { padding: clamp(48px, 7vw, 96px) clamp(20px, 5vw, 64px); }
+
+/* ---------- scroll reveal (only when JavaScript runs; content is visible without it) ---------- */
+.js [data-reveal] { opacity: 0; transform: translateY(18px); transition: opacity 0.7s var(--ease-out), transform 0.8s var(--ease-out); }
+.js [data-reveal].in { opacity: 1; transform: none; }
+.js [data-reveal='fade'] { transform: none; }
+.js [data-reveal='scale'] { transform: scale(0.97); }
+
+/* ---------- hairline figures: tinted with the brand colour, framed like a product tile ---------- */
+[data-figure] { --hl-hi: var(--brand); width: 100%; }
+.figure-tile { border-radius: var(--radius-card); background: var(--card); border: 1px solid var(--border); overflow: hidden; display: grid; place-items: center; }
+.figure-tile [data-figure] { max-width: 300px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .js [data-reveal] { opacity: 1; transform: none; transition: none; }
+}

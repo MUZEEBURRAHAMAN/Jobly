@@ -1,0 +1,68 @@
+---
+import Figure from '../Figure.astro';
+import Icon from '../Icon.astro';
+
+const faqs = [
+  { q: 'How is Jobly different from LinkedIn or Indeed?', a: 'Jobly reads postings from company career pages and shows the date the employer posted them. It hides anything older than two months, shows no promoted jobs, and works without an account. LinkedIn and Indeed have far more jobs across every industry, plus things Jobly doesn’t do, like Easy Apply.' },
+  { q: 'Is it really free?', a: 'Yes. Jobly is free, has no premium tier and shows no ads.' },
+  { q: 'Which jobs does it cover?', a: 'Product design, frontend, product management, AI/ML and fullstack roles. Jobly reads more than 170 company career pages on Greenhouse, Ashby, Lever, Workday and Amazon, plus remote job boards such as We Work Remotely, Remotive, Himalayas and Arbeitnow.' },
+  { q: 'How fresh are the jobs?', a: 'The server refreshes every two hours and drops anything older than 60 days or no longer listed by the employer. Your browser checks for new matches every 60 to 90 minutes.' },
+  { q: 'What do you store about me?', a: 'Nothing in a database. Your preferences, saved jobs and alerts stay in your browser. Your search words and preferences go to the server with each request to pick matching jobs, and the server doesn’t keep them.' },
+  { q: 'Which browsers does it work in?', a: 'Chrome on desktop. Chromium browsers that install extensions from the Chrome Web Store, such as Edge and Brave, should work too, but we test on Chrome.' },
+];
+---
+<section class="shell faq-wrap" id="faq" aria-labelledby="faq-title">
+  <div class="panel panel-pad faq-panel">
+    <div class="container layout">
+      <div class="intro" data-stagger>
+        <span class="eyebrow" data-reveal>FAQ</span>
+        <h2 class="title" id="faq-title" data-reveal>Questions, answered.</h2>
+        <p class="lead" data-reveal>Can’t find yours? <a href="/support">Write to us</a> and a person replies.</p>
+        <div class="q-art" data-reveal><Figure name="query" intensity={0.7} /></div>
+      </div>
+      <div class="list" data-stagger>
+        {faqs.map((f, i) => (
+          <details name="faq" open={i === 0} data-reveal>
+            <summary><span>{f.q}</span><span class="plus" aria-hidden="true"><Icon name="plus" size={16} /></span></summary>
+            <div class="answer"><p>{f.a}</p></div>
+          </details>
+        ))}
+        <a class="more" href="/faq" data-reveal>See all questions <Icon name="arrow-right" size={14} /></a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .faq-panel { background:
+      radial-gradient(55% 70% at 0% 100%, color-mix(in srgb, var(--blob-1) 50%, transparent), transparent 70%),
+      radial-gradient(45% 60% at 100% 0%, color-mix(in srgb, var(--blob-3) 40%, transparent), transparent 70%),
+      var(--panel); }
+  .layout { display: grid; grid-template-columns: 1fr 1.4fr; gap: clamp(32px, 6vw, 80px); padding-inline: 0; align-items: start; }
+  .intro { display: flex; flex-direction: column; gap: 16px; position: sticky; top: calc(var(--nav-h) + 32px); }
+  .lead a { color: var(--brand); text-decoration: underline; text-underline-offset: 3px; }
+  .q-art { width: 100%; max-width: 300px; aspect-ratio: 5 / 4; border-radius: 20px; background: var(--card); border: 1px solid var(--border); display: grid; place-items: center; margin-top: 16px; overflow: hidden; }
+  .q-art :global([data-figure]) { width: 74%; }
+
+  .list { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 6px 24px; box-shadow: var(--shadow-sm); }
+  details { border-bottom: 1px solid var(--border); interpolate-size: allow-keywords; }
+  details:last-of-type { border-bottom: 0; }
+  summary { list-style: none; display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 20px 0; cursor: pointer; font-size: 1.0625rem; font-weight: 500; color: var(--fg); border-radius: 8px; }
+  summary::-webkit-details-marker { display: none; }
+  summary:hover { color: var(--brand); }
+  .plus { width: 28px; height: 28px; flex: none; display: grid; place-items: center; border-radius: 50%; background: var(--panel); color: var(--fg); transition: transform var(--dur) var(--ease-out), background-color var(--dur-fast) ease; }
+  details[open] .plus { transform: rotate(45deg); background: var(--brand-soft); color: var(--brand); }
+  details::details-content { height: 0; overflow: clip; transition: height 0.35s var(--ease-out), content-visibility 0.35s allow-discrete; }
+  details[open]::details-content { height: auto; }
+  .answer p { color: var(--muted); line-height: 1.7; padding-bottom: 20px; max-width: 62ch; }
+  .more { display: inline-flex; align-items: center; gap: 6px; padding: 16px 0 18px; font-weight: 500; color: var(--fg); border-top: 1px solid var(--border); width: 100%; }
+  .more:hover { color: var(--brand); }
+
+  @media (max-width: 900px) {
+    .layout { grid-template-columns: 1fr; }
+    .intro { position: static; }
+    .q-art { display: none; }
+    .list { padding: 4px 18px; }
+  }
+  @media (prefers-reduced-motion: reduce) { details::details-content { transition: none; } }
+</style>

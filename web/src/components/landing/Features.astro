@@ -1,0 +1,211 @@
+---
+import SectionHead from '../SectionHead.astro';
+import Figure from '../Figure.astro';
+import Icon from '../Icon.astro';
+
+// Demo rows use the same fictional companies as the extension's screenshots.
+const rows = [
+  { l: 'N', title: 'Product Designer', co: 'Northwind Labs', when: '2 hours ago', tone: 'fresh' },
+  { l: 'C', title: 'Frontend Engineer', co: 'Copperfield AI', when: 'Yesterday', tone: 'fresh' },
+  { l: 'S', title: 'Product Manager', co: 'Skylark', when: '5 days ago', tone: '' },
+];
+const extras = [
+  { icon: 'eye-off', text: 'Hide companies you don’t want' },
+  { icon: 'flag', text: 'Report a fake or expired listing' },
+  { icon: 'share-2', text: 'Share a job in one click' },
+  { icon: 'wifi-off', text: 'Shows your last results offline' },
+  { icon: 'moon', text: 'Light and dark mode' },
+  { icon: 'keyboard', text: 'Works fully with the keyboard' },
+];
+---
+<section class="shell features-wrap" id="features" aria-labelledby="features-title">
+  <div class="panel panel-pad">
+    <div class="container inner">
+      <SectionHead eyebrow="Features" id="features-title" title="Six tools in one small extension."
+        lead="Everything below works the moment you install it. None of it needs an account." />
+
+      <div class="bento" data-stagger>
+        <!-- 1. Real posting dates -->
+        <article class="tile t-dates" data-reveal data-play>
+          <div class="visual">
+            <div class="mock list" aria-hidden="true">
+              {rows.map((r) => (
+                <div class="row"><span class="logo">{r.l}</span><span class="who"><b>{r.title}</b><small>{r.co}</small></span><span class:list={['when', r.tone]}>{r.when}</span></div>
+              ))}
+              <div class="row stale"><span class="logo">O</span><span class="who"><b>Senior Designer</b><small>Old Mill Co</small></span><span class="when old">74 days ago</span><span class="removed">Removed: older than 60 days</span></div>
+            </div>
+          </div>
+          <h3>Real posting dates</h3>
+          <p>Every card shows when the employer posted the job. Jobly reads the date from the listing itself, and anything older than 60 days drops off your list.</p>
+        </article>
+
+        <!-- 2. Alerts -->
+        <article class="tile t-alerts" data-reveal data-play>
+          <div class="visual alerts-visual">
+            <div class="toolbar" aria-hidden="true"><span class="ext"><span class="j">J</span><span class="badge">3</span></span></div>
+            <div class="toast" aria-hidden="true">
+              <span class="j big">J</span>
+              <span><b>3 new matches</b><small>Northwind Labs, Skylark and 1 other</small></span>
+              <em>now</em>
+            </div>
+          </div>
+          <h3>Alerts that don’t nag</h3>
+          <p>Jobly checks for new matches every hour or so and sends one grouped notification. Turn it off any time.</p>
+        </article>
+
+        <!-- 3. Filters -->
+        <article class="tile t-filters" data-reveal data-play>
+          <div class="visual">
+            <div class="mock filters" aria-hidden="true">
+              <span class="f-label">Date posted</span>
+              <span class="f-select"><span class="cycle"><i>Any time</i><i>Past week</i><i>Past 24 hours</i></span><Icon name="chevron-down" size={14} /></span>
+              <span class="f-count"><span class="cycle"><i>11,355 jobs</i><i>2,053 jobs</i><i>547 jobs</i></span></span>
+              <span class="f-pills"><span>Remote only</span><span>Senior</span><span>$120K+</span></span>
+            </div>
+          </div>
+          <h3>Filters you already know</h3>
+          <p>Date posted, experience, salary, location and remote, like the filters on LinkedIn.</p>
+        </article>
+
+        <!-- 4. Matches -->
+        <article class="tile t-match" data-reveal>
+          <div class="visual fig"><Figure name="hub" intensity={0.6} /><span class="match-badge" aria-hidden="true"><Icon name="sparkles" size={12} /> Matches you</span></div>
+          <h3>Matched to you</h3>
+          <p>Pick your roles and level once. Jobs that fit get a “Matches you” badge and land in your For you tab.</p>
+        </article>
+
+        <!-- 5. Saved -->
+        <article class="tile t-saved" data-reveal data-play>
+          <div class="visual">
+            <div class="mock job" aria-hidden="true">
+              <div class="row"><span class="logo">Q</span><span class="who"><b>Senior Product Designer</b><small>Quill Systems · Remote</small></span></div>
+              <div class="job-actions">
+                <span class="save"><span class="s-off"><Icon name="bookmark" size={14} /> Save</span><span class="s-on"><Icon name="bookmark-check" size={14} /> Saved</span></span>
+                <span class="apply">Apply <Icon name="external-link" size={13} /></span>
+              </div>
+              <span class="device"><Icon name="laptop" size={13} /> Kept on this device</span>
+            </div>
+          </div>
+          <h3>A shortlist that stays yours</h3>
+          <p>Save a job in one click. Jobly keeps a copy on your device, so it stays on your list after the posting comes down.</p>
+        </article>
+
+        <!-- 6. Direct apply -->
+        <article class="tile t-apply" data-reveal>
+          <div class="visual fig"><Figure name="plug" intensity={0.7} /></div>
+          <h3>Apply on the employer’s site</h3>
+          <p>The Apply button opens the company’s own page. Jobly never stands between you and the application.</p>
+        </article>
+
+        <!-- extras -->
+        <article class="tile t-extras" data-reveal>
+          <h3>And the small things</h3>
+          <ul class="extras">
+            {extras.map((x) => <li><span class="x-icon"><Icon name={x.icon} size={15} /></span>{x.text}</li>)}
+          </ul>
+        </article>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .inner { padding-inline: 0; }
+  .bento { display: grid; grid-template-columns: repeat(6, 1fr); gap: 16px; margin-top: 56px; }
+  .tile { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 12px 12px 24px; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+  .t-dates { grid-column: span 4; } .t-alerts { grid-column: span 2; }
+  .t-filters, .t-match, .t-saved { grid-column: span 2; }
+  .t-apply { grid-column: span 3; } .t-extras { grid-column: span 3; padding: 28px; justify-content: center; }
+  .visual { position: relative; border-radius: 14px; background: var(--panel); min-height: 220px; display: grid; place-items: center; overflow: hidden; margin-bottom: 12px; padding: 20px; }
+  .visual.fig :global([data-figure]) { width: 78%; max-width: 280px; }
+  h3 { font-size: 1.125rem; font-weight: 500; letter-spacing: -0.015em; padding-inline: 12px; color: var(--fg); }
+  .tile > p { font-size: var(--text-md); line-height: 1.6; color: var(--muted); padding-inline: 12px; }
+  .t-extras h3 { padding: 0; }
+
+  /* shared mock bits, drawn like the extension */
+  .mock { width: 100%; font-size: 13px; color: var(--fg); }
+  .row { display: flex; align-items: center; gap: 10px; background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; }
+  .logo { width: 28px; height: 28px; flex: none; display: grid; place-items: center; border-radius: 7px; border: 1px solid var(--border); font-weight: 600; font-size: 12px; color: var(--muted); background: var(--card); }
+  .who { display: flex; flex-direction: column; min-width: 0; flex: 1; line-height: 1.3; }
+  .who b { font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .who small { font-size: 12px; color: var(--subtle); }
+  .when { font-size: 12px; color: var(--subtle); white-space: nowrap; }
+  .when.fresh { color: var(--success); }
+
+  /* 1. dates: the stale row gets struck through, labelled, then folds away */
+  .list { display: flex; flex-direction: column; gap: 8px; max-width: 520px; }
+  .stale { position: relative; transform-origin: top; }
+  .when.old { color: var(--danger); }
+  .removed { position: absolute; right: 10px; top: 50%; translate: 0 -50%; font-size: 11px; font-weight: 500; padding: 3px 8px; border-radius: 999px;
+    background: color-mix(in srgb, var(--danger) 12%, var(--card)); color: var(--danger); opacity: 0; }
+  [data-playing] .stale { animation: stale 7s var(--ease-out) infinite; }
+  [data-playing] .removed { animation: removed 7s var(--ease-out) infinite; }
+  [data-playing] .stale .who b { animation: strike 7s linear infinite; }
+  @keyframes stale { 0%, 30% { opacity: 1; max-height: 60px; } 52% { opacity: 1; } 64%, 86% { opacity: 0; max-height: 0; padding-block: 0; margin-top: -8px; border-width: 0; } 100% { opacity: 1; max-height: 60px; } }
+  @keyframes removed { 0%, 30% { opacity: 0; } 36%, 52% { opacity: 1; } 60%, 100% { opacity: 0; } }
+  @keyframes strike { 0%, 30% { text-decoration: none; } 31%, 60% { text-decoration: line-through; } 61%, 100% { text-decoration: none; } }
+
+  /* 2. alerts: a notification drops in and the badge counts */
+  .alerts-visual { place-items: start stretch; }
+  .toolbar { display: flex; justify-content: flex-end; padding: 2px 4px 16px; }
+  .ext { position: relative; }
+  .j { width: 24px; height: 24px; display: grid; place-items: center; border-radius: 7px; background: var(--brand); color: var(--on-brand); font-size: 12px; font-weight: 700; }
+  .j.big { width: 32px; height: 32px; border-radius: 9px; font-size: 14px; flex: none; }
+  .badge { position: absolute; top: -6px; right: -8px; min-width: 16px; height: 16px; padding: 0 4px; border-radius: 999px; background: var(--fg); color: var(--page); font-size: 10px; font-weight: 600; display: grid; place-items: center; }
+  .toast { display: flex; gap: 10px; align-items: flex-start; background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 12px; box-shadow: var(--shadow-md); font-size: 13px; line-height: 1.35; }
+  .toast > span:not(.j) { display: flex; flex-direction: column; flex: 1; min-width: 0; }
+  .toast b { font-weight: 600; } .toast small { color: var(--subtle); font-size: 12px; }
+  .toast em { font-style: normal; font-size: 11px; color: var(--subtle); }
+  [data-playing] .toast { animation: toast 5.5s var(--ease-out) infinite; }
+  [data-playing] .badge { animation: pop 5.5s var(--ease-out) infinite; }
+  @keyframes toast { 0% { opacity: 0; transform: translateY(-24px) scale(0.96); } 12%, 78% { opacity: 1; transform: none; } 92%, 100% { opacity: 0; transform: translateY(-12px); } }
+  @keyframes pop { 0%, 8% { transform: scale(0); } 16% { transform: scale(1.25); } 22%, 88% { transform: scale(1); } 96%, 100% { transform: scale(0); } }
+
+  /* 3. filters: the date choice and the count change together */
+  .filters { display: grid; gap: 10px; max-width: 280px; }
+  .f-label { font-size: 12px; color: var(--subtle); }
+  .f-select { display: flex; align-items: center; justify-content: space-between; height: 38px; padding: 0 12px; border-radius: 10px; border: 1px solid var(--border-strong); background: var(--card); }
+  .f-count { font-size: 20px; font-weight: 500; letter-spacing: -0.02em; height: 28px; }
+  .cycle { display: grid; } .cycle i { grid-area: 1 / 1; font-style: normal; opacity: 0; }
+  .cycle i:first-child { opacity: 1; }
+  [data-playing] .cycle i { animation: cycle 7.5s infinite; }
+  [data-playing] .cycle i:nth-child(2) { animation-delay: 2.5s; } [data-playing] .cycle i:nth-child(3) { animation-delay: 5s; }
+  [data-playing] .cycle i:first-child { opacity: 0; }
+  @keyframes cycle { 0% { opacity: 0; transform: translateY(6px); } 4%, 30% { opacity: 1; transform: none; } 34%, 100% { opacity: 0; transform: translateY(-6px); } }
+  .f-pills { display: flex; gap: 6px; flex-wrap: wrap; }
+  .f-pills span { font-size: 12px; padding: 3px 9px; border-radius: 999px; border: 1px solid var(--border); background: var(--card); color: var(--muted); }
+
+  /* 4. match badge over the figure */
+  .match-badge { position: absolute; left: 14px; bottom: 14px; display: inline-flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 500; padding: 4px 9px; border-radius: 999px; background: var(--brand-soft); color: var(--brand); }
+
+  /* 5. saved: the button flips to Saved */
+  .job { display: grid; gap: 10px; max-width: 300px; }
+  .job-actions { display: flex; justify-content: space-between; }
+  .save, .apply { display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 12px; border-radius: 8px; font-size: 13px; font-weight: 500; }
+  .save { border: 1px solid var(--border-strong); background: var(--card); display: grid; }
+  .save > span { grid-area: 1 / 1; display: inline-flex; align-items: center; gap: 6px; }
+  .s-on { opacity: 0; color: var(--brand); }
+  .apply { background: var(--ink); color: var(--on-ink); }
+  .device { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: var(--subtle); }
+  [data-playing] .s-off { animation: off 4.5s infinite; } [data-playing] .s-on { animation: on 4.5s infinite; }
+  [data-playing] .save { animation: press 4.5s infinite; }
+  @keyframes off { 0%, 30% { opacity: 1; } 34%, 86% { opacity: 0; } 90%, 100% { opacity: 1; } }
+  @keyframes on { 0%, 30% { opacity: 0; } 34%, 86% { opacity: 1; } 90%, 100% { opacity: 0; } }
+  @keyframes press { 0%, 28% { transform: none; border-color: var(--border-strong); } 31% { transform: scale(0.94); } 35%, 86% { transform: none; border-color: var(--brand); } 90%, 100% { border-color: var(--border-strong); } }
+
+  /* extras */
+  .extras { list-style: none; padding: 0; margin-top: 20px; display: grid; grid-template-columns: 1fr; gap: 14px; }
+  .extras li { display: flex; align-items: center; gap: 10px; font-size: var(--text-md); color: var(--muted); }
+  .x-icon { width: 30px; height: 30px; flex: none; display: grid; place-items: center; border-radius: 8px; background: var(--panel); color: var(--fg); border: 1px solid var(--border); }
+
+  @media (max-width: 1000px) {
+    .bento { grid-template-columns: repeat(2, 1fr); }
+    .t-dates { grid-column: span 2; }
+    .t-alerts, .t-filters, .t-match, .t-saved, .t-apply, .t-extras { grid-column: span 1; }
+  }
+  @media (max-width: 640px) {
+    .bento { grid-template-columns: 1fr; }
+    .tile { grid-column: auto !important; }
+    .extras { grid-template-columns: 1fr; }
+  }
+</style>

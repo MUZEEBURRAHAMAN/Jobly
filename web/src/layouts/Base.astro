@@ -2,6 +2,7 @@
 import '../styles/global.css';
 import AnnouncementBar from '../components/AnnouncementBar.astro';
 import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
 import { SITE } from '../lib/site';
 
 interface Props { title?: string; description: string; path?: string }
@@ -39,5 +40,9 @@ const canonical = new URL(path, SITE.url).href;
     <main id="main">
       <slot />
     </main>
+    <Footer />
+    <script>
+      import '../scripts/motion';
+    </script>
   </body>
 </html>

@@ -1,0 +1,90 @@
+---
+import SectionHead from '../SectionHead.astro';
+import Figure from '../Figure.astro';
+import Icon from '../Icon.astro';
+
+const benefits = [
+  { icon: 'timer', title: 'Apply while a role is new', text: 'New matches reach you within a few hours, and every card says how old the posting is.' },
+  { icon: 'filter-x', title: 'Skip the dead ends', text: 'Listings older than two months and postings that closed never reach your list.' },
+  { icon: 'layers', title: 'One list instead of dozens of tabs', text: 'Jobly reads about 400 career pages and job boards, so you check one place.' },
+];
+// Rounded fallbacks; scripts/motion.ts swaps in the live numbers and counts up to them.
+const stats = [
+  { key: 'new_jobs_today', fallback: '500+', label: 'jobs posted in the last 24 hours' },
+  { key: 'week', fallback: '2,000+', label: 'posted in the last 7 days' },
+  { key: 'active_companies', fallback: '390+', label: 'career pages and job boards read' },
+];
+---
+<section class="shell benefits-wrap" aria-labelledby="benefits-title">
+  <div class="panel panel-pad benefits">
+    <div class="container inner">
+      <div class="layout">
+        <div class="left">
+          <SectionHead eyebrow="Why people use it" id="benefits-title" title="Spend your time applying, not searching."
+            lead="Jobly does the checking, so the hours you give your job search go into applications." />
+          <ul class="list" data-stagger>
+            {benefits.map((b) => (
+              <li data-reveal>
+                <span class="b-icon" aria-hidden="true"><Icon name={b.icon} size={18} /></span>
+                <span><strong>{b.title}</strong><span class="b-text">{b.text}</span></span>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <aside class="privacy" data-reveal="scale" aria-labelledby="privacy-title">
+          <div class="p-art"><Figure name="padlock" intensity={0.7} /></div>
+          <h3 id="privacy-title">Nobody builds a profile on you</h3>
+          <p>No account, no email, no tracking. Your preferences, saved jobs and alerts stay in your browser. Uninstall Jobly and they’re gone.</p>
+          <a class="p-link" href="/privacy">Read the privacy policy <Icon name="arrow-right" size={14} /></a>
+        </aside>
+      </div>
+
+      <dl class="stats" data-stagger>
+        {stats.map((s) => (
+          <div class="stat" data-reveal>
+            <dt>{s.label}</dt>
+            <dd data-count={s.key}>{s.fallback}</dd>
+          </div>
+        ))}
+        <div class="stat" data-reveal><dt>to use, with no premium tier</dt><dd>Free</dd></div>
+      </dl>
+    </div>
+  </div>
+</section>
+
+<style>
+  .inner { padding-inline: 0; }
+  .benefits { background:
+      radial-gradient(60% 80% at 100% 0%, color-mix(in srgb, var(--blob-2) 55%, transparent), transparent 70%),
+      radial-gradient(50% 70% at 0% 100%, color-mix(in srgb, var(--blob-3) 45%, transparent), transparent 70%),
+      var(--panel); }
+  .layout { display: grid; grid-template-columns: 1.25fr 1fr; gap: clamp(32px, 5vw, 72px); align-items: center; }
+  .list { list-style: none; padding: 0; margin-top: 40px; display: grid; gap: 22px; }
+  .list li { display: flex; gap: 16px; align-items: flex-start; }
+  .b-icon { width: 40px; height: 40px; flex: none; display: grid; place-items: center; border-radius: 12px; background: var(--card); border: 1px solid var(--border); color: var(--brand); }
+  .list strong { display: block; font-size: 1.125rem; font-weight: 500; letter-spacing: -0.015em; color: var(--fg); }
+  .b-text { display: block; color: var(--muted); margin-top: 4px; line-height: 1.6; }
+
+  .privacy { background: var(--card); border: 1px solid var(--border); border-radius: 24px; padding: 16px 16px 28px; box-shadow: var(--shadow-md); }
+  .p-art { aspect-ratio: 5 / 4; border-radius: 16px; background: var(--panel); display: grid; place-items: center; margin-bottom: 20px; overflow: hidden; }
+  .p-art :global([data-figure]) { width: 70%; }
+  .privacy h3 { font-size: 1.375rem; font-weight: 500; letter-spacing: -0.02em; padding-inline: 12px; }
+  .privacy p { color: var(--muted); line-height: 1.6; padding-inline: 12px; margin-top: 8px; }
+  .p-link { display: inline-flex; align-items: center; gap: 6px; margin: 16px 12px 0; font-weight: 500; color: var(--brand); }
+  .p-link:hover { text-decoration: underline; text-underline-offset: 3px; }
+
+  .stats { margin-top: clamp(48px, 6vw, 72px); display: grid; grid-template-columns: repeat(4, 1fr); border-top: 1px solid var(--border-strong); }
+  .stat { padding: 24px 24px 0 0; display: flex; flex-direction: column-reverse; gap: 6px; }
+  .stat + .stat { padding-left: 24px; border-left: 1px solid var(--border); }
+  dd { font-size: clamp(2rem, 1.4rem + 2vw, 2.75rem); font-weight: 500; letter-spacing: -0.03em; line-height: 1; color: var(--fg); font-variant-numeric: tabular-nums; }
+  dt { font-size: var(--text-sm); color: var(--subtle); }
+
+  @media (max-width: 960px) {
+    .layout { grid-template-columns: 1fr; }
+    .privacy { max-width: 520px; }
+    .stats { grid-template-columns: repeat(2, 1fr); }
+    .stat:nth-child(3) { padding-left: 0; border-left: 0; }
+    .stat:nth-child(n + 3) { border-top: 1px solid var(--border); margin-top: 24px; }
+  }
+</style>

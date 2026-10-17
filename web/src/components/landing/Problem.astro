@@ -1,0 +1,43 @@
+---
+import SectionHead from '../SectionHead.astro';
+import Figure from '../Figure.astro';
+import Icon from '../Icon.astro';
+
+const problems = [
+  { figure: 'slow', title: 'Old jobs look new', text: 'A repost or a paid boost can push an old listing back to the top. The date you see may say when the post was refreshed, not when the job opened.' },
+  { figure: 'cabinet', title: 'Twenty career pages, every morning', text: 'Many companies post roles on their own career page first. Checking those pages one by one eats your morning.' },
+  { figure: 'router', title: 'Alerts full of noise', text: 'Daily digests mix in promoted jobs and loose matches, so the good ones get lost between them.' },
+];
+---
+<section class="section container problem" aria-labelledby="problem-title">
+  <SectionHead eyebrow="The problem" id="problem-title" title="Job hunting shouldn't feel like digging through an archive."
+    lead="You find a role that looks new, apply, and never hear back. Often the job was filled weeks before you saw it." />
+
+  <div class="cards" data-stagger>
+    {problems.map((p) => (
+      <article class="card" data-reveal>
+        <div class="art"><Figure name={p.figure} intensity={0.55} /></div>
+        <h3>{p.title}</h3>
+        <p>{p.text}</p>
+      </article>
+    ))}
+  </div>
+
+  <p class="bridge" data-reveal>
+    <span class="bridge-mark" aria-hidden="true"><Icon name="sparkles" size={16} /></span>
+    Jobly reads the career pages for you, keeps only recent jobs, and tells you when one fits.
+  </p>
+</section>
+
+<style>
+  .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 56px; }
+  .card { background: var(--panel); border-radius: 20px; padding: 12px 12px 28px; display: flex; flex-direction: column; gap: 10px; }
+  .art { aspect-ratio: 5 / 4; border-radius: 14px; background: var(--card); border: 1px solid var(--border); display: grid; place-items: center; margin-bottom: 14px; overflow: hidden; }
+  .art :global([data-figure]) { width: 82%; }
+  h3 { font-size: 1.25rem; font-weight: 500; letter-spacing: -0.02em; padding-inline: 12px; color: var(--fg); }
+  p { font-size: var(--text-md); line-height: 1.6; color: var(--muted); padding-inline: 12px; }
+  .bridge { margin: 48px auto 0; max-width: 640px; display: flex; gap: 12px; align-items: center; justify-content: center; text-align: left;
+    font-size: 1.125rem; line-height: 1.5; color: var(--fg); font-weight: 500; letter-spacing: -0.01em; }
+  .bridge-mark { width: 36px; height: 36px; flex: none; display: grid; place-items: center; border-radius: 50%; background: var(--brand-soft); color: var(--brand); }
+  @media (max-width: 900px) { .cards { grid-template-columns: 1fr; max-width: 520px; margin-inline: auto; } }
+</style>

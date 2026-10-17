@@ -4,4 +4,5 @@
   try { saved = localStorage.getItem('jobly-theme'); } catch (e) {}
   var dark = saved === 'dark' || (saved !== 'light' && window.matchMedia('(prefers-color-scheme: dark)').matches);
   document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+  document.documentElement.classList.add('js'); // scroll animations only start hidden when scripts run
 })();

@@ -1,0 +1,56 @@
+---
+import Icon from './Icon.astro';
+import { SITE, installHref } from '../lib/site';
+
+const cols = [
+  { title: 'Product', links: [['Features', '/#features'], ['How it works', '/#how-it-works'], ['Jobly vs others', '/#compare'], ['How dates work', '/how-dates-work']] },
+  { title: 'Resources', links: [['Guides', '/guides'], ['Alternatives', '/alternatives'], ['Companies', '/companies'], ['Roadmap', '/roadmap'], ['FAQ', '/faq']] },
+  { title: 'Company', links: [['Support', '/support'], ['Privacy', '/privacy'], ['Security', '/security'], ['Terms', '/terms']] },
+];
+---
+<footer class="shell site-footer">
+  <div class="panel foot">
+    <div class="container top">
+      <div class="brand">
+        <a class="logo" href="/"><span class="mark" aria-hidden="true">J</span>Jobly</a>
+        <p>Fresh jobs from company career pages, in your toolbar.</p>
+        <a class="btn btn-ink btn-sm" href={installHref}>Add to Chrome</a>
+      </div>
+      {cols.map((c) => (
+        <nav aria-label={c.title}>
+          <p class="col-title">{c.title}</p>
+          <ul>{c.links.map(([label, href]) => <li><a href={href}>{label}</a></li>)}</ul>
+        </nav>
+      ))}
+    </div>
+    <div class="container bottom">
+      <span>© {new Date().getFullYear()} Jobly. Not affiliated with the employers or job boards it lists.</span>
+      <span class="status" data-status="unknown"><span class="s-dot" aria-hidden="true"></span><span data-updated>Jobs update every 2 hours</span></span>
+      <a class="mail" href={`mailto:${SITE.email}`}><Icon name="mail" size={14} />{SITE.email}</a>
+    </div>
+    <div class="wordmark" aria-hidden="true">Jobly</div>
+  </div>
+</footer>
+
+<style>
+  .site-footer { margin-top: 16px; padding-bottom: 16px; }
+  .foot { padding-top: clamp(48px, 6vw, 72px); }
+  .top { display: grid; grid-template-columns: 1.6fr repeat(3, 1fr); gap: 32px; }
+  .brand { display: flex; flex-direction: column; gap: 14px; align-items: flex-start; max-width: 280px; }
+  .brand p { color: var(--muted); line-height: 1.6; }
+  .logo { display: inline-flex; align-items: center; gap: 10px; font-weight: 600; font-size: 1.125rem; letter-spacing: -0.02em; }
+  .mark { width: 28px; height: 28px; display: grid; place-items: center; border-radius: 8px; background: var(--brand); color: var(--on-brand); font-size: 0.9375rem; font-weight: 700; }
+  .col-title { font-size: var(--text-sm); font-weight: 600; color: var(--fg); margin-bottom: 12px; }
+  ul { list-style: none; padding: 0; display: grid; gap: 10px; }
+  ul a { color: var(--muted); font-size: var(--text-md); transition: color var(--dur-fast) ease; }
+  ul a:hover { color: var(--fg); }
+  .bottom { display: flex; flex-wrap: wrap; gap: 12px 24px; justify-content: space-between; align-items: center; margin-top: 56px; padding-top: 20px; border-top: 1px solid var(--border); font-size: var(--text-sm); color: var(--subtle); }
+  .status { display: inline-flex; align-items: center; gap: 8px; }
+  .s-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--border-strong); }
+  .status[data-status='ok'] .s-dot { background: var(--success); }
+  .mail { display: inline-flex; align-items: center; gap: 6px; color: var(--muted); }
+  .mail:hover { color: var(--fg); }
+  .wordmark { font-size: clamp(6rem, 22vw, 20rem); font-weight: 600; letter-spacing: -0.06em; line-height: 0.78; text-align: center; margin-top: 32px; margin-bottom: -0.12em;
+    background: linear-gradient(180deg, color-mix(in srgb, var(--fg) 9%, transparent), transparent 85%); -webkit-background-clip: text; background-clip: text; color: transparent; user-select: none; }
+  @media (max-width: 860px) { .top { grid-template-columns: 1fr 1fr; } .brand { grid-column: 1 / -1; } }
+</style>

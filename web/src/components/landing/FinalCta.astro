@@ -1,0 +1,38 @@
+---
+import Figure from '../Figure.astro';
+import Icon from '../Icon.astro';
+import { installHref } from '../../lib/site';
+---
+<section class="shell cta-wrap" aria-labelledby="cta-title">
+  <div class="panel cta">
+    <div class="glow" aria-hidden="true"></div>
+    <div class="copy" data-stagger>
+      <p class="live" data-reveal><span class="dot" aria-hidden="true"></span><span data-count="new_jobs_today">500+</span>&nbsp;jobs posted in the last 24 hours</p>
+      <h2 class="title" id="cta-title" data-reveal>See what went up today.</h2>
+      <p class="lead" data-reveal>Add Jobly to Chrome, pick your roles, and your first matches are waiting. It takes about a minute.</p>
+      <div class="buttons" data-reveal>
+        <a class="btn btn-ink btn-lg" href={installHref}>Add to Chrome, it’s free <Icon name="arrow-right" size={16} class="arrow" /></a>
+        <a class="btn btn-outline btn-lg" href="#how-it-works">How it works</a>
+      </div>
+    </div>
+    <div class="art" data-reveal="scale"><Figure name="terrain" intensity={0.7} /></div>
+  </div>
+</section>
+
+<style>
+  .cta-wrap { margin-top: clamp(72px, 9vw, 120px); }
+  .cta { display: grid; grid-template-columns: 1.2fr 1fr; align-items: center; gap: 32px; padding: clamp(48px, 7vw, 88px) clamp(24px, 6vw, 80px); isolation: isolate; }
+  .glow { position: absolute; inset: 0; z-index: -1; background:
+      radial-gradient(50% 80% at 85% 50%, color-mix(in srgb, var(--blob-1) 75%, transparent), transparent 70%),
+      radial-gradient(40% 60% at 10% 0%, color-mix(in srgb, var(--blob-2) 70%, transparent), transparent 70%); }
+  .copy { display: flex; flex-direction: column; gap: 18px; align-items: flex-start; }
+  .live { display: inline-flex; align-items: center; gap: 8px; font-size: var(--text-sm); color: var(--muted); background: var(--card); border: 1px solid var(--border); border-radius: 999px; padding: 6px 12px; font-variant-numeric: tabular-nums; }
+  .live [data-count] { color: var(--fg); font-weight: 600; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--success); box-shadow: 0 0 0 0 color-mix(in srgb, var(--success) 50%, transparent); animation: ping 2.4s ease-out infinite; }
+  @keyframes ping { 0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--success) 45%, transparent); } 70%, 100% { box-shadow: 0 0 0 8px transparent; } }
+  .buttons { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 8px; }
+  .buttons :global(.arrow) { transition: transform var(--dur) var(--ease-out); }
+  .buttons a:hover :global(.arrow) { transform: translateX(2px); }
+  .art { justify-self: center; width: 100%; max-width: 380px; aspect-ratio: 5 / 4; }
+  @media (max-width: 860px) { .cta { grid-template-columns: 1fr; } .art { max-width: 300px; } }
+</style>

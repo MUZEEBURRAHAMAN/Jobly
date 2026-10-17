@@ -1,0 +1,120 @@
+---
+import SectionHead from '../SectionHead.astro';
+import Icon from '../Icon.astro';
+
+type Mark = 'yes' | 'no' | 'part';
+type Cell = [Mark, string];
+const cols = [
+  { id: 'linkedin', name: 'LinkedIn Jobs' },
+  { id: 'indeed', name: 'Indeed' },
+  { id: 'pages', name: 'Career pages, by hand' },
+];
+// Checked October 2026 (sources listed under the table). Keep this honest: Jobly loses the breadth row.
+const rows: { label: string; jobly: Cell; linkedin: Cell; indeed: Cell; pages: Cell }[] = [
+  { label: 'Shows when the job was first posted', jobly: ['yes', 'From the employer’s listing'], linkedin: ['part', 'Can show a repost date'], indeed: ['part', 'Older jobs say “30+ days”'], pages: ['part', 'Varies by company'] },
+  { label: 'Hides old listings automatically', jobly: ['yes', 'Older than 60 days'], linkedin: ['no', 'Filter by date yourself'], indeed: ['no', 'Filter by date yourself'], pages: ['no', 'No'] },
+  { label: 'No paid or promoted listings', jobly: ['yes', 'None'], linkedin: ['no', '“Promoted” jobs'], indeed: ['no', '“Sponsored” jobs'], pages: ['yes', 'None'] },
+  { label: 'Job alerts without an account', jobly: ['yes', 'No sign-up'], linkedin: ['no', 'Account needed'], indeed: ['no', 'Account needed'], pages: ['no', 'No alerts'] },
+  { label: 'Apply on the employer’s own site', jobly: ['yes', 'Always'], linkedin: ['part', 'Easy Apply or employer site'], indeed: ['part', 'Indeed Apply or employer site'], pages: ['yes', 'Always'] },
+  { label: 'Jobs in every industry', jobly: ['no', 'Tech roles only'], linkedin: ['yes', 'Millions of jobs'], indeed: ['yes', 'Millions of jobs'], pages: ['part', 'One company at a time'] },
+  { label: 'Free for job seekers', jobly: ['yes', 'Free'], linkedin: ['yes', 'Free; Premium is paid'], indeed: ['yes', 'Free'], pages: ['yes', 'Free'] },
+];
+const ICON: Record<Mark, string> = { yes: 'check', no: 'x', part: 'minus' };
+const WORD: Record<Mark, string> = { yes: 'Yes', no: 'No', part: 'Partly' };
+const sources = [
+  { label: 'LinkedIn: reposting a job', href: 'https://www.linkedin.com/help/learning/answer/a522249' },
+  { label: 'LinkedIn: promoted job posts', href: 'https://business.linkedin.com/talent-solutions/jobs-101/pricing' },
+  { label: 'Indeed: free vs sponsored jobs', href: 'https://www.indeed.com/hire/resources/howtohub/free-vs-sponsored-jobs-on-indeed' },
+  { label: 'Indeed: job alerts need an account', href: 'https://www.indeed.com/help/job-seekers/articles/204488890-starting-stopping-and-managing-job-alerts' },
+];
+---
+<section class="section container compare" id="compare" aria-labelledby="compare-title">
+  <SectionHead eyebrow="Jobly vs others" id="compare-title" title="Fewer jobs. Fresher jobs." center
+    lead="LinkedIn and Indeed list far more jobs than Jobly. Jobly does one thing: recent tech jobs straight from the source, without an account." />
+
+  <fieldset class="picker">
+    <legend class="sr-only">Compare Jobly with</legend>
+    {cols.map((c, i) => (
+      <label><input type="radio" name="vs" value={c.id} checked={i === 0} /><span>{c.name}</span></label>
+    ))}
+  </fieldset>
+
+  <div class="table-wrap" data-reveal>
+    <table>
+      <caption class="sr-only">Jobly compared with LinkedIn Jobs, Indeed, and checking company career pages by hand</caption>
+      <thead>
+        <tr>
+          <th scope="col"><span class="sr-only">Feature</span></th>
+          <th scope="col" class="jobly-col"><span class="brand-head"><span class="mark" aria-hidden="true">J</span>Jobly</span></th>
+          {cols.map((c) => <th scope="col" class={`col-${c.id}`}>{c.name}</th>)}
+        </tr>
+      </thead>
+      <tbody>
+        {rows.map((r) => (
+          <tr>
+            <th scope="row">{r.label}</th>
+            {(['jobly', ...cols.map((c) => c.id)] as const).map((k) => {
+              const [mark, text] = r[k as 'jobly' | 'linkedin' | 'indeed' | 'pages'];
+              return (
+                <td class={k === 'jobly' ? 'jobly-col' : `col-${k}`}>
+                  <span class={`cell ${mark}`}>
+                    <span class="m" aria-hidden="true"><Icon name={ICON[mark]} size={13} /></span>
+                    <span><span class="sr-only">{WORD[mark]}. </span>{text}</span>
+                  </span>
+                </td>
+              );
+            })}
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+
+  <p class="sources">Checked October 2026. Products change; <a href="/support">tell us</a> if something here is out of date. Sources:{' '}
+    {sources.map((s, i) => <>{i > 0 && ' · '}<a href={s.href} rel="noopener" target="_blank">{s.label}</a></>)}
+  </p>
+</section>
+
+<style>
+  .picker { display: none; border: 0; padding: 0; margin: 0; min-width: 0; }
+  .table-wrap { margin-top: 56px; border-radius: 20px; border: 1px solid var(--border); background: var(--card); overflow: hidden; }
+  table { width: 100%; border-collapse: collapse; font-size: var(--text-md); }
+  th, td { padding: 16px 20px; text-align: left; vertical-align: middle; border-bottom: 1px solid var(--border); }
+  tbody tr:last-child > * { border-bottom: 0; }
+  thead th { font-size: var(--text-sm); font-weight: 500; color: var(--muted); background: var(--panel); }
+  tbody th { font-weight: 500; color: var(--fg); width: 26%; }
+  .jobly-col { background: color-mix(in srgb, var(--brand-soft) 70%, var(--card)); }
+  thead .jobly-col { background: color-mix(in srgb, var(--brand-soft) 100%, var(--panel)); }
+  .brand-head { display: inline-flex; align-items: center; gap: 8px; color: var(--fg); font-weight: 600; font-size: var(--text-md); }
+  .mark { width: 22px; height: 22px; display: grid; place-items: center; border-radius: 6px; background: var(--brand); color: var(--on-brand); font-size: 12px; font-weight: 700; }
+  .cell { display: flex; gap: 10px; align-items: center; color: var(--muted); line-height: 1.35; }
+  .jobly-col .cell { color: var(--fg); }
+  .m { width: 22px; height: 22px; flex: none; display: grid; place-items: center; border-radius: 50%; }
+  .yes .m { background: color-mix(in srgb, var(--success) 16%, transparent); color: var(--success); }
+  .no .m { background: color-mix(in srgb, var(--danger) 12%, transparent); color: var(--danger); }
+  .part .m { background: var(--card-muted); color: var(--subtle); }
+  tbody tr { transition: background-color var(--dur-fast) ease; }
+  tbody tr:hover > :not(.jobly-col) { background: var(--panel); }
+
+  .sources { margin: 20px auto 0; max-width: 820px; text-align: center; font-size: var(--text-sm); color: var(--subtle); line-height: 1.7; }
+  .sources a { color: var(--muted); text-decoration: underline; text-underline-offset: 3px; }
+  .sources a:hover { color: var(--fg); }
+
+  /* phone: Jobly next to one competitor at a time */
+  @media (max-width: 760px) {
+    .picker { display: flex; gap: 6px; justify-content: center; flex-wrap: wrap; margin-top: 32px; }
+    .picker label { position: relative; }
+    .picker input { position: absolute; opacity: 0; inset: 0; cursor: pointer; }
+    .picker span { display: inline-block; padding: 7px 14px; border-radius: 999px; border: 1px solid var(--border); font-size: var(--text-sm); color: var(--muted); background: var(--card); }
+    .picker input:checked + span { background: var(--ink); color: var(--on-ink); border-color: var(--ink); }
+    .picker input:focus-visible + span { box-shadow: var(--ring); }
+    .table-wrap { margin-top: 16px; }
+    th, td { padding: 12px; font-size: var(--text-sm); }
+    tbody th { width: 34%; }
+    .col-linkedin, .col-indeed, .col-pages { display: none; }
+    .compare:has(input[value='linkedin']:checked) .col-linkedin,
+    .compare:has(input[value='indeed']:checked) .col-indeed,
+    .compare:has(input[value='pages']:checked) .col-pages { display: table-cell; }
+    .m { width: 18px; height: 18px; }
+  }
+</style>

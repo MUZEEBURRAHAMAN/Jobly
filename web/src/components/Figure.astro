@@ -1,0 +1,6 @@
+---
+// A hairline illustration, mounted by scripts/motion.ts when it nears the viewport.
+interface Props { name: string; intensity?: number; autoplay?: boolean; class?: string }
+const { name, intensity = 0.6, autoplay = true, class: cls } = Astro.props;
+---
+<div class={cls} data-figure={name} data-intensity={intensity} data-autoplay={autoplay ? undefined : 'false'}></div>

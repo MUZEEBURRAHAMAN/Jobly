@@ -1,0 +1,10 @@
+---
+interface Props { eyebrow?: string; title: string; lead?: string; center?: boolean; id?: string }
+const { eyebrow, title, lead, center = false, id } = Astro.props;
+---
+<header class:list={['section-head', { center }]} data-stagger>
+  {eyebrow && <span class="eyebrow" data-reveal>{eyebrow}</span>}
+  <h2 class="title" id={id} data-reveal>{title}</h2>
+  {lead && <p class="lead" data-reveal>{lead}</p>}
+  <slot />
+</header>
