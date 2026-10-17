@@ -50,12 +50,14 @@ const cols = [
   .status[data-status='ok'] .s-dot { background: var(--success); }
   .mail { display: inline-flex; align-items: center; gap: 6px; color: var(--muted); }
   .mail:hover { color: var(--fg); }
-  /* Wrangle-style: a huge wordmark on the content edge, in a warm brand gradient, cut off by the bottom of the panel */
-  .wm-wrap { margin-top: clamp(28px, 4vw, 48px); }
-  .wordmark { font-size: clamp(7.5rem, 29vw, 26rem); font-weight: 600; letter-spacing: -0.07em; line-height: 0.8; margin-left: -0.05em; margin-bottom: -0.17em;
-    background: linear-gradient(100deg, #e9764c 0%, #f39a6c 30%, #f8bd97 62%, #fcdcc8 100%);
+  /* Wrangle-style: a huge wordmark, centred, in a soft brand gradient; only its top half shows above the panel's edge */
+  .wm-wrap { --wm: clamp(7.5rem, 26vw, 24rem); margin-top: clamp(8px, 1.5vw, 20px); height: calc(var(--wm) * 0.62); overflow: hidden;
+    display: flex; justify-content: center; }
+  .wordmark { font-size: var(--wm); font-weight: 600; letter-spacing: -0.06em; line-height: 1; white-space: nowrap;
+    transform: translateX(-0.18em); /* centre what is visible: the J's hook sits in the hidden lower half */
+    background: linear-gradient(100deg, rgb(233 118 76 / 0.5) 0%, rgb(243 154 108 / 0.42) 40%, rgb(248 189 151 / 0.36) 75%, rgb(252 210 186 / 0.32) 100%);
     -webkit-background-clip: text; background-clip: text; color: transparent; user-select: none;
-    -webkit-mask-image: linear-gradient(180deg, #000 45%, rgb(0 0 0 / 0.45) 100%); mask-image: linear-gradient(180deg, #000 45%, rgb(0 0 0 / 0.45) 100%); }
-  :global([data-theme='dark']) .wordmark { background-image: linear-gradient(100deg, #8a3517 0%, #a8461f 35%, #c26038 70%, #7a3216 100%); }
+    -webkit-mask-image: linear-gradient(180deg, #000 40%, rgb(0 0 0 / 0.35) 62%); mask-image: linear-gradient(180deg, #000 40%, rgb(0 0 0 / 0.35) 62%); }
+  :global([data-theme='dark']) .wordmark { background-image: linear-gradient(100deg, rgb(178 76 36 / 0.55) 0%, rgb(200 104 62 / 0.45) 50%, rgb(150 60 28 / 0.38) 100%); }
   @media (max-width: 860px) { .top { grid-template-columns: 1fr 1fr; } .brand { grid-column: 1 / -1; } }
 </style>

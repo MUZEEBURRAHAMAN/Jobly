@@ -119,7 +119,7 @@ const extras = [
   .t-dates { grid-column: span 4; } .t-alerts { grid-column: span 2; }
   .t-filters, .t-match, .t-saved { grid-column: span 2; }
   .t-apply { grid-column: span 3; } .t-extras { grid-column: span 3; padding: 26px 22px 22px; justify-content: flex-start; }
-  .visual { position: relative; border-radius: 13px; background: var(--panel); min-height: 240px; display: grid; place-items: center; overflow: hidden; padding: 20px; }
+  .visual { position: relative; height: 300px; flex: none; border-radius: 13px; background: var(--panel); display: grid; place-items: center; overflow: hidden; padding: 20px; }
   .visual.fig :global([data-figure]) { width: 78%; max-width: 280px; }
   h3 { margin: 22px 18px 0; font-size: 1.1875rem; font-weight: 500; letter-spacing: -0.015em; color: var(--fg); }
   .tile > p { margin: 8px 18px 0; font-size: var(--text-md); line-height: 1.6; color: var(--muted); }
@@ -192,7 +192,8 @@ const extras = [
   [data-playing] .cycle i { animation: cycle 7.5s infinite; }
   [data-playing] .cycle i:nth-child(2) { animation-delay: 2.5s; } [data-playing] .cycle i:nth-child(3) { animation-delay: 5s; }
   [data-playing] .cycle i:first-child { opacity: 0; }
-  @keyframes cycle { 0% { opacity: 0; transform: translateY(6px); } 4%, 30% { opacity: 1; transform: none; } 34%, 100% { opacity: 0; transform: translateY(-6px); } }
+  /* each label overlaps the next one's fade-in, so the field is never empty */
+  @keyframes cycle { 0% { opacity: 0; transform: translateY(6px); } 4%, 33.3% { opacity: 1; transform: none; } 37%, 100% { opacity: 0; transform: translateY(-6px); } }
   .f-pills { display: flex; gap: 6px; flex-wrap: wrap; }
   .f-pills span { font-size: 12px; padding: 3px 9px; border-radius: 999px; border: 1px solid var(--border); background: var(--card); color: var(--muted); }
 
