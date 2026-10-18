@@ -10,7 +10,8 @@
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro",
-    "og": "node scripts/make-og.mjs"
+    "og": "node scripts/make-og.mjs",
+    "map": "node scripts/make-map.mjs"
   },
   "dependencies": {
     "@hugeicons/core-free-icons": "^4.3.5",
@@ -19,6 +20,7 @@
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.10",
+    "dotted-map": "^3.1.0",
     "typescript": "^6.0.3"
   }
 }

@@ -18,7 +18,7 @@ from urllib.parse import parse_qsl, urlencode
 
 from .config import settings
 
-CACHEABLE_PATHS = {"/api/jobs", "/api/stats", "/api/companies"}
+CACHEABLE_PATHS = {"/api/jobs", "/api/stats", "/api/companies", "/api/geo"}
 MAX_ENTRIES = 400
 MAX_TOTAL_BYTES = 24 * 1024 * 1024
 MAX_ENTRY_BYTES = 400 * 1024
@@ -69,7 +69,7 @@ def _worth_caching(path: str, body: bytes) -> bool:
     # Never pin a "still gathering" answer: the client polls these until real data shows up.
     if path == "/api/stats":
         return b'"is_syncing":true' not in body and b'"total_jobs":0,' not in body
-    if path == "/api/jobs":
+    if path in ("/api/jobs", "/api/geo"):
         return b'"total":0,' not in body
     return True
 

@@ -14,9 +14,10 @@ from ..config import settings
 from ..db import get_db_connection, get_utc_now
 from ..schemas import (
     JobOut, JobsResponse, CompanyOut, CompanyCreate,
-    PreferencesSchema, StatsOut
+    PreferencesSchema, StatsOut, GeoOut, GeoPlace, GeoCountry
 )
 from ..matching import matches_preferences
+from ..geo import COUNTRIES, HUBS, place_of
 from ..ingestion.runner import sync_all_sources
 from ..ingestion.runner import age_cutoff_iso
 from ..security import UnsafeURL, require_admin, validate_public_url
@@ -510,3 +511,49 @@ async def get_stats(prefs_dict: dict[str, Any] = Depends(prefs_param)):
             last_sync_time=last_sync,
             is_syncing=_sync_lock.locked()
         )
+
+
+@router.get("/api/geo", response_model=GeoOut)
+async def get_geo():
+    """Open jobs in Jobly's five roles, by country and hiring hub: feeds the map on the website."""
+    window = age_cutoff_iso(settings.MAX_JOB_AGE_DAYS)
+    async with get_db_connection() as db:
+        cur = await db.execute(
+            "SELECT location, normalized_role, company_id FROM jobs "
+            "WHERE status = 'active' AND normalized_role IS NOT NULL AND (posted_at IS NULL OR posted_at >= ?)",
+            (window,),
+        )
+        rows = await cur.fetchall()
+
+    hubs = {h[0]: h for h in HUBS}
+    place_roles: dict[tuple[str, str, str], dict[str, int]] = {}      # (kind, name, country) -> role counts
+    place_firms: dict[tuple[str, str, str], set[int]] = {}
+    country_roles: dict[str, dict[str, int]] = {}
+    country_firms: dict[str, set[int]] = {}
+    roles: dict[str, int] = {}
+    unplaced = 0
+    for row in rows:
+        role, firm = row["normalized_role"], row["company_id"]
+        roles[role] = roles.get(role, 0) + 1
+        country, hub = place_of(row["location"])
+        if country is None:
+            unplaced += 1
+            continue
+        key = ("hub", hub, country) if hub else ("country", country, country)
+        place_roles.setdefault(key, {})
+        place_roles[key][role] = place_roles[key].get(role, 0) + 1
+        place_firms.setdefault(key, set()).add(firm)
+        country_roles.setdefault(country, {})
+        country_roles[country][role] = country_roles[country].get(role, 0) + 1
+        country_firms.setdefault(country, set()).add(firm)
+
+    places = []
+    for (kind, name, country), by_role in place_roles.items():
+        lat, lng = (hubs[name][2], hubs[name][3]) if kind == "hub" else COUNTRIES[country][:2]
+        places.append(GeoPlace(name=name, kind=kind, country=country, lat=lat, lng=lng, jobs=sum(by_role.values()),
+                               employers=len(place_firms[(kind, name, country)]), roles=by_role))
+    places.sort(key=lambda p: -p.jobs)
+    by_country = sorted((GeoCountry(country=c, jobs=sum(r.values()), employers=len(country_firms[c]), roles=r) for c, r in country_roles.items()),
+                        key=lambda c: -c.jobs)
+    return GeoOut(total=len(rows), countries=len(country_roles), employers=len({r["company_id"] for r in rows}), unplaced=unplaced,
+                  roles=roles, places=places, by_country=by_country)

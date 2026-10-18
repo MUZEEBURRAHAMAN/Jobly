@@ -1,0 +1,157 @@
+---
+// "Where the jobs are": a dotted world map. Each cluster is a hiring hub, sized by its open tech jobs; hover or tap
+// one (or pick a country below) for its numbers. The headline, the stats and the country list are real text, so the
+// section reads fine without the canvas. Numbers: build-time copy of /api/geo, refreshed live by scripts/job-map.ts.
+import { geoAtBuild } from '../../lib/geo';
+import { SITE } from '../../lib/site';
+import Icon from '../Icon.astro';
+
+interface Props { title?: string; lead?: string }
+const {
+  title,
+  lead = 'Every dot is a place employers are hiring right now. Bigger clusters, more open jobs. Hover or tap one to see who.',
+} = Astro.props;
+const geo = await geoAtBuild();
+const fmt = (n: number) => new Intl.NumberFormat('en-US').format(n);
+const top = geo?.by_country.slice(0, 10) ?? [];
+const topMax = top[0]?.jobs ?? 1;
+const hubs = geo?.places.filter((p) => p.kind === 'hub').length ?? 0;
+---
+<section class="shell map-wrap" aria-labelledby="map-title" data-job-map data-api={SITE.api}>
+  <div class="panel panel-pad map-panel">
+    <div class="container">
+      <header class="head" data-stagger>
+        <span class="eyebrow" data-reveal>Coverage</span>
+        <h2 class="title" id="map-title" data-reveal>
+          {title ?? <><span class="big" data-geo="total">{geo ? fmt(geo.total) : '2,000+'}</span> tech jobs open in <span class="big" data-geo="countries">{geo?.countries ?? '30+'}</span> countries</>}
+        </h2>
+        <p class="lead" data-reveal>{lead}</p>
+      </header>
+
+      <div class="stage" data-reveal="fade">
+        <div class="scroll" data-scroll>
+          <div class="inner">
+            <canvas class="canvas" data-canvas aria-hidden="true"></canvas>
+          </div>
+        </div>
+        <div class="tip" data-tip aria-hidden="true">
+          <p class="t-name" data-t="name"></p>
+          <p class="t-sub" data-t="sub"></p>
+          <ul class="t-roles" data-t="roles"></ul>
+        </div>
+        <p class="hint" aria-hidden="true"><span class="h-dot"></span><span class="h-hover">Hover a cluster</span><span class="h-touch">Tap a cluster, or scroll the map sideways</span></p>
+      </div>
+
+      <dl class="stats" data-stagger>
+        <div class="stat" data-reveal><dt>tech jobs open</dt><dd data-geo="total2">{geo ? fmt(geo.total) : '2,000+'}</dd></div>
+        <div class="stat" data-reveal><dt>employers hiring</dt><dd data-geo="employers">{geo ? fmt(geo.employers) : '190+'}</dd></div>
+        <div class="stat" data-reveal><dt>countries</dt><dd data-geo="countries2">{geo?.countries ?? '30+'}</dd></div>
+        <div class="stat" data-reveal><dt>hiring hubs on the map</dt><dd data-geo="hubs">{hubs || '40+'}</dd></div>
+      </dl>
+
+      <div class="countries" data-stagger>
+        <h3 class="c-title" data-reveal>Where most jobs are</h3>
+        <ol class="c-list" data-list>
+          {top.map((c) => (
+            <li data-reveal>
+              <button type="button" class="c-row" data-country={c.country}>
+                <span class="c-name">{c.country}</span>
+                <span class="c-bar" aria-hidden="true"><span class={`c-fill w${Math.max(5, Math.round((c.jobs / topMax) * 20) * 5)}`}></span></span>
+                <span class="c-num"><span class="sr-only">, </span>{fmt(c.jobs)}<span class="sr-only"> tech jobs at {c.employers} employers</span></span>
+              </button>
+            </li>
+          ))}
+        </ol>
+      </div>
+
+      <p class="note small">
+        Jobly reads about {geo ? Math.round((geo.employers) / 10) * 10 : 190}+ tech employers with openings, mostly US companies plus remote job boards, so the map leans west. A job whose location only says “Remote” isn’t placed ({geo ? fmt(geo.unplaced) : 'a few hundred'} right now).{' '}
+        <a href="/companies">See every employer <Icon name="arrow-right" size={13} /></a>
+      </p>
+    </div>
+  </div>
+  {geo && <script type="application/json" data-geo-seed set:html={JSON.stringify(geo)} />}
+</section>
+<script>import '../../scripts/job-map';</script>
+
+<style>
+  .map-panel { background:
+      radial-gradient(55% 60% at 50% 0%, color-mix(in srgb, var(--blob-2) 70%, transparent), transparent 70%),
+      var(--panel); }
+  .head { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 16px; max-width: 820px; margin-inline: auto; }
+  .head .title { font-size: clamp(2.25rem, 1.4rem + 3.4vw, 4rem); line-height: 1.04; }
+  .big { font-variant-numeric: tabular-nums; }
+  .head .lead { max-width: 56ch; }
+  .stage { position: relative; margin-top: clamp(24px, 4vw, 48px); }
+  .scroll { overflow-x: auto; overflow-y: hidden; scrollbar-width: none; overscroll-behavior-x: contain; border-radius: 12px; }
+  .scroll::-webkit-scrollbar { display: none; }
+  .inner { position: relative; }
+  .canvas { display: block; width: 100%; height: auto; aspect-ratio: 167 / 64; touch-action: pan-y; cursor: default; }
+  .canvas[data-hover] { cursor: pointer; }
+  .hint { margin-top: 8px; display: flex; align-items: center; gap: 8px; font-size: var(--text-xs); color: var(--subtle); transition: opacity var(--dur) ease; }
+  .h-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--ink); }
+  .h-touch { display: none; }
+  .stage[data-used] .hint { opacity: 0; }
+  @media (hover: none) { .h-hover { display: none; } .h-touch { display: inline; } }
+  /* phone: draw the map wider than the screen so clusters are big enough to tap, and let it scroll sideways */
+  @media (max-width: 640px) { .inner { min-width: 640px; } .h-hover { display: none; } .h-touch { display: inline; } }
+
+  .tip { position: absolute; left: 0; top: 0; z-index: 3; width: min(288px, calc(100% - 16px)); padding: 14px 16px; border-radius: 16px; background: var(--card); border: 1px solid var(--border-strong);
+    box-shadow: var(--shadow-lg); pointer-events: none; opacity: 0; transition: opacity var(--dur-fast) ease; }
+  .tip[data-open] { opacity: 1; }
+  .t-name { font-weight: 600; font-size: 1.0625rem; letter-spacing: -0.015em; }
+  .t-sub { margin-top: 2px; font-size: var(--text-sm); color: var(--muted); font-variant-numeric: tabular-nums; }
+  .t-roles { list-style: none; padding: 0; margin-top: 12px; display: grid; gap: 6px; }
+  .t-roles :global(li) { display: grid; grid-template-columns: 1fr auto; gap: 2px 12px; font-size: var(--text-xs); color: var(--muted); font-variant-numeric: tabular-nums; }
+  .t-roles :global(.bar) { grid-column: 1 / -1; height: 4px; border-radius: 999px; background: var(--card-muted); overflow: hidden; }
+  .tip[data-narrow] { padding: 10px 14px; }
+  .tip[data-narrow] .t-roles { display: flex; flex-wrap: wrap; gap: 2px 14px; margin-top: 6px; }
+  .tip[data-narrow] .t-roles :global(li) { display: flex; gap: 5px; }
+  .tip[data-narrow] .t-roles :global(.bar) { display: none; }
+  .t-roles :global(.bar > span) { display: block; height: 100%; border-radius: inherit; background: var(--brand); }
+
+  .stats { margin-top: clamp(32px, 5vw, 56px); display: grid; grid-template-columns: repeat(4, 1fr); border-top: 1px solid var(--border-strong); }
+  .stat { padding: 24px 24px 0 0; display: flex; flex-direction: column-reverse; gap: 6px; }
+  .stat + .stat { padding-left: 24px; border-left: 1px solid var(--border); }
+  .stat dd { font-size: clamp(2rem, 1.4rem + 2vw, 2.75rem); font-weight: 500; letter-spacing: -0.03em; line-height: 1; color: var(--fg); font-variant-numeric: tabular-nums; }
+  .stat dt { font-size: var(--text-sm); color: var(--subtle); }
+
+  .countries { margin-top: clamp(40px, 5vw, 64px); }
+  .c-title { font-size: 1.125rem; font-weight: 500; letter-spacing: -0.015em; }
+  .c-list { list-style: none; padding: 0; margin-top: 16px; display: grid; grid-template-columns: 1fr 1fr; gap: 4px 48px; }
+  .c-row { width: 100%; display: grid; grid-template-columns: minmax(96px, 150px) 1fr 52px; align-items: center; gap: 14px; padding: 10px 12px; margin-inline: -12px; border-radius: 12px; text-align: left;
+    transition: background-color var(--dur-fast) ease; }
+  .c-row:hover, .c-row[data-on], .c-row:focus-visible { background: var(--card); }
+  .c-name { font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .c-bar { height: 6px; border-radius: 999px; background: var(--card-muted); overflow: hidden; }
+  .c-fill { display: block; height: 100%; width: 0; border-radius: inherit; background: var(--ink); transition: width 1s var(--ease-out), background-color var(--dur-fast) ease; }
+  .c-row:hover .c-fill, .c-row[data-on] .c-fill, .c-row:focus-visible .c-fill { background: var(--brand); }
+  :global(html:not(.js)) .c-fill.w5, :global(.in) .c-fill.w5 { width: 5%; }
+  :global(html:not(.js)) .c-fill.w10, :global(.in) .c-fill.w10 { width: 10%; }
+  :global(html:not(.js)) .c-fill.w15, :global(.in) .c-fill.w15 { width: 15%; }
+  :global(html:not(.js)) .c-fill.w20, :global(.in) .c-fill.w20 { width: 20%; }
+  :global(html:not(.js)) .c-fill.w25, :global(.in) .c-fill.w25 { width: 25%; }
+  :global(html:not(.js)) .c-fill.w30, :global(.in) .c-fill.w30 { width: 30%; }
+  :global(html:not(.js)) .c-fill.w35, :global(.in) .c-fill.w35 { width: 35%; }
+  :global(html:not(.js)) .c-fill.w40, :global(.in) .c-fill.w40 { width: 40%; }
+  :global(html:not(.js)) .c-fill.w45, :global(.in) .c-fill.w45 { width: 45%; }
+  :global(html:not(.js)) .c-fill.w50, :global(.in) .c-fill.w50 { width: 50%; }
+  :global(html:not(.js)) .c-fill.w55, :global(.in) .c-fill.w55 { width: 55%; }
+  :global(html:not(.js)) .c-fill.w60, :global(.in) .c-fill.w60 { width: 60%; }
+  :global(html:not(.js)) .c-fill.w65, :global(.in) .c-fill.w65 { width: 65%; }
+  :global(html:not(.js)) .c-fill.w70, :global(.in) .c-fill.w70 { width: 70%; }
+  :global(html:not(.js)) .c-fill.w75, :global(.in) .c-fill.w75 { width: 75%; }
+  :global(html:not(.js)) .c-fill.w80, :global(.in) .c-fill.w80 { width: 80%; }
+  :global(html:not(.js)) .c-fill.w85, :global(.in) .c-fill.w85 { width: 85%; }
+  :global(html:not(.js)) .c-fill.w90, :global(.in) .c-fill.w90 { width: 90%; }
+  :global(html:not(.js)) .c-fill.w95, :global(.in) .c-fill.w95 { width: 95%; }
+  :global(html:not(.js)) .c-fill.w100, :global(.in) .c-fill.w100 { width: 100%; }
+  .c-num { text-align: right; font-variant-numeric: tabular-nums; color: var(--muted); }
+  .note { margin-top: 32px; max-width: 78ch; line-height: 1.7; }
+  .note a { display: inline-flex; align-items: center; gap: 4px; color: var(--muted); text-decoration: underline; text-underline-offset: 3px; white-space: nowrap; }
+  .note a:hover { color: var(--fg); }
+
+  @media (max-width: 960px) { .stats { grid-template-columns: repeat(2, 1fr); } .stats .stat:nth-child(3) { padding-left: 0; border-left: 0; } .stats .stat:nth-child(n + 3) { border-top: 1px solid var(--border); margin-top: 24px; } }
+  @media (max-width: 760px) { .c-list { grid-template-columns: 1fr; } }
+  @media (max-width: 560px) { .c-row { grid-template-columns: minmax(80px, 120px) 1fr 44px; gap: 10px; } }
+</style>

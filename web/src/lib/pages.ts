@@ -6,6 +6,7 @@ import { ROLES } from './roles';
 import { isoDate } from './text';
 
 export type PageInfo = { path: string; title: string; eyebrow: string; summary: string; lastmod?: string; section: string };
+type Draft = Omit<PageInfo, 'lastmod'> & { lastmod?: string };
 
 const BUILT = isoDate(new Date());
 
@@ -26,12 +27,13 @@ export async function listPages(): Promise<PageInfo[]> {
     { path: '/support', title: 'How can we help?', eyebrow: 'Support', summary: 'Contact the Jobly team.', section: 'Company' },
     ...['privacy', 'terms', 'security'].map((id) => ({ path: `/${id}`, title: doc(id).data.title, eyebrow: doc(id).data.eyebrow, summary: doc(id).data.description, lastmod: isoDate(doc(id).data.updated), section: 'Company' })),
   ];
-  return [
+  const drafts: Draft[] = [
     ...core,
     ...ROLES.map((r) => ({ path: `/jobs/${r.slug}`, title: `${r.name} jobs, straight from the source.`, eyebrow: `${r.name} jobs`, summary: r.lead, section: 'Jobs' })),
     ...guides.map((g) => ({ path: g.href, title: g.data.title, eyebrow: g.data.category, summary: g.data.description, lastmod: isoDate(g.data.updated ?? g.data.date), section: 'Guides' })),
     ...ALTERNATIVES.map((a) => ({ path: `/alternatives/${a.slug}`, title: a.title, eyebrow: `${a.name} alternative`, summary: a.description, section: 'Alternatives' })),
-  ].map((p) => ({ ...p, lastmod: p.lastmod ?? BUILT }));
+  ];
+  return drafts.map((p) => ({ ...p, lastmod: p.lastmod ?? BUILT }));
 }
 
 /** The social image for a path: one per page when it exists, else the default. */

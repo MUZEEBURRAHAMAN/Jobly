@@ -116,3 +116,32 @@ class StatsOut(BaseModel):
     last_sync_time: str | None = None
     # True while a crawl is running (the client shows "gathering jobs" instead of an empty list)
     is_syncing: bool = False
+
+
+class GeoPlace(BaseModel):
+    name: str
+    kind: str                      # "hub" (a city or metro) or "country" (jobs in a country outside any hub)
+    country: str
+    lat: float
+    lng: float
+    jobs: int
+    employers: int
+    roles: dict[str, int]
+
+
+class GeoCountry(BaseModel):
+    country: str
+    jobs: int
+    employers: int
+    roles: dict[str, int]
+
+
+class GeoOut(BaseModel):
+    """Jobs in Jobly's five roles by place. `unplaced` are jobs whose location names no country (plain "Remote")."""
+    total: int
+    countries: int
+    employers: int
+    unplaced: int
+    roles: dict[str, int]
+    places: list[GeoPlace]
+    by_country: list[GeoCountry]
