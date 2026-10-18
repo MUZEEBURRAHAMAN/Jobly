@@ -9,7 +9,8 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "og": "node scripts/make-og.mjs"
   },
   "dependencies": {
     "@hugeicons/core-free-icons": "^4.3.5",

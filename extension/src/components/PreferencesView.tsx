@@ -1,7 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { Check, Save } from '../lib/icons';
+import { Check, ExternalLink, Save } from '../lib/icons';
 import { Preferences } from '../types';
 import { ROLES, SENIORITIES } from '../lib/format';
+
+const SITE = 'https://joblyextension.netlify.app';
+const HELP = [['Guides', '/guides'], ['FAQ', '/faq'], ['Support', '/support'], ['Privacy', '/privacy']] as const;
 
 interface PreferencesViewProps {
   preferences: Preferences;
@@ -92,6 +95,15 @@ export const PreferencesView: React.FC<PreferencesViewProps> = ({ preferences, o
       </div>
       {onReplayWelcome && <button type="button" className="btn btn-ghost btn-sm" style={{ alignSelf: 'flex-start' }} onClick={onReplayWelcome}>Show the welcome tour again</button>}
       <p role="status" className="text-sm" style={{ color: 'var(--success)' }}>{justSaved && 'Saved on this device.'}</p>
+
+      <nav aria-label="Help">
+        <p className="label">Help</p>
+        <div className="row wrap">
+          {HELP.map(([label, path]) => (
+            <a key={path} className="btn btn-ghost btn-sm" href={SITE + path} target="_blank" rel="noopener noreferrer">{label} <ExternalLink size={12} aria-hidden="true" /></a>
+          ))}
+        </div>
+      </nav>
     </form>
   );
 };

@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /thanks
+Disallow: /uninstall
+Disallow: /og-pages.json
+
+Sitemap: https://joblyextension.netlify.app/sitemap.xml
