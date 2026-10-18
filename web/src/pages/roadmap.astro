@@ -1,0 +1,111 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHero from '../components/page/PageHero.astro';
+import SectionHead from '../components/SectionHead.astro';
+import Icon from '../components/Icon.astro';
+import FinalCta from '../components/landing/FinalCta.astro';
+
+// Status of upcoming work. "Exploring" items are ideas, not promises.
+const board = [
+  { id: 'now', title: 'In progress', icon: 'clock', items: [
+    { t: 'Chrome Web Store listing', d: 'Publishing Jobly so it installs in one click.' },
+    { t: 'This website', d: 'Guides, comparisons and live job pages for each role.' },
+  ] },
+  { id: 'next', title: 'Planned', icon: 'calendar', items: [
+    { t: 'More companies', d: 'Adding career pages people ask for. Suggest one through support.' },
+    { t: 'More hiring systems', d: 'Reading more of the systems companies use for their careers pages.' },
+    { t: 'Clearer job cards', d: 'Showing salary and location details more consistently across sources.' },
+  ] },
+  { id: 'later', title: 'Exploring', icon: 'lightbulb', items: [
+    { t: 'More role families', d: 'Such as data, DevOps and mobile engineering.' },
+    { t: 'Other browsers', d: 'Listing Jobly in the Edge and Firefox add-on stores.' },
+    { t: 'Export saved jobs', d: 'Download your shortlist as a file you can keep.' },
+  ] },
+];
+const changelog = [
+  { date: '2026-10-18', title: 'A new website, and fewer logs', items: [
+    'New website with guides, how dates work, a live list of companies, privacy, security and support pages.',
+    'After uninstalling, Chrome opens a short optional feedback page. It carries no identifier.',
+    'Jobly’s server no longer keeps an access log, so your search words aren’t written to its logs.',
+  ] },
+  { date: '2026-10-17', title: 'Your data stays on your device', items: [
+    'Preferences, saved jobs and alerts now live only in your browser. The server keeps no record of who asked for what.',
+    'Alerts are worked out in your browser: only jobs that appeared since the last check.',
+    'Real posting dates from each source, a 60-day limit and a Date posted filter.',
+    'A full-page dashboard, a welcome tour and a helpful message for every empty or error state.',
+    'Faster under load: identical requests are answered from a two-minute cache.',
+    'New look: the Switzer typeface, new icons and an animated light and dark switch.',
+  ] },
+  { date: '2026-10-16', title: 'Safer and sturdier', items: [
+    'Server limits on request rates and input sizes, and a guard that keeps the crawler off private networks.',
+    'The extension handles slow or failed requests honestly and works with a keyboard and screen readers.',
+  ] },
+  { date: '2026-09-25', title: 'Jobly’s first version', items: [
+    'Jobly gets its name, a search that understands common job-title variations, and matching to your roles and experience.',
+    'The server starts reading company career pages on its own schedule.',
+  ] },
+];
+const fmt = (d: string) => new Date(d + 'T12:00:00Z').toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+---
+<Base title="Roadmap" description="What Jobly is working on, what's planned, and everything that shipped, with dates.">
+  <PageHero crumbs={[{ label: 'Roadmap' }]} eyebrow="Roadmap" title="What’s next, and what shipped." figure="rail" intensity={0.7}
+    lead="Jobly is shaped by feedback from the people who use it. Here is what’s in progress, what’s planned, and a dated list of every change." />
+
+  <section class="container section board-wrap" aria-labelledby="board-title">
+    <h2 class="sr-only" id="board-title">Roadmap</h2>
+    <div class="board" data-stagger>
+      {board.map((col) => (
+        <section class:list={['col', col.id]} aria-labelledby={`${col.id}-t`} data-reveal>
+          <h3 id={`${col.id}-t`}><span class="c-icon" aria-hidden="true"><Icon name={col.icon} size={16} /></span>{col.title}<span class="count">{col.items.length}</span></h3>
+          <ul>{col.items.map((i) => <li><strong>{i.t}</strong><span>{i.d}</span></li>)}</ul>
+        </section>
+      ))}
+    </div>
+    <p class="small note">Planned and exploring items can change. Want something? <a href="/support">Tell us</a>; requests decide what comes next.</p>
+  </section>
+
+  <section class="shell" aria-labelledby="log-title">
+    <div class="panel panel-pad">
+      <div class="container log-wrap">
+        <SectionHead eyebrow="Changelog" id="log-title" title="Everything that shipped" />
+        <ol class="log">
+          {changelog.map((c) => (
+            <li data-reveal>
+              <time datetime={c.date}>{fmt(c.date)}</time>
+              <div class="entry">
+                <h3>{c.title}</h3>
+                <ul>{c.items.map((i) => <li>{i}</li>)}</ul>
+              </div>
+            </li>
+          ))}
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <FinalCta title="Try what shipped." secondary={{ label: 'Suggest a feature', href: '/support' }} />
+</Base>
+
+<style>
+  .board { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .col { padding: 8px; border-radius: 22px; background: var(--panel); border: 1px solid var(--border); }
+  .col h3 { display: flex; align-items: center; gap: 10px; padding: 12px 12px 14px; font-size: 1rem; font-weight: 600; }
+  .c-icon { width: 28px; height: 28px; display: grid; place-items: center; border-radius: 8px; background: var(--card); border: 1px solid var(--border); }
+  .now .c-icon { color: var(--brand); }
+  .next .c-icon { color: var(--success); }
+  .later .c-icon { color: var(--subtle); }
+  .count { margin-left: auto; font-size: var(--text-sm); color: var(--subtle); font-weight: 500; }
+  .col ul { list-style: none; padding: 0; display: grid; gap: 8px; }
+  .col li { padding: 16px; border-radius: 14px; background: var(--card); border: 1px solid var(--border); box-shadow: var(--shadow-sm); display: grid; gap: 4px; }
+  .col strong { font-weight: 500; }
+  .col li span { color: var(--muted); font-size: var(--text-md); line-height: 1.55; }
+  .note { margin-top: 20px; }
+  .note a { color: var(--muted); text-decoration: underline; text-underline-offset: 3px; }
+  .log { list-style: none; padding: 0; margin-top: 48px; display: grid; }
+  .log > li { display: grid; grid-template-columns: 200px minmax(0, 1fr); gap: 32px; padding-block: 28px; border-top: 1px solid var(--border-strong); }
+  .log time { font-size: var(--text-sm); font-weight: 500; color: var(--brand); padding-top: 4px; }
+  .entry h3 { font-size: 1.25rem; font-weight: 500; letter-spacing: -0.02em; }
+  .entry ul { margin-top: 12px; padding-left: 1.2em; display: grid; gap: 8px; color: var(--muted); line-height: 1.6; max-width: 70ch; }
+  .entry li::marker { color: var(--subtle); }
+  @media (max-width: 900px) { .board { grid-template-columns: 1fr; } .log > li { grid-template-columns: 1fr; gap: 8px; } }
+</style>

@@ -44,10 +44,6 @@ Jobly's own server keeps no access log. It logs only errors and crawl results, n
 
 The hosting providers (Render, Cloudflare and Netlify) keep short-lived technical logs such as IP address, time and the address requested, like any website. Because a search request carries your search words in its address, those can appear in the provider's logs for a short time.
 
-## Open source
-
-All of Jobly's code is public on [GitHub](https://github.com/MUZEEBURRAHAMAN/Jobly), so you can check every claim on this page.
-
 ## Report a security problem
 
 Found a vulnerability? Please email [rahamanmuzeeb1108@gmail.com](mailto:rahamanmuzeeb1108@gmail.com) with "Security" in the subject and the steps to reproduce it. Please don't open a public issue for it first.

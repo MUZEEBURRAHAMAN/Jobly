@@ -1,12 +1,12 @@
 ---
 title: Terms of use
 eyebrow: Terms
-description: The plain-language terms for using the Jobly extension, website and server. Free, open source, no warranty.
+description: The plain-language terms for using the Jobly extension, website and server. Free, no account, no warranty.
 updated: 2026-10-18
 figure: format
 ---
 
-> **The short version.** Jobly is free and open source. It shows public job listings from other companies, so check details on the employer's site before you rely on them. Use the extension and the server fairly, and we'll keep them running as well as we can.
+> **The short version.** Jobly is free. It shows public job listings from other companies, so check details on the employer's site before you rely on them. Use the extension and the server fairly, and we'll keep them running as well as we can.
 
 ## Agreeing to these terms
 
@@ -26,7 +26,7 @@ Jobly collects public job postings from company career pages and job boards and 
 
 Jobly is free and has no paid tier. The server runs on a free hosting plan, so it can be slow to wake up or briefly unavailable. We may change, pause or end any part of the service.
 
-The software is provided "as is", without warranty of any kind, as described in its MIT license. To the extent the law allows, the people who make Jobly are not liable for any loss that comes from using it, including a missed job or a listing that turned out to be wrong.
+Jobly is provided "as is", without warranty of any kind. To the extent the law allows, the people who make Jobly are not liable for any loss that comes from using it, including a missed job or a listing that turned out to be wrong.
 
 ## Fair use of the server
 
@@ -36,13 +36,13 @@ Jobly's server exists to answer the extension and this website. Please don't:
 - Try to break into it, test its security without telling us, or use it to attack anyone else.
 - Resell its data or present it as your own service.
 
-We may block traffic that does this. If you want to build on Jobly, the code is open source: run your own copy.
+We may block traffic that does this. If you'd like to build something on Jobly's data, [ask us first](/support).
 
-## Open source
+## Jobly's name, software and credits
 
-Jobly's code is released under the [MIT license](https://github.com/MUZEEBURRAHAMAN/Jobly/blob/main/LICENSE). You may use, copy and change it under that license. The name "Jobly" and its logo are not part of the license; please don't use them in a way that suggests your copy is ours.
+The Jobly name, logo, extension and website belong to their maker. You may use them to find jobs; please don't copy, resell or rebrand them.
 
-The Switzer typeface is by Indian Type Foundry under the ITF Free Font License. Icons are from Hugeicons (MIT) and illustrations from hairline.
+Jobly is built with work by others: the Switzer typeface by Indian Type Foundry (ITF Free Font License), icons from Hugeicons (MIT license) and illustrations from hairline.
 
 ## Changes to these terms
 

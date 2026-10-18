@@ -1,0 +1,76 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHero from '../components/page/PageHero.astro';
+import Icon from '../components/Icon.astro';
+import FinalCta from '../components/landing/FinalCta.astro';
+import { FAQ_GROUPS, ALL_FAQS } from '../lib/faq';
+
+const jsonLd = {
+  '@context': 'https://schema.org', '@type': 'FAQPage',
+  mainEntity: ALL_FAQS.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })),
+};
+---
+<Base title="FAQ" description="Answers about Jobly: what it covers, where posting dates come from, how alerts work, what it stores, and how to fix common problems.">
+  <PageHero crumbs={[{ label: 'FAQ' }]} eyebrow="FAQ" title="Questions, answered." figure="query" intensity={0.7}
+    lead={`${ALL_FAQS.length} short answers about what Jobly covers, how dates and alerts work, what it stores, and what to do when something looks off.`} />
+
+  <section class="container faq">
+    <nav class="groups" aria-label="Topics">
+      <p class="g-title">Topics</p>
+      <ul>{FAQ_GROUPS.map((g) => <li><a href={`#${g.id}`}>{g.title}<span>{g.items.length}</span></a></li>)}</ul>
+      <a class="btn btn-outline btn-sm ask" href="/support"><Icon name="mail" size={15} />Ask a question</a>
+    </nav>
+    <div class="lists">
+      {FAQ_GROUPS.map((g) => (
+        <section class="group" id={g.id} aria-labelledby={`${g.id}-title`}>
+          <h2 id={`${g.id}-title`}>{g.title}</h2>
+          <div class="card">
+            {g.items.map((f) => (
+              <details name={g.id}>
+                <summary><span>{f.q}</span><span class="plus" aria-hidden="true"><Icon name="plus" size={16} /></span></summary>
+                <p class="answer">{f.a}</p>
+              </details>
+            ))}
+          </div>
+        </section>
+      ))}
+    </div>
+  </section>
+
+  <FinalCta title="Still deciding? Try it." lead="Jobly is free and needs no account. If it isn’t for you, uninstalling removes everything it stored." />
+  <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+</Base>
+
+<style>
+  .faq { display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: clamp(32px, 6vw, 96px); padding-block: clamp(48px, 6vw, 80px) var(--section-y); }
+  .groups { position: sticky; top: calc(var(--nav-h) + 24px); align-self: start; }
+  .g-title { font-size: var(--text-sm); font-weight: 600; margin-bottom: 12px; }
+  .groups ul { list-style: none; padding: 0; display: grid; gap: 2px; }
+  .groups a:not(.btn) { display: flex; justify-content: space-between; padding: 7px 10px; margin-inline: -10px; border-radius: 8px; color: var(--muted); font-size: var(--text-md); }
+  .groups a:not(.btn):hover { background: var(--panel); color: var(--fg); }
+  .groups a span { color: var(--subtle); font-variant-numeric: tabular-nums; }
+  .ask { margin-top: 20px; }
+  .lists { display: grid; gap: 48px; max-width: 820px; }
+  .group { scroll-margin-top: calc(var(--nav-h) + 24px); }
+  .group h2 { font-size: 1.5rem; font-weight: 500; letter-spacing: -0.025em; margin-bottom: 16px; }
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 4px 24px; }
+  details { border-bottom: 1px solid var(--border); interpolate-size: allow-keywords; }
+  details:last-child { border-bottom: 0; }
+  summary { list-style: none; display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 18px 0; cursor: pointer; font-size: 1.0625rem; font-weight: 500; border-radius: 8px; }
+  summary::-webkit-details-marker { display: none; }
+  summary:hover { color: var(--brand); }
+  .plus { width: 28px; height: 28px; flex: none; display: grid; place-items: center; border-radius: 50%; background: var(--panel); color: var(--fg); transition: transform var(--dur) var(--ease-out), background-color var(--dur-fast) ease; }
+  details[open] .plus { transform: rotate(45deg); background: var(--brand-soft); color: var(--brand); }
+  details::details-content { height: 0; overflow: clip; transition: height 0.35s var(--ease-out), content-visibility 0.35s allow-discrete; }
+  details[open]::details-content { height: auto; }
+  .answer { color: var(--muted); line-height: 1.7; padding-bottom: 20px; max-width: 64ch; }
+  @media (max-width: 960px) {
+    .faq { grid-template-columns: 1fr; }
+    .groups { position: static; }
+    .groups ul { display: flex; flex-wrap: wrap; gap: 6px; }
+    .groups a:not(.btn) { margin: 0; border: 1px solid var(--border); border-radius: 999px; padding: 6px 12px; gap: 8px; font-size: var(--text-sm); }
+    .ask { display: none; }
+  }
+  @media (max-width: 560px) { .card { padding: 2px 16px; } }
+  @media (prefers-reduced-motion: reduce) { details::details-content { transition: none; } }
+</style>

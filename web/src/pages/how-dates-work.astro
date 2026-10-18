@@ -1,0 +1,172 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHero from '../components/page/PageHero.astro';
+import SectionHead from '../components/SectionHead.astro';
+import Icon from '../components/Icon.astro';
+import FinalCta from '../components/landing/FinalCta.astro';
+import { SOURCES } from '../lib/sources';
+
+const rules = [
+  { icon: 'calendar', title: 'The employer’s own date', text: 'Jobly reads the posting date from the system the employer published the job in, not the day Jobly happened to find it.' },
+  { icon: 'filter-x', title: 'Nothing older than 60 days', text: 'Jobs posted more than 60 days ago are never stored, and jobs that pass the limit are removed at the next refresh.' },
+  { icon: 'x', title: 'Closed jobs go away', text: 'When an employer takes a job down, Jobly stops showing it at the next refresh, within about two hours.' },
+];
+const life = [
+  { when: 'Day 0', title: 'Posted', text: 'The employer publishes the job on its careers page or a job board.' },
+  { when: 'Within 2 hours', title: 'Found', text: 'Jobly’s server reads every source every two hours and stores the job with its real date.' },
+  { when: 'Within 60–90 min', title: 'You’re told', text: 'Your browser checks for new matches and shows an alert if the job fits your preferences.' },
+  { when: 'Day 60', title: 'Retired', text: 'The job drops out of Jobly, even if the employer still lists it.' },
+];
+const buckets = [
+  { key: '1', label: 'Last 24 hours' },
+  { key: '7', label: '1 to 7 days' },
+  { key: '14', label: '1 to 2 weeks' },
+  { key: '30', label: '2 to 4 weeks' },
+  { key: '60', label: '1 to 2 months' },
+];
+const unclear = [
+  { title: 'Relative dates', text: 'Some systems say “Posted 3 days ago” instead of a date. Jobly turns that into a date when it reads the page. “30+ days ago” counts as 30 days, so those jobs can be a little older than shown.' },
+  { title: 'No date at all', text: 'If a source gives no date, Jobly doesn’t invent one. The job has no age on its card, appears after dated jobs, and is left out whenever you use the Date posted filter.' },
+  { title: 'Reposts', text: 'If an employer closes a job and publishes it again as a new posting, it gets a new date. Jobly can’t tell that apart from a new job.' },
+  { title: 'Updated, not new', text: 'Greenhouse is read from the date a job was first published. Only when that’s missing does Jobly fall back to the last update, which can make a job look newer than it is.' },
+];
+---
+<Base title="How dates work" description="Where every posting date in Jobly comes from, source by source, the 60-day rule, and how closed jobs are removed. With live numbers.">
+  <PageHero crumbs={[{ label: 'How dates work' }]} eyebrow="How dates work" title="Every date, straight from the source." figure="turntable" intensity={0.7}
+    lead="A job’s age is the most useful thing to know before you apply. Here is exactly where Jobly gets each date, what it does with old jobs, and where the limits are." />
+
+  <section class="container section rules-wrap" aria-labelledby="rules-title">
+    <h2 class="sr-only" id="rules-title">The rules</h2>
+    <ul class="rules" data-stagger>
+      {rules.map((r) => (
+        <li data-reveal><span class="r-icon" aria-hidden="true"><Icon name={r.icon} size={20} /></span><h3>{r.title}</h3><p>{r.text}</p></li>
+      ))}
+    </ul>
+  </section>
+
+  <section class="shell" aria-labelledby="live-title">
+    <div class="panel panel-pad">
+      <div class="container live">
+        <SectionHead eyebrow="Live" id="live-title" title="How old are the jobs in Jobly right now?"
+          lead="Every open job, grouped by when the employer posted it. These numbers come straight from Jobly’s server." />
+        <div class="chart" data-freshness data-reveal>
+          <ul class="bars">
+            {buckets.map((b) => (
+              <li data-bucket={b.key}>
+                <span class="b-label">{b.label}</span>
+                <span class="b-track"><span class="b-fill"></span></span>
+                <span class="b-value" data-value>–</span>
+              </li>
+            ))}
+          </ul>
+          <p class="c-foot small" data-chart-status role="status" aria-live="polite">Loading live numbers…</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="container section" aria-labelledby="sources-title">
+    <SectionHead eyebrow="Sources" id="sources-title" title="Where each date comes from"
+      lead="Jobly reads company career pages through the hiring system each company uses, plus four remote job boards. Each one names its date a little differently." />
+    <div class="table-wrap" data-reveal>
+      <table>
+        <caption class="sr-only">The posting date field Jobly reads from each source</caption>
+        <thead><tr><th scope="col">Source</th><th scope="col">Type</th><th scope="col">Date Jobly reads</th><th scope="col">What it means</th></tr></thead>
+        <tbody>
+          {Object.values(SOURCES).map((s) => (
+            <tr><th scope="row">{s.label}</th><td>{s.kind === 'career' ? 'Careers page' : 'Job board'}</td><td><code>{s.field}</code></td><td>{s.note}</td></tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+    <p class="small t-note">See the <a href="/companies">full list of companies</a> and which source each one uses.</p>
+  </section>
+
+  <section class="shell" aria-labelledby="life-title">
+    <div class="panel panel-pad">
+      <div class="container">
+        <SectionHead eyebrow="Timeline" id="life-title" title="A job’s life in Jobly" />
+        <ol class="life" data-stagger>
+          {life.map((l, i) => (
+            <li data-reveal><span class="l-dot" aria-hidden="true">{i + 1}</span><span class="l-when">{l.when}</span><h3>{l.title}</h3><p>{l.text}</p></li>
+          ))}
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <section class="container section" aria-labelledby="limits-title">
+    <SectionHead eyebrow="Limits" id="limits-title" title="When a date isn’t clear-cut"
+      lead="No method is perfect. These are the cases where a date in Jobly can be off, and what Jobly does about them." />
+    <div class="limits" data-stagger>
+      {unclear.map((u) => <div class="limit" data-reveal><h3>{u.title}</h3><p>{u.text}</p></div>)}
+    </div>
+    <p class="small t-note">Spotted a wrong date? <a href="/support">Tell us</a> or use <strong>Report this listing</strong> in the extension.</p>
+  </section>
+
+  <FinalCta title="See only jobs that are still fresh." />
+  <script>import '../scripts/freshness';</script>
+</Base>
+
+<style>
+  .rules-wrap { padding-bottom: clamp(48px, 6vw, 80px); }
+  .rules { list-style: none; padding: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .rules li { padding: 24px; border-radius: 20px; border: 1px solid var(--border); background: var(--card); }
+  .r-icon { width: 42px; height: 42px; display: grid; place-items: center; border-radius: 12px; background: var(--brand-soft); color: var(--brand); margin-bottom: 18px; }
+  .rules h3, .limit h3, .life h3 { font-size: 1.125rem; font-weight: 500; letter-spacing: -0.015em; }
+  .rules p, .limit p, .life p { color: var(--muted); margin-top: 6px; line-height: 1.6; }
+
+  .live { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); gap: clamp(32px, 5vw, 72px); align-items: center; }
+  .chart { padding: 28px; border-radius: 20px; background: var(--card); border: 1px solid var(--border); box-shadow: var(--shadow-md); }
+  .bars { list-style: none; padding: 0; display: grid; gap: 14px; }
+  .bars li { display: grid; grid-template-columns: 110px 1fr 64px; align-items: center; gap: 14px; }
+  .b-label { font-size: var(--text-sm); color: var(--muted); }
+  .b-track { height: 12px; border-radius: 999px; background: var(--card-muted); overflow: hidden; }
+  .b-fill { display: block; height: 100%; width: 0; border-radius: inherit; background: linear-gradient(90deg, var(--brand), color-mix(in srgb, var(--brand) 55%, var(--blob-1)));
+    transition: width 1.1s var(--ease-out); }
+  .bars li:nth-child(n + 4) .b-fill { background: color-mix(in srgb, var(--brand) 45%, var(--card-muted)); }
+  .b-value { text-align: right; font-weight: 500; font-variant-numeric: tabular-nums; }
+  .c-foot { margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--border); }
+
+  .table-wrap { margin-top: 40px; border-radius: 20px; border: 1px solid var(--border); background: var(--card); overflow: hidden; }
+  table { width: 100%; border-collapse: collapse; font-size: var(--text-md); }
+  th, td { padding: 14px 18px; text-align: left; vertical-align: top; border-bottom: 1px solid var(--border); line-height: 1.5; }
+  tbody tr:last-child > * { border-bottom: 0; }
+  thead th { font-size: var(--text-sm); font-weight: 600; background: var(--panel); }
+  tbody th { font-weight: 500; white-space: nowrap; }
+  td { color: var(--muted); }
+  td:nth-child(2) { white-space: nowrap; }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.8125rem; padding: 0.15em 0.4em; border-radius: 6px; background: var(--card-muted); color: var(--fg); overflow-wrap: anywhere; }
+  .t-note { margin-top: 16px; }
+  .t-note a { color: var(--muted); text-decoration: underline; text-underline-offset: 3px; }
+
+  .life { list-style: none; padding: 0; margin-top: 48px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; counter-reset: s; position: relative; }
+  .life::before { content: ''; position: absolute; left: 20px; right: 20px; top: 19px; height: 1px; background: var(--border-strong); }
+  .life li { position: relative; }
+  .l-dot { position: relative; width: 40px; height: 40px; display: grid; place-items: center; border-radius: 50%; background: var(--card); border: 1px solid var(--border-strong); font-weight: 600; color: var(--brand); }
+  .life li:last-child .l-dot { background: var(--ink); color: var(--on-ink); border-color: var(--ink); }
+  .l-when { display: block; margin-top: 16px; font-size: var(--text-sm); color: var(--brand); font-weight: 500; }
+  .life h3 { margin-top: 4px; }
+
+  .limits { margin-top: 40px; display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .limit { padding: 24px; border-radius: 20px; background: var(--panel); }
+
+  @media (max-width: 960px) {
+    .rules { grid-template-columns: 1fr; }
+    .live { grid-template-columns: 1fr; }
+    .life { grid-template-columns: 1fr 1fr; row-gap: 32px; }
+    .life::before { display: none; }
+  }
+  @media (max-width: 760px) {
+    thead { display: none; }
+    tbody tr { display: grid; grid-template-columns: 1fr; padding: 14px 16px; border-bottom: 1px solid var(--border); gap: 4px; }
+    tbody tr:last-child { border-bottom: 0; }
+    th, td { padding: 0; border: 0; }
+    td:nth-child(2) { font-size: var(--text-sm); color: var(--subtle); }
+  }
+  @media (max-width: 560px) {
+    .limits, .life { grid-template-columns: 1fr; }
+    .bars li { grid-template-columns: 1fr 56px; row-gap: 6px; }
+    .b-label { grid-column: 1 / -1; }
+  }
+</style>

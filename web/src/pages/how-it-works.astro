@@ -1,0 +1,155 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHero from '../components/page/PageHero.astro';
+import SectionHead from '../components/SectionHead.astro';
+import HowItWorks from '../components/landing/HowItWorks.astro';
+import Icon from '../components/Icon.astro';
+import FinalCta from '../components/landing/FinalCta.astro';
+import { SITE, installHref } from '../lib/site';
+
+const views = [
+  { id: 'jobs', title: 'Jobs feed', text: 'Your matches, newest first. Every card shows the company, location, how long ago it was posted, and a Matches you badge when it fits your preferences. Apply opens the employer’s own page.', points: ['Sorted by real posting date', 'Search by title, company or skill', 'Report a wrong or suspicious listing'] },
+  { id: 'filters', title: 'Filters', text: 'Narrow the list without changing your preferences: location, experience, minimum salary, how recently the job was posted, and remote.', points: ['Date posted: past 24 hours to past month', 'Minimum salary, or only jobs that list one', 'Reset all filters in one click'] },
+  { id: 'saved', title: 'Saved jobs', text: 'Keep a shortlist while you prepare your application. Saved jobs stay in this browser and nowhere else.', points: ['One click to save or remove', 'Works offline', 'No account, no sync to a server'] },
+  { id: 'alerts', title: 'Alerts', text: 'New matches found by the background check, with how long ago each was posted. New ones stay highlighted for the rest of your visit.', points: ['Badge on the toolbar icon', 'Optional desktop notification', 'Only jobs that appeared since the last check'] },
+];
+const prefs = [
+  { icon: 'briefcase', title: 'Roles', text: 'Product design, frontend, product management, AI and machine learning, and fullstack. Pick one or several.' },
+  { icon: 'layers', title: 'Experience', text: 'Intern, junior (0–2 years), mid (2–5), senior (5–8), and lead or staff (8+).' },
+  { icon: 'globe', title: 'Remote only', text: 'Hide on-site and hybrid jobs.' },
+  { icon: 'tag', title: 'Keywords', text: 'Words to include, such as Figma or PyTorch, and words to leave out, such as contract.' },
+  { icon: 'bell', title: 'Desktop alerts', text: 'One notification when new jobs match. Off until you turn it on.' },
+];
+const flow = [
+  { icon: 'server', title: 'Jobly’s server reads the sources', text: 'Every two hours it reads around 400 career pages and job boards, keeps each job’s real posting date, and drops anything older than 60 days.' },
+  { icon: 'laptop', title: 'Your browser asks for matches', text: 'The extension sends your search and preferences with each request. The server answers and keeps nothing.' },
+  { icon: 'bell', title: 'New matches become alerts', text: 'Your browser compares the answer with what it has seen before and shows only what’s new.' },
+];
+---
+<Base title="How it works" description="How Jobly finds new tech jobs on company career pages, matches them to your preferences in your browser, and alerts you. Install guide included.">
+  <PageHero crumbs={[{ label: 'How it works' }]} eyebrow="How it works" title="From the careers page to your toolbar." figure="hub" intensity={0.7}
+    lead="Jobly does the checking for you: it reads company career pages every two hours, keeps each job’s real date, and tells you when a new one fits what you’re looking for.">
+    <div class="hero-ctas"><a class="btn btn-ink" href="#install"><Icon name="chrome" size={17} />Install Jobly</a><a class="btn btn-outline" href="#tour">Take the tour</a></div>
+  </PageHero>
+
+  <HowItWorks />
+
+  <section class="shell" id="tour" aria-labelledby="tour-title">
+    <div class="panel panel-pad">
+      <div class="container">
+        <SectionHead eyebrow="Tour" id="tour-title" title="What you’ll see" lead="Jobly opens as a full page from the toolbar icon. Four views, nothing else to learn." />
+        <div class="views">
+          {views.map((v, i) => (
+            <article class:list={['view', { flip: i % 2 }]} data-reveal>
+              <div class="v-shot">
+                <img class="only-light" src={`/img/dashboard-${v.id}-light.webp`} width="1440" height="900" alt="" loading="lazy" decoding="async" />
+                <img class="only-dark" src={`/img/dashboard-${v.id}-dark.webp`} width="1440" height="900" alt="" loading="lazy" decoding="async" />
+              </div>
+              <div class="v-copy">
+                <span class="v-num">0{i + 1}</span>
+                <h3>{v.title}</h3>
+                <p>{v.text}</p>
+                <ul>{v.points.map((p) => <li><Icon name="check" size={16} />{p}</li>)}</ul>
+              </div>
+            </article>
+          ))}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="container section" aria-labelledby="prefs-title">
+    <SectionHead eyebrow="Preferences" id="prefs-title" title="Tell it once what you want" lead="Set these in the welcome tour or later in Preferences. They’re stored in your browser and used to pick your matches." />
+    <ul class="prefs" data-stagger>
+      {prefs.map((p) => <li data-reveal><span class="p-icon" aria-hidden="true"><Icon name={p.icon} size={20} /></span><h3>{p.title}</h3><p>{p.text}</p></li>)}
+    </ul>
+  </section>
+
+  <section class="shell" aria-labelledby="flow-title">
+    <div class="panel panel-pad">
+      <div class="container">
+        <SectionHead eyebrow="Behind the scenes" id="flow-title" title="What happens in the background" />
+        <ol class="flow" data-stagger>
+          {flow.map((f, i) => (
+            <li data-reveal><span class="f-icon" aria-hidden="true"><Icon name={f.icon} size={20} /></span><span class="f-step">Step {i + 1}</span><h3>{f.title}</h3><p>{f.text}</p></li>
+          ))}
+        </ol>
+        <p class="flow-links"><a href="/how-dates-work">How dates work <Icon name="arrow-right" size={14} /></a><a href="/security">Permissions and security <Icon name="arrow-right" size={14} /></a></p>
+      </div>
+    </div>
+  </section>
+
+  <section class="container section install" id="install" aria-labelledby="install-title">
+    <div class="i-card">
+      <div class="i-copy">
+        <span class="eyebrow">Install</span>
+        <h2 class="title" id="install-title">{SITE.storeUrl ? 'Add Jobly to Chrome' : 'Coming soon to the Chrome Web Store'}</h2>
+        {SITE.storeUrl ? (
+          <p class="lead">Install from the Chrome Web Store, pin the icon to your toolbar, and pick your roles in the welcome tour.</p>
+        ) : (
+          <p class="lead">Jobly is getting ready for its Chrome Web Store listing. As soon as it’s live, the Add to Chrome buttons on this site will take you straight there.</p>
+        )}
+        <ol class="i-steps">
+          <li><span>1</span>{SITE.storeUrl ? 'Open the Chrome Web Store page and click Add to Chrome.' : 'Come back when the listing is live, or ask us to let you know.'}</li>
+          <li><span>2</span>Click the puzzle icon in Chrome’s toolbar and pin Jobly.</li>
+          <li><span>3</span>Pick your roles in the welcome tour. Your first matches appear right away.</li>
+        </ol>
+        <div class="i-ctas">
+          {SITE.storeUrl
+            ? <a class="btn btn-ink btn-lg" href={installHref}><Icon name="chrome" size={18} />Add to Chrome, it’s free</a>
+            : <a class="btn btn-ink btn-lg" href="/support"><Icon name="mail" size={18} />Tell me when it’s live</a>}
+          <a class="btn btn-outline btn-lg" href="/faq">Read the FAQ</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <FinalCta title="Ready when you are." secondary={{ label: 'Read the guides', href: '/guides' }} />
+</Base>
+
+<style>
+  .hero-ctas { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 8px; }
+  .views { margin-top: 56px; display: grid; gap: clamp(48px, 6vw, 80px); }
+  .view { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: clamp(24px, 4vw, 56px); align-items: center; }
+  .view.flip .v-shot { order: 2; }
+  .v-shot { border-radius: 16px; overflow: hidden; border: 1px solid var(--border-strong); box-shadow: var(--shadow-lg); background: var(--card); }
+  .v-shot img { width: 100%; height: auto; vertical-align: top; }
+  .v-num { font-size: var(--text-sm); font-weight: 600; color: var(--brand); font-variant-numeric: tabular-nums; }
+  .v-copy h3 { font-size: clamp(1.5rem, 1.2rem + 1vw, 2rem); font-weight: 500; letter-spacing: -0.03em; margin-top: 8px; }
+  .v-copy p { color: var(--muted); margin-top: 10px; line-height: 1.65; font-size: var(--text-lg); }
+  .v-copy ul { list-style: none; padding: 0; margin-top: 18px; display: grid; gap: 10px; }
+  .v-copy li { display: flex; gap: 10px; align-items: center; color: var(--fg-2); }
+  .v-copy li :global(.icon) { color: var(--success); }
+
+  .prefs { list-style: none; padding: 0; margin-top: 40px; display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; }
+  .prefs li { padding: 20px; border-radius: 18px; border: 1px solid var(--border); background: var(--card); }
+  .p-icon, .f-icon { width: 40px; height: 40px; display: grid; place-items: center; border-radius: 12px; background: var(--brand-soft); color: var(--brand); margin-bottom: 16px; }
+  .prefs h3, .flow h3 { font-size: 1.0625rem; font-weight: 500; letter-spacing: -0.015em; }
+  .prefs p, .flow p { color: var(--muted); margin-top: 6px; line-height: 1.6; font-size: var(--text-md); }
+
+  .flow { list-style: none; padding: 0; margin-top: 40px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .flow li { padding: 24px; border-radius: 20px; background: var(--card); border: 1px solid var(--border); }
+  .f-icon { background: var(--card-muted); color: var(--fg); }
+  .f-step { display: block; font-size: var(--text-sm); color: var(--brand); font-weight: 500; margin-bottom: 4px; }
+  .flow-links { margin-top: 24px; display: flex; gap: 24px; flex-wrap: wrap; }
+  .flow-links a { display: inline-flex; align-items: center; gap: 6px; font-weight: 500; }
+  .flow-links a:hover { color: var(--brand); }
+
+  .install { scroll-margin-top: calc(var(--nav-h) + 16px); }
+  .i-card { padding: clamp(28px, 5vw, 64px); border-radius: var(--radius-panel); border: 1px solid var(--border);
+    background: radial-gradient(60% 90% at 100% 0%, color-mix(in srgb, var(--blob-1) 55%, transparent), transparent 70%), var(--card); }
+  .i-copy { max-width: 680px; display: flex; flex-direction: column; gap: 16px; align-items: flex-start; }
+  .i-steps { list-style: none; padding: 0; display: grid; gap: 12px; margin-top: 8px; }
+  .i-steps li { display: flex; gap: 12px; align-items: center; color: var(--fg-2); }
+  .i-steps span { width: 28px; height: 28px; flex: none; display: grid; place-items: center; border-radius: 50%; border: 1px solid var(--border-strong); font-size: var(--text-sm); font-weight: 600; }
+  .i-ctas { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 8px; }
+
+  @media (max-width: 1100px) { .prefs { grid-template-columns: repeat(3, 1fr); } }
+  @media (max-width: 860px) {
+    .view { grid-template-columns: 1fr; }
+    .view.flip .v-shot { order: 0; }
+    .flow { grid-template-columns: 1fr; }
+    .prefs { grid-template-columns: 1fr 1fr; }
+  }
+  @media (max-width: 560px) { .prefs { grid-template-columns: 1fr; } .i-ctas .btn { width: 100%; } }
+</style>

@@ -1,0 +1,108 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHero from '../components/page/PageHero.astro';
+import Icon from '../components/Icon.astro';
+import FinalCta from '../components/landing/FinalCta.astro';
+import { SITE } from '../lib/site';
+import { SOURCES, sourceLabel } from '../lib/sources';
+
+type Company = { id: number; name: string; careers_url: string; source_type: string; job_count: number };
+// A build-time copy, so the list is there without JavaScript and for search engines. The page refreshes it live.
+let initial: Company[] = [];
+try {
+  const res = await fetch(`${SITE.api}/api/companies`, { signal: AbortSignal.timeout(60000) });
+  if (res.ok) initial = ((await res.json()) as Company[]).map(({ id, name, careers_url, source_type, job_count }) => ({ id, name, careers_url, source_type, job_count }));
+} catch { /* the live request in the browser fills the list */ }
+initial.sort((a, b) => b.job_count - a.job_count || a.name.localeCompare(b.name));
+const careerCount = initial.filter((c) => SOURCES[c.source_type]?.kind === 'career').length;
+const filters = [
+  { id: 'all', label: 'All' },
+  { id: 'career', label: 'Career pages' },
+  { id: 'board', label: 'Via job boards' },
+];
+---
+<Base title="Companies" description="Every company career page and job board Jobly reads, with how many open tech jobs each has right now. Updated every two hours.">
+  <PageHero crumbs={[{ label: 'Companies' }]} eyebrow="Companies" title="Every company Jobly reads." figure="cabinet" intensity={0.7}
+    lead="Jobly reads company career pages directly, plus four remote job boards. Here is the full list, with how many open jobs each has right now." />
+
+  <section class="container companies" data-companies data-api={SITE.api}>
+    <dl class="sum">
+      <div><dt>Career pages read directly</dt><dd data-sum="career">{careerCount || '170+'}</dd></div>
+      <div><dt>Employers found on job boards</dt><dd data-sum="board">{initial.length ? initial.length - careerCount : '200+'}</dd></div>
+      <div><dt>Job boards</dt><dd>4</dd></div>
+      <div><dt>Refreshed</dt><dd>Every 2 h</dd></div>
+    </dl>
+
+    <div class="tools">
+      <div class="search">
+        <label for="c-search" class="sr-only">Search companies</label>
+        <Icon name="search" size={17} />
+        <input class="input" id="c-search" type="search" placeholder="Search companies" autocomplete="off" data-search />
+      </div>
+      <fieldset class="chips">
+        <legend class="sr-only">Show</legend>
+        {filters.map((f, i) => <label><input type="radio" name="kind" value={f.id} checked={i === 0} /><span>{f.label}</span></label>)}
+      </fieldset>
+      <label class="sort"><span class="sr-only">Sort by</span>
+        <select class="input" data-sort><option value="jobs">Most open jobs</option><option value="name">A to Z</option></select>
+      </label>
+    </div>
+
+    <p class="status small" data-status role="status" aria-live="polite">{initial.length ? `${initial.length} companies` : 'Loading companies…'}</p>
+    <ul class="list" data-list>
+      {initial.map((c) => (
+        <li class="co" data-kind={SOURCES[c.source_type]?.kind ?? 'career'}>
+          <span class="av" aria-hidden="true">{c.name.trim().charAt(0).toUpperCase()}</span>
+          <span class="co-main"><span class="co-name">{c.name}</span><span class="co-meta">{sourceLabel(c.source_type)} · {c.job_count} open {c.job_count === 1 ? 'job' : 'jobs'}</span></span>
+          {SOURCES[c.source_type]?.kind !== 'board' && <a class="co-link" href={c.careers_url} rel="noopener nofollow" target="_blank" aria-label={`${c.name} careers page (opens in a new tab)`}><Icon name="arrow-up-right" size={16} /></a>}
+        </li>
+      ))}
+    </ul>
+    <div class="empty" data-empty hidden>
+      <p><strong>No company matches that search.</strong> Jobly reads tech companies only. Missing one you like?</p>
+      <a class="btn btn-outline btn-sm" href="/support">Suggest a company</a>
+    </div>
+    <p class="foot small">Logos and names belong to their owners. Jobly isn’t affiliated with these companies. <a href="/how-dates-work">How Jobly reads each source</a></p>
+  </section>
+
+  <FinalCta title="Their newest jobs, in one place." lead="Jobly checks every one of these pages every two hours and tells you when a new job matches." />
+  <script>import '../scripts/companies';</script>
+</Base>
+
+<style>
+  .companies { padding-block: clamp(40px, 5vw, 64px) var(--section-y); }
+  .sum { display: grid; grid-template-columns: repeat(4, 1fr); border: 1px solid var(--border); border-radius: 20px; background: var(--card); }
+  .sum div { padding: 20px 24px; display: flex; flex-direction: column-reverse; gap: 4px; }
+  .sum div + div { border-left: 1px solid var(--border); }
+  .sum dd { font-size: 1.75rem; font-weight: 500; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; }
+  .sum dt { font-size: var(--text-sm); color: var(--subtle); }
+  .tools { margin-top: 32px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+  .search { position: relative; flex: 1 1 280px; }
+  .search :global(.icon) { position: absolute; left: 14px; top: 50%; translate: 0 -50%; color: var(--subtle); pointer-events: none; }
+  .search .input { padding-left: 40px; }
+  .chips { border: 0; padding: 0; margin: 0; min-width: 0; display: flex; gap: 6px; flex-wrap: wrap; }
+  .chips label { position: relative; }
+  .chips input { position: absolute; inset: 0; opacity: 0; margin: 0; cursor: pointer; }
+  .chips span { display: inline-block; padding: 9px 14px; border-radius: 999px; border: 1px solid var(--border); background: var(--card); font-size: var(--text-sm); color: var(--muted); }
+  .chips label:hover span { border-color: var(--border-strong); color: var(--fg); }
+  .chips input:checked + span { background: var(--ink); color: var(--on-ink); border-color: var(--ink); }
+  .chips input:focus-visible + span { box-shadow: var(--ring); }
+  .sort .input { width: auto; min-width: 170px; }
+  .status { margin-top: 20px; }
+  .list { list-style: none; padding: 0; margin-top: 12px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+  .co { display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: 14px; border: 1px solid var(--border); background: var(--card); min-width: 0;
+    transition: border-color var(--dur-fast) ease; }
+  .co:hover { border-color: var(--border-strong); }
+  .av { width: 36px; height: 36px; flex: none; display: grid; place-items: center; border-radius: 10px; background: var(--brand-soft); color: var(--brand); font-weight: 600; }
+  .co-main { display: flex; flex-direction: column; min-width: 0; flex: 1; }
+  .co-name { font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .co-meta { font-size: var(--text-sm); color: var(--subtle); }
+  .co-link { width: 32px; height: 32px; flex: none; display: grid; place-items: center; border-radius: 8px; color: var(--muted); }
+  .co-link:hover { background: var(--card-muted); color: var(--fg); }
+  .empty { margin-top: 12px; padding: 24px; border-radius: 16px; border: 1px dashed var(--border-strong); display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; color: var(--muted); }
+  .empty strong { color: var(--fg); font-weight: 500; }
+  .foot { margin-top: 24px; }
+  .foot a { color: var(--muted); text-decoration: underline; text-underline-offset: 3px; }
+  @media (max-width: 960px) { .list { grid-template-columns: repeat(2, minmax(0, 1fr)); } .sum { grid-template-columns: repeat(2, 1fr); } .sum div:nth-child(3) { border-left: 0; } .sum div:nth-child(n + 3) { border-top: 1px solid var(--border); } }
+  @media (max-width: 640px) { .list { grid-template-columns: 1fr; } .sort, .sort .input { width: 100%; } }
+</style>
