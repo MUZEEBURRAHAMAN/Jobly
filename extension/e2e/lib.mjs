@@ -11,7 +11,7 @@ export const LOCAL = /^http:\/\/(127\.0\.0\.1|localhost):8000\//;
 export const JSON_HEADERS = { 'access-control-allow-origin': '*', 'content-type': 'application/json' };
 export const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
-function chromiumPath() {
+export function chromiumPath() {
   if (process.env.CHROMIUM_PATH) return process.env.CHROMIUM_PATH;
   const bundled = chromium.executablePath();
   if (fs.existsSync(bundled)) return bundled;

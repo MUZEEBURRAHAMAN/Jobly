@@ -1,0 +1,100 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHero from '../components/page/PageHero.astro';
+import Icon from '../components/Icon.astro';
+import { SITE } from '../lib/site';
+
+const topics = ['A question', 'Something is broken', 'An idea or a missing company', 'A wrong or suspicious listing', 'Privacy or security', 'Something else'];
+const fixes = [
+  { q: 'Jobs take a while to load', a: 'Jobly’s server sleeps when nobody is using it. The first request can take up to a minute while it wakes up; after that it’s quick.' },
+  { q: 'No desktop alerts', a: 'Turn alerts on in Jobly’s Preferences, then check that Chrome is allowed to show notifications in your computer’s settings.' },
+  { q: 'Too few matches', a: 'Add more roles or experience levels, remove an exclude keyword, or turn off Remote only. Jobly covers tech roles only.' },
+  { q: 'A job is gone when I click Apply', a: 'The employer may have just closed it. Jobly removes closed jobs at the next refresh, within about two hours.' },
+];
+---
+<Base title="Support" description="Questions, bugs, ideas or a wrong listing: write to the Jobly team. A person reads every message and replies within two working days.">
+  <PageHero crumbs={[{ label: 'Support' }]} eyebrow="Support" title="How can we help?" figure="relay" intensity={0.8}
+    lead="Questions, bugs, ideas or a listing that looks wrong. A person reads every message and replies within two working days." />
+
+  <section class="container support">
+    <div class="form-card">
+      <form name="support" method="POST" action="/thanks" data-netlify="true" netlify-honeypot="bot-field" data-form="support-done" data-email={SITE.email}>
+        <input type="hidden" name="form-name" value="support" />
+        <p class="hp"><label>Leave this empty <input name="bot-field" tabindex="-1" autocomplete="off" /></label></p>
+        <div class="row">
+          <div class="field"><label for="s-name">Name <span class="opt">(optional)</span></label><input class="input" id="s-name" name="name" autocomplete="name" maxlength="80" /></div>
+          <div class="field"><label for="s-email">Email</label><input class="input" id="s-email" name="email" type="email" required autocomplete="email" maxlength="120" aria-describedby="s-email-hint" /><span class="hint" id="s-email-hint">Only used to reply to you.</span></div>
+        </div>
+        <div class="field"><label for="s-topic">What is it about?</label>
+          <select class="input" id="s-topic" name="topic">{topics.map((t) => <option>{t}</option>)}</select>
+        </div>
+        <div class="field"><label for="s-message">Message</label>
+          <textarea class="input" id="s-message" name="message" required minlength="10" maxlength="4000" aria-describedby="s-message-hint"></textarea>
+          <span class="hint" id="s-message-hint">For a bug, say what you did and what happened. For a listing, paste its link.</span>
+        </div>
+        <div class="submit">
+          <button class="btn btn-ink btn-lg" type="submit"><Icon name="send" size={17} />Send message</button>
+          <p class="form-status" data-form-status role="status" aria-live="polite"></p>
+        </div>
+        <p class="small">By sending, you agree that we keep your message until we’ve dealt with it (at most 12 months). See the <a href="/privacy#forms-you-can-send-us">privacy policy</a>.</p>
+      </form>
+      <div class="done" id="support-done" hidden tabindex="-1">
+        <span class="done-icon"><Icon name="check" size={22} /></span>
+        <h2>Message sent</h2>
+        <p>Thanks for writing. We’ll reply to the email you gave within two working days.</p>
+        <a class="btn btn-outline btn-sm" href="/guides">Browse the guides meanwhile</a>
+      </div>
+    </div>
+
+    <aside class="side">
+      <div class="box">
+        <h2 class="box-title">Other ways to reach us</h2>
+        <a class="way" href={`mailto:${SITE.email}`}><span class="w-icon"><Icon name="mail" size={18} /></span><span><strong>Email</strong><span>{SITE.email}</span></span></a>
+        <a class="way" href="/security#report-a-security-problem"><span class="w-icon"><Icon name="shield" size={18} /></span><span><strong>Security issue</strong><span>Report it privately</span></span></a>
+        <a class="way" href="/faq"><span class="w-icon"><Icon name="circle-help" size={18} /></span><span><strong>FAQ</strong><span>Answers to common questions</span></span></a>
+      </div>
+      <div class="box">
+        <h2 class="box-title">Quick fixes</h2>
+        <div class="fixes">
+          {fixes.map((f) => (
+            <details name="fix"><summary>{f.q}<Icon name="plus" size={15} /></summary><p>{f.a}</p></details>
+          ))}
+        </div>
+      </div>
+    </aside>
+  </section>
+  <script>import '../scripts/forms';</script>
+</Base>
+
+<style>
+  .support { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: clamp(24px, 4vw, 48px); align-items: start; padding-block: clamp(40px, 5vw, 72px) var(--section-y); }
+  .form-card { padding: clamp(20px, 3vw, 36px); border-radius: 24px; border: 1px solid var(--border); background: var(--card); box-shadow: var(--shadow-md); }
+  form { display: grid; gap: 20px; position: relative; }
+  .row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; align-items: start; }
+  .opt { color: var(--subtle); font-weight: 400; }
+  .submit { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+  .small a { color: var(--muted); text-decoration: underline; text-underline-offset: 3px; }
+  .done { display: grid; justify-items: start; gap: 10px; padding: 12px 0; }
+  .done:focus { outline: none; box-shadow: none; }
+  .done h2 { font-size: 1.5rem; font-weight: 500; letter-spacing: -0.02em; }
+  .done p { color: var(--muted); margin-bottom: 8px; }
+  .done-icon { width: 44px; height: 44px; display: grid; place-items: center; border-radius: 50%; background: color-mix(in srgb, var(--success) 15%, transparent); color: var(--success); }
+  .side { display: grid; gap: 16px; }
+  .box { padding: 20px; border-radius: 20px; background: var(--panel); border: 1px solid var(--border); }
+  .box-title { font-size: 1rem; font-weight: 600; margin-bottom: 12px; }
+  .way { display: flex; gap: 12px; align-items: center; padding: 10px; margin-inline: -10px; border-radius: 12px; transition: background-color var(--dur-fast) ease; }
+  .way:hover { background: var(--card); }
+  .way strong { display: block; font-weight: 500; }
+  .way span span { color: var(--muted); font-size: var(--text-sm); word-break: break-word; }
+  .w-icon { width: 38px; height: 38px; flex: none; display: grid; place-items: center; border-radius: 10px; background: var(--card); border: 1px solid var(--border); color: var(--brand); }
+  .fixes details { border-top: 1px solid var(--border); }
+  .fixes details:first-child { border-top: 0; }
+  .fixes summary { list-style: none; display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 12px 0; cursor: pointer; font-weight: 500; }
+  .fixes summary::-webkit-details-marker { display: none; }
+  .fixes summary :global(.icon) { color: var(--subtle); transition: transform var(--dur) var(--ease-out); }
+  .fixes details[open] summary :global(.icon) { transform: rotate(45deg); }
+  .fixes summary:focus-visible { border-radius: 6px; }
+  .fixes p { color: var(--muted); font-size: var(--text-md); padding-bottom: 14px; line-height: 1.6; }
+  @media (max-width: 900px) { .support { grid-template-columns: 1fr; } }
+  @media (max-width: 560px) { .row { grid-template-columns: 1fr; } .submit .btn { width: 100%; } }
+</style>

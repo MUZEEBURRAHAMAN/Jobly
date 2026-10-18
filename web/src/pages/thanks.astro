@@ -1,0 +1,17 @@
+---
+// Shown by Netlify after a form posts without JavaScript.
+import Base from '../layouts/Base.astro';
+import PageHero from '../components/page/PageHero.astro';
+import Icon from '../components/Icon.astro';
+---
+<Base title="Thank you" description="Your message reached the Jobly team." noindex>
+  <PageHero crumbs={[{ label: 'Thank you' }]} eyebrow="Sent" title="Thanks, we got it." figure="dish" intensity={0.6}
+    lead="A person reads every message. If you asked a question, we’ll reply to the email you gave within two working days.">
+    <div class="actions"><a class="btn btn-ink" href="/">Back to home</a><a class="btn btn-outline" href="/guides"><Icon name="book-open" size={16} />Read the guides</a></div>
+  </PageHero>
+  <div class="spacer"></div>
+</Base>
+<style>
+  .actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 8px; }
+  .spacer { height: var(--stack); }
+</style>

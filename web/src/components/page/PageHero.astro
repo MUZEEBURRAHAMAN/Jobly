@@ -1,0 +1,53 @@
+---
+// The top of every inner page: breadcrumbs, title, lead, and a hairline figure in a tile on the right.
+import Breadcrumbs from './Breadcrumbs.astro';
+import Figure from '../Figure.astro';
+
+interface Props {
+  crumbs: { label: string; href?: string }[];
+  eyebrow?: string;
+  title: string;
+  lead?: string;
+  figure?: string;
+  intensity?: number;
+  drive?: 'lock' | 'plug';
+  center?: boolean;
+}
+const { crumbs, eyebrow, title, lead, figure, intensity = 0.6, drive, center = false } = Astro.props;
+---
+<section class="shell page-hero-wrap">
+  <div class:list={['panel page-hero container', { center, 'has-art': figure, 'ill-trigger': drive }]}>
+    <div class="bg" aria-hidden="true"><span class="blob b1"></span><span class="blob b2"></span></div>
+    <div class="copy">
+      <Breadcrumbs items={crumbs} />
+      {eyebrow && <span class="eyebrow">{eyebrow}</span>}
+      <h1 class="display page-title">{title}</h1>
+      {lead && <p class="lead">{lead}</p>}
+      <slot />
+    </div>
+    {figure && <div class="art"><Figure name={figure} intensity={intensity} drive={drive} /></div>}
+  </div>
+</section>
+
+<style>
+  .page-hero-wrap { padding-top: 8px; }
+  .page-hero { isolation: isolate; display: grid; grid-template-columns: 1fr; gap: 32px; align-items: center;
+    padding-block: clamp(40px, 6vw, 80px) clamp(48px, 6vw, 88px); }
+  .page-hero.has-art { grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); }
+  .bg { position: absolute; inset: 0; z-index: -1; }
+  .blob { position: absolute; border-radius: 50%; filter: blur(70px); opacity: var(--blob-opacity); }
+  .b1 { width: 45%; height: 80%; right: -6%; top: -20%; background: var(--blob-2); }
+  .b2 { width: 35%; height: 60%; right: 18%; top: 40%; background: var(--blob-1); opacity: calc(var(--blob-opacity) * 0.55); }
+  .copy { display: flex; flex-direction: column; align-items: flex-start; gap: 16px; max-width: 680px; }
+  .copy :global(.crumbs) { margin-bottom: 8px; }
+  .page-title { font-size: clamp(2.25rem, 1.6rem + 2.4vw, 3.25rem); }
+  .center .copy { margin-inline: auto; align-items: center; text-align: center; }
+  .center :global(.crumbs ol) { justify-content: center; }
+  .art { justify-self: end; width: 100%; max-width: 380px; aspect-ratio: 5 / 4; display: grid; place-items: center;
+    border-radius: 20px; background: color-mix(in srgb, var(--card) 70%, transparent); border: 1px solid var(--border); box-shadow: var(--shadow-sm); }
+  .art :global([data-figure]) { width: 78%; }
+  @media (max-width: 860px) {
+    .page-hero.has-art { grid-template-columns: 1fr; }
+    .art { justify-self: start; max-width: 300px; }
+  }
+</style>

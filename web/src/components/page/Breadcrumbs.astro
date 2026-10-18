@@ -1,0 +1,29 @@
+---
+import Icon from '../Icon.astro';
+import { SITE } from '../../lib/site';
+interface Props { items: { label: string; href?: string }[] }
+const { items } = Astro.props;
+const all = [{ label: 'Home', href: '/' }, ...items];
+const jsonLd = {
+  '@context': 'https://schema.org', '@type': 'BreadcrumbList',
+  itemListElement: all.map((c, i) => ({ '@type': 'ListItem', position: i + 1, name: c.label, ...(c.href ? { item: new URL(c.href, SITE.url).href } : {}) })),
+};
+---
+<nav class="crumbs" aria-label="Breadcrumb">
+  <ol>
+    {all.map((c, i) => (
+      <li>
+        {c.href && i < all.length - 1 ? <a href={c.href}>{c.label}</a> : <span aria-current="page">{c.label}</span>}
+        {i < all.length - 1 && <Icon name="chevron-right" size={13} />}
+      </li>
+    ))}
+  </ol>
+</nav>
+<script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+
+<style>
+  .crumbs ol { list-style: none; padding: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 4px; font-size: var(--text-sm); color: var(--subtle); }
+  .crumbs li { display: inline-flex; align-items: center; gap: 4px; }
+  .crumbs a { color: var(--muted); border-radius: 4px; } .crumbs a:hover { color: var(--fg); }
+  .crumbs [aria-current] { color: var(--fg); }
+</style>

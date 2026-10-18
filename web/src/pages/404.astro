@@ -1,0 +1,25 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHero from '../components/page/PageHero.astro';
+import Icon from '../components/Icon.astro';
+
+const links = [
+  { label: 'Home', href: '/', icon: 'briefcase' },
+  { label: 'Guides', href: '/guides', icon: 'book-open' },
+  { label: 'Companies', href: '/companies', icon: 'building-2' },
+  { label: 'Support', href: '/support', icon: 'life-buoy' },
+];
+---
+<Base title="Page not found" description="This page doesn't exist, or it moved." path="/404" noindex>
+  <PageHero crumbs={[{ label: 'Not found' }]} eyebrow="404" title="This page went the way of an old job post." figure="loupe" intensity={0.8}
+    lead="It doesn’t exist, or it moved. Try one of these instead.">
+    <nav class="links" aria-label="Popular pages">
+      {links.map((l) => <a class="btn btn-outline" href={l.href}><Icon name={l.icon} size={16} />{l.label}</a>)}
+    </nav>
+  </PageHero>
+  <div class="spacer"></div>
+</Base>
+<style>
+  .links { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+  .spacer { height: var(--stack); }
+</style>

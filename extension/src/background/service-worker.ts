@@ -45,6 +45,9 @@ async function ensureAlarm() {
 }
 void ensureAlarm();
 
+// After an uninstall Chrome opens a short, optional feedback page. It carries no identifier.
+void chrome.runtime.setUninstallURL('https://joblyextension.netlify.app/uninstall');
+
 chrome.runtime.onInstalled.addListener(async (details) => {
   await chrome.action.setBadgeBackgroundColor({ color: '#06b6d4' });
   // Updates replace the old 30-45 minute schedule with the slower one.

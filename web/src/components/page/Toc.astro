@@ -1,0 +1,22 @@
+---
+// "On this page" list for long documents. scripts/toc.ts highlights the section being read.
+interface Props { headings: { depth: number; slug: string; text: string }[] }
+const items = Astro.props.headings.filter((h) => h.depth === 2);
+---
+<nav class="toc" aria-label="On this page" data-toc>
+  <p class="toc-title">On this page</p>
+  <ol>{items.map((h) => <li><a href={`#${h.slug}`}>{h.text}</a></li>)}</ol>
+</nav>
+<script>import '../../scripts/toc';</script>
+
+<style>
+  .toc { position: sticky; top: calc(var(--nav-h) + 24px); max-height: calc(100vh - var(--nav-h) - 48px); overflow: auto; }
+  .toc-title { font-size: var(--text-sm); font-weight: 600; margin-bottom: 12px; }
+  ol { list-style: none; padding: 0; display: grid; gap: 2px; border-left: 1px solid var(--border); }
+  a { display: block; padding: 5px 0 5px 14px; margin-left: -1px; border-left: 2px solid transparent; font-size: var(--text-sm); color: var(--muted); line-height: 1.4;
+    transition: color var(--dur-fast) ease, border-color var(--dur-fast) ease; }
+  a:hover { color: var(--fg); }
+  a[aria-current='true'] { color: var(--fg); border-left-color: var(--brand); }
+  a:focus-visible { border-radius: 4px; }
+  @media (max-width: 960px) { .toc { display: none; } }
+</style>

@@ -115,6 +115,7 @@ img { height: auto; }
 button, input, select, textarea { font: inherit; color: inherit; }
 button { cursor: pointer; background: none; border: 0; padding: 0; }
 a { color: inherit; text-decoration: none; }
+[hidden] { display: none !important; }
 :focus-visible { outline: none; box-shadow: var(--ring); border-radius: 6px; }
 ::selection { background: var(--brand-soft); color: var(--fg); }
 
@@ -198,3 +199,47 @@ a { color: inherit; text-decoration: none; }
 ::view-transition-old(root), ::view-transition-new(root) { animation: none; mix-blend-mode: normal; }
 ::view-transition-old(root) { z-index: 1; }
 ::view-transition-new(root) { z-index: 2; }
+
+/* ---------- long-form text: privacy, terms, guides ---------- */
+.prose { font-size: 1.0625rem; line-height: 1.75; color: var(--fg-2); max-width: 70ch; }
+.prose > * + * { margin-top: 1.1em; }
+.prose h2 { font-size: clamp(1.5rem, 1.25rem + 0.8vw, 1.875rem); line-height: 1.2; font-weight: 500; letter-spacing: -0.03em; color: var(--fg); margin-top: 2.2em; scroll-margin-top: calc(var(--nav-h) + 24px); }
+.prose h3 { font-size: 1.25rem; line-height: 1.3; font-weight: 500; letter-spacing: -0.02em; color: var(--fg); margin-top: 1.8em; scroll-margin-top: calc(var(--nav-h) + 24px); }
+.prose h2 + *, .prose h3 + * { margin-top: 0.6em; }
+.prose > :first-child { margin-top: 0; }
+.prose p, .prose li { color: var(--muted); }
+.prose strong { color: var(--fg); font-weight: 600; }
+.prose a { color: var(--brand); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; }
+.prose a:hover { color: var(--brand-hover); }
+.prose ul, .prose ol { padding-left: 1.3em; display: grid; gap: 0.45em; }
+.prose li::marker { color: var(--subtle); }
+.prose code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.875em; padding: 0.15em 0.4em; border-radius: 6px; background: var(--card-muted); color: var(--fg); }
+.prose pre { padding: 16px 18px; border-radius: var(--radius-card); background: var(--card-muted); border: 1px solid var(--border); overflow-x: auto; font-size: 0.875rem; line-height: 1.6; }
+.prose pre code { padding: 0; background: none; }
+.prose blockquote { padding: 16px 20px; border-radius: var(--radius-card); background: var(--brand-soft); color: var(--fg-2); }
+.prose blockquote p { color: inherit; }
+.prose hr { border: 0; border-top: 1px solid var(--border); margin-block: 2.4em; }
+.prose table { width: 100%; border-collapse: collapse; font-size: 0.9375rem; line-height: 1.5; }
+.prose td code { overflow-wrap: anywhere; }
+.prose th, .prose td { text-align: left; vertical-align: top; padding: 12px 14px; border-bottom: 1px solid var(--border); }
+.prose thead th { font-size: var(--text-sm); font-weight: 600; color: var(--fg); background: var(--panel); white-space: nowrap; }
+.prose td { color: var(--muted); }
+.prose td:first-child { color: var(--fg); }
+@media (max-width: 560px) { .prose th, .prose td { padding: 10px 8px; font-size: 0.875rem; } }
+
+/* ---------- forms ---------- */
+.field { display: grid; gap: 6px; align-content: start; }
+.field label, .field legend { font-size: var(--text-sm); font-weight: 500; color: var(--fg); }
+.field .hint { font-size: var(--text-sm); color: var(--subtle); }
+.input { width: 100%; min-height: 44px; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--border-strong); background: var(--card); color: var(--fg);
+  transition: border-color var(--dur-fast) ease, box-shadow var(--dur-fast) ease; }
+.input::placeholder { color: var(--subtle); }
+.input:hover { border-color: color-mix(in srgb, var(--fg) 30%, var(--border-strong)); }
+.input:focus-visible { outline: none; border-color: var(--brand); box-shadow: var(--ring); border-radius: 10px; }
+textarea.input { min-height: 140px; resize: vertical; line-height: 1.6; }
+select.input { appearance: none; padding-right: 36px; background-image: linear-gradient(45deg, transparent 50%, var(--muted) 50%), linear-gradient(135deg, var(--muted) 50%, transparent 50%);
+  background-position: calc(100% - 18px) 50%, calc(100% - 13px) 50%; background-size: 5px 5px; background-repeat: no-repeat; }
+.form-status { font-size: var(--text-sm); }
+.form-status[data-state='ok'] { color: var(--success); }
+.form-status[data-state='error'] { color: var(--danger); }
+.hp { position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden; }

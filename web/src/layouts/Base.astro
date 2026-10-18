@@ -5,8 +5,8 @@ import Nav from '../components/Nav.astro';
 import Footer from '../components/Footer.astro';
 import { SITE } from '../lib/site';
 
-interface Props { title?: string; description: string; path?: string }
-const { title, description, path = Astro.url.pathname } = Astro.props;
+interface Props { title?: string; description: string; path?: string; noindex?: boolean }
+const { title, description, path = Astro.url.pathname, noindex = false } = Astro.props;
 const fullTitle = title ? `${title} · ${SITE.name}` : `${SITE.name}: fresh jobs from company career pages`;
 const canonical = new URL(path, SITE.url).href;
 ---
@@ -18,6 +18,7 @@ const canonical = new URL(path, SITE.url).href;
     <title>{fullTitle}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
+    {noindex && <meta name="robots" content="noindex" />}
     <meta name="color-scheme" content="light dark" />
     <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
     <meta name="theme-color" content="#0b0b0c" media="(prefers-color-scheme: dark)" />

@@ -2,17 +2,25 @@
 import Figure from '../Figure.astro';
 import Icon from '../Icon.astro';
 import { installHref } from '../../lib/site';
+
+// Used at the end of every page; the second button points wherever makes sense for that page.
+interface Props { title?: string; lead?: string; secondary?: { label: string; href: string } }
+const {
+  title = 'See what went up today.',
+  lead = 'Add Jobly to Chrome, pick your roles, and your first matches are waiting. It takes about a minute.',
+  secondary = { label: 'How it works', href: '/how-it-works' },
+} = Astro.props;
 ---
 <section class="shell cta-wrap stack-next" aria-labelledby="cta-title">
   <div class="panel cta container">
     <div class="glow" aria-hidden="true"></div>
     <div class="copy" data-stagger>
       <p class="live" data-reveal><span class="dot" aria-hidden="true"></span><span data-count="new_jobs_today">500+</span>&nbsp;jobs posted in the last 24 hours</p>
-      <h2 class="title" id="cta-title" data-reveal>See what went up today.</h2>
-      <p class="lead" data-reveal>Add Jobly to Chrome, pick your roles, and your first matches are waiting. It takes about a minute.</p>
+      <h2 class="title" id="cta-title" data-reveal>{title}</h2>
+      <p class="lead" data-reveal>{lead}</p>
       <div class="buttons" data-reveal>
         <a class="btn btn-ink btn-lg" href={installHref}><Icon name="chrome" size={18} />Add to Chrome, it’s free</a>
-        <a class="btn btn-outline btn-lg" href="#how-it-works">How it works</a>
+        <a class="btn btn-outline btn-lg" href={secondary.href}>{secondary.label}</a>
       </div>
     </div>
     <div class="art" data-reveal="scale"><Figure name="terrain" intensity={0.7} /></div>

@@ -1,0 +1,73 @@
+---
+// Privacy, Terms and Security: page hero, sticky "On this page" list, the text, and a contact card.
+import { getEntry, render } from 'astro:content';
+import Base from './Base.astro';
+import PageHero from '../components/page/PageHero.astro';
+import Toc from '../components/page/Toc.astro';
+import Icon from '../components/Icon.astro';
+import { SITE } from '../lib/site';
+import { formatDate, isoDate } from '../lib/text';
+
+interface Props { id: 'privacy' | 'terms' | 'security'; drive?: 'lock' | 'plug' }
+const { id, drive } = Astro.props;
+const entry = (await getEntry('docs', id))!;
+const { Content, headings } = await render(entry);
+const { title, eyebrow, description, updated, figure } = entry.data;
+const others = [
+  { id: 'privacy', label: 'Privacy policy', href: '/privacy', icon: 'lock' },
+  { id: 'terms', label: 'Terms of use', href: '/terms', icon: 'file' },
+  { id: 'security', label: 'Security', href: '/security', icon: 'shield' },
+].filter((o) => o.id !== id);
+---
+<Base title={title} description={description}>
+  <PageHero crumbs={[{ label: title }]} eyebrow={eyebrow} title={title} lead={description} figure={figure} intensity={1} drive={drive}>
+    <p class="updated"><Icon name="calendar" size={15} />Last updated <time datetime={isoDate(updated)}>{formatDate(updated)}</time></p>
+  </PageHero>
+
+  <section class="container doc">
+    <aside class="side">
+      <Toc headings={headings} />
+    </aside>
+    <div class="body">
+      <article class="prose"><Content /></article>
+
+      <div class="contact">
+        <div>
+          <p class="c-title">Something unclear?</p>
+          <p class="c-text">Ask us anything about this page. A person reads every message.</p>
+        </div>
+        <div class="c-actions">
+          <a class="btn btn-ink btn-sm" href="/support"><Icon name="mail" size={15} />Contact support</a>
+          <a class="btn btn-outline btn-sm" href={`mailto:${SITE.email}`}>Email us</a>
+        </div>
+      </div>
+
+      <nav class="more" aria-label="Related policies">
+        {others.map((o) => (
+          <a href={o.href}><span class="m-icon"><Icon name={o.icon} size={18} /></span><span>{o.label}</span><Icon name="arrow-right" size={16} class="arrow" /></a>
+        ))}
+      </nav>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .updated { display: inline-flex; align-items: center; gap: 8px; font-size: var(--text-sm); color: var(--subtle); margin-top: 4px; }
+  .doc { display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: clamp(32px, 6vw, 96px); padding-block: clamp(48px, 6vw, 88px) var(--section-y); }
+  .body { min-width: 0; max-width: 760px; }
+  .contact { margin-top: 56px; padding: 24px; border-radius: 20px; background: var(--panel); border: 1px solid var(--border);
+    display: flex; gap: 20px; align-items: center; justify-content: space-between; flex-wrap: wrap; }
+  .c-title { font-weight: 500; font-size: 1.125rem; letter-spacing: -0.015em; }
+  .c-text { color: var(--muted); margin-top: 2px; }
+  .c-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+  .more { margin-top: 16px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .more a { display: flex; align-items: center; gap: 12px; padding: 16px; border-radius: 16px; border: 1px solid var(--border); background: var(--card); font-weight: 500;
+    transition: border-color var(--dur-fast) ease, transform var(--dur) var(--ease-out); }
+  .more a:hover { border-color: var(--border-strong); transform: translateY(-1px); }
+  .more a > span:nth-child(2) { flex: 1; }
+  .more :global(.arrow) { color: var(--subtle); transition: transform var(--dur) var(--ease-out); }
+  .more a:hover :global(.arrow) { transform: translateX(3px); color: var(--fg); }
+  .m-icon { width: 36px; height: 36px; display: grid; place-items: center; border-radius: 10px; background: var(--brand-soft); color: var(--brand); }
+  @media (max-width: 960px) { .doc { grid-template-columns: 1fr; } }
+  @media (max-width: 560px) { .more { grid-template-columns: 1fr; } }
+</style>
