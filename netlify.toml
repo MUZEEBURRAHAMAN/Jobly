@@ -1,0 +1,9 @@
+# Netlify: the website is the Astro project in web/. This file overrides the build settings in the Netlify UI.
+# Headers and redirects: web/public/_headers and web/public/_redirects.
+[build]
+  base = "web"
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "22"

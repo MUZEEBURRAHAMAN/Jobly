@@ -1,7 +1,0 @@
-# Used if the Netlify site's base directory is set to "web". Headers and redirects: public/_headers, public/_redirects.
-[build]
-  command = "npm run build"
-  publish = "dist"
-
-[build.environment]
-  NODE_VERSION = "22"
