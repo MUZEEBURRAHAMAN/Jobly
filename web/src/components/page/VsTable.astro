@@ -1,0 +1,55 @@
+---
+// Jobly against one other product, row by row. Marks are spelled out for screen readers.
+import Icon from '../Icon.astro';
+import type { Row, Mark } from '../../lib/alternatives';
+
+interface Props { name: string; rows: Row[] }
+const { name, rows } = Astro.props;
+const ICON: Record<Mark, string> = { yes: 'check', no: 'x', part: 'minus' };
+const WORD: Record<Mark, string> = { yes: 'Yes', no: 'No', part: 'Partly' };
+---
+<div class="vs" data-reveal>
+  <table>
+    <caption class="sr-only">Jobly compared with {name}</caption>
+    <thead><tr><th scope="col"><span class="sr-only">Feature</span></th><th scope="col" class="j"><span class="brand"><span class="mark" aria-hidden="true">J</span>Jobly</span></th><th scope="col">{name}</th></tr></thead>
+    <tbody>
+      {rows.map((r) => (
+        <tr>
+          <th scope="row">{r.label}</th>
+          {[r.jobly, r.them].map(([m, t], i) => (
+            <td class={i === 0 ? 'j' : ''}><span class={`cell ${m}`}><span class="m" aria-hidden="true"><Icon name={ICON[m]} size={13} /></span><span><span class="sr-only">{WORD[m]}. </span>{t}</span></span></td>
+          ))}
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</div>
+
+<style>
+  .vs { border-radius: 20px; border: 1px solid var(--border); background: var(--card); overflow: hidden; }
+  table { width: 100%; border-collapse: collapse; font-size: var(--text-md); table-layout: fixed; }
+  th, td { padding: 16px 20px; text-align: left; vertical-align: middle; border-bottom: 1px solid var(--border); }
+  tbody tr:last-child > * { border-bottom: 0; }
+  thead th { font-size: var(--text-sm); font-weight: 600; color: var(--fg); background: var(--panel); }
+  tbody th { font-weight: 500; width: 28%; }
+  .j { background: color-mix(in srgb, var(--brand-soft) 70%, var(--card)); }
+  thead .j { background: color-mix(in srgb, var(--brand-soft) 100%, var(--panel)); }
+  .brand { display: inline-flex; align-items: center; gap: 8px; font-weight: 600; }
+  .mark { width: 22px; height: 22px; display: grid; place-items: center; border-radius: 6px; background: var(--brand); color: var(--on-brand); font-size: 12px; font-weight: 700; }
+  .cell { display: flex; gap: 10px; align-items: center; color: var(--muted); line-height: 1.4; }
+  .j .cell { color: var(--fg); }
+  .m { width: 22px; height: 22px; flex: none; display: grid; place-items: center; border-radius: 50%; }
+  .yes .m { background: color-mix(in srgb, var(--success) 16%, transparent); color: var(--success); }
+  .no .m { background: color-mix(in srgb, var(--danger) 12%, transparent); color: var(--danger); }
+  .part .m { background: var(--card-muted); color: var(--subtle); }
+  /* phone: each row's label sits above the two answers */
+  @media (max-width: 640px) {
+    thead tr, tbody tr { display: grid; grid-template-columns: 1fr 1fr; }
+    thead th:first-child { display: none; }
+    tbody th { grid-column: 1 / -1; width: auto; padding: 14px 12px 4px; border-bottom: 0; font-size: var(--text-sm); color: var(--subtle); }
+    td, thead th { padding: 8px 12px 14px; font-size: var(--text-sm); }
+    thead th { padding-block: 12px; }
+    .cell { gap: 8px; align-items: flex-start; }
+    .m { width: 18px; height: 18px; margin-top: 1px; }
+  }
+</style>

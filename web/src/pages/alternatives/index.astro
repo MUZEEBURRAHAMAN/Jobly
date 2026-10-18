@@ -1,0 +1,77 @@
+---
+import Base from '../../layouts/Base.astro';
+import PageHero from '../../components/page/PageHero.astro';
+import SectionHead from '../../components/SectionHead.astro';
+import Figure from '../../components/Figure.astro';
+import Icon from '../../components/Icon.astro';
+import FinalCta from '../../components/landing/FinalCta.astro';
+import { ALTERNATIVES } from '../../lib/alternatives';
+
+const pickers = [
+  { need: 'I want the newest tech jobs, early, without promoted listings', tool: 'Jobly', href: '/how-it-works' },
+  { need: 'I want jobs in every industry, or to use my network', tool: 'LinkedIn Jobs', href: '/alternatives/linkedin-jobs' },
+  { need: 'I want the widest search, with company reviews', tool: 'Indeed', href: '/alternatives/indeed' },
+  { need: 'Filling in applications takes me hours', tool: 'Simplify', href: '/alternatives/simplify' },
+  { need: 'I want career-page jobs outside tech, on a website', tool: 'HiringCafe', href: '/alternatives/hiring-cafe' },
+];
+---
+<Base title="Alternatives" description="Honest comparisons of Jobly with LinkedIn Jobs, Indeed, Simplify and HiringCafe: what each does best, what it costs, and when to use more than one.">
+  <PageHero crumbs={[{ label: 'Alternatives' }]} eyebrow="Alternatives" title="Jobly and the tools you already use." figure="branches" intensity={0.7}
+    lead="Honest, sourced comparisons with the job tools people use most. Jobly does one thing, and the others are better at plenty. Here’s which to use when." />
+
+  <section class="container section-tight">
+    <div class="grid" data-stagger>
+      {ALTERNATIVES.map((a) => (
+        <a class="card" href={`/alternatives/${a.slug}`} data-reveal>
+          <span class="art"><Figure name={a.figure} intensity={0.55} /></span>
+          <span class="kind">{a.kind}</span>
+          <span class="name">Jobly vs {a.name}</span>
+          <span class="sum">{a.summary}</span>
+          <span class="go">Read the comparison <Icon name="arrow-right" size={15} class="arrow" /></span>
+        </a>
+      ))}
+    </div>
+  </section>
+
+  <section class="shell" aria-labelledby="pick-title">
+    <div class="panel panel-pad">
+      <div class="container">
+        <SectionHead eyebrow="Quick answer" id="pick-title" title="Which tool for which job?" lead="Most people use two or three. Start from the problem you have." />
+        <ul class="pick" data-stagger>
+          {pickers.map((p) => (
+            <li data-reveal><a href={p.href}><span class="need">{p.need}</span><span class="tool">{p.tool}<Icon name="arrow-right" size={15} /></span></a></li>
+          ))}
+        </ul>
+        <p class="small note">Comparisons checked October 2026. Sources are listed on each page.</p>
+      </div>
+    </div>
+  </section>
+
+  <FinalCta title="Add the fresh-jobs layer." lead="Keep your favourite job sites. Add Jobly to catch new tech jobs on career pages the day they go up." />
+</Base>
+
+<style>
+  .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+  .card { display: flex; flex-direction: column; gap: 8px; padding: 10px 10px 24px; border-radius: 22px; background: var(--card); border: 1px solid var(--border);
+    transition: border-color var(--dur) ease, box-shadow var(--dur) ease, translate var(--dur) var(--ease-out); }
+  .card:hover { border-color: var(--border-strong); box-shadow: var(--shadow-md); translate: 0 -2px; }
+  .art { aspect-ratio: 16 / 8; border-radius: 16px; display: grid; place-items: center; margin-bottom: 12px; overflow: hidden;
+    background: radial-gradient(70% 90% at 70% 10%, color-mix(in srgb, var(--blob-2) 85%, transparent), transparent 70%), var(--panel); }
+  .art :global([data-figure]) { width: 42%; }
+  .kind, .name, .sum, .go { padding-inline: 14px; }
+  .kind { font-size: var(--text-sm); color: var(--brand); font-weight: 500; }
+  .name { font-size: 1.5rem; font-weight: 500; letter-spacing: -0.025em; }
+  .sum { color: var(--muted); line-height: 1.6; }
+  .go { margin-top: 8px; display: inline-flex; align-items: center; gap: 6px; font-weight: 500; }
+  .card :global(.arrow) { transition: transform var(--dur) var(--ease-out); }
+  .card:hover :global(.arrow) { transform: translateX(3px); }
+  .pick { list-style: none; padding: 0; margin-top: 40px; display: grid; gap: 8px; }
+  .pick a { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 18px 22px; border-radius: 16px; background: var(--card); border: 1px solid var(--border);
+    transition: border-color var(--dur-fast) ease; }
+  .pick a:hover { border-color: var(--border-strong); }
+  .need { font-size: 1.0625rem; color: var(--fg-2); }
+  .tool { display: inline-flex; align-items: center; gap: 8px; font-weight: 600; color: var(--brand); white-space: nowrap; }
+  .note { margin-top: 20px; }
+  @media (max-width: 860px) { .grid { grid-template-columns: 1fr; } }
+  @media (max-width: 560px) { .pick a { flex-direction: column; align-items: flex-start; gap: 6px; } }
+</style>

@@ -1,0 +1,118 @@
+---
+import Base from '../../layouts/Base.astro';
+import PageHero from '../../components/page/PageHero.astro';
+import SectionHead from '../../components/SectionHead.astro';
+import VsTable from '../../components/page/VsTable.astro';
+import Icon from '../../components/Icon.astro';
+import Figure from '../../components/Figure.astro';
+import FinalCta from '../../components/landing/FinalCta.astro';
+import { ALTERNATIVES, type Alternative } from '../../lib/alternatives';
+
+export function getStaticPaths() {
+  return ALTERNATIVES.map((alt) => ({ params: { slug: alt.slug }, props: { alt } }));
+}
+interface Props { alt: Alternative }
+const { alt } = Astro.props;
+const others = ALTERNATIVES.filter((a) => a.slug !== alt.slug);
+---
+<Base title={`${alt.title}: an honest comparison`} description={alt.description}>
+  <PageHero crumbs={[{ label: 'Alternatives', href: '/alternatives' }, { label: alt.name }]} eyebrow={`${alt.name} alternative`} title={alt.title} lead={alt.summary} figure={alt.figure} intensity={0.7}>
+    <p class="checked"><Icon name="calendar" size={15} />Checked {alt.checked} · sources at the bottom</p>
+  </PageHero>
+
+  <section class="container section-tight" aria-labelledby="choose-title">
+    <h2 class="sr-only" id="choose-title">Which to choose</h2>
+    <div class="choose" data-stagger>
+      <div class="pick them" data-reveal>
+        <p class="p-title">Choose {alt.name} if…</p>
+        <ul>{alt.chooseThem.map((c) => <li><Icon name="check" size={16} />{c}</li>)}</ul>
+      </div>
+      <div class="pick jobly" data-reveal>
+        <p class="p-title"><span class="mark" aria-hidden="true">J</span>Choose Jobly if…</p>
+        <ul>{alt.chooseJobly.map((c) => <li><Icon name="check" size={16} />{c}</li>)}</ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="shell" aria-labelledby="table-title">
+    <div class="panel panel-pad">
+      <div class="container">
+        <SectionHead eyebrow="Side by side" id="table-title" title={`Jobly and ${alt.name}, feature by feature`} />
+        <div class="table"><VsTable name={alt.name} rows={alt.rows} /></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="container section" aria-labelledby="fair-title">
+    <SectionHead eyebrow="Honest take" id="fair-title" title="Where each one wins" />
+    <div class="fair" data-stagger>
+      {alt.better.map((b, i) => <div class:list={['f-card', { mine: i === 1 }]} data-reveal><h3>{b.title}</h3><p>{b.text}</p></div>)}
+    </div>
+    <div class="together" data-reveal>
+      <span class="t-icon" aria-hidden="true"><Icon name="layers" size={20} /></span>
+      <div><h3>Use them together</h3><p>{alt.together}</p></div>
+    </div>
+    <div class="sources">
+      <p class="s-title">Sources, checked {alt.checked}</p>
+      <ul>{alt.sources.map((s) => <li><a href={s.href} rel="noopener" target="_blank">{s.label}<Icon name="arrow-up-right" size={13} /></a></li>)}</ul>
+      <p class="small">Products change. If something here is out of date, <a href="/support">tell us</a> and we’ll fix it. Jobly isn’t affiliated with {alt.name}; names and trademarks belong to their owners.</p>
+    </div>
+  </section>
+
+  <section class="shell" aria-labelledby="more-title">
+    <div class="panel panel-pad">
+      <div class="container">
+        <SectionHead eyebrow="Alternatives" id="more-title" title="More comparisons" />
+        <div class="more" data-stagger>
+          {others.map((o) => (
+            <a class="o-card" href={`/alternatives/${o.slug}`} data-reveal>
+              <span class="o-art"><Figure name={o.figure} intensity={0.5} /></span>
+              <span class="o-kind">{o.kind}</span>
+              <span class="o-name">Jobly vs {o.name}</span>
+              <Icon name="arrow-right" size={16} class="arrow" />
+            </a>
+          ))}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <FinalCta title="Try Jobly next to what you use now." lead="It’s free, needs no account, and takes about a minute to set up. Keep the tools that work for you." />
+</Base>
+
+<style>
+  .checked { display: inline-flex; align-items: center; gap: 8px; font-size: var(--text-sm); color: var(--subtle); }
+  .choose { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .pick { padding: 28px; border-radius: 22px; border: 1px solid var(--border); background: var(--card); }
+  .pick.jobly { background: radial-gradient(70% 100% at 100% 0%, color-mix(in srgb, var(--blob-1) 50%, transparent), transparent 70%), var(--card); border-color: color-mix(in srgb, var(--brand) 30%, var(--border)); }
+  .p-title { display: flex; align-items: center; gap: 10px; font-size: 1.25rem; font-weight: 500; letter-spacing: -0.02em; }
+  .mark { width: 24px; height: 24px; display: grid; place-items: center; border-radius: 7px; background: var(--brand); color: var(--on-brand); font-size: 12px; font-weight: 700; }
+  .pick ul { list-style: none; padding: 0; margin-top: 16px; display: grid; gap: 12px; }
+  .pick li { display: flex; gap: 10px; align-items: flex-start; color: var(--fg-2); line-height: 1.5; }
+  .pick li :global(.icon) { margin-top: 3px; color: var(--success); }
+  .table { margin-top: 40px; }
+  .fair { margin-top: 40px; display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .f-card { padding: 24px; border-radius: 20px; background: var(--panel); }
+  .f-card.mine { background: var(--brand-soft); }
+  .f-card h3, .together h3 { font-size: 1.125rem; font-weight: 500; letter-spacing: -0.015em; }
+  .f-card p, .together p { color: var(--muted); margin-top: 8px; line-height: 1.65; }
+  .together { margin-top: 16px; display: flex; gap: 16px; align-items: flex-start; padding: 24px; border-radius: 20px; border: 1px solid var(--border); background: var(--card); }
+  .t-icon { width: 42px; height: 42px; flex: none; display: grid; place-items: center; border-radius: 12px; background: var(--brand-soft); color: var(--brand); }
+  .sources { margin-top: 40px; padding-top: 24px; border-top: 1px solid var(--border); }
+  .s-title { font-weight: 600; font-size: var(--text-sm); }
+  .sources ul { list-style: none; padding: 0; margin: 10px 0 14px; display: flex; flex-wrap: wrap; gap: 8px 20px; }
+  .sources ul a { display: inline-flex; align-items: center; gap: 4px; color: var(--muted); text-decoration: underline; text-underline-offset: 3px; font-size: var(--text-sm); }
+  .sources ul a:hover { color: var(--fg); }
+  .sources .small a { color: var(--muted); text-decoration: underline; text-underline-offset: 3px; }
+  .more { margin-top: 40px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .o-card { position: relative; display: flex; flex-direction: column; gap: 4px; padding: 10px 10px 20px; border-radius: 20px; background: var(--card); border: 1px solid var(--border);
+    transition: border-color var(--dur) ease, box-shadow var(--dur) ease, translate var(--dur) var(--ease-out); }
+  .o-card:hover { border-color: var(--border-strong); box-shadow: var(--shadow-md); translate: 0 -2px; }
+  .o-art { aspect-ratio: 16 / 9; border-radius: 14px; background: var(--panel); display: grid; place-items: center; margin-bottom: 12px; overflow: hidden; }
+  .o-art :global([data-figure]) { width: 50%; }
+  .o-kind { font-size: var(--text-sm); color: var(--subtle); padding-inline: 10px; }
+  .o-name { font-size: 1.125rem; font-weight: 500; letter-spacing: -0.015em; padding-inline: 10px; }
+  .o-card :global(.arrow) { position: absolute; right: 20px; bottom: 22px; color: var(--subtle); transition: transform var(--dur) var(--ease-out); }
+  .o-card:hover :global(.arrow) { transform: translateX(3px); color: var(--fg); }
+  @media (max-width: 860px) { .choose, .fair { grid-template-columns: 1fr; } .more { grid-template-columns: 1fr; } }
+</style>

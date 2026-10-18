@@ -70,6 +70,7 @@ const sources = [
     </table>
   </div>
 
+  <p class="all"><a class="btn btn-outline" href="/alternatives">See every comparison, including Simplify and HiringCafe <Icon name="arrow-right" size={15} class="arrow" /></a></p>
   <p class="sources">Checked October 2026. Products change; <a href="/support">tell us</a> if something here is out of date. Sources:{' '}
     {sources.map((s, i) => <>{i > 0 && ' · '}<a href={s.href} rel="noopener" target="_blank">{s.label}</a></>)}
   </p>
@@ -96,6 +97,8 @@ const sources = [
   tbody tr { transition: background-color var(--dur-fast) ease; }
   tbody tr:hover > :not(.jobly-col) { background: var(--panel); }
 
+  .all { margin-top: 24px; display: flex; justify-content: center; }
+  .all .btn { white-space: normal; height: auto; min-height: 40px; padding-block: 8px; text-align: center; }
   .sources { margin: 20px auto 0; max-width: 820px; text-align: center; font-size: var(--text-sm); color: var(--subtle); line-height: 1.7; }
   .sources a { color: var(--muted); text-decoration: underline; text-underline-offset: 3px; white-space: nowrap; }
   .sources a:hover { color: var(--fg); }
