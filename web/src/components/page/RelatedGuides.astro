@@ -1,0 +1,35 @@
+---
+// "Related content", Wrangle-style: a heading with an "All guides" link, then three guide cards.
+import GuideCard from './GuideCard.astro';
+import Icon from '../Icon.astro';
+import type { Guide } from '../../lib/guides';
+
+interface Props { guides: Guide[]; title?: string; eyebrow?: string; lead?: string; panel?: boolean }
+const { guides, title = 'Related content', eyebrow = 'Guides', lead, panel = false } = Astro.props;
+---
+<section class:list={['related', panel ? 'shell stack-next' : 'container section']} aria-labelledby="related-title">
+  <div class:list={{ 'panel panel-pad': panel }}>
+    <div class:list={{ container: panel }}>
+      <div class="r-head" data-stagger>
+        <div class="r-copy">
+          <span class="eyebrow" data-reveal>{eyebrow}</span>
+          <h2 class="title" id="related-title" data-reveal>{title}</h2>
+          {lead && <p class="lead" data-reveal>{lead}</p>}
+        </div>
+        <a class="btn btn-outline" href="/guides" data-reveal>All guides <Icon name="arrow-right" size={16} class="arrow" /></a>
+      </div>
+      <div class="r-grid" data-stagger>
+        {guides.map((g) => <GuideCard guide={g} />)}
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .r-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; flex-wrap: wrap; }
+  .r-copy { display: flex; flex-direction: column; gap: 14px; max-width: 640px; }
+  .r-grid { margin-top: 40px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+  .related .btn:hover :global(.arrow) { transform: translateX(2px); }
+  @media (max-width: 960px) and (min-width: 641px) { .r-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .r-grid > :nth-child(3) { display: none; } }
+  @media (max-width: 640px) { .r-grid { grid-template-columns: 1fr; } }
+</style>

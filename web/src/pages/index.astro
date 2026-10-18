@@ -8,6 +8,10 @@ import Benefits from '../components/landing/Benefits.astro';
 import Compare from '../components/landing/Compare.astro';
 import Faq from '../components/landing/Faq.astro';
 import FinalCta from '../components/landing/FinalCta.astro';
+import RelatedGuides from '../components/page/RelatedGuides.astro';
+import { getGuides } from '../lib/guides';
+
+const guides = (await getGuides()).filter((g) => g.data.featured).slice(0, 3);
 ---
 <Base description="Jobly is a free Chrome extension that lists jobs from company career pages with their real posting date, hides anything older than two months, and alerts you to new matches. No account.">
   <Hero />
@@ -17,5 +21,6 @@ import FinalCta from '../components/landing/FinalCta.astro';
   <Benefits />
   <Compare />
   <Faq />
-  <FinalCta />
+  <RelatedGuides guides={guides} title="Related content" lead="Practical help for a faster job search, from finding new jobs early to spotting the ones that aren’t real." />
+  <FinalCta secondary={{ label: 'How it works', href: '#how-it-works' }} />
 </Base>

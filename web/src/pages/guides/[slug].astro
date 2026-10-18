@@ -1,0 +1,91 @@
+---
+import { render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import Breadcrumbs from '../../components/page/Breadcrumbs.astro';
+import Toc from '../../components/page/Toc.astro';
+import Figure from '../../components/Figure.astro';
+import Icon from '../../components/Icon.astro';
+import RelatedGuides from '../../components/page/RelatedGuides.astro';
+import { getGuides, related, type Guide } from '../../lib/guides';
+import { SITE, installHref } from '../../lib/site';
+import { formatDate, isoDate } from '../../lib/text';
+
+export async function getStaticPaths() {
+  const guides = await getGuides();
+  return guides.map((guide) => ({ params: { slug: guide.id }, props: { guide, all: guides } }));
+}
+interface Props { guide: Guide; all: Guide[] }
+const { guide, all } = Astro.props;
+const { Content, headings } = await render(guide);
+const { title, description, category, date, updated, figure } = guide.data;
+const tone = category.toLowerCase().replace(/\s+/g, '-');
+const jsonLd = {
+  '@context': 'https://schema.org', '@type': 'Article', headline: title, description,
+  datePublished: isoDate(date), dateModified: isoDate(updated ?? date),
+  author: { '@type': 'Organization', name: 'Jobly', url: SITE.url }, publisher: { '@type': 'Organization', name: 'Jobly', url: SITE.url },
+  mainEntityOfPage: `${SITE.url}${guide.href}`,
+};
+---
+<Base title={title} description={description}>
+  <section class="shell">
+    <header class="panel container g-hero">
+      <div class="copy">
+        <Breadcrumbs items={[{ label: 'Guides', href: '/guides' }, { label: title }]} />
+        <p class="meta"><span class="cat">{category}</span><span aria-hidden="true">·</span><span>{guide.minutes} min read</span></p>
+        <h1 class="display g-title">{title}</h1>
+        <p class="lead">{description}</p>
+        <p class="byline"><span class="mark" aria-hidden="true">J</span><span>Jobly team · <time datetime={isoDate(updated ?? date)}>{formatDate(updated ?? date)}</time></span></p>
+      </div>
+      <div class:list={['art', `tone-${tone}`]}><Figure name={figure} intensity={0.75} /></div>
+    </header>
+  </section>
+
+  <div class="container g-layout">
+    <aside class="side"><Toc headings={headings} /></aside>
+    <div class="g-main">
+      <article class="prose"><Content /></article>
+
+      <aside class="try" aria-labelledby="try-title">
+        <div>
+          <p class="try-title" id="try-title">Let Jobly do the checking</p>
+          <p class="try-text">New tech jobs from company career pages, with their real posting date. Free, no account.</p>
+        </div>
+        <a class="btn btn-ink" href={installHref}><Icon name="chrome" size={17} />Add to Chrome</a>
+      </aside>
+
+      <nav class="back" aria-label="Guides"><a href="/guides"><Icon name="arrow-left" size={15} />All guides</a></nav>
+    </div>
+  </div>
+
+  <RelatedGuides guides={related(all, guide)} title="Keep reading" panel />
+  <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+</Base>
+
+<style>
+  .g-hero { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: clamp(24px, 4vw, 56px); align-items: center; margin-top: 8px;
+    padding-block: clamp(40px, 6vw, 80px); }
+  .copy { display: flex; flex-direction: column; gap: 16px; align-items: flex-start; }
+  .copy :global(.crumbs) { margin-bottom: 8px; }
+  .meta { display: flex; gap: 6px; font-size: var(--text-sm); color: var(--subtle); }
+  .cat { color: var(--brand); font-weight: 500; }
+  .g-title { font-size: clamp(2.125rem, 1.5rem + 2.4vw, 3.25rem); }
+  .byline { display: inline-flex; align-items: center; gap: 10px; font-size: var(--text-sm); color: var(--muted); margin-top: 4px; }
+  .mark { width: 26px; height: 26px; display: grid; place-items: center; border-radius: 8px; background: var(--brand); color: var(--on-brand); font-size: 13px; font-weight: 700; }
+  .art { aspect-ratio: 5 / 4; border-radius: 20px; display: grid; place-items: center; border: 1px solid var(--border); --tone: var(--blob-2);
+    background: radial-gradient(80% 90% at 70% 10%, color-mix(in srgb, var(--tone) 85%, transparent), transparent 70%), var(--card); }
+  .tone-search-tips { --tone: var(--blob-1); }
+  .tone-tools { --tone: var(--blob-3); }
+  .tone-privacy { --tone: color-mix(in srgb, var(--success) 22%, var(--panel)); }
+  .art :global([data-figure]) { width: 70%; }
+  .g-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: clamp(32px, 6vw, 96px); padding-block: clamp(48px, 6vw, 80px) var(--section-y); }
+  .g-main { min-width: 0; max-width: 760px; }
+  .try { margin-top: 56px; padding: 24px; border-radius: 20px; display: flex; gap: 20px; align-items: center; justify-content: space-between; flex-wrap: wrap;
+    background: radial-gradient(70% 120% at 100% 0%, color-mix(in srgb, var(--blob-1) 60%, transparent), transparent 70%), var(--panel); border: 1px solid var(--border); }
+  .try-title { font-weight: 500; font-size: 1.125rem; letter-spacing: -0.015em; }
+  .try-text { color: var(--muted); margin-top: 2px; max-width: 46ch; }
+  .back { margin-top: 24px; }
+  .back a { display: inline-flex; align-items: center; gap: 6px; color: var(--muted); font-weight: 500; }
+  .back a:hover { color: var(--fg); }
+  @media (max-width: 960px) { .g-layout { grid-template-columns: 1fr; } }
+  @media (max-width: 860px) { .g-hero { grid-template-columns: 1fr; } .art { max-width: 360px; } }
+</style>

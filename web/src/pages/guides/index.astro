@@ -1,0 +1,67 @@
+---
+import Base from '../../layouts/Base.astro';
+import PageHero from '../../components/page/PageHero.astro';
+import GuideCard from '../../components/page/GuideCard.astro';
+import FinalCta from '../../components/landing/FinalCta.astro';
+import { getGuides, CATEGORIES } from '../../lib/guides';
+import { SITE } from '../../lib/site';
+
+const guides = await getGuides();
+const [lead, ...rest] = guides;
+const counts = Object.fromEntries(CATEGORIES.map((c) => [c, guides.filter((g) => g.data.category === c).length]));
+const jsonLd = {
+  '@context': 'https://schema.org', '@type': 'CollectionPage', name: 'Jobly guides', url: `${SITE.url}/guides`,
+  hasPart: guides.map((g) => ({ '@type': 'Article', headline: g.data.title, url: `${SITE.url}${g.href}` })),
+};
+---
+<Base title="Guides" description="Practical guides for a faster, calmer job search: finding new jobs early, spotting ghost jobs, alerts that aren't spam, and role-by-role tips.">
+  <PageHero crumbs={[{ label: 'Guides' }]} eyebrow="Guides" title="Search smarter, apply sooner." figure="riffle" intensity={0.7}
+    lead="Short, practical guides for a faster job search: finding jobs while they’re new, avoiding dead listings, and role-by-role tips. No fluff, no sign-up." />
+
+  <section class="container guides">
+    <GuideCard guide={lead} size="lg" headingLevel="h2" />
+
+    <div class="bar">
+      <h2 class="bar-title">All guides</h2>
+      <fieldset class="filters">
+        <legend class="sr-only">Show guides about</legend>
+        <label><input type="radio" name="cat" value="all" checked /><span>All <span class="n">{rest.length}</span></span></label>
+        {CATEGORIES.map((c) => (
+          <label><input type="radio" name="cat" value={c} /><span>{c} <span class="n">{rest.filter((g) => g.data.category === c).length}</span></span></label>
+        ))}
+      </fieldset>
+    </div>
+
+    <div class="grid" data-stagger>
+      {rest.map((g) => <GuideCard guide={g} headingLevel="h3" />)}
+    </div>
+    <p class="note small">{guides.length} guides · {Object.entries(counts).map(([c, n]) => `${n} ${c.toLowerCase()}`).join(', ')}</p>
+  </section>
+
+  <FinalCta title="Put the guides to work." lead="Jobly finds new tech jobs on company career pages and tells you when one matches. Free, no account." />
+  <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+</Base>
+
+<style>
+  .guides { padding-block: clamp(40px, 5vw, 64px) var(--section-y); }
+  .bar { margin-top: clamp(56px, 7vw, 88px); display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+  .bar-title { font-size: 1.5rem; font-weight: 500; letter-spacing: -0.025em; }
+  .filters { border: 0; padding: 0; margin: 0; min-width: 0; display: flex; gap: 6px; flex-wrap: wrap; }
+  .filters label { position: relative; }
+  .filters input { position: absolute; inset: 0; opacity: 0; margin: 0; cursor: pointer; }
+  .filters label > span { display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px; border-radius: 999px; border: 1px solid var(--border); background: var(--card); font-size: var(--text-sm); color: var(--muted);
+    transition: background-color var(--dur-fast) ease, color var(--dur-fast) ease, border-color var(--dur-fast) ease; }
+  .filters label:hover > span { border-color: var(--border-strong); color: var(--fg); }
+  .filters input:checked + span { background: var(--ink); color: var(--on-ink); border-color: var(--ink); }
+  .filters input:focus-visible + span { box-shadow: var(--ring); }
+  .n { font-variant-numeric: tabular-nums; opacity: 0.7; }
+  .grid { margin-top: 24px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+  /* CSS-only category filter */
+  .guides:has(input[value='Search tips']:checked) .grid > :not([data-cat='Search tips']),
+  .guides:has(input[value='Roles']:checked) .grid > :not([data-cat='Roles']),
+  .guides:has(input[value='Tools']:checked) .grid > :not([data-cat='Tools']),
+  .guides:has(input[value='Privacy']:checked) .grid > :not([data-cat='Privacy']) { display: none; }
+  .note { margin-top: 24px; }
+  @media (max-width: 960px) { .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (max-width: 640px) { .grid { grid-template-columns: 1fr; } }
+</style>

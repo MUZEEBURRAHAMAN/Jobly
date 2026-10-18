@@ -4,7 +4,8 @@ import { z } from 'astro/zod';
 
 // Hairline figures the site loads (see scripts/figures.ts).
 const figure = z.enum(['slow', 'cabinet', 'router', 'hub', 'plug', 'padlock', 'query', 'terrain', 'phosphor', 'laptop', 'settle', 'relay',
-  'plot', 'vault', 'format', 'dish', 'branches', 'drawer', 'turntable', 'loupe', 'sieve', 'stack', 'rail', 'lockers']);
+  'plot', 'vault', 'format', 'dish', 'branches', 'drawer', 'turntable', 'loupe', 'sieve', 'stack', 'rail', 'lockers',
+  'terminal', 'exploded', 'keyboard', 'riffle', 'basket', 'phone', 'elevator', 'patch', 'rebuild']);
 
 const guides = defineCollection({
   loader: glob({ pattern: '**/*.md', base: './src/content/guides' }),
