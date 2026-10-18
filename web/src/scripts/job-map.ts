@@ -259,25 +259,15 @@ function init(root: HTMLElement) {
 
   // ---------- live numbers
   const fmtInto = (key: string, value: string) => root.querySelectorAll<HTMLElement>(`[data-geo="${key}"]`).forEach((el) => { el.textContent = value; });
-  const scope = [...(list.attributes as unknown as Attr[])].find((a) => a.name.startsWith('data-astro-cid'))?.name;
-  const tag = <T extends Element>(el: T): T => { if (scope) { el.setAttribute(scope, ''); el.querySelectorAll('*').forEach((c) => c.setAttribute(scope, '')); } return el; };
   const renderList = () => {
     if (!geo) return;
-    const top = geo.by_country.slice(0, 10), max = top[0]?.jobs || 1;
-    list.replaceChildren(...top.map((c) => {
-      const li = document.createElement('li');
-      li.innerHTML = `<button type="button" class="c-row" data-country=""><span class="c-name"></span><span class="c-bar" aria-hidden="true"><span class="c-fill"></span></span><span class="c-num"></span></button>`;
-      const b = li.querySelector('button')!;
-      b.dataset.country = c.country;
-      li.querySelector('.c-name')!.textContent = c.country;
-      const num = li.querySelector('.c-num')!;
-      num.innerHTML = '<span class="sr-only">, </span><span class="n"></span><span class="sr-only"></span>';
-      num.querySelector('.n')!.textContent = formatNumber(c.jobs);
-      num.querySelector('.sr-only:last-child')!.textContent = ` tech jobs at ${c.employers} employers`;
-      li.querySelector('.c-fill')!.classList.add(`w${Math.max(5, Math.round((c.jobs / max) * 20) * 5)}`);
-      return tag(li);
+    list.replaceChildren(...geo.by_country.slice(0, 10).map((c) => {
+      const li = document.createElement('li'), b = document.createElement('button');
+      b.type = 'button'; b.className = 'c-row'; b.dataset.country = c.country;
+      b.textContent = `${c.country}, ${formatNumber(c.jobs)} tech jobs at ${c.employers} employers`;
+      li.append(b);
+      return li;
     }));
-    requestAnimationFrame(() => list.querySelectorAll('li').forEach((li) => li.classList.add('in')));
     bindList();
   };
   const applyGeo = (g: Geo) => {
