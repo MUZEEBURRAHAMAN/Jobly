@@ -4,12 +4,14 @@ import PageHero from '../components/page/PageHero.astro';
 import Icon from '../components/Icon.astro';
 import FinalCta from '../components/landing/FinalCta.astro';
 import { SITE } from '../lib/site';
+import { serverReady } from '../lib/server';
 import { SOURCES, sourceLabel } from '../lib/sources';
 
 type Company = { id: number; name: string; careers_url: string; source_type: string; job_count: number };
 // A build-time copy, so the list is there without JavaScript and for search engines. The page refreshes it live.
 let initial: Company[] = [];
 try {
+  await serverReady();
   const res = await fetch(`${SITE.api}/api/companies`, { signal: AbortSignal.timeout(60000) });
   if (res.ok) initial = ((await res.json()) as Company[]).map(({ id, name, careers_url, source_type, job_count }) => ({ id, name, careers_url, source_type, job_count }));
 } catch { /* the live request in the browser fills the list */ }
