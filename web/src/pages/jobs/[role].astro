@@ -1,0 +1,109 @@
+---
+import Base from '../../layouts/Base.astro';
+import PageHero from '../../components/page/PageHero.astro';
+import SectionHead from '../../components/SectionHead.astro';
+import GuideCard from '../../components/page/GuideCard.astro';
+import FinalCta from '../../components/landing/FinalCta.astro';
+import { ROLES, type Role } from '../../lib/roles';
+import { getGuides } from '../../lib/guides';
+
+export function getStaticPaths() {
+  return ROLES.map((role) => ({ params: { role: role.slug }, props: { role } }));
+}
+interface Props { role: Role }
+const { role } = Astro.props;
+const guide = role.guide ? (await getGuides()).find((g) => g.id === role.guide) : undefined;
+const others = ROLES.filter((r) => r.slug !== role.slug);
+const ranges = [{ d: 1, l: 'Past 24 hours' }, { d: 7, l: 'Past week' }, { d: 14, l: 'Past 2 weeks' }, { d: 30, l: 'Past month' }];
+const title = `Latest ${role.name.toLowerCase()} jobs`;
+---
+<Base title={title} description={`The newest ${role.plural} from company career pages, updated every two hours, each with its real posting date. No promoted listings, no account.`}>
+  <PageHero crumbs={[{ label: 'Jobs', href: '/jobs' }, { label: role.name }]} eyebrow={`${role.name} jobs`} title={`${role.name} jobs, straight from the source.`} lead={role.lead} figure={role.figure} intensity={0.7}>
+    <p class="live"><span class="dot" aria-hidden="true"></span><span data-week>…</span>&nbsp;posted in the last 7 days</p>
+  </PageHero>
+
+  <section class="container board" data-role-jobs data-role={role.id} aria-labelledby="list-title">
+    <div class="bar">
+      <h2 id="list-title" class="bar-title">Latest {role.plural}</h2>
+      <div class="controls">
+        <fieldset class="chips">
+          <legend class="sr-only">Posted within</legend>
+          {ranges.map((r) => <label><input type="radio" name="days" value={r.d} checked={r.d === 7} /><span>{r.l}</span></label>)}
+        </fieldset>
+        <label class="remote"><input type="checkbox" data-remote role="switch" /><span>Remote only</span></label>
+      </div>
+    </div>
+    <p class="status small" data-status role="status" aria-live="polite">Loading the latest jobs…</p>
+    <ol class="jobs" data-list></ol>
+    <div class="more-wrap"><button type="button" class="btn btn-outline" data-more hidden>Show more jobs</button></div>
+    <noscript><p class="small">Turn on JavaScript to see the latest jobs, or <a href="/how-it-works">get the extension</a>.</p></noscript>
+    <p class="small note">Jobs older than 60 days never appear. Apply opens the original listing. Jobly isn’t affiliated with these employers. <a href="/how-dates-work">How dates work</a></p>
+  </section>
+
+  <section class="shell" aria-labelledby="titles-title">
+    <div class="panel panel-pad">
+      <div class="container about">
+        <div>
+          <SectionHead eyebrow="What’s included" id="titles-title" title={`Every title Jobly counts as ${role.name.toLowerCase()}`}
+            lead="Employers name the same job in many ways. Jobly reads the title and groups these together, so one preference covers them all." />
+          <ul class="titles">{role.titles.map((t) => <li>{t}</li>)}</ul>
+          <p class="others">Other roles: {others.map((o, i) => <>{i > 0 && ' · '}<a href={`/jobs/${o.slug}`}>{o.name}</a></>)}</p>
+        </div>
+        {guide && <div class="guide"><p class="g-label">Guide</p><GuideCard guide={guide} /></div>}
+      </div>
+    </div>
+  </section>
+
+  <FinalCta title={`Get an alert for the next one.`} lead={`Pick ${role.name.toLowerCase()} in Jobly and it tells you when a new job matches, usually within a few hours of it going up. Free, no account.`} />
+  <script>import '../../scripts/role-jobs';</script>
+</Base>
+
+<style>
+  .live { display: inline-flex; align-items: center; gap: 8px; font-size: var(--text-sm); color: var(--muted); background: var(--card); border: 1px solid var(--border); border-radius: 999px; padding: 6px 12px; font-variant-numeric: tabular-nums; }
+  .live [data-week] { color: var(--fg); font-weight: 600; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--success); }
+  .board { padding-block: clamp(40px, 5vw, 64px) var(--section-y); }
+  .bar { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+  .bar-title { font-size: 1.5rem; font-weight: 500; letter-spacing: -0.025em; }
+  .controls { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+  .chips { border: 0; padding: 0; margin: 0; min-width: 0; display: flex; gap: 6px; flex-wrap: wrap; }
+  .chips label { position: relative; }
+  .chips input { position: absolute; inset: 0; opacity: 0; margin: 0; cursor: pointer; }
+  .chips span { display: inline-block; padding: 7px 14px; border-radius: 999px; border: 1px solid var(--border); background: var(--card); font-size: var(--text-sm); color: var(--muted); }
+  .chips label:hover span { border-color: var(--border-strong); color: var(--fg); }
+  .chips input:checked + span { background: var(--ink); color: var(--on-ink); border-color: var(--ink); }
+  .chips input:focus-visible + span { box-shadow: var(--ring); }
+  .remote { display: inline-flex; align-items: center; gap: 8px; font-size: var(--text-sm); color: var(--fg); cursor: pointer; }
+  .remote input { appearance: none; width: 34px; height: 20px; border-radius: 999px; background: var(--border-strong); position: relative; cursor: pointer; transition: background-color var(--dur-fast) ease; margin: 0; }
+  .remote input::after { content: ''; position: absolute; top: 2px; left: 2px; width: 16px; height: 16px; border-radius: 50%; background: var(--card); box-shadow: var(--shadow-sm); transition: translate var(--dur) var(--ease-out); }
+  .remote input:checked { background: var(--brand); }
+  .remote input:checked::after { translate: 14px 0; }
+  .remote input:focus-visible { box-shadow: var(--ring); }
+  .status { margin-top: 20px; }
+  .jobs { list-style: none; padding: 0; margin-top: 12px; display: grid; gap: 8px; }
+  .jobs :global(.job) { display: grid; grid-template-columns: 40px minmax(0, 1fr) auto; align-items: center; gap: 14px; padding: 14px 16px; border-radius: 16px; border: 1px solid var(--border); background: var(--card);
+    transition: border-color var(--dur-fast) ease; }
+  .jobs :global(.job:hover) { border-color: var(--border-strong); }
+  .jobs :global(.av) { width: 40px; height: 40px; display: grid; place-items: center; border-radius: 10px; background: var(--brand-soft); color: var(--brand); font-weight: 600; }
+  .jobs :global(.j-title) { font-weight: 500; font-size: 1.0625rem; letter-spacing: -0.01em; color: var(--fg); }
+  .jobs :global(.j-meta) { display: flex; flex-wrap: wrap; gap: 4px 12px; margin-top: 2px; font-size: var(--text-sm); color: var(--subtle); }
+  .jobs :global(.j-age) { color: var(--brand); font-weight: 500; }
+  .jobs :global(.j-tag) { padding: 1px 8px; border-radius: 999px; background: var(--card-muted); color: var(--muted); }
+  .jobs :global(.j-apply) { white-space: nowrap; }
+  .jobs :global(.skel) { height: 70px; border-radius: 16px; background: linear-gradient(90deg, var(--panel), var(--card-muted), var(--panel)); background-size: 200% 100%; animation: role-skel 1.4s ease-in-out infinite; }
+  @keyframes role-skel { to { background-position: -200% 0; } }
+  .more-wrap { display: flex; justify-content: center; margin-top: 20px; }
+  .note { margin-top: 24px; }
+  .note a, .others a { color: var(--muted); text-decoration: underline; text-underline-offset: 3px; }
+  .about { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: clamp(32px, 5vw, 64px); align-items: start; }
+  .titles { list-style: none; padding: 0; margin-top: 28px; display: flex; flex-wrap: wrap; gap: 8px; }
+  .titles li { padding: 8px 14px; border-radius: 999px; background: var(--card); border: 1px solid var(--border); font-size: var(--text-md); }
+  .others { margin-top: 28px; color: var(--muted); font-size: var(--text-md); }
+  .g-label { font-size: var(--text-sm); font-weight: 600; margin-bottom: 10px; }
+  @media (max-width: 860px) { .about { grid-template-columns: 1fr; } }
+  @media (max-width: 560px) {
+    .jobs :global(.job) { grid-template-columns: 36px minmax(0, 1fr); }
+    .jobs :global(.av) { width: 36px; height: 36px; }
+    .jobs :global(.j-apply) { grid-column: 1 / -1; width: 100%; }
+  }
+</style>

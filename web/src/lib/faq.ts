@@ -7,7 +7,7 @@ export const FAQ_GROUPS: { id: string; title: string; items: Faq[] }[] = [
       { top: true, q: 'Is it really free?', a: 'Yes. Jobly is free, has no premium tier and shows no ads.' },
       { q: 'Do I need an account?', a: 'No. There is no sign-up, no login and no email. You pick your roles in the extension and that’s it.' },
       { top: true, q: 'Which browsers does it work in?', a: 'Chrome on desktop. Chromium browsers that install extensions from the Chrome Web Store, such as Edge and Brave, should work too, but we test on Chrome.' },
-      { q: 'Does Jobly apply to jobs for me?', a: 'No. Every Apply button opens the job on the employer’s own site, and you apply there yourself. Jobly never submits anything on your behalf.' },
+      { q: 'Does Jobly apply to jobs for me?', a: 'No. Every Apply button opens the original listing, usually the employer’s own careers page and sometimes the remote job board it came from. You apply there yourself. Jobly never submits anything on your behalf.' },
     ],
   },
   {

@@ -53,4 +53,4 @@ Mostly, on well-known sites. Leave out your home address, date of birth and ID n
 
 ### Does Jobly ever see my résumé?
 
-No. Jobly never asks for your résumé, name or email. You apply on the employer's own site.
+No. Jobly never asks for your résumé, name or email. You apply on the original listing, usually the employer's own site.

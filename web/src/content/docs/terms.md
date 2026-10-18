@@ -14,7 +14,7 @@ By installing the Jobly extension or using this website or Jobly's server, you a
 
 ## What Jobly does
 
-Jobly collects public job postings from company career pages and job boards and shows them to you with their posting date. When you apply, you leave Jobly and apply on the employer's own site. Jobly is not an employer, recruiter or agency, and it does not take part in any hiring decision.
+Jobly collects public job postings from company career pages and job boards and shows them to you with their posting date. When you apply, you leave Jobly and apply on the original listing: the employer's own site, or the job board where the job was posted. Jobly is not an employer, recruiter or agency, and it does not take part in any hiring decision.
 
 ## Job listings belong to others
 

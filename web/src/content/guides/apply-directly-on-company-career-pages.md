@@ -35,7 +35,7 @@ For a long list of similar roles, one-click apply can be a reasonable way to cas
 
 ## How Jobly fits in
 
-Every Apply button in Jobly opens the job on the employer's own page: the ATS or careers site where it was published. Jobly never applies for you and never sits in the middle. You get the listing straight from the source, with its real posting date.
+Almost every job in Jobly comes straight from an employer's own ATS or careers site, and its Apply button opens that page. A small share comes from remote job boards; for those, Apply opens the board's listing, which links on to the employer. Jobly never applies for you and never sits in the middle. You get the listing straight from the source, with its real posting date.
 
 ## Common questions
 

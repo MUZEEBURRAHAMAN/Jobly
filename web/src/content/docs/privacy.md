@@ -10,7 +10,7 @@ figure: padlock
 
 ## What Jobly is
 
-Jobly is a Chrome extension, plus this website, that lists public job postings collected from company career pages and job boards. The extension has one purpose: helping you find relevant jobs and apply on the employer's own site.
+Jobly is a Chrome extension, plus this website, that lists public job postings collected from company career pages and job boards. The extension has one purpose: helping you find relevant jobs and apply on the original listing.
 
 ## What stays on your device
 
@@ -34,7 +34,7 @@ If you use **Report this listing**, we store the job, the reason you chose and a
 
 - No cookies, no analytics, no advertising or tracking scripts. Fonts are served from this site, not from a font service.
 - Your theme choice is saved in your browser's local storage so the page doesn't flash the wrong colours.
-- Some pages show live numbers and the list of companies. Your browser fetches them from Jobly's server, the same way the extension does.
+- Some pages show live numbers, the list of companies and the latest jobs for a role. Your browser fetches them from Jobly's server, the same way the extension does, without sending any preferences.
 
 ## Forms you can send us
 

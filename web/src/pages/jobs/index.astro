@@ -1,0 +1,52 @@
+---
+import Base from '../../layouts/Base.astro';
+import PageHero from '../../components/page/PageHero.astro';
+import Figure from '../../components/Figure.astro';
+import Icon from '../../components/Icon.astro';
+import FinalCta from '../../components/landing/FinalCta.astro';
+import { ROLES } from '../../lib/roles';
+---
+<Base title="Jobs by role" description="Browse the newest tech jobs from company career pages by role: product design, frontend, product management, AI and ML, and fullstack. Live, every two hours.">
+  <PageHero crumbs={[{ label: 'Jobs' }]} eyebrow="Jobs" title="The newest tech jobs, by role." figure="basket" intensity={0.7}
+    lead="Pick a role to see what went up on company career pages most recently, live from Jobly’s server. For alerts on new ones, add the extension." />
+  <section class="container roles" data-role-counts>
+    <ul class="grid" data-stagger>
+      {ROLES.map((r) => (
+        <li data-reveal>
+          <a class="card" href={`/jobs/${r.slug}`}>
+            <span class="art"><Figure name={r.figure} intensity={0.55} /></span>
+            <span class="name">{r.name}</span>
+            <span class="count"><span data-count-role={r.id}>…</span> posted this week</span>
+            <span class="titles">{r.titles.slice(0, 4).join(' · ')}</span>
+            <span class="go">See the jobs <Icon name="arrow-right" size={15} class="arrow" /></span>
+          </a>
+        </li>
+      ))}
+    </ul>
+  </section>
+  <FinalCta title="Let new jobs come to you." />
+  <script>import '../../scripts/role-counts';</script>
+</Base>
+
+<style>
+  .roles { padding-block: clamp(40px, 5vw, 64px) var(--section-y); }
+  .grid { list-style: none; padding: 0; display: grid; grid-template-columns: repeat(6, 1fr); gap: 16px; }
+  .grid li { grid-column: span 2; }
+  .grid li:nth-child(4) { grid-column: 2 / span 2; }
+  .card { height: 100%; display: flex; flex-direction: column; gap: 6px; padding: 10px 10px 22px; border-radius: 22px; background: var(--card); border: 1px solid var(--border);
+    transition: border-color var(--dur) ease, box-shadow var(--dur) ease, translate var(--dur) var(--ease-out); }
+  .card:hover { border-color: var(--border-strong); box-shadow: var(--shadow-md); translate: 0 -2px; }
+  .art { aspect-ratio: 16 / 10; border-radius: 16px; display: grid; place-items: center; margin-bottom: 12px; overflow: hidden;
+    background: radial-gradient(70% 90% at 70% 10%, color-mix(in srgb, var(--blob-1) 75%, transparent), transparent 70%), var(--panel); }
+  .art :global([data-figure]) { width: 58%; }
+  .name, .count, .titles, .go { padding-inline: 12px; }
+  .name { font-size: 1.375rem; font-weight: 500; letter-spacing: -0.025em; }
+  .count { font-size: var(--text-sm); color: var(--muted); font-variant-numeric: tabular-nums; }
+  .count span { color: var(--brand); font-weight: 600; }
+  .titles { font-size: var(--text-sm); color: var(--subtle); line-height: 1.5; }
+  .go { margin-top: auto; padding-top: 10px; display: inline-flex; align-items: center; gap: 6px; font-weight: 500; }
+  .card :global(.arrow) { transition: transform var(--dur) var(--ease-out); }
+  .card:hover :global(.arrow) { transform: translateX(3px); }
+  @media (max-width: 960px) { .grid { grid-template-columns: 1fr 1fr; } .grid li, .grid li:nth-child(4) { grid-column: auto; } }
+  @media (max-width: 600px) { .grid { grid-template-columns: 1fr; } }
+</style>

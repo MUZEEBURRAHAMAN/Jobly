@@ -33,7 +33,7 @@ The server keeps no record of who asked for what. Identical requests are cached 
 ## Built-in protections
 
 - **Content Security Policy.** The extension only runs its own scripts and only connects to Jobly's server: `default-src 'self'; script-src 'self'; connect-src https://jobly-yd6l.onrender.com`.
-- **Links that don't leak.** Apply links open the employer's page in a new tab with `noopener noreferrer`, so the employer's site can't see or control where you came from.
+- **Links that don't leak.** Apply links open the job's original page in a new tab with `noopener noreferrer`, so that site can't see or control the page you came from.
 - **Limits on the server.** Request rate limits, size limits on every input, a cap on how many heavy queries run at once, and a guard that stops the crawler from being pointed at private network addresses.
 - **No secrets in the extension.** There are no API keys or tokens in the extension to steal. Changing the list of companies needs an admin key that only the server holds.
 - **This website** uses a strict policy too: no inline scripts, no third-party scripts, self-hosted fonts.

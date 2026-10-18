@@ -22,6 +22,7 @@ export const MENUS: { id: string; label: string; items: MenuItem[]; preview: { t
       { label: 'Alerts', text: 'A notification when a new match appears.', href: '/#features', icon: 'bell' },
       { label: 'Saved jobs', text: 'A shortlist that stays on your device.', href: '/#features', icon: 'bookmark' },
       { label: 'Filters', text: 'Date posted, experience, salary, location, remote.', href: '/#features', icon: 'sliders-horizontal' },
+      { label: 'How it works', text: 'From career page to your toolbar.', href: '/how-it-works', icon: 'layers' },
       { label: 'How dates work', text: 'Where dates come from and the 60-day rule.', href: '/how-dates-work', icon: 'calendar-clock' },
     ],
     preview: { title: 'Jobly dashboard', text: 'Your matches, sorted by posting date.' },
@@ -41,4 +42,4 @@ export const MENUS: { id: string; label: string; items: MenuItem[]; preview: { t
   },
 ];
 
-export const NAV_LINKS = [{ label: 'Companies', href: '/companies' }];
+export const NAV_LINKS = [{ label: 'Jobs', href: '/jobs' }, { label: 'Companies', href: '/companies' }];
