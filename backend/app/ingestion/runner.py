@@ -8,7 +8,7 @@ from typing import Any
 import httpx
 from ..db import get_db_connection, get_utc_now
 from ..matching import (
-    detect_role, detect_seniority, detect_work_mode,
+    classify_role, detect_seniority, detect_work_mode,
     detect_geo_hub, detect_experience_tier
 )
 from ..config import settings
@@ -147,7 +147,7 @@ async def upsert_job_record(
     if clean_url is None:
         return
     job.application_url = clean_url
-    role = job.normalized_role or detect_role(job.title)
+    role = classify_role(job.title, job.normalized_role)
     seniority = job.seniority or detect_seniority(job.title)
     work_mode = job.work_mode or detect_work_mode(job.location, job.title)
     geo_hub = detect_geo_hub(job.location, job.title)
@@ -467,6 +467,9 @@ async def sync_all_sources(company_id_filter: int | None = None, include_aggrega
                     logger.error(f"[Ingestion] RSS sync error: {rss_err}")
                     summary["errors"].append({"source": "rss", "error": str(rss_err)})
 
+        # Re-check stored roles, so rule changes also apply to jobs whose content hasn't changed
+        summary["reclassified"] = await reclassify_roles(db)
+
         # Purge what we'd never show anyway: postings older than the age limit and long-closed jobs
         await db.execute("DELETE FROM jobs WHERE posted_at IS NOT NULL AND posted_at < ?", (age_cutoff_iso(),))
         await db.execute("DELETE FROM jobs WHERE status = 'closed' AND last_seen_at < ?", (age_cutoff_iso(14),))
@@ -475,6 +478,19 @@ async def sync_all_sources(company_id_filter: int | None = None, include_aggrega
         await db.commit()
         gc.collect()
     return summary
+
+
+async def reclassify_roles(db) -> int:
+    """Apply the current role rules to every active job. The stored role doubles as the category hint,
+    which keeps this stable from one run to the next. Returns how many jobs changed role."""
+    cur = await db.execute("SELECT id, title, normalized_role FROM jobs WHERE status = 'active'")
+    changes = [(new, row["id"]) for row in await cur.fetchall()
+               if (new := classify_role(row["title"], row["normalized_role"])) != row["normalized_role"]]
+    if changes:
+        await db.executemany("UPDATE jobs SET normalized_role = ? WHERE id = ?", changes)
+        await db.commit()
+        logger.info(f"[Ingestion] Re-classified {len(changes)} job roles")
+    return len(changes)
 
 
 async def sync_board_sources() -> dict[str, Any]:
@@ -552,6 +568,7 @@ async def sync_board_sources() -> dict[str, Any]:
             except Exception as e:
                 summary["errors"].append({"source": "rss", "error": str(e)})
 
+        summary["reclassified"] = await reclassify_roles(db)
         await db.commit()
         gc.collect()
     return summary

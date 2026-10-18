@@ -16,12 +16,16 @@ ROLE_TAXONOMY = {
             r"\bdesign\s+technologist\b",
             r"\bvisual\s+designer\b",
             r"\bbrand\s+designer\b",
+            r"\bui\s+designer\b",
+            r"\bweb\s+designer\b",
+            r"\b(?:ux|user)\s+research(?:er)?\b",
         ],
         "exclude": [
             r"\bfashion\s+design\b",
             r"\binterior\s+design\b",
             r"\binstructional\s+design\b",
-            r"\bhardware\s+design\b",
+            r"\bhardware\b",
+            r"\bmask\s+design\b",
             r"\bphysical\s+design\b",
             r"\brtl\s+design\b",
             r"\belectrical\b",
@@ -31,7 +35,11 @@ ROLE_TAXONOMY = {
             r"\banalog\b",
             r"\bmechanical\b",
             r"\basic\b",
-            r"\bfpga\b"
+            r"\bfpga\b",
+            # Engineers who build design systems or UI kits are engineers, not designers.
+            r"\bsoftware\s+(?:engineer|developer)\b",
+            r"\b(?:android|ios|mobile|backend|back-end|full[\s-]?stack|devops|platform|infrastructure)\s+(?:engineer|developer)\b",
+            r"\b(?:developer|programmer)\b",
         ]
     },
     "frontend_engineering": {
@@ -60,7 +68,10 @@ ROLE_TAXONOMY = {
             r"\bphysical\s+design\b",
             r"\brtl\b",
             r"\bsilicon\b",
-            r"\bactuator\b"
+            r"\bactuator\b",
+            # "Full-stack (React / TypeScript)" is a fullstack job that happens to name frontend tools.
+            r"\bfull\s*[-]?\s*stack\b",
+            r"\bfullstack\b"
         ]
     },
     "product_management": {
@@ -73,7 +84,8 @@ ROLE_TAXONOMY = {
             r"\bhead\s+of\s+product\b",
             r"\bdirector\s+of\s+product\b",
             r"\bprincipal\s+product\s+manager\b",
-            r"\bproduct\s+lead\b"
+            r"\bproduct\s+lead\b",
+            r"\bproduct\s+owner\b"
         ],
         "exclude": [
             r"\bproject\s+manager\b",
@@ -88,6 +100,7 @@ ROLE_TAXONOMY = {
             r"\bmachine\s+learning\b",
             r"\bml\s+(?:engineer|scientist|researcher)\b",
             r"\bai\s+(?:engineer|researcher|scientist|specialist)\b",
+            r"\bapplied\s+ai\b",
             r"\bllm\b",
             r"\bapplied\s+scientist\b",
             r"\bresearch\s+scientist\b",
@@ -116,6 +129,23 @@ ROLE_TAXONOMY = {
         ]
     }
 }
+
+# Job boards file jobs under broad categories (a "design" feed also carries sales and ops jobs), so a board's
+# category is only trusted when the title itself says engineer/developer and the category is an engineering one.
+_ENGINEERING_TITLE = re.compile(r"\b(?:engineer|developer|programmer)\b")
+_ENGINEERING_ROLES = {"frontend_engineering", "fullstack_engineering"}
+
+
+def classify_role(title: str, hint: str | None = None) -> str | None:
+    """The role for a job: from its title, else from the source's category when the title fits it."""
+    role = detect_role(title)
+    if role or not hint:
+        return role
+    if hint in _ENGINEERING_ROLES and _ENGINEERING_TITLE.search(title.lower()):
+        excluded = any(re.search(exc, title.lower()) for exc in ROLE_TAXONOMY[hint]["exclude"])
+        return None if excluded else hint
+    return None
+
 
 def detect_role(title: str) -> str | None:
     title_lower = title.lower()
