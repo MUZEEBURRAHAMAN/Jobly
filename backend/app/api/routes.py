@@ -491,6 +491,16 @@ async def get_stats(prefs_dict: dict[str, Any] = Depends(prefs_param)):
         n_cur = await db.execute("SELECT COUNT(*) as count FROM jobs WHERE status = 'active' AND posted_at >= ?", (day_ago,))
         new_jobs_today = (await n_cur.fetchone())["count"]
 
+        # Tech roles only: jobs Jobly sorted into one of its five roles
+        week_ago = (datetime.now(timezone.utc) - timedelta(days=7)).isoformat()
+        t_cur = await db.execute(
+            "SELECT COUNT(*) AS jobs, "
+            "COALESCE(SUM(posted_at >= ?), 0) AS today, COALESCE(SUM(posted_at >= ?), 0) AS week "
+            "FROM jobs WHERE status = 'active' AND normalized_role IS NOT NULL AND (posted_at IS NULL OR posted_at >= ?)",
+            (day_ago, week_ago, window),
+        )
+        tech = await t_cur.fetchone()
+
         # Last sync = newest job we've seen (company rows are also touched by seeding/edits)
         comp_cur = await db.execute("SELECT MAX(last_seen_at) as last_sync FROM jobs")
         last_sync = (await comp_cur.fetchone())["last_sync"]
@@ -508,6 +518,9 @@ async def get_stats(prefs_dict: dict[str, Any] = Depends(prefs_param)):
             active_companies=active_companies,
             matched_jobs=matched_jobs,
             new_jobs_today=new_jobs_today,
+            tech_jobs=tech["jobs"],
+            tech_jobs_today=tech["today"],
+            tech_jobs_week=tech["week"],
             last_sync_time=last_sync,
             is_syncing=_sync_lock.locked()
         )

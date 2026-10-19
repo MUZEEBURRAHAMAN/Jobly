@@ -113,6 +113,10 @@ class StatsOut(BaseModel):
     active_companies: int
     matched_jobs: int
     new_jobs_today: int
+    # The same counts for Jobly's five tech roles only (the website quotes these; the totals above include every job stored)
+    tech_jobs: int = 0
+    tech_jobs_today: int = 0
+    tech_jobs_week: int = 0
     last_sync_time: str | None = None
     # True while a crawl is running (the client shows "gathering jobs" instead of an empty list)
     is_syncing: bool = False

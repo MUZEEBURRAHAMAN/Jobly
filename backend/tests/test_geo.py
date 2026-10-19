@@ -94,3 +94,11 @@ class TestGeoEndpoint(unittest.IsolatedAsyncioTestCase):
         sf = next(p for p in data["places"] if p["name"] == "San Francisco Bay Area")
         self.assertTrue(30 < sf["lat"] < 40 and -125 < sf["lng"] < -120)
         self.assertEqual(sf["employers"], 2)
+
+    async def test_stats_have_tech_only_counts(self):
+        """The website quotes the tech_* numbers: a job outside the five roles (our Berlin row) must not be in them."""
+        stats = (await self.client.get("/api/stats")).json()
+        self.assertEqual(stats["tech_jobs"], stats["total_jobs"] - 1)
+        self.assertEqual(stats["tech_jobs_today"], stats["new_jobs_today"] - 1)
+        self.assertGreaterEqual(stats["tech_jobs_week"], stats["tech_jobs_today"])
+        self.assertLessEqual(stats["tech_jobs_week"], stats["tech_jobs"])

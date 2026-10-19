@@ -6,13 +6,13 @@ import Icon from '../Icon.astro';
 const benefits = [
   { icon: 'timer', title: 'Apply while a role is new', text: 'New matches reach you within a few hours, and every card says how old the posting is.' },
   { icon: 'filter-x', title: 'Skip the dead ends', text: 'Listings older than two months and postings that closed never reach your list.' },
-  { icon: 'layers', title: 'One list instead of dozens of tabs', text: 'Jobly reads about 400 career pages and job boards, so you check one place.' },
+  { icon: 'layers', title: 'One list instead of dozens of tabs', text: 'Jobly reads more than 170 company career pages and four remote job boards, so you check one place.' },
 ];
 // Rounded fallbacks; scripts/motion.ts swaps in the live numbers and counts up to them.
 const stats = [
-  { key: 'new_jobs_today', fallback: '500+', label: 'jobs posted in the last 24 hours' },
-  { key: 'week', fallback: '2,000+', label: 'posted in the last 7 days' },
-  { key: 'active_companies', fallback: '390+', label: 'career pages and job boards read' },
+  { key: 'tech_jobs_today', fallback: '100+', label: 'tech jobs posted in the last 24 hours' },
+  { key: 'tech_jobs_week', fallback: '400+', label: 'tech jobs posted in the last 7 days' },
+  { key: 'active_companies', fallback: '400+', label: 'employers checked for new jobs' },
 ];
 ---
 <section class="shell benefits-wrap" aria-labelledby="benefits-title">

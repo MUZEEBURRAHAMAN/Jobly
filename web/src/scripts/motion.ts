@@ -42,7 +42,7 @@ const figureWatcher = new IntersectionObserver((entries) => {
 }, { rootMargin: '200px 0px' });
 document.querySelectorAll<HTMLElement>('[data-figure]').forEach((el) => figureWatcher.observe(el));
 
-// ---------- live numbers: [data-count="new_jobs_today"] etc., counted up when they scroll in
+// ---------- live numbers: [data-count="tech_jobs_today"] etc. (keys of /api/stats), counted up when they scroll in
 type Stats = Record<string, number | string | null>;
 const countEls = [...document.querySelectorAll<HTMLElement>('[data-count]')];
 const sinceEls = [...document.querySelectorAll<HTMLElement>('[data-updated]')];
@@ -60,12 +60,8 @@ function countUp(el: HTMLElement, to: number) {
 }
 
 if (countEls.length || sinceEls.length) {
-  const want = new Set(countEls.map((el) => el.dataset.count!));
-  const stats = apiGet<Stats>('/api/stats', {}, { timeoutMs: 20000 });
-  const week = want.has('week') ? apiGet<{ total: number }>('/api/jobs', { freshness_days: 7, limit: 1 }, { timeoutMs: 20000 }) : null;
-  Promise.all([stats, week]).then(([s, w]) => {
-    const values: Record<string, number> = { ...(Object.fromEntries(Object.entries(s).filter(([, v]) => typeof v === 'number')) as Record<string, number>) };
-    if (w) values.week = w.total;
+  apiGet<Stats>('/api/stats', {}, { timeoutMs: 20000 }).then((s) => {
+    const values = Object.fromEntries(Object.entries(s).filter(([, v]) => typeof v === 'number')) as Record<string, number>;
     const counter = new IntersectionObserver((entries) => {
       for (const e of entries) {
         if (!e.isIntersecting) continue;

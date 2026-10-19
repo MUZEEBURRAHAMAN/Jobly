@@ -6,6 +6,12 @@ services:
     dockerContext: ./backend
     plan: free            # 512MB RAM — optimised for by workers=1 + batch sync
     healthCheckPath: /health
+    # Redeploy only when the server changes: the website and extension live in other folders. (A restart empties the job
+    # list until the snapshot is restored, so needless restarts are expensive.)
+    buildFilter:
+      paths:
+        - backend/**
+        - render.yaml
     envVars:
       - key: PYTHONDONTWRITEBYTECODE
         value: "1"
