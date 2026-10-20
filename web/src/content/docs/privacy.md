@@ -28,6 +28,8 @@ When you browse, search or filter, the extension asks Jobly's server for jobs. E
 
 The server uses this only to answer that request. To stay fast, it keeps identical requests in memory for about two minutes. It does not write them to a database, keep an access log of them, or link them to you. The hosting provider's short-lived request logs can include them, as described under [Services involved](#services-involved).
 
+To stop abuse, the server also counts requests per IP address. It holds the address in memory for up to a minute for that count; it is never written to a database or a file.
+
 If you use **Report this listing**, we store the job, the reason you chose and any note you typed (up to 500 characters). Reports are not linked to you.
 
 ## This website
