@@ -1,0 +1,312 @@
+# name|website domain|region|optional extra board names (comma separated)
+# Candidates to test with scripts/verify_employers.py. Being listed here does not mean anything: only boards that
+# answer with jobs in Jobly's five roles outside the US are added to backend/app/data/companies.json.
+Wise|wise.com|uk|transferwise
+Revolut|revolut.com|uk
+Monzo|monzo.com|uk
+Starling Bank|starlingbank.com|uk|starling
+GoCardless|gocardless.com|uk
+Checkout.com|checkout.com|uk|checkoutcom
+Deliveroo|deliveroo.co.uk|uk
+Tide|tide.co|uk
+Zopa|zopa.com|uk
+Octopus Energy|octopus.energy|uk|octopusenergy
+Onfido|onfido.com|uk
+Improbable|improbable.io|uk
+Thought Machine|thoughtmachine.net|uk|thoughtmachine
+Curve|curve.com|uk
+Marshmallow|marshmallow.com|uk
+Cleo|meetcleo.com|uk
+Plum|withplum.com|uk|plum
+Snyk|snyk.io|uk
+Darktrace|darktrace.com|uk
+Cloudsmith|cloudsmith.com|uk
+Ravelin|ravelin.com|uk
+Moonpig|moonpig.com|uk
+Gousto|gousto.co.uk|uk
+Cazoo|cazoo.co.uk|uk
+Babylon Health|babylonhealth.com|uk|babylon
+Peak|peak.ai|uk
+Graphcore|graphcore.ai|uk
+Arm|arm.com|uk
+Skyscanner|skyscanner.net|uk
+Trainline|thetrainline.com|uk|trainline
+Farfetch|farfetch.com|uk
+Depop|depop.com|uk
+Wayflyer|wayflyer.com|ie
+Intercom|intercom.com|ie
+Stripe|stripe.com|ie
+Workhuman|workhuman.com|ie
+Flipdish|flipdish.com|ie
+Tines|tines.com|ie
+Wiz|wiz.io|il
+Monday.com|monday.com|il|mondaycom
+Fiverr|fiverr.com|il
+Similarweb|similarweb.com|il
+Wix|wix.com|il
+JFrog|jfrog.com|il
+Riskified|riskified.com|il
+Lemonade|lemonade.com|il
+Taboola|taboola.com|il
+Payoneer|payoneer.com|il
+Papaya Global|papayaglobal.com|il|papaya
+HiBob|hibob.com|il|bob
+Cato Networks|catonetworks.com|il|cato
+Gong|gong.io|il
+Check Point|checkpoint.com|il
+Celonis|celonis.com|de
+Personio|personio.com|de
+SumUp|sumup.com|de
+GetYourGuide|getyourguide.com|de
+SoundCloud|soundcloud.com|de
+Zalando|zalando.com|de
+HelloFresh|hellofresh.com|de
+Delivery Hero|deliveryhero.com|de|deliveryhero
+Taxfix|taxfix.com|de
+Contentful|contentful.com|de
+Trivago|trivago.com|de
+Wefox|wefox.com|de
+Mambu|mambu.com|de
+Forto|forto.com|de
+FlixBus|flixbus.com|de|flix
+Adjust|adjust.com|de
+AUTO1|auto1-group.com|de|auto1
+Raisin|raisin.com|de
+Solaris|solarisgroup.com|de|solarisbank
+Babbel|babbel.com|de
+Omio|omio.com|de
+Helsing|helsing.ai|de
+Parloa|parloa.com|de
+N26|n26.com|de
+Trade Republic|traderepublic.com|de
+Scalable Capital|scalable.capital|de|scalable
+DeepL|deepl.com|de
+Black Forest Labs|bfl.ai|de|blackforestlabs
+Celonis|celonis.com|de
+Bitpanda|bitpanda.com|at
+Dynatrace|dynatrace.com|at
+GoStudent|gostudent.org|at
+Bolt|bolt.eu|ee|bolt-eu
+Wise Estonia|wise.com|ee
+Veriff|veriff.com|ee
+Pipedrive|pipedrive.com|ee
+Playtech|playtech.com|ee
+Klarna|klarna.com|nordics
+Spotify|spotify.com|nordics
+King|king.com|nordics
+Tink|tink.com|nordics
+Voi|voi.com|nordics
+Northvolt|northvolt.com|nordics
+Einride|einride.tech|nordics|einride
+Oda|oda.com|nordics
+Pleo|pleo.io|nordics
+Lunar|lunar.app|nordics
+Vivino|vivino.com|nordics
+Zendesk|zendesk.com|nordics
+Trustpilot|trustpilot.com|nordics
+Unity|unity.com|nordics
+Supercell|supercell.com|nordics
+Wolt|wolt.com|nordics
+Rovio|rovio.com|nordics
+Normative|normative.io|nordics
+Lovable|lovable.dev|nordics
+Mollie|mollie.com|nl
+Adyen|adyen.com|nl
+MessageBird|messagebird.com|nl|bird
+Bunq|bunq.com|nl
+Picnic|picnic.app|nl|picnic
+Just Eat Takeaway|justeattakeaway.com|nl|takeaway
+Elastic|elastic.co|nl
+Booking.com|booking.com|nl
+TomTom|tomtom.com|nl
+Mendix|mendix.com|nl
+WeTransfer|wetransfer.com|nl
+Backbase|backbase.com|nl
+Catawiki|catawiki.com|nl
+Sendcloud|sendcloud.com|nl
+Odoo|odoo.com|be
+Collibra|collibra.com|be
+Doctolib|doctolib.fr|fr
+Alan|alan.com|fr
+Qonto|qonto.com|fr
+Back Market|backmarket.com|fr|backmarket
+Ledger|ledger.com|fr
+Swile|swile.co|fr
+Mirakl|mirakl.com|fr
+Contentsquare|contentsquare.com|fr
+PayFit|payfit.com|fr
+Spendesk|spendesk.com|fr
+Dataiku|dataiku.com|fr
+Criteo|criteo.com|fr
+Deezer|deezer.com|fr
+OVHcloud|ovhcloud.com|fr
+BlaBlaCar|blablacar.com|fr
+Mistral AI|mistral.ai|fr|mistral
+Hugging Face|huggingface.co|fr
+Algolia|algolia.com|fr
+Datadog|datadoghq.com|fr
+Sorare|sorare.com|fr
+Vinted|vinted.com|lt
+Nord Security|nordsec.com|lt|nordsecurity
+Oxylabs|oxylabs.io|lt
+Typeform|typeform.com|es
+TravelPerk|perk.com|es|travelperk
+Factorial|factorialhr.com|es|factorial
+Cabify|cabify.com|es
+Idealista|idealista.com|es
+Glovo|glovoapp.com|es|glovo
+Wallbox|wallbox.com|es
+Jobandtalent|jobandtalent.com|es
+Hotjar|hotjar.com|es
+Prodigy Finance|prodigyfinance.com|pt
+Feedzai|feedzai.com|pt
+Talkdesk|talkdesk.com|pt
+OutSystems|outsystems.com|pt
+Farfetch Portugal|farfetch.com|pt
+Unbabel|unbabel.com|pt
+Allegro|allegro.pl|cee|allegro
+CD Projekt|cdprojekt.com|cee
+Booksy|booksy.com|cee
+Brainly|brainly.com|cee
+Docplanner|docplanner.com|cee|doctoralia
+Revolut Poland|revolut.com|cee
+JetBrains|jetbrains.com|cee
+Rohlik|rohlik.cz|cee|rohlik
+Kiwi.com|kiwi.com|cee|kiwicom
+Productboard|productboard.com|cee
+Avast|avast.com|cee
+Bitdefender|bitdefender.com|cee
+UiPath|uipath.com|cee
+Emarsys|emarsys.com|cee
+Prezi|prezi.com|cee
+Razorpay|razorpay.com|in
+CRED|cred.club|in|cred
+PhonePe|phonepe.com|in
+Swiggy|swiggy.com|in
+Zomato|zomato.com|in
+Meesho|meesho.com|in
+Groww|groww.in|in
+Zerodha|zerodha.com|in
+Freshworks|freshworks.com|in
+Postman|postman.com|in
+BrowserStack|browserstack.com|in
+Chargebee|chargebee.com|in
+Uniphore|uniphore.com|in
+Flipkart|flipkart.com|in
+Paytm|paytm.com|in
+Ola|olacabs.com|in
+Dream11|dreamsports.group|in
+ShareChat|sharechat.com|in
+Sprinklr|sprinklr.com|in
+Zoho|zoho.com|in
+InMobi|inmobi.com|in
+Delhivery|delhivery.com|in
+Unacademy|unacademy.com|in
+PhysicsWallah|pw.live|in
+upGrad|upgrad.com|in
+Cars24|cars24.com|in
+Slice|sliceit.com|in
+Jupiter|jupiter.money|in
+Rapido|rapido.bike|in
+Urban Company|urbancompany.com|in
+Lenskart|lenskart.com|in
+PharmEasy|pharmeasy.in|in
+Nykaa|nykaa.com|in
+Zepto|zeptonow.com|in
+Hasura|hasura.io|in
+Rippling India|rippling.com|in
+Atlan|atlan.com|in
+Grab|grab.com|sea
+GoTo|gotocompany.com|sea|gojek
+Sea Group|sea.com|sea
+Shopee|shopee.com|sea
+Tokopedia|tokopedia.com|sea
+Xendit|xendit.co|sea
+Airwallex|airwallex.com|sea
+Carousell|carousell.com|sea
+Lazada|lazada.com|sea
+Traveloka|traveloka.com|sea
+Bukalapak|bukalapak.com|sea
+Razer|razer.com|sea
+Nium|nium.com|sea
+Advance Intelligence Group|advance.ai|sea|advanceai
+Canva|canva.com|anz
+Atlassian|atlassian.com|anz
+SafetyCulture|safetyculture.com|anz
+Xero|xero.com|anz
+Culture Amp|cultureamp.com|anz
+Airtasker|airtasker.com|anz
+Employment Hero|employmenthero.com|anz
+Linktree|linktr.ee|anz
+Afterpay|afterpay.com|anz
+Zip|zip.co|anz
+Immutable|immutable.com|anz
+Rokt|rokt.com|anz
+Deputy|deputy.com|anz
+Mercari|mercari.com|east-asia
+LINE|linecorp.com|east-asia
+Rakuten|rakuten.com|east-asia
+SmartNews|smartnews.com|east-asia
+Preferred Networks|preferred.jp|east-asia
+Coupang|coupang.com|east-asia
+Toss|toss.im|east-asia
+Krafton|krafton.com|east-asia
+Kakao|kakaocorp.com|east-asia
+Naver|navercorp.com|east-asia
+Gogoro|gogoro.com|east-asia
+Careem|careem.com|mena
+Talabat|talabat.com|mena
+Noon|noon.com|mena
+Tabby|tabby.ai|mena
+Tamara|tamara.co|mena
+Property Finder|propertyfinder.ae|mena|propertyfinder
+Kitopi|kitopi.com|mena
+Swvl|swvl.com|mena
+Nubank|nubank.com.br|latam
+Mercado Libre|mercadolibre.com|latam|mercadolibre
+Rappi|rappi.com|latam
+Kavak|kavak.com|latam
+Clip|clip.mx|latam
+Despegar|despegar.com|latam
+Globant|globant.com|latam
+Ualá|uala.com.ar|latam|uala
+Creditas|creditas.com|latam
+QuintoAndar|quintoandar.com.br|latam
+iFood|ifood.com.br|latam
+Loft|loft.com.br|latam
+Nuvemshop|nuvemshop.com.br|latam
+Konfio|konfio.mx|latam
+Bitso|bitso.com|latam
+Flutterwave|flutterwave.com|africa
+Paystack|paystack.com|africa
+Andela|andela.com|africa
+Interswitch|interswitchgroup.com|africa
+Jumia|jumia.com|africa
+Chipper Cash|chippercash.com|africa|chippercash
+Moniepoint|moniepoint.com|africa
+Wave|wave.com|africa
+Yoco|yoco.com|africa
+Takealot|takealot.com|africa
+Luno|luno.com|africa
+Shopify|shopify.com|ca
+Wealthsimple|wealthsimple.com|ca
+Clio|clio.com|ca
+1Password|1password.com|ca
+Faire|faire.com|ca
+Ada|ada.cx|ca
+Lightspeed|lightspeedhq.com|ca
+Hootsuite|hootsuite.com|ca
+Thinkific|thinkific.com|ca
+Cohere|cohere.com|ca
+Ritual|ritual.co|ca
+Top Hat|tophat.com|ca
+Dialpad|dialpad.com|ca
+Nuvei|nuvei.com|ca
+Koho|koho.ca|ca
+League|league.com|ca
+Jobber|getjobber.com|ca
+FreshBooks|freshbooks.com|ca
+Plooto|plooto.com|ca
+Visier|visier.com|ca
+Hopper|hopper.com|ca
+Coveo|coveo.com|ca
