@@ -12,7 +12,7 @@ export const FAQ_GROUPS: { id: string; title: string; items: Faq[] }[] = [
   },
   {
     id: 'jobs', title: 'Jobs and dates', items: [
-      { top: true, q: 'Which jobs does it cover?', a: 'Product design, frontend, product management, AI/ML and fullstack roles. Jobly reads more than 170 company career pages on Greenhouse, Ashby, Lever, Workday and Amazon, plus remote job boards such as We Work Remotely, Remotive, Himalayas and Arbeitnow.' },
+      { top: true, q: 'Which jobs does it cover?', a: 'Product design, frontend, product management, AI/ML and fullstack roles. Jobly reads the career pages of hundreds of companies in the US, Europe, Israel, India, Southeast Asia, Australia, Latin America and beyond (on Greenhouse, Ashby, Lever, Workable, SmartRecruiters, Recruitee, Teamtailor, Personio, Workday and Amazon), plus three remote job boards: We Work Remotely, Himalayas and Arbeitnow.' },
       { top: true, q: 'How fresh are the jobs?', a: 'The server refreshes every two hours and drops anything older than 60 days or no longer listed by the employer. Your browser checks for new matches every 60 to 90 minutes.' },
       { q: 'Where does the posting date come from?', a: 'From the system the employer published the job in, for example Greenhouse’s first-published date or Lever’s created date. The How dates work page lists the exact field for every source.' },
       { q: 'Why don’t I see jobs from a company I like?', a: 'Jobly only reads the companies on its list, and only shows tech roles that match your preferences. Check the Companies page, and suggest a company through the support form.' },

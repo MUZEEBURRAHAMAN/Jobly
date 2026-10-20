@@ -5,9 +5,9 @@
     .venv/bin/python scripts/verify_employers.py --only ca,in       # only these regions of the candidate file
     .venv/bin/python scripts/verify_employers.py --recheck          # test the employers already in the list, report dead boards
 
-Each candidate (scripts/employer_candidates.csv) is tried on Greenhouse, Ashby and Lever under a few board names, using the
+Each candidate (scripts/employer_candidates.csv) is tried on Greenhouse, Ashby, Lever, SmartRecruiters, Workable, Recruitee, Teamtailor and Personio under a few board names, using the
 same readers the server uses. An employer is eligible when its board answers and has at least --min-role jobs in Jobly's
-five roles outside the United States. Nothing is written unless --write is given.
+five roles outside the United States (for candidates tagged "us": anywhere). Nothing is written unless --write is given.
 """
 from __future__ import annotations
 
@@ -28,11 +28,16 @@ from backend.app.geo import place_of  # noqa: E402
 from backend.app.ingestion.ashby import fetch_ashby_jobs  # noqa: E402
 from backend.app.ingestion.greenhouse import fetch_greenhouse_jobs  # noqa: E402
 from backend.app.ingestion.lever import fetch_lever_jobs  # noqa: E402
+from backend.app.ingestion.more_boards import (  # noqa: E402
+    fetch_personio_jobs, fetch_recruitee_jobs, fetch_smartrecruiters_jobs, fetch_teamtailor_jobs, fetch_workable_jobs,
+)
 from backend.app.matching import classify_role  # noqa: E402
 
 logging.disable(logging.CRITICAL)  # the readers warn on every missing board; that is expected here
-READERS = {"greenhouse": fetch_greenhouse_jobs, "ashby": fetch_ashby_jobs, "lever": fetch_lever_jobs}
-BOARD_PAGE = {"greenhouse": "https://job-boards.greenhouse.io/{}", "ashby": "https://jobs.ashbyhq.com/{}", "lever": "https://jobs.lever.co/{}"}
+READERS = {
+    "greenhouse": fetch_greenhouse_jobs, "ashby": fetch_ashby_jobs, "lever": fetch_lever_jobs, "smartrecruiters": fetch_smartrecruiters_jobs,
+    "workable": fetch_workable_jobs, "recruitee": fetch_recruitee_jobs, "teamtailor": fetch_teamtailor_jobs, "personio": fetch_personio_jobs,
+}
 COMPANIES = ROOT / "backend" / "app" / "data" / "companies.json"
 CANDIDATES = ROOT / "scripts" / "employer_candidates.csv"
 USER_AGENT = "HiringRadar/1.0 (job discovery; +https://joblyextension.netlify.app)"
@@ -63,6 +68,15 @@ def read_candidates(regions: set[str] | None) -> list[dict]:
     return unique
 
 
+def same_company(candidate: str, board_name: str | None) -> bool:
+    """A slug can belong to a different company. Boards that name themselves must resemble the candidate; boards that don't are trusted."""
+    if not board_name:
+        return True
+    norm = lambda t: re.sub(r"[^a-z0-9]", "", re.sub(r"\.(com|io|ai|co)\b", "", t.lower()))  # noqa: E731
+    a, b = norm(candidate), norm(board_name)
+    return bool(a and b and (a in b or b in a or a[:5] == b[:5]))
+
+
 def score(jobs) -> dict:
     mine = [(j, classify_role(j.title, j.normalized_role)) for j in jobs]
     role = [j for j, r in mine if r]
@@ -77,7 +91,12 @@ async def try_board(client, sem, kind: str, slug: str, name: str):
             jobs = await READERS[kind](slug, name, client)
         except Exception:
             return None
-    return (kind, slug, score(jobs)) if jobs else None
+    if not jobs:
+        return None
+    board = next((j.raw_data.get("board_name") for j in jobs if j.raw_data.get("board_name")), None)
+    if not same_company(name, board):
+        return None
+    return (kind, slug, score(jobs))
 
 
 async def best_board(client, sem, cand: dict):
@@ -103,11 +122,11 @@ async def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--write", action="store_true", help="add eligible employers to companies.json")
     ap.add_argument("--only", help="comma-separated regions from the candidate file")
-    ap.add_argument("--min-role", type=int, default=2, help="minimum role jobs outside the US (default 2)")
+    ap.add_argument("--min-role", type=int, default=2, help="minimum role jobs outside the US (default 2); region 'us' counts role jobs anywhere")
     ap.add_argument("--fix-links", action="store_true", help="re-resolve careers links that are just a home page")
     ap.add_argument("--recheck", action="store_true", help="test the employers already in the list instead")
     args = ap.parse_args()
-    sem = asyncio.Semaphore(4)
+    sem = asyncio.Semaphore(10)
     async with httpx.AsyncClient(headers={"User-Agent": USER_AGENT}, timeout=25.0) as client:
         existing = json.loads(COMPANIES.read_text(encoding="utf-8"))
         if args.recheck:
@@ -135,7 +154,7 @@ async def main() -> None:
             kind, slug, sc = hit
             if (kind, slug.lower()) in known_ids:
                 rows.append((cand, hit, "already in the list")); continue
-            ok = sc["outside"] >= args.min_role
+            ok = (sc["role"] if cand["region"] == "us" else sc["outside"]) >= args.min_role
             rows.append((cand, hit, "ELIGIBLE" if ok else f"only {sc['outside']} role jobs outside the US"))
             if ok:
                 eligible.append((cand, kind, slug, sc))

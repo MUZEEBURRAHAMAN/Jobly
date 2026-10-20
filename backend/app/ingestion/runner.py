@@ -18,9 +18,11 @@ from .greenhouse import fetch_greenhouse_jobs
 from .lever import fetch_lever_jobs
 from .ashby import fetch_ashby_jobs
 from .workday import fetch_workday_jobs
+from .more_boards import (
+    fetch_personio_jobs, fetch_recruitee_jobs, fetch_smartrecruiters_jobs, fetch_teamtailor_jobs, fetch_workable_jobs,
+)
 from .amazon import fetch_amazon_jobs
 from .custom_portal import fetch_custom_portal_jobs
-from .remotive import fetch_remotive_jobs
 from .weworkremotely import fetch_wwr_jobs
 from .remote_rss import fetch_all_remote_rss_jobs
 
@@ -294,6 +296,16 @@ async def fetch_company_jobs(
             jobs = await fetch_lever_jobs(source_id, name, client)
         elif source_type == "ashby":
             jobs = await fetch_ashby_jobs(source_id, name, client)
+        elif source_type == "smartrecruiters":
+            jobs = await fetch_smartrecruiters_jobs(source_id, name, client)
+        elif source_type == "workable":
+            jobs = await fetch_workable_jobs(source_id, name, client)
+        elif source_type == "recruitee":
+            jobs = await fetch_recruitee_jobs(source_id, name, client)
+        elif source_type == "teamtailor":
+            jobs = await fetch_teamtailor_jobs(source_id, name, client)
+        elif source_type == "personio":
+            jobs = await fetch_personio_jobs(source_id, name, client)
         elif source_type == "workday":
             jobs = await fetch_workday_jobs(source_id, name, client)
         elif source_type == "amazon":
@@ -340,7 +352,8 @@ async def sync_all_sources(company_id_filter: int | None = None, include_aggrega
         query = """
             SELECT * FROM companies
             WHERE is_active = 1
-              AND source_type IN ('greenhouse', 'lever', 'ashby', 'workday', 'amazon', 'custom')
+              AND source_type IN ('greenhouse', 'lever', 'ashby', 'workday', 'amazon', 'custom',
+                                'smartrecruiters', 'workable', 'recruitee', 'teamtailor', 'personio')
         """
         params = []
         if company_id_filter:
@@ -404,28 +417,7 @@ async def sync_all_sources(company_id_filter: int | None = None, include_aggrega
 
             # 2. Board Aggregators Sync (processed sequentially to prevent memory peaks)
             if include_aggregators:
-                # 2A. Remotive
-                try:
-                    logger.info("[Ingestion] Fetching Remotive feeds...")
-                    remotive_jobs = await fetch_remotive_jobs(client)
-                    summary["board_jobs_fetched"] += len(remotive_jobs)
-                    summary["jobs_fetched"] += len(remotive_jobs)
-                    for b_job in remotive_jobs:
-                        b_comp_name = b_job.company_name or "Remote Employer"
-                        b_logo = b_job.raw_data.get("company_logo") if b_job.raw_data else None
-                        comp_id = await get_or_create_company(
-                            db, company_name=b_comp_name, source_type=b_job.source_type,
-                            careers_url=b_job.application_url, logo_url=b_logo, cache=company_cache
-                        )
-                        await upsert_job_record(db, b_job, comp_id, b_comp_name, now, summary)
-                    await db.commit()
-                    del remotive_jobs
-                    gc.collect()
-                except Exception as rem_err:
-                    logger.error(f"[Ingestion] Remotive sync error: {rem_err}")
-                    summary["errors"].append({"source": "remotive", "error": str(rem_err)})
-
-                # 2B. WeWorkRemotely
+                # 2A. WeWorkRemotely
                 try:
                     logger.info("[Ingestion] Fetching WWR feeds...")
                     wwr_jobs = await fetch_wwr_jobs()
@@ -467,6 +459,8 @@ async def sync_all_sources(company_id_filter: int | None = None, include_aggrega
                     logger.error(f"[Ingestion] RSS sync error: {rss_err}")
                     summary["errors"].append({"source": "rss", "error": str(rss_err)})
 
+        from ..seed import retire_stale_rows  # imported here: seed imports the database layer, which imports this module
+        await retire_stale_rows(db)
         # Re-check stored roles, so rule changes also apply to jobs whose content hasn't changed
         summary["reclassified"] = await reclassify_roles(db)
 
@@ -514,24 +508,6 @@ async def sync_board_sources() -> dict[str, Any]:
 
         limits = httpx.Limits(max_keepalive_connections=5, max_connections=10)
         async with httpx.AsyncClient(timeout=25.0, limits=limits) as client:
-            # 1. Remotive
-            try:
-                remotive_jobs = await fetch_remotive_jobs(client)
-                summary["board_jobs_fetched"] += len(remotive_jobs)
-                for b_job in remotive_jobs:
-                    b_comp_name = b_job.company_name or "Remote Employer"
-                    b_logo = b_job.raw_data.get("company_logo") if b_job.raw_data else None
-                    comp_id = await get_or_create_company(
-                        db, company_name=b_comp_name, source_type=b_job.source_type,
-                        careers_url=b_job.application_url, logo_url=b_logo, cache=company_cache
-                    )
-                    await upsert_job_record(db, b_job, comp_id, b_comp_name, now, summary)
-                await db.commit()
-                del remotive_jobs
-                gc.collect()
-            except Exception as e:
-                summary["errors"].append({"source": "remotive", "error": str(e)})
-
             # 2. WWR
             try:
                 wwr_jobs = await fetch_wwr_jobs()

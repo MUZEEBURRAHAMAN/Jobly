@@ -68,9 +68,10 @@ Extension permissions: `storage`, `notifications`, `alarms`, and one host (`http
 | --- | --- | --- | --- |
 | Greenhouse, Ashby, Lever | Public job-board interfaces that employers publish for their own careers pages; read-only, no key | Not reviewed | **Not verified.** Ask the lawyer whether aggregating them is acceptable |
 | Workday, Amazon Jobs | Public careers-site interfaces | Not reviewed | **Not verified** |
-| **Remotive** | Public API | **Link back to the Remotive listing and mention Remotive as the source or access is terminated; call at most about 4 times a day (more than 2 a minute is blocked); do not submit its jobs to Jooble, Neuvoo, Google Jobs or LinkedIn; do not use its listings to collect sign-ups** | **Verified 2026-10-20. Jobly breaches the call limit** (see below) |
+| ~~Remotive~~ | **Removed 2026-10-20.** Its published terms require attribution and at most about 4 calls a day, which Jobly could not meet for 4 jobs of about 2,600 | Verified | Retired: its stored jobs are deleted at start and after every crawl |
+| SmartRecruiters, Workable, Recruitee, Teamtailor, Personio | Public job feeds employers publish for their own careers pages; read-only, no key, one request per employer per crawl (SmartRecruiters is paged, capped at 600 jobs) | Not reviewed | **Not verified.** Same question as Greenhouse/Ashby/Lever |
 | Himalayas | Public API | Use of the public API, job feeds and MCP server "in line with their published documentation and rate limits" is expressly allowed; bulk republication is not | Verified; within limits |
 | Arbeitnow | Free public API, no key | No attribution or rate rule found on its documentation page | Partly verified |
 | We Work Remotely | Public RSS feeds | Terms page could not be read (the site blocks automated requests) | **Not verified** |
 
-**Remotive in detail.** The server asks Remotive for 10 categories on every crawl; crawls run every 2 hours, after every restart, and in a separate snapshot job every 6 hours. That is well over 100 requests a day against the stated limit of 4 a day. Jobly links to the Remotive listing but does not show the name "Remotive" to users. Remotive supplies 4 of about 2,600 tech jobs, so the recommendation is to **stop using it** unless it can be brought within its terms.
+**Remotive:** removed. The server asked it for 10 categories on every crawl (well over 100 requests a day against its stated limit of 4 a day) without showing its name to users, so the source was dropped.

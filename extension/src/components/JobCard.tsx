@@ -4,7 +4,7 @@ import { ReportModal } from './ReportModal';
 import { Job } from '../types';
 import { getCompanyLogoUrl } from '../lib/companyLogos';
 import { hostOf, safeHttpUrl } from '../lib/url';
-import { EXPERIENCE_LABELS, timeAgo } from '../lib/format';
+import { BOARD_NAMES, EXPERIENCE_LABELS, timeAgo } from '../lib/format';
 
 interface JobCardProps {
   job: Job;
@@ -58,6 +58,7 @@ export const JobCard: React.FC<JobCardProps> = ({ job, onToggleSave }) => {
         {job.work_mode === 'remote' && <span className="badge badge-success">Remote</span>}
         {job.experience_tier && EXPERIENCE_LABELS[job.experience_tier] && <span className="badge badge-outline">{EXPERIENCE_LABELS[job.experience_tier]}</span>}
         {job.salary_summary && <span className="badge badge-outline">{job.salary_summary.split('•')[0].trim()}</span>}
+        {BOARD_NAMES[job.source_type] && <span className="badge badge-outline">via {BOARD_NAMES[job.source_type]}</span>}
       </div>
 
       <div className="row" style={{ justifyContent: 'space-between', gap: 8 }}>

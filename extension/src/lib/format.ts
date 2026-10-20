@@ -33,3 +33,6 @@ export const EXPERIENCE_LABELS: Record<string, string> = { '0-2': '0–2 yrs', '
 export const HUB_LABELS: Record<string, string> = { us: 'US & Canada', india: 'India', europe: 'Europe', apac: 'Asia-Pacific', global: 'Global' };
 
 export const DEFAULT_ROLE_IDS: string[] = ROLES.map((r) => r.id);
+
+/** Remote job boards whose listings Jobly passes on: the card says where the job was found (their terms ask for that). */
+export const BOARD_NAMES: Record<string, string> = { weworkremotely: 'We Work Remotely', himalayas: 'Himalayas', arbeitnow: 'Arbeitnow' };

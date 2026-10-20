@@ -38,7 +38,7 @@ If you know which companies you'd like to work for, check their careers pages di
 - `jobs.lever.co/company`
 - `jobs.ashbyhq.com/company`
 
-These pages list jobs the moment they're published, with no promoted listings in between. The catch is that checking 30 companies by hand every morning takes a long time. That's the job Jobly does for you: it reads 170+ company career pages and four remote job boards every two hours.
+These pages list jobs the moment they're published, with no promoted listings in between. The catch is that checking 30 companies by hand every morning takes a long time. That's the job Jobly does for you: it reads the career pages of hundreds of companies, plus three remote job boards, every two hours.
 
 ## Let new jobs come to you
 

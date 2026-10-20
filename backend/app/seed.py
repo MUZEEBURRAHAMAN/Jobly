@@ -13,6 +13,30 @@ from .security import sanitize_http_url
 logger = logging.getLogger(__name__)
 _REQUIRED = ("name", "slug", "source_type", "source_identifier")
 
+# Sources Jobly no longer reads, and employers whose job board has been closed or moved. Their stored rows (a restored snapshot may
+# still hold them) are deleted at start and after every crawl, so old listings can't linger until they age out.
+RETIRED_SOURCES = ("remotive",)
+RETIRED_COMPANY_SLUGS = ("anthropic", "canva", "webflow", "framer", "raycast", "liveblocks", "confluent", "retool", "clay", "deel", "amplitude")
+
+
+async def retire_stale_rows(db=None) -> int:
+    """Delete jobs and employers of retired sources and boards. Returns the number of jobs removed."""
+    async def run(conn) -> int:
+        marks = ",".join("?" * len(RETIRED_COMPANY_SLUGS))
+        srcs = ",".join("?" * len(RETIRED_SOURCES))
+        ids = [r["id"] for r in await (await conn.execute(
+            f"SELECT id FROM companies WHERE slug IN ({marks}) OR source_type IN ({srcs})", (*RETIRED_COMPANY_SLUGS, *RETIRED_SOURCES))).fetchall()]
+        removed = (await conn.execute(f"DELETE FROM jobs WHERE source_type IN ({srcs})", RETIRED_SOURCES)).rowcount
+        for cid in ids:
+            removed += (await conn.execute("DELETE FROM jobs WHERE company_id = ?", (cid,))).rowcount
+            await conn.execute("DELETE FROM companies WHERE id = ?", (cid,))
+        await conn.commit()
+        return max(removed, 0)
+    if db is not None:
+        return await run(db)
+    async with get_db_connection() as conn:
+        return await run(conn)
+
 
 async def seed_companies_if_missing() -> int:
     """Insert companies from the bundled list that are not in the database yet (existing rows are left alone,

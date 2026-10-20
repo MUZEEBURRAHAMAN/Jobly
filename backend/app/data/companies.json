@@ -9,15 +9,6 @@
     "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
   },
   {
-    "name": "Anthropic",
-    "slug": "anthropic",
-    "careers_url": "https://www.anthropic.com/careers",
-    "source_type": "ashby",
-    "source_identifier": "anthropic",
-    "industry": "Artificial Intelligence",
-    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
-  },
-  {
     "name": "Perplexity AI",
     "slug": "perplexity",
     "careers_url": "https://www.perplexity.ai/careers",
@@ -186,33 +177,6 @@
     "source_type": "greenhouse",
     "source_identifier": "figma",
     "industry": "Design & Collaboration",
-    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
-  },
-  {
-    "name": "Canva",
-    "slug": "canva",
-    "careers_url": "https://www.canva.com/careers/",
-    "source_type": "greenhouse",
-    "source_identifier": "canva",
-    "industry": "Visual Design Suite",
-    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
-  },
-  {
-    "name": "Webflow",
-    "slug": "webflow",
-    "careers_url": "https://webflow.com/careers",
-    "source_type": "greenhouse",
-    "source_identifier": "webflow",
-    "industry": "Visual Web Development",
-    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
-  },
-  {
-    "name": "Framer",
-    "slug": "framer",
-    "careers_url": "https://www.framer.com/careers/",
-    "source_type": "ashby",
-    "source_identifier": "framer",
-    "industry": "Interactive Web Builder",
     "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
   },
   {
@@ -441,39 +405,12 @@
     "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
   },
   {
-    "name": "Raycast",
-    "slug": "raycast",
-    "careers_url": "https://www.raycast.com/careers",
-    "source_type": "ashby",
-    "source_identifier": "raycast",
-    "industry": "Mac Productivity Platform",
-    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
-  },
-  {
     "name": "Resend",
     "slug": "resend",
     "careers_url": "https://resend.com/careers",
     "source_type": "ashby",
     "source_identifier": "resend",
     "industry": "Modern Email API",
-    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
-  },
-  {
-    "name": "Liveblocks",
-    "slug": "liveblocks",
-    "careers_url": "https://liveblocks.io/careers",
-    "source_type": "ashby",
-    "source_identifier": "liveblocks",
-    "industry": "Real-Time Collaborative Infrastructure",
-    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
-  },
-  {
-    "name": "Confluent",
-    "slug": "confluent",
-    "careers_url": "https://www.confluent.io/careers/",
-    "source_type": "ashby",
-    "source_identifier": "confluent",
-    "industry": "Data in Motion (Apache Kafka)",
     "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
   },
   {
@@ -675,24 +612,6 @@
     "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
   },
   {
-    "name": "Retool",
-    "slug": "retool",
-    "careers_url": "https://retool.com/careers",
-    "source_type": "ashby",
-    "source_identifier": "retool",
-    "industry": "Internal Development Platform",
-    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
-  },
-  {
-    "name": "Clay",
-    "slug": "clay",
-    "careers_url": "https://www.clay.com/careers",
-    "source_type": "ashby",
-    "source_identifier": "clay",
-    "industry": "GTM AI & Relationship Engine",
-    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
-  },
-  {
     "name": "Vanta",
     "slug": "vanta",
     "careers_url": "https://www.vanta.com/careers",
@@ -708,15 +627,6 @@
     "source_type": "greenhouse",
     "source_identifier": "gusto",
     "industry": "Modern HR, Payroll & Benefits",
-    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
-  },
-  {
-    "name": "Deel",
-    "slug": "deel",
-    "careers_url": "https://www.deel.com/careers",
-    "source_type": "ashby",
-    "source_identifier": "deel",
-    "industry": "Global Hiring & Payroll",
     "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
   },
   {
@@ -1330,15 +1240,6 @@
     "source_identifier": "wise",
     "industry": "Cross-Border Money Transfer",
     "logo_url": "https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://wise.jobs&size=128"
-  },
-  {
-    "name": "Amplitude",
-    "slug": "amplitude",
-    "careers_url": "https://amplitude.com/careers",
-    "source_type": "greenhouse",
-    "source_identifier": "amplitude",
-    "industry": "Digital Analytics Platform",
-    "logo_url": "https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://amplitude.com/careers&size=128"
   },
   {
     "name": "Waymo",
@@ -2158,5 +2059,653 @@
     "source_identifier": "hopper",
     "industry": null,
     "region": "ca"
+  },
+  {
+    "name": "Micron",
+    "slug": "micron",
+    "careers_url": "https://careers.micron.com",
+    "source_type": "workday",
+    "source_identifier": "micron.wd1/External",
+    "industry": "Semiconductors",
+    "region": "us"
+  },
+  {
+    "name": "Capital One",
+    "slug": "capital-one",
+    "careers_url": "https://www.capitalonecareers.com",
+    "source_type": "workday",
+    "source_identifier": "capitalone.wd12/Capital_One",
+    "industry": "Financial Technology",
+    "region": "us"
+  },
+  {
+    "name": "Cisco",
+    "slug": "cisco",
+    "careers_url": "https://jobs.cisco.com",
+    "source_type": "workday",
+    "source_identifier": "cisco.wd5/Cisco_Careers",
+    "industry": "Networking",
+    "region": "us"
+  },
+  {
+    "name": "Citi",
+    "slug": "citi",
+    "careers_url": "https://jobs.citi.com",
+    "source_type": "workday",
+    "source_identifier": "citi.wd5/2",
+    "industry": "Financial Technology",
+    "region": "us"
+  },
+  {
+    "name": "Intel",
+    "slug": "intel",
+    "careers_url": "https://jobs.intel.com",
+    "source_type": "workday",
+    "source_identifier": "intel.wd1/External",
+    "industry": "Semiconductors",
+    "region": "us"
+  },
+  {
+    "name": "NXP",
+    "slug": "nxp",
+    "careers_url": "https://nxp.wd3.myworkdayjobs.com/careers",
+    "source_type": "workday",
+    "source_identifier": "nxp.wd3/careers",
+    "industry": "Semiconductors",
+    "region": "eu"
+  },
+  {
+    "name": "Mastercard",
+    "slug": "mastercard",
+    "careers_url": "https://careers.mastercard.com",
+    "source_type": "workday",
+    "source_identifier": "mastercard.wd1/CorporateCareers",
+    "industry": "Payments",
+    "region": "us"
+  },
+  {
+    "name": "HP",
+    "slug": "hp",
+    "careers_url": "https://jobs.hp.com",
+    "source_type": "workday",
+    "source_identifier": "hp.wd5/ExternalCareerSite",
+    "industry": "Computing",
+    "region": "us"
+  },
+  {
+    "name": "Philips",
+    "slug": "philips",
+    "careers_url": "https://www.careers.philips.com",
+    "source_type": "workday",
+    "source_identifier": "philips.wd3/jobs-and-careers",
+    "industry": "Health Technology",
+    "region": "eu"
+  },
+  {
+    "name": "Visa",
+    "slug": "visa",
+    "careers_url": "https://corporate.visa.com/en/jobs",
+    "source_type": "workday",
+    "source_identifier": "visa.wd5/Visa",
+    "industry": "Payments",
+    "region": "us"
+  },
+  {
+    "name": "Broadcom",
+    "slug": "broadcom",
+    "careers_url": "https://www.broadcom.com/company/careers",
+    "source_type": "workday",
+    "source_identifier": "broadcom.wd1/External_Career",
+    "industry": "Semiconductors",
+    "region": "us"
+  },
+  {
+    "name": "Workday",
+    "slug": "workday",
+    "careers_url": "https://www.workday.com/en-us/company/careers/overview.html",
+    "source_type": "workday",
+    "source_identifier": "workday.wd5/Workday",
+    "industry": "Enterprise Software",
+    "region": "us"
+  },
+  {
+    "name": "Autodesk",
+    "slug": "autodesk",
+    "careers_url": "https://www.autodesk.com/careers",
+    "source_type": "workday",
+    "source_identifier": "autodesk.wd1/Ext",
+    "industry": "Design Software",
+    "region": "us"
+  },
+  {
+    "name": "Thomson Reuters",
+    "slug": "thomson-reuters",
+    "careers_url": "https://careers.thomsonreuters.com",
+    "source_type": "workday",
+    "source_identifier": "thomsonreuters.wd5/External_Career_Site",
+    "industry": "Information Services",
+    "region": "us"
+  },
+  {
+    "name": "PayPal",
+    "slug": "paypal",
+    "careers_url": "https://careers.pypl.com",
+    "source_type": "workday",
+    "source_identifier": "paypal.wd1/jobs",
+    "industry": "Payments",
+    "region": "us"
+  },
+  {
+    "name": "BlackRock",
+    "slug": "blackrock",
+    "careers_url": "https://careers.blackrock.com",
+    "source_type": "workday",
+    "source_identifier": "blackrock.wd1/BlackRock_Professional",
+    "industry": "Financial Technology",
+    "region": "us"
+  },
+  {
+    "name": "Nasdaq",
+    "slug": "nasdaq",
+    "careers_url": "https://www.nasdaq.com/about/careers",
+    "source_type": "workday",
+    "source_identifier": "nasdaq.wd1/Global_External_Site",
+    "industry": "Financial Technology",
+    "region": "us"
+  },
+  {
+    "name": "Zoom",
+    "slug": "zoom",
+    "careers_url": "https://careers.zoom.us",
+    "source_type": "workday",
+    "source_identifier": "zoom.wd5/Zoom",
+    "industry": "Communications Software",
+    "region": "us"
+  },
+  {
+    "name": "Starling Bank",
+    "slug": "starling-bank",
+    "careers_url": "https://www.starlingbank.com/careers/",
+    "source_type": "workable",
+    "source_identifier": "starling-bank",
+    "industry": null,
+    "region": "uk"
+  },
+  {
+    "name": "Delivery Hero",
+    "slug": "delivery-hero",
+    "careers_url": "https://careers.deliveryhero.com",
+    "source_type": "smartrecruiters",
+    "source_identifier": "deliveryhero",
+    "industry": null,
+    "region": "de"
+  },
+  {
+    "name": "Playtech",
+    "slug": "playtech",
+    "careers_url": "https://playtech.com",
+    "source_type": "smartrecruiters",
+    "source_identifier": "playtech",
+    "industry": null,
+    "region": "ee"
+  },
+  {
+    "name": "Sendcloud",
+    "slug": "sendcloud",
+    "careers_url": "https://jobs.sendcloud.com/",
+    "source_type": "teamtailor",
+    "source_identifier": "sendcloud",
+    "industry": null,
+    "region": "nl"
+  },
+  {
+    "name": "Freshworks",
+    "slug": "freshworks",
+    "careers_url": "https://careers.smartrecruiters.com/Freshworks",
+    "source_type": "smartrecruiters",
+    "source_identifier": "freshworks",
+    "industry": null,
+    "region": "in"
+  },
+  {
+    "name": "Grab",
+    "slug": "grab",
+    "careers_url": "https://www.grab.careers/en/",
+    "source_type": "smartrecruiters",
+    "source_identifier": "grab",
+    "industry": null,
+    "region": "sea"
+  },
+  {
+    "name": "Canva",
+    "slug": "canva",
+    "careers_url": "https://www.lifeatcanva.com/en/",
+    "source_type": "smartrecruiters",
+    "source_identifier": "canva",
+    "industry": null,
+    "region": "anz"
+  },
+  {
+    "name": "Property Finder",
+    "slug": "property-finder",
+    "careers_url": "https://propertyfinder.ae",
+    "source_type": "teamtailor",
+    "source_identifier": "propertyfinder",
+    "industry": null,
+    "region": "mena"
+  },
+  {
+    "name": "Loft",
+    "slug": "loft",
+    "careers_url": "https://loft.com.br",
+    "source_type": "teamtailor",
+    "source_identifier": "loft",
+    "industry": null,
+    "region": "latam"
+  },
+  {
+    "name": "Snowflake",
+    "slug": "snowflake",
+    "careers_url": "https://careers.snowflake.com/us/en",
+    "source_type": "ashby",
+    "source_identifier": "snowflake",
+    "industry": null,
+    "region": "us"
+  },
+  {
+    "name": "Stability AI",
+    "slug": "stability-ai",
+    "careers_url": "https://stability.ai/careers",
+    "source_type": "greenhouse",
+    "source_identifier": "stabilityai",
+    "industry": null,
+    "region": "us"
+  },
+  {
+    "name": "Together AI",
+    "slug": "together-ai",
+    "careers_url": "https://www.together.ai/careers",
+    "source_type": "greenhouse",
+    "source_identifier": "togetherai",
+    "industry": null,
+    "region": "us"
+  },
+  {
+    "name": "Sierra",
+    "slug": "sierra",
+    "careers_url": "https://sierra.ai/careers",
+    "source_type": "ashby",
+    "source_identifier": "sierra",
+    "industry": null,
+    "region": "us"
+  },
+  {
+    "name": "Decagon",
+    "slug": "decagon",
+    "careers_url": "https://decagon.ai/careers",
+    "source_type": "ashby",
+    "source_identifier": "decagon",
+    "industry": null,
+    "region": "us"
+  },
+  {
+    "name": "Mercury",
+    "slug": "mercury",
+    "careers_url": "https://mercury.com/jobs",
+    "source_type": "greenhouse",
+    "source_identifier": "mercury",
+    "industry": null,
+    "region": "us"
+  },
+  {
+    "name": "Plaid",
+    "slug": "plaid",
+    "careers_url": "https://plaid.com/careers/",
+    "source_type": "ashby",
+    "source_identifier": "plaid",
+    "industry": null,
+    "region": "us"
+  },
+  {
+    "name": "Gemini",
+    "slug": "gemini",
+    "careers_url": "https://www.gemini.com/careers",
+    "source_type": "greenhouse",
+    "source_identifier": "gemini",
+    "industry": null,
+    "region": "us"
+  },
+  {
+    "name": "Square",
+    "slug": "square",
+    "careers_url": "https://careers.squareup.com/us/en",
+    "source_type": "greenhouse",
+    "source_identifier": "block",
+    "industry": null,
+    "region": "us"
+  },
+  {
+    "name": "New Relic",
+    "slug": "new-relic",
+    "careers_url": "https://newrelic.com/careers",
+    "source_type": "greenhouse",
+    "source_identifier": "newrelic",
+    "industry": null,
+    "region": "us"
+  },
+  {
+    "name": "CircleCI",
+    "slug": "circleci",
+    "careers_url": "https://circleci.com/careers/",
+    "source_type": "greenhouse",
+    "source_identifier": "circleci",
+    "industry": null,
+    "region": "us"
+  },
+  {
+    "name": "Oura",
+    "slug": "oura",
+    "careers_url": "https://ouraring.com/careers",
+    "source_type": "greenhouse",
+    "source_identifier": "oura",
+    "industry": null,
+    "region": "us"
+  },
+  {
+    "name": "Whoop",
+    "slug": "whoop",
+    "careers_url": "https://whoop.com",
+    "source_type": "ashby",
+    "source_identifier": "whoop",
+    "industry": null,
+    "region": "us"
+  },
+  {
+    "name": "Strava",
+    "slug": "strava",
+    "careers_url": "https://www.strava.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "strava",
+    "industry": null,
+    "region": "us"
+  },
+  {
+    "name": "Ro",
+    "slug": "ro",
+    "careers_url": "https://ro.co",
+    "source_type": "lever",
+    "source_identifier": "ro",
+    "industry": null,
+    "region": "us"
+  },
+  {
+    "name": "Flatiron Health",
+    "slug": "flatiron-health",
+    "careers_url": "https://flatiron.com/careers",
+    "source_type": "greenhouse",
+    "source_identifier": "flatironhealth",
+    "industry": null,
+    "region": "us"
+  },
+  {
+    "name": "Benchling",
+    "slug": "benchling",
+    "careers_url": "https://www.benchling.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "benchling",
+    "industry": null,
+    "region": "us"
+  },
+  {
+    "name": "Zocdoc",
+    "slug": "zocdoc",
+    "careers_url": "https://zocdoc.com",
+    "source_type": "greenhouse",
+    "source_identifier": "zocdoc",
+    "industry": null,
+    "region": "us"
+  },
+  {
+    "name": "Oscar Health",
+    "slug": "oscar-health",
+    "careers_url": "https://oscarhealth.com/careers",
+    "source_type": "greenhouse",
+    "source_identifier": "oscar",
+    "industry": null,
+    "region": "us"
+  },
+  {
+    "name": "Nuro",
+    "slug": "nuro",
+    "careers_url": "https://www.nuro.ai/careers",
+    "source_type": "greenhouse",
+    "source_identifier": "nuro",
+    "industry": null,
+    "region": "us"
+  },
+  {
+    "name": "Zoox",
+    "slug": "zoox",
+    "careers_url": "https://zoox.com/careers",
+    "source_type": "lever",
+    "source_identifier": "zoox",
+    "industry": null,
+    "region": "us"
+  },
+  {
+    "name": "SpaceX",
+    "slug": "spacex",
+    "careers_url": "https://www.spacex.com/careers",
+    "source_type": "greenhouse",
+    "source_identifier": "spacex",
+    "industry": null,
+    "region": "us"
+  },
+  {
+    "name": "Relativity Space",
+    "slug": "relativity-space",
+    "careers_url": "https://www.relativityspace.com/careers",
+    "source_type": "greenhouse",
+    "source_identifier": "relativity",
+    "industry": null,
+    "region": "us"
+  },
+  {
+    "name": "Planet Labs",
+    "slug": "planet-labs",
+    "careers_url": "https://www.planet.com/company/careers/",
+    "source_type": "greenhouse",
+    "source_identifier": "planetlabs",
+    "industry": null,
+    "region": "us"
+  },
+  {
+    "name": "Shield AI",
+    "slug": "shield-ai",
+    "careers_url": "https://shield.ai/careers/",
+    "source_type": "lever",
+    "source_identifier": "shieldai",
+    "industry": null,
+    "region": "us"
+  },
+  {
+    "name": "Mapbox",
+    "slug": "mapbox",
+    "careers_url": "https://www.mapbox.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "mapbox",
+    "industry": null,
+    "region": "us"
+  },
+  {
+    "name": "Esri",
+    "slug": "esri",
+    "careers_url": "https://www.esri.com/en-us/about/careers/overview?rsource=%2Fcareers",
+    "source_type": "greenhouse",
+    "source_identifier": "esri",
+    "industry": null,
+    "region": "us"
+  },
+  {
+    "name": "Smartsheet",
+    "slug": "smartsheet",
+    "careers_url": "https://www.smartsheet.com/careers",
+    "source_type": "greenhouse",
+    "source_identifier": "smartsheet",
+    "industry": null,
+    "region": "us"
+  },
+  {
+    "name": "ClickUp",
+    "slug": "clickup",
+    "careers_url": "https://clickup.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "clickup",
+    "industry": null,
+    "region": "us"
+  },
+  {
+    "name": "Deepgram",
+    "slug": "deepgram",
+    "careers_url": "https://deepgram.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "deepgram",
+    "industry": null,
+    "region": "us"
+  },
+  {
+    "name": "Moon Active",
+    "slug": "moon-active",
+    "careers_url": "https://www.moonactive.com/careers/",
+    "source_type": "ashby",
+    "source_identifier": "moonactive",
+    "industry": null,
+    "region": "il"
+  },
+  {
+    "name": "Yotpo",
+    "slug": "yotpo",
+    "careers_url": "https://www.yotpo.com/careers/",
+    "source_type": "greenhouse",
+    "source_identifier": "yotpo",
+    "industry": null,
+    "region": "il"
+  },
+  {
+    "name": "Zeta Global",
+    "slug": "zeta-global",
+    "careers_url": "https://www.zetaglobal.com/about/life-at-zeta/",
+    "source_type": "greenhouse",
+    "source_identifier": "zetaglobal",
+    "industry": null,
+    "region": "us"
+  },
+  {
+    "name": "Aircall",
+    "slug": "aircall",
+    "careers_url": "https://aircall.io/careers/",
+    "source_type": "lever",
+    "source_identifier": "aircall",
+    "industry": null,
+    "region": "fr"
+  },
+  {
+    "name": "Pennylane",
+    "slug": "pennylane",
+    "careers_url": "https://pennylane.com",
+    "source_type": "ashby",
+    "source_identifier": "pennylane",
+    "industry": null,
+    "region": "fr"
+  },
+  {
+    "name": "Veepee",
+    "slug": "veepee",
+    "careers_url": "https://careers.veepee.com/fr/",
+    "source_type": "lever",
+    "source_identifier": "veepee",
+    "industry": null,
+    "region": "fr"
+  },
+  {
+    "name": "Voodoo",
+    "slug": "voodoo",
+    "careers_url": "https://voodoo.io/careers",
+    "source_type": "ashby",
+    "source_identifier": "voodoo",
+    "industry": null,
+    "region": "fr"
+  },
+  {
+    "name": "Multiverse",
+    "slug": "multiverse",
+    "careers_url": "https://www.multiverse.io/careers/were-hiring",
+    "source_type": "ashby",
+    "source_identifier": "multiverse",
+    "industry": null,
+    "region": "uk"
+  },
+  {
+    "name": "Zenjob",
+    "slug": "zenjob",
+    "careers_url": "https://zenjob.com",
+    "source_type": "ashby",
+    "source_identifier": "zenjob",
+    "industry": null,
+    "region": "de"
+  },
+  {
+    "name": "Staffbase",
+    "slug": "staffbase",
+    "careers_url": "https://staffbase.com/careers",
+    "source_type": "greenhouse",
+    "source_identifier": "staffbase",
+    "industry": null,
+    "region": "de"
+  },
+  {
+    "name": "Enpal",
+    "slug": "enpal",
+    "careers_url": "https://www.careers.enpal.com/",
+    "source_type": "ashby",
+    "source_identifier": "enpal",
+    "industry": null,
+    "region": "de"
+  },
+  {
+    "name": "Isar Aerospace",
+    "slug": "isar-aerospace",
+    "careers_url": "https://isaraerospace.com",
+    "source_type": "greenhouse",
+    "source_identifier": "isaraerospace",
+    "industry": null,
+    "region": "de"
+  },
+  {
+    "name": "Langdock",
+    "slug": "langdock",
+    "careers_url": "https://langdock.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "langdock",
+    "industry": null,
+    "region": "de"
+  },
+  {
+    "name": "Moss",
+    "slug": "moss",
+    "careers_url": "https://www.getmoss.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "moss",
+    "industry": null,
+    "region": "de"
+  },
+  {
+    "name": "Upvest",
+    "slug": "upvest",
+    "careers_url": "https://upvest.co/careers",
+    "source_type": "ashby",
+    "source_identifier": "upvest",
+    "industry": null,
+    "region": "de"
   }
 ]

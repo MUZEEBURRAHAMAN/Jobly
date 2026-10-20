@@ -12,8 +12,9 @@ if (root) {
   const sort = root.querySelector<HTMLSelectElement>('[data-sort]')!;
   const labels: Record<string, [string, 'career' | 'board']> = {
     greenhouse: ['Greenhouse', 'career'], ashby: ['Ashby', 'career'], lever: ['Lever', 'career'], workday: ['Workday', 'career'],
-    amazon: ['Amazon Jobs', 'career'], custom: ['Careers page', 'career'], weworkremotely: ['We Work Remotely', 'board'],
-    remotive: ['Remotive', 'board'], himalayas: ['Himalayas', 'board'], arbeitnow: ['Arbeitnow', 'board'],
+    smartrecruiters: ['SmartRecruiters', 'career'], workable: ['Workable', 'career'], recruitee: ['Recruitee', 'career'], teamtailor: ['Teamtailor', 'career'],
+    personio: ['Personio', 'career'], amazon: ['Amazon Jobs', 'career'], custom: ['Careers page', 'career'], weworkremotely: ['We Work Remotely', 'board'],
+    himalayas: ['Himalayas', 'board'], arbeitnow: ['Arbeitnow', 'board'],
   };
   const arrow = list.querySelector('.co-link svg')?.outerHTML ?? '↗';
   let data: Company[] | null = null;

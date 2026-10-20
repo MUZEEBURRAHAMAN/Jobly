@@ -25,7 +25,7 @@ class TestAdapters(unittest.TestCase):
             }
             mock_client.post.return_value = mock_response
 
-            jobs = await fetch_workday_jobs("adobe.wd5/external_experienced", "Adobe", mock_client, max_pages=1)
+            jobs = await fetch_workday_jobs("adobe.wd5/external_experienced", "Adobe", mock_client, max_pages=1, only_roles=False)
             self.assertEqual(len(jobs), 1)
             self.assertEqual(jobs[0].title, "Senior AI Systems Engineer")
             self.assertEqual(jobs[0].source_type, "workday")
@@ -103,6 +103,30 @@ class TestAdapters(unittest.TestCase):
             self.assertIn("Mountain View", jobs[0].location)
 
         asyncio.run(run())
+
+
+class TestWorkdaySearches(unittest.IsolatedAsyncioTestCase):
+    async def test_searches_are_merged_without_duplicates_and_only_role_jobs_are_kept(self):
+        postings = {
+            "product manager": [{"title": "Senior Product Manager", "externalPath": "/job/A/Senior-Product-Manager_R1", "locationsText": "Dublin", "postedOn": "Posted Today"},
+                                {"title": "Forklift Operator", "externalPath": "/job/B/Forklift-Operator_R2", "locationsText": "Dublin", "postedOn": "Posted Today"}],
+            "software engineer": [{"title": "Senior Product Manager", "externalPath": "/job/A/Senior-Product-Manager_R1", "locationsText": "Dublin", "postedOn": "Posted Today"},
+                                  {"title": "Software Engineer II", "externalPath": "/job/C/Software-Engineer-II_R3", "locationsText": "Pune", "postedOn": "Posted 3 Days Ago"}],
+        }
+        asked = []
+
+        def handler(request: httpx.Request) -> httpx.Response:
+            import json
+            query = json.loads(request.content)["searchText"]
+            asked.append(query)
+            rows = postings.get(query, [])
+            return httpx.Response(200, json={"total": len(rows), "jobPostings": rows})
+
+        async with httpx.AsyncClient(transport=httpx.MockTransport(handler)) as client:
+            jobs = await fetch_workday_jobs("acme.wd1/External", "Acme", client, queries=("product manager", "software engineer", "ux designer"))
+        self.assertEqual(asked, ["product manager", "software engineer", "ux designer"])
+        self.assertEqual(sorted(j.external_id for j in jobs), ["R1", "R3"])   # R1 only once; the forklift job is not one of Jobly's roles
+
 
 if __name__ == "__main__":
     unittest.main()

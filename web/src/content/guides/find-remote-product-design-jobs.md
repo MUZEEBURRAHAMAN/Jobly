@@ -23,7 +23,7 @@ Jobly groups all of these under **Product design**, so one preference covers the
 ## Where remote design jobs are posted
 
 - **Company career pages.** Product-led companies often hire designers directly through Greenhouse, Lever or Ashby. Jobs appear there first.
-- **Remote job boards.** We Work Remotely, Remotive and Himalayas list only remote jobs. Jobly reads these too.
+- **Remote job boards.** We Work Remotely and Himalayas list only remote jobs. Jobly reads these too.
 - **Design communities.** Job boards run by design communities and newsletters often carry roles that never reach the big sites.
 
 ## Read the location fine print

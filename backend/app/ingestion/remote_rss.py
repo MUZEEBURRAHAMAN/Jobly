@@ -2,10 +2,10 @@
 Aggregator and remote RSS adapters:
 - Himalayas RSS (remote tech/design/product jobs with company names & logos)
 - Arbeitnow API (European & remote tech jobs)
-- Remotive.io RSS feed
 All free, zero authentication, reliable.
 """
 from __future__ import annotations
+import asyncio
 import logging
 import hashlib
 import re
@@ -13,10 +13,12 @@ from email.utils import parsedate_to_datetime
 from typing import Any
 import httpx
 import feedparser
+from ..matching import classify_role
 from .base import NormalizedJob, clean_text
 
 logger = logging.getLogger(__name__)
 
+ARBEITNOW_PAGES = 6
 HEADERS = {"User-Agent": "Mozilla/5.0 (compatible; HiringRadar/1.0; +https://hiringradar.app)"}
 
 
@@ -100,8 +102,8 @@ async def fetch_himalayas_jobs() -> list[NormalizedJob]:
 
 
 async def fetch_arbeitnow_jobs(client: httpx.AsyncClient | None = None) -> list[NormalizedJob]:
-    """Fetch jobs from Arbeitnow's public job board API."""
-    url = "https://www.arbeitnow.com/api/job-board-api?page=1"
+    """Fetch jobs from Arbeitnow's public job board API: the newest ARBEITNOW_PAGES pages (300 jobs each, all industries),
+    keeping only the jobs that fit one of Jobly's five roles."""
     close_client = False
     if client is None:
         client = httpx.AsyncClient(timeout=30.0)
@@ -111,17 +113,22 @@ async def fetch_arbeitnow_jobs(client: httpx.AsyncClient | None = None) -> list[
     seen: set[str] = set()
 
     try:
-        resp = await client.get(url, headers=HEADERS)
-        if resp.status_code != 200:
-            logger.warning(f"[Arbeitnow] HTTP {resp.status_code}")
-            return []
-
-        data = resp.json().get("data", [])
+        data: list[dict] = []
+        for page in range(1, ARBEITNOW_PAGES + 1):
+            resp = await client.get(f"https://www.arbeitnow.com/api/job-board-api?page={page}", headers=HEADERS)
+            if resp.status_code != 200:
+                logger.warning(f"[Arbeitnow] HTTP {resp.status_code} on page {page}")
+                break
+            rows = resp.json().get("data", [])
+            if not rows:
+                break
+            data += rows
+            await asyncio.sleep(1.0)  # their API is free and asks not to be abused
         for item in data:
             title = clean_text(item.get("title", ""))
             company = clean_text(item.get("company_name", ""))
             link = item.get("url", "")
-            if not title or not company or not link:
+            if not title or not company or not link or not classify_role(title):
                 continue
 
             slug = item.get("slug") or link

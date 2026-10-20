@@ -1,16 +1,27 @@
 import logging
 from typing import Any
 import httpx
+from ..matching import classify_role
 from .base import NormalizedJob, clean_text
 
 logger = logging.getLogger(__name__)
+
+# Big employers list thousands of jobs, and Workday has no "newest first" or role filter we can rely on. Searching for each
+# role family's usual titles (and merging the results) finds the jobs Jobly shows, within a few requests per employer.
+ROLE_QUERIES = (
+    "software engineer", "frontend engineer", "full stack", "product manager", "product designer", "ux designer",
+    "machine learning", "ai engineer", "applied scientist",
+)
+
 
 async def fetch_workday_jobs(
     source_identifier: str,
     company_name: str,
     client: httpx.AsyncClient,
-    max_pages: int = 5,
-    page_size: int = 20
+    max_pages: int = 3,
+    page_size: int = 20,
+    queries: tuple[str, ...] = ROLE_QUERIES,
+    only_roles: bool = True,
 ) -> list[NormalizedJob]:
     """
     Ingests live jobs from Workday's unauthenticated CXS JSON API.
@@ -32,14 +43,26 @@ async def fetch_workday_jobs(
         return []
 
     jobs: list[NormalizedJob] = []
-    offset = 0
+    seen: set[str] = set()
+    for query in queries:
+        jobs += await _search(client, endpoint, base_host, site_id, company_name, query, max_pages, page_size, seen)
 
+    if only_roles:  # a search for "engineer" also finds hardware, sales and plant jobs; keep what Jobly shows
+        jobs = [j for j in jobs if classify_role(j.title)]
+    logger.info(f"Fetched {len(jobs)} role jobs for {company_name} from Workday ({len(queries)} searches)")
+    return jobs
+
+
+async def _search(client, endpoint, base_host, site_id, company_name, query, max_pages, page_size, seen) -> list[NormalizedJob]:
+    """One search term, paged. `seen` holds the ids already collected for this employer, so overlapping searches add nothing twice."""
+    jobs: list[NormalizedJob] = []
+    offset = 0
     for page in range(max_pages):
         payload = {
             "appliedFacets": {},
             "limit": page_size,
             "offset": offset,
-            "searchText": ""
+            "searchText": query
         }
 
         try:
@@ -79,6 +102,9 @@ async def fetch_workday_jobs(
                 location = item.get("locationsText")
                 posted_on = item.get("postedOn")
 
+                if ext_id in seen:
+                    continue
+                seen.add(ext_id)
                 jobs.append(
                     NormalizedJob(
                         company_name=company_name,
@@ -102,5 +128,4 @@ async def fetch_workday_jobs(
             logger.error(f"Error fetching Workday page {page} for {company_name}: {e}")
             break
 
-    logger.info(f"Successfully fetched {len(jobs)} jobs for {company_name} from Workday")
     return jobs

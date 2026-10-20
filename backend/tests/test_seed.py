@@ -7,7 +7,7 @@ from unittest.mock import patch
 
 from backend.app.config import settings
 from backend.app.db import get_db_connection, get_utc_now, init_db
-from backend.app.seed import needs_initial_sync, seed_companies_if_missing
+from backend.app.seed import RETIRED_COMPANY_SLUGS, needs_initial_sync, retire_stale_rows, seed_companies_if_missing
 
 
 class TestBootstrap(unittest.IsolatedAsyncioTestCase):
@@ -22,6 +22,22 @@ class TestBootstrap(unittest.IsolatedAsyncioTestCase):
     async def asyncTearDown(self):
         self._patch.stop()
         self._tmp.cleanup()
+
+    async def test_retired_boards_and_sources_are_removed_with_their_jobs(self):
+        now = get_utc_now()
+        async with get_db_connection() as db:
+            for name, slug, src in [("Gone Co", RETIRED_COMPANY_SLUGS[0], "ashby"), ("Board Co", "board-co", "remotive"), ("Live Co", "live-co", "greenhouse")]:
+                cur = await db.execute("INSERT INTO companies (name, slug, careers_url, source_type, source_identifier, is_active, created_at, updated_at) VALUES (?,?,?,?,?,1,?,?)",
+                                       (name, slug, "https://example.com", src, slug, now, now))
+                await db.execute("""INSERT INTO jobs (company_id, company_name, source_type, external_id, title, application_url, content_hash, first_seen_at, last_seen_at, status)
+                                    VALUES (?,?,?,?,?,?,?,?,?, 'active')""", (cur.lastrowid, name, src, f"x-{slug}", "Engineer", "https://example.com/j", slug, now, now))
+            await db.commit()
+        self.assertEqual(await retire_stale_rows(), 2)
+        async with get_db_connection() as db:
+            left = [r["name"] for r in await (await db.execute("SELECT name FROM companies ORDER BY name")).fetchall()]
+            jobs = [r["company_name"] for r in await (await db.execute("SELECT company_name FROM jobs")).fetchall()]
+        self.assertEqual((left, jobs), (["Live Co"], ["Live Co"]))
+        self.assertEqual(await retire_stale_rows(), 0)
 
     async def test_company_list_ships_with_the_backend_and_seeds_idempotently(self):
         self.assertTrue(settings.COMPANIES_FILE.exists(), "seed list must live inside backend/app (Docker context is ./backend)")
