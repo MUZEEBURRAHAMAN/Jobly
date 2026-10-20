@@ -1,5 +1,5 @@
 // Generates marketing + Chrome Web Store images from the real UI (fictional demo companies, no real brands).
-//   npm run e2e:screens   ->  site/assets/*.png  and  store-assets/*.png
+//   npm run e2e:screens   ->  store-assets/*.png  and  web/public/img/*.webp (the website's product window)
 import { launch, open, sleep } from './lib.mjs';
 import { execFileSync } from 'child_process';
 import fs from 'fs';
@@ -8,14 +8,13 @@ import path from 'path';
 import { fileURLToPath, pathToFileURL } from 'url';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
-const SITE = path.join(root, 'site', 'assets');
 const STORE = path.join(root, 'store-assets');
 const WEB = path.join(root, 'web', 'public', 'img');
-fs.mkdirSync(SITE, { recursive: true }); fs.mkdirSync(STORE, { recursive: true }); fs.mkdirSync(WEB, { recursive: true });
+fs.mkdirSync(STORE, { recursive: true }); fs.mkdirSync(WEB, { recursive: true });
 const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'jobly-shots-'));
 const SWITZER = { 400: 'Regular', 500: 'Medium', 600: 'Semibold', 700: 'Bold' };
 const fontUrl = (w) => pathToFileURL(path.join(root, 'web', 'public', 'fonts', 'switzer', `Switzer-${SWITZER[w]}.woff2`)).href;
-const iconUrl = pathToFileURL(path.join(root, 'site', 'assets', 'icon-128.png')).href;
+const iconUrl = pathToFileURL(path.join(root, 'extension', 'public', 'icons', 'icon-128.png')).href;
 const b64 = (f) => 'data:image/png;base64,' + fs.readFileSync(f).toString('base64');
 
 const h = await launch();
@@ -27,7 +26,7 @@ const shot = async (p, file) => { await p.screenshot({ path: file }); console.lo
 for (const theme of ['light', 'dark']) {
   const p = await open(h, 'options.html', { theme, width: 1280, height: 800 }); await settle(p);
   await shot(p, path.join(STORE, `screenshot-${theme === 'light' ? 1 : 2}-dashboard-${theme}.png`));
-  if (theme === 'light') { await shot(p, path.join(SITE, 'shot-dashboard.png')); await p.getByRole('button', { name: /Filters/ }).click(); await p.locator('#f-new').selectOption('7'); await sleep(1500); await shot(p, path.join(STORE, 'screenshot-3-filters-date-posted.png')); }
+  if (theme === 'light') { await p.getByRole('button', { name: /Filters/ }).click(); await p.locator('#f-new').selectOption('7'); await sleep(1500); await shot(p, path.join(STORE, 'screenshot-3-filters-date-posted.png')); }
   await p.close();
 }
 
@@ -35,7 +34,6 @@ for (const theme of ['light', 'dark']) {
 const popup = async (theme, after) => { const p = await open(h, 'popup.html', { theme, width: 400, height: 590 }); await settle(p); if (after) await after(p); const f = path.join(tmp, `popup-${theme}-${Math.random().toString(36).slice(2)}.png`); await p.screenshot({ path: f }); await p.close(); return f; };
 const popLight = await popup('light'); const popDark = await popup('dark');
 const popEmpty = await popup('light', async (p) => { await p.getByLabel('Search jobs').fill('zzzzqqq'); await p.getByText(/No jobs match/).waitFor(); await sleep(900); });
-fs.copyFileSync(popLight, path.join(SITE, 'shot-popup.png'));
 
 // welcome screen (fresh profile)
 const g = await launch({ onboarded: false }); await g.ctx.route(/t2\.gstatic\.com/, (r) => r.abort());
@@ -87,7 +85,7 @@ for (const theme of ['light', 'dark']) {
 }
 await hi.ctx.close();
 
-execFileSync(py, ['-c', `import glob,sys\nfrom PIL import Image\nfor f in glob.glob(r"${STORE}/*.png")+glob.glob(r"${SITE}/shot-*.png"):\n    Image.open(f).convert("RGB").save(f, optimize=True)`]);
+execFileSync(py, ['-c', `import glob,sys\nfrom PIL import Image\nfor f in glob.glob(r"${STORE}/*.png"):\n    Image.open(f).convert("RGB").save(f, optimize=True)`]);
 execFileSync(py, ['-c', `import glob,os\nfrom PIL import Image\nfor f in glob.glob(r"${WEB}/dashboard-*.png"):\n    Image.open(f).convert("RGB").save(f[:-4] + ".webp", quality=82, method=6)\n    os.remove(f)`]);
 console.log('done');
 process.exit(0);

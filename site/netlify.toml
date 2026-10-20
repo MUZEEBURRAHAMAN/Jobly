@@ -1,9 +1,0 @@
-# The website is now the Astro project in web/. This file stays in site/ because the Netlify site's
-# base directory is "site"; it builds web/ and publishes web/dist. Headers and redirects live in
-# web/public/_headers and web/public/_redirects.
-[build]
-  command = "cd ../web && npm ci && npm run build"
-  publish = "../web/dist"
-
-[build.environment]
-  NODE_VERSION = "22"

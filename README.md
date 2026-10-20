@@ -46,7 +46,7 @@ cd extension && npm ci && npm run build      # outputs extension/dist
    The free server sleeps when idle: the first open can take ~30 s ("Connecting…"), then it works normally.
 
 > `dist/` is the **production** build: it only talks to the hosted backend and never to localhost.
-> This is what you zip for the Chrome Web Store (see `CHROMEWEBSTORE.md`).
+> This is what you zip for the Chrome Web Store (see `store-assets/LISTING.md`).
 
 ### 2. Develop against a local backend
 
@@ -143,15 +143,14 @@ JOB EXTENSION/
 │   ├── dist/                     # Production build ready for Chrome
 │   ├── package.json
 │   └── vite.config.ts
-├── data/
-│   └── companies.json            # Curated catalog of tech employers
 ├── scripts/
 │   ├── seed_companies.py         # Seed companies into SQLite
 │   ├── sync_jobs.py              # Ingestion CLI trigger
 │   └── generate_icons.py         # PNG icon generator
-├── site/                         # Free static landing + privacy pages (Netlify/Vercel)
-├── store-assets/                 # Web Store screenshots + promo tile (npm run e2e:screens)
-├── CHROMEWEBSTORE.md             # Chrome Web Store listing metadata & disclosures
+├── web/                          # The website (Astro, static): landing, guides, jobs by role, privacy; deployed on Netlify
+├── netlify.toml                  # Netlify: build web/ and publish web/dist
+├── render.yaml                   # Render blueprint (the live service is configured in the Render dashboard)
+├── store-assets/                 # Web Store screenshots, promo tile and LISTING.md (npm run e2e:screens)
 └── README.md
 ```
 

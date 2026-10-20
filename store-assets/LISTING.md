@@ -82,6 +82,15 @@ My suggestion: declare no categories of *stored* personal data, and make sure th
 - **Trader status (EU):** answer honestly. A free, non-commercial extension from an individual is normally "non-trader"; if you plan to earn money from it, choose "trader"
 - **Test instructions for the reviewer:** No sign-in is needed. Open the extension, pick one or more roles in the welcome tour, and jobs appear. The server runs on a free plan; if the list says it is gathering jobs, wait up to a minute and refresh.
 
+## Things that must never go wrong (kept from the old checklist)
+
+- **Upload only the production build.** `npm run build` is the only build for the store. `npm run build:dev` adds localhost access and must never be uploaded.
+- **Never quote job or employer counts in the listing** unless you checked them the same day. The numbers change every two hours.
+- **The extension may only talk to the Jobly server** (`https://jobly-yd6l.onrender.com`). Do not add the other project's `api.getcatchly.com` anywhere.
+- **Pin the server to the published extension ID after the first upload:** set `EXTENSION_IDS=<id>` on Render. Until then any extension can call the server.
+- `ADMIN_TOKEN` stays unset on the server unless you want to manage the employer list through the API (disabled by default).
+- Company logos come from Google's favicon service (`t2.gstatic.com`), so Google can see which company logos a browser asks for. The privacy policy says so; the data-usage form should not contradict it.
+
 ## Before you press Submit
 
 1. Developer account registered ($5 one-time fee) with 2-step verification on.
