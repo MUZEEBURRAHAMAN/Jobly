@@ -224,6 +224,10 @@ class SecurityHeadersMiddleware:
         await self.app(scope, receive, send_wrapper)
 
 
+# Why the last snapshot download did or didn't happen (shown by /health; never contains the token)
+last_download_note = ""
+
+
 async def download_github_release_asset(
     client: httpx.AsyncClient, repo: str, tag: str, name: str, dest, *, token: str = "", max_bytes: int = 200_000_000
 ) -> bool:
@@ -231,11 +235,15 @@ async def download_github_release_asset(
     The token goes only to api.github.com: it is dropped on the redirect to the signed download host."""
     base = {"Accept": "application/vnd.github+json", "X-GitHub-Api-Version": "2022-11-28"}
     auth = {"Authorization": f"Bearer {token}"} if token else {}
+    global last_download_note
+    last_download_note = ""
     meta = await client.get(f"https://api.github.com/repos/{repo}/releases/tags/{tag}", headers={**base, **auth}, timeout=20.0)
     if meta.status_code != 200:
+        last_download_note = f"github answered {meta.status_code} for the release" + ("" if token else " (no token configured)")
         return False
     asset = next((a for a in meta.json().get("assets", []) if a.get("name") == name), None)
     if not asset or not asset.get("url") or asset.get("size", 0) > max_bytes:
+        last_download_note = "release found but the snapshot file is missing or too large"
         return False
 
     url, headers = asset["url"], {**auth, "Accept": "application/octet-stream"}
@@ -247,13 +255,17 @@ async def download_github_release_asset(
                 headers = {"Accept": "application/octet-stream"}  # never forward the token to the storage host
                 continue
             if resp.status_code != 200:
+                last_download_note = f"file download answered {resp.status_code}"
                 return False
             size = 0
             with open(dest, "wb") as fh:
                 async for chunk in resp.aiter_bytes():
                     size += len(chunk)
                     if size > max_bytes:
+                        last_download_note = "snapshot file larger than the limit"
                         return False
                     fh.write(chunk)
+            last_download_note = "downloaded"
             return True
+    last_download_note = "too many redirects"
     return False

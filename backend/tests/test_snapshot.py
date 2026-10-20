@@ -125,6 +125,33 @@ class TestReleaseDownload(unittest.IsolatedAsyncioTestCase):
         self.assertTrue(api_hosts and all(a == "Bearer SECRET" for a in api_hosts))
         self.assertEqual(storage, [None])               # the signed URL must not receive the token
 
+    async def test_failures_say_why_without_revealing_the_token(self):
+        from backend.app import security
+        handler = lambda r: httpx.Response(404, json={"message": "Not Found"})
+        with tempfile.TemporaryDirectory() as tmp:
+            async with httpx.AsyncClient(transport=httpx.MockTransport(handler)) as client:
+                self.assertFalse(await download_github_release_asset(client, "o/r", "snapshot", "jobly.db.gz", Path(tmp) / "a"))
+                self.assertIn("404", security.last_download_note)
+                self.assertIn("no token configured", security.last_download_note)
+                self.assertFalse(await download_github_release_asset(client, "o/r", "snapshot", "jobly.db.gz", Path(tmp) / "a", token="SECRET"))
+                self.assertIn("404", security.last_download_note)
+                self.assertNotIn("SECRET", security.last_download_note)
+                self.assertNotIn("no token", security.last_download_note)
+
+    async def test_restore_status_reports_the_missing_setting(self):
+        from backend.app.snapshot import restore_status
+        with patch.object(settings, "SNAPSHOT_REPO", ""):
+            self.assertFalse(await restore_snapshot_if_needed())
+        self.assertEqual(restore_status["repo_configured"], False)
+        self.assertIn("SNAPSHOT_REPO is empty", restore_status["result"])
+        handler = lambda r: httpx.Response(404)
+        async with httpx.AsyncClient(transport=httpx.MockTransport(handler)) as client:
+            with patch.object(settings, "SNAPSHOT_REPO", "o/r"), patch.object(settings, "SNAPSHOT_TOKEN", "SECRET"), patch.object(settings, "DATABASE_PATH", Path(tempfile.mkdtemp()) / "x.db"):
+                self.assertFalse(await restore_snapshot_if_needed(client))
+        self.assertEqual((restore_status["repo_configured"], restore_status["token_configured"]), (True, True))
+        self.assertIn("404", restore_status["result"])
+        self.assertNotIn("SECRET", str(restore_status))
+
     async def test_oversized_asset_is_refused(self):
         handler = lambda r: httpx.Response(200, json={"assets": [{"name": "jobly.db.gz", "size": 10**10, "url": "https://api.github.com/x"}]})
         with tempfile.TemporaryDirectory() as tmp:

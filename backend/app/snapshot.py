@@ -20,9 +20,13 @@ from pathlib import Path
 import httpx
 
 from .config import settings
+from . import security
 from .security import download_github_release_asset
 
 logger = logging.getLogger(__name__)
+
+# What happened to the warm start at boot, for /health: which setting is missing shows up here without revealing any secret.
+restore_status: dict[str, object] = {"result": "not attempted"}
 MAX_DB_BYTES = 500_000_000
 REQUIRED_TABLES = {"companies", "jobs", "preferences", "notifications", "reports"}
 
@@ -107,7 +111,13 @@ def _has_jobs(db_path: Path) -> bool:
 async def restore_snapshot_if_needed(client: httpx.AsyncClient | None = None) -> bool:
     """On an empty database, try to restore the latest published snapshot. Never raises: a failed restore just
     means the normal first-boot crawl runs instead."""
-    if not settings.SNAPSHOT_REPO or _has_jobs(settings.DATABASE_PATH):
+    restore_status.clear()
+    restore_status.update({"repo_configured": bool(settings.SNAPSHOT_REPO), "token_configured": bool(settings.SNAPSHOT_TOKEN), "result": "not attempted"})
+    if not settings.SNAPSHOT_REPO:
+        restore_status["result"] = "skipped: SNAPSHOT_REPO is empty"
+        return False
+    if _has_jobs(settings.DATABASE_PATH):
+        restore_status["result"] = "skipped: the database already had jobs"
         return False
     db_path = settings.DATABASE_PATH
     db_path.parent.mkdir(parents=True, exist_ok=True)
@@ -119,13 +129,16 @@ async def restore_snapshot_if_needed(client: httpx.AsyncClient | None = None) ->
             client, settings.SNAPSHOT_REPO, settings.SNAPSHOT_TAG, settings.SNAPSHOT_ASSET, gz, token=settings.SNAPSHOT_TOKEN
         )
         if not ok:
-            logger.info("[Snapshot] No snapshot available; the first sync will populate the database")
+            logger.info("[Snapshot] No snapshot available (%s); the first sync will populate the database", security.last_download_note)
+            restore_status["result"] = f"no snapshot: {security.last_download_note}"
             return False
         jobs = await asyncio.to_thread(install_snapshot, gz, db_path)
         logger.info("[Snapshot] Restored %d jobs from the latest snapshot", jobs)
+        restore_status["result"] = f"restored {jobs} jobs"
         return True
     except Exception as exc:  # network, validation, disk...: fall back to crawling
         logger.warning("[Snapshot] Restore failed (%s); falling back to a normal crawl", exc)
+        restore_status["result"] = f"restore failed: {type(exc).__name__}"
         return False
     finally:
         gz.unlink(missing_ok=True)

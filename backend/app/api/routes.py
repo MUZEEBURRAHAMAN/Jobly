@@ -21,6 +21,7 @@ from ..geo import COUNTRIES, HUBS, place_of
 from ..ingestion.runner import sync_all_sources
 from ..ingestion.runner import age_cutoff_iso
 from ..security import UnsafeURL, require_admin, validate_public_url
+from ..snapshot import restore_status
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
@@ -44,7 +45,9 @@ async def health():
     return {
         "status": "ok",
         "service": "hiring-radar-api",
-        "timestamp": get_utc_now()
+        "timestamp": get_utc_now(),
+        # What the boot-time warm start did (no secrets): lets us see a missing setting without access to the host's logs
+        "snapshot": dict(restore_status),
     }
 
 def _like(term: str) -> str:
