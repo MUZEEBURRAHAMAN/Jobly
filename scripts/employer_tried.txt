@@ -1,0 +1,614 @@
+# Employers already tested with no usable board on the eight systems (written by verify_employers.py; --retry ignores this list)
+
+Revolut
+GoCardless
+Checkout.com
+Octopus Energy
+Onfido
+Improbable
+Curve
+Marshmallow
+Cleo
+Plum
+Snyk
+Darktrace
+Cloudsmith
+Ravelin
+Moonpig
+Gousto
+Cazoo
+Babylon Health
+Peak
+Arm
+Skyscanner
+Depop
+Wayflyer
+Workhuman
+Flipdish
+Tines
+Wiz
+Monday.com
+Fiverr
+Wix
+Lemonade
+Papaya Global
+HiBob
+Gong
+Check Point
+Personio
+SoundCloud
+Zalando
+Taxfix
+Wefox
+Mambu
+Forto
+Adjust
+AUTO1
+Babbel
+Omio
+Trade Republic
+Scalable Capital
+DeepL
+Black Forest Labs
+Dynatrace
+GoStudent
+Bolt
+Wise Estonia
+Klarna
+King
+Tink
+Voi
+Northvolt
+Einride
+Oda
+Pleo
+Lunar
+Vivino
+Zendesk
+Unity
+Rovio
+Normative
+MessageBird
+Bunq
+Picnic
+Just Eat Takeaway
+Booking.com
+TomTom
+WeTransfer
+Backbase
+Odoo
+Collibra
+Ledger
+Mirakl
+Contentsquare
+PayFit
+Spendesk
+Criteo
+Deezer
+OVHcloud
+BlaBlaCar
+Mistral AI
+Hugging Face
+Sorare
+Vinted
+Oxylabs
+TravelPerk
+Factorial
+Cabify
+Idealista
+Glovo
+Wallbox
+Jobandtalent
+Hotjar
+Prodigy Finance
+Talkdesk
+OutSystems
+Farfetch Portugal
+Unbabel
+Allegro
+CD Projekt
+Booksy
+Brainly
+Revolut Poland
+Rohlik
+Kiwi.com
+Productboard
+Avast
+Bitdefender
+Emarsys
+Prezi
+PhonePe
+Swiggy
+Zomato
+Zerodha
+Postman
+BrowserStack
+Chargebee
+Uniphore
+Flipkart
+Ola
+Dream11
+ShareChat
+Sprinklr
+Zoho
+Delhivery
+Unacademy
+PhysicsWallah
+upGrad
+Cars24
+Jupiter
+Rapido
+Urban Company
+Lenskart
+PharmEasy
+Nykaa
+Zepto
+Hasura
+Rippling India
+Atlan
+GoTo
+Sea Group
+Shopee
+Tokopedia
+Carousell
+Lazada
+Traveloka
+Bukalapak
+Razer
+Nium
+Advance Intelligence Group
+Atlassian
+SafetyCulture
+Airtasker
+Employment Hero
+Linktree
+Afterpay
+Immutable
+Rokt
+LINE
+Rakuten
+SmartNews
+Preferred Networks
+Toss
+Kakao
+Naver
+Gogoro
+Talabat
+Noon
+Tabby
+Kitopi
+Swvl
+Mercado Libre
+Rappi
+Clip
+Globant
+Ualá
+Creditas
+iFood
+Nuvemshop
+Konfio
+Bitso
+Flutterwave
+Paystack
+Andela
+Interswitch
+Jumia
+Chipper Cash
+Wave
+Yoco
+Takealot
+Luno
+Shopify
+Clio
+1Password
+Ada
+Lightspeed
+Hootsuite
+Thinkific
+Ritual
+Top Hat
+Dialpad
+Nuvei
+Koho
+League
+FreshBooks
+Plooto
+Visier
+Coveo
+Loom
+GitHub
+HashiCorp
+Auth0
+Elastic US
+Weights & Biases
+Replicate
+Kraken
+Marqeta
+Rippling
+Box
+Slack
+Intercom US
+HubSpot
+Mailchimp
+Amplitude US
+Segment
+Splunk
+Postman US
+Fly.io
+Pulumi
+Chronosphere
+Uber
+DoorDash
+Snap
+Udemy
+Khan Academy
+Grammarly
+Canva US
+Webflow US
+Wix US
+Shopify US
+BigCommerce
+Etsy
+Wayfair
+Calm
+Headspace
+Hims & Hers
+Tempus
+Lemonade US
+Root Insurance
+Opendoor
+Zillow
+Redfin
+Compass
+Procore
+Flock Safety
+Rivian
+Aurora
+Applied Intuition
+Cruise
+Docusign
+Dropbox Sign
+Atlassian US
+Trello
+Monday US
+Coda
+Retool US
+Airbyte
+dbt Labs
+Confluent US
+Redis
+Couchbase
+Sourcegraph
+JetBrains US
+Codeium
+Tabnine
+Mistral US
+Cohere US
+Lightricks
+Playtika
+Ironsource
+Nayax
+Rapyd
+Tipalti
+Pagaya
+Hippo
+Snyk US
+Aqua Security
+CyberArk
+SentinelOne
+Armis
+Vulcan Cyber
+Lusha
+Via
+Fundbox
+Tines US
+Contentful US
+Algolia US
+Qonto FR
+Ledger FR
+Lydia
+Ankorstore
+Vestiaire Collective
+ManoMano
+Believe
+Exotec
+Ornikar
+Payfit FR
+Lokalise
+Printful
+Paysera
+Vinted LT
+Wolt FI
+Oura FI
+Smartly
+Bolt EE
+Skeleton
+Starship
+Monese
+Cleo UK
+Bulb
+Ovo Energy
+Cazoo UK
+Wise UK
+Ocado Technology
+Sky
+Bumble
+Elevate
+Kraken UK
+ClearScore
+Hargreaves
+Cleanbit
+Cera
+Huma
+Eve Sleep
+Gymshark
+Bloom & Wild
+Hopin
+Beamery
+Cleverbridge
+Sennder
+Taxfix DE
+Pitch
+Amboss
+Medwing
+1Komma5
+Tier Mobility
+Lilium
+Aleph Alpha
+Mobimeo
+GetSafe
+Pliant
+Billie
+Scout24
+Idealo
+Check24
+Gorillas
+Flink
+Zeit
+Stepstone
+Chroma
+Qdrant
+Groq
+SambaNova
+Magic
+Adept
+Inflection AI
+Mistral
+Reka
+AI21 Labs
+Jasper
+Hippocratic AI
+Nabla
+Spring Health
+Cityblock Health
+Devoted Health
+Carbon Health
+One Medical
+23andMe
+Recursion
+Moderna
+Stripe Climate
+Pachama
+Sunrun
+Tesla
+Climeworks
+Octopus Tech
+Northvolt SE
+Plaid UK
+Truelayer
+Yapily
+Fnality
+Zilch
+Moneybox
+Freetrade
+Cleo AI
+OakNorth
+Tandem Bank
+Allica Bank
+Atom Bank
+Pockit
+Paysafe
+Skrill
+Worldpay
+Nexi
+Scalapay
+Bending Spoons
+Casavo
+Moneyfarm
+Prima Assicurazioni
+Talent Garden
+Glovo Spain
+Cabify Spain
+Holaluz
+Typeform Spain
+Wallapop
+Fever
+Clarity AI
+Zinkee
+Sennder Spain
+Pennylane FR
+Lemonway
+Swan
+Agicap
+Alma
+Qover
+Ontex
+Teamleader
+Sinch
+Kry
+Tobii
+Sana Labs
+Tink SE
+Gelato
+Vend
+Kahoot
+Aker BP
+Zaptec
+Unacast
+Pleo DK
+Tradeshift
+Templafy
+Ørsted
+Vestas
+Maersk
+Lego Digital
+Zendesk DK
+Vivino DK
+Nets Group
+Danske Bank
+Wolt Finland
+Nokia
+Ericsson
+Rovio FI
+Remedy Entertainment
+Smartly FI
+Aiven
+Hiven
+Futurice
+Houston Analytics
+Nord Anglia
+Deezer Tech
+Wefox DE
+Heyflow
+Trade Republic DE
+Ada Health
+Cleverreach
+Celonis Munich
+Lieferando
+Choco
+Knowunity
+Tado
+Ottonova
+Vimcar
+About You
+Zeitgold
+Penta
+Finanzguru
+Joblift
+Carwow
+Cinch
+Cazana
+Zoopla
+Rightmove
+Just Eat UK
+Ocado UK
+Monzo UK
+Starling UK
+Wise Tech
+Checkout UK
+Hargreaves Lansdown
+Bumble UK
+Badoo
+BrewDog
+Cera UK
+Babylon
+Doctorlink
+Kheiron
+Exscientia
+Benevolent AI
+DeepMind
+Stability AI UK
+Synthesia UK
+ElevenLabs UK
+Featurespace
+Cleo Tech
+Tessian
+Immersive Labs
+Truphone
+Cellebrite
+Fortinet
+Palo Alto Networks
+CrowdStrike
+SentinelOne US
+Rapid7
+Tenable
+Qualys
+Proofpoint
+Darktrace US
+Wiz US
+1Password US
+Teleport
+Snyk Boston
+Lacework
+Elastic Mountain View
+Amplitude Oct
+Heap
+FullStory
+LogRocket
+Gainsight
+Gong US
+Clari
+Apollo.io
+Seamless.AI
+Drift
+Typeform US
+Doodle
+Superhuman
+Front
+Gorgias
+Postscript
+Yotpo US
+Fast
+Stord
+Samsara US
+Motive
+Convoy
+Uber Freight
+Turo
+Getaround
+Vacasa
+Sonder
+Hopper US
+Spotnana
+Mews
+Cloudbeds
+Toast US
+Lightspeed US
+Square US
+Shift4
+Checkout US
+Nuvei US
+Paysafe US
+Expensify
+Divvy
+Navan US
+Pilot
+Bench
+Wave Financial
+Clearco
+Borrowell
+Neo Financial
+Tangerine
+Question Mark
+Applyboard
+Vidyard
+Clearwater Analytics
+Alkami
+nCino
+Q2
+MX
+Finicity
+Yodlee
+Stash
+Acorns
+Betterment US
+LendingClub
+Prosper
+Credit Karma
+Mission Lane
+Varo
+Dave
+MoneyLion
+Current
+Aspiration
+Chainalysis
+Anchorage Digital
+Circle
+Paxos
+OpenSea
+Uniswap Labs
+Ledger US
+Gemini US
+Bitstamp
+Bitpanda LU
+Kraken EU

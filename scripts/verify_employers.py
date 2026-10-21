@@ -40,6 +40,7 @@ READERS = {
 }
 COMPANIES = ROOT / "backend" / "app" / "data" / "companies.json"
 CANDIDATES = ROOT / "scripts" / "employer_candidates.csv"
+TRIED = ROOT / "scripts" / "employer_tried.txt"
 USER_AGENT = "HiringRadar/1.0 (job discovery; +https://joblyextension.netlify.app)"
 
 
@@ -124,6 +125,7 @@ async def main() -> None:
     ap.add_argument("--only", help="comma-separated regions from the candidate file")
     ap.add_argument("--min-role", type=int, default=2, help="minimum role jobs outside the US (default 2); region 'us' counts role jobs anywhere")
     ap.add_argument("--fix-links", action="store_true", help="re-resolve careers links that are just a home page")
+    ap.add_argument("--retry", action="store_true", help="test candidates again even if an earlier run found nothing")
     ap.add_argument("--recheck", action="store_true", help="test the employers already in the list instead")
     args = ap.parse_args()
     sem = asyncio.Semaphore(10)
@@ -143,7 +145,8 @@ async def main() -> None:
         known_ids = {(c["source_type"], c["source_identifier"].lower()) for c in existing}
         known_slugs = {c["slug"] for c in existing}
         known_names = {c["name"].lower() for c in existing}
-        cands = [c for c in read_candidates(set(args.only.split(",")) if args.only else None) if c["name"].lower() not in known_names]
+        tried = set() if args.retry or not TRIED.exists() else {l.strip().lower() for l in TRIED.read_text(encoding="utf-8").splitlines() if l.strip() and not l.startswith("#")}
+        cands = [c for c in read_candidates(set(args.only.split(",")) if args.only else None) if c["name"].lower() not in known_names | tried]
         print(f"testing {len(cands)} candidates on {len(READERS)} systems...", flush=True)
         found = await asyncio.gather(*[best_board(client, sem, c) for c in cands])
 
@@ -169,6 +172,10 @@ async def main() -> None:
         by_region = Counter(e[0]["region"] for e in eligible)
         print("by region:", dict(by_region))
 
+        if args.write:  # remember the misses so the next run starts with new names only
+            lost = [c["name"] for c, h, v in rows if v not in ("ELIGIBLE", "already in the list")]
+            old = TRIED.read_text(encoding="utf-8").splitlines() if TRIED.exists() else []
+            TRIED.write_text("\n".join(old + [n for n in lost if n not in old]) + "\n", encoding="utf-8")
         if args.write and eligible:
             urls = await asyncio.gather(*[careers_url(client, e[0]["domain"]) for e in eligible])
             added = 0

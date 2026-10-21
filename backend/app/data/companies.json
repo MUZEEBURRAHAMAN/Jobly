@@ -2707,5 +2707,914 @@
     "source_identifier": "upvest",
     "industry": null,
     "region": "de"
+  },
+  {
+    "name": "Mercari",
+    "slug": "mercari",
+    "careers_url": "https://careers.mercari.com",
+    "source_type": "workable",
+    "source_identifier": "mercari",
+    "industry": null,
+    "region": "east-asia"
+  },
+  {
+    "name": "Hugging Face US",
+    "slug": "hugging-face-us",
+    "careers_url": "https://huggingface.co/login?next=%2Fsettings%2Fjobs",
+    "source_type": "workable",
+    "source_identifier": "huggingface",
+    "industry": null,
+    "region": "us"
+  },
+  {
+    "name": "Cerebras",
+    "slug": "cerebras",
+    "careers_url": "https://www.cerebras.ai/join-us",
+    "source_type": "ashby",
+    "source_identifier": "cerebras",
+    "industry": null,
+    "region": "us"
+  },
+  {
+    "name": "Lambda",
+    "slug": "lambda",
+    "careers_url": "https://lambda.ai/careers",
+    "source_type": "ashby",
+    "source_identifier": "lambda",
+    "industry": null,
+    "region": "us"
+  },
+  {
+    "name": "CoreWeave",
+    "slug": "coreweave",
+    "careers_url": "https://www.coreweave.com/careers",
+    "source_type": "greenhouse",
+    "source_identifier": "coreweave",
+    "industry": null,
+    "region": "us"
+  },
+  {
+    "name": "Crusoe",
+    "slug": "crusoe",
+    "careers_url": "https://www.crusoe.ai/about/careers",
+    "source_type": "ashby",
+    "source_identifier": "crusoe",
+    "industry": null,
+    "region": "us"
+  },
+  {
+    "name": "Mercor",
+    "slug": "mercor",
+    "careers_url": "https://www.mercor.com/careers/",
+    "source_type": "ashby",
+    "source_identifier": "mercor",
+    "industry": null,
+    "region": "us"
+  },
+  {
+    "name": "Surge AI",
+    "slug": "surge-ai",
+    "careers_url": "https://surgehq.ai/careers",
+    "source_type": "ashby",
+    "source_identifier": "surge-ai",
+    "industry": null,
+    "region": "us"
+  },
+  {
+    "name": "xAI",
+    "slug": "xai",
+    "careers_url": "https://x.ai/",
+    "source_type": "greenhouse",
+    "source_identifier": "xai",
+    "industry": null,
+    "region": "us"
+  },
+  {
+    "name": "Typeface",
+    "slug": "typeface",
+    "careers_url": "https://www.typeface.ai/careers",
+    "source_type": "greenhouse",
+    "source_identifier": "typeface",
+    "industry": null,
+    "region": "us"
+  },
+  {
+    "name": "Lightmatter",
+    "slug": "lightmatter",
+    "careers_url": "https://lightmatter.co",
+    "source_type": "greenhouse",
+    "source_identifier": "lightmatter",
+    "industry": null,
+    "region": "us"
+  },
+  {
+    "name": "Abridge",
+    "slug": "abridge",
+    "careers_url": "https://jobs.ashbyhq.com/Abridge",
+    "source_type": "ashby",
+    "source_identifier": "abridge",
+    "industry": null,
+    "region": "us"
+  },
+  {
+    "name": "Ambience Healthcare",
+    "slug": "ambience-healthcare",
+    "careers_url": "https://www.ambiencehealthcare.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "ambiencehealthcare",
+    "industry": null,
+    "region": "us"
+  },
+  {
+    "name": "Tebra",
+    "slug": "tebra",
+    "careers_url": "https://www.tebra.com/careers",
+    "source_type": "greenhouse",
+    "source_identifier": "tebra",
+    "industry": null,
+    "region": "us"
+  },
+  {
+    "name": "Sword Health",
+    "slug": "sword-health",
+    "careers_url": "https://swordhealth.com",
+    "source_type": "greenhouse",
+    "source_identifier": "swordhealth",
+    "industry": null,
+    "region": "pt"
+  },
+  {
+    "name": "Lyra Health",
+    "slug": "lyra-health",
+    "careers_url": "https://careers.lyrahealth.com/",
+    "source_type": "lever",
+    "source_identifier": "lyrahealth",
+    "industry": null,
+    "region": "us"
+  },
+  {
+    "name": "Included Health",
+    "slug": "included-health",
+    "careers_url": "https://includedhealth.com/careers/",
+    "source_type": "lever",
+    "source_identifier": "includedhealth",
+    "industry": null,
+    "region": "us"
+  },
+  {
+    "name": "Komodo Health",
+    "slug": "komodo-health",
+    "careers_url": "https://job-boards.greenhouse.io/komodohealth",
+    "source_type": "greenhouse",
+    "source_identifier": "komodohealth",
+    "industry": null,
+    "region": "us"
+  },
+  {
+    "name": "Veeva",
+    "slug": "veeva",
+    "careers_url": "https://careers.veeva.com/",
+    "source_type": "lever",
+    "source_identifier": "veeva",
+    "industry": null,
+    "region": "us"
+  },
+  {
+    "name": "Color Health",
+    "slug": "color-health",
+    "careers_url": "https://www.color.com/careers/",
+    "source_type": "ashby",
+    "source_identifier": "color-health",
+    "industry": null,
+    "region": "us"
+  },
+  {
+    "name": "Ginkgo Bioworks",
+    "slug": "ginkgo-bioworks",
+    "careers_url": "https://ginkgobioworks.com",
+    "source_type": "greenhouse",
+    "source_identifier": "ginkgobioworks",
+    "industry": null,
+    "region": "us"
+  },
+  {
+    "name": "Insitro",
+    "slug": "insitro",
+    "careers_url": "https://www.insitro.com/join-us/",
+    "source_type": "ashby",
+    "source_identifier": "insitro",
+    "industry": null,
+    "region": "us"
+  },
+  {
+    "name": "Watershed",
+    "slug": "watershed",
+    "careers_url": "https://watershed.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "watershed",
+    "industry": null,
+    "region": "us"
+  },
+  {
+    "name": "Redwood Materials",
+    "slug": "redwood-materials",
+    "careers_url": "https://www.redwoodmaterials.com/join/",
+    "source_type": "greenhouse",
+    "source_identifier": "redwoodmaterials",
+    "industry": null,
+    "region": "us"
+  },
+  {
+    "name": "Satispay",
+    "slug": "satispay",
+    "careers_url": "https://www.satispay.com/404.html",
+    "source_type": "ashby",
+    "source_identifier": "satispay",
+    "industry": null,
+    "region": "it"
+  },
+  {
+    "name": "Seedtag",
+    "slug": "seedtag",
+    "careers_url": "https://jobs.seedtag.com",
+    "source_type": "teamtailor",
+    "source_identifier": "seedtag",
+    "industry": null,
+    "region": "es"
+  },
+  {
+    "name": "Ebury",
+    "slug": "ebury",
+    "careers_url": "https://ebury.com/company/careers",
+    "source_type": "greenhouse",
+    "source_identifier": "ebury",
+    "industry": null,
+    "region": "es"
+  },
+  {
+    "name": "Shine",
+    "slug": "shine",
+    "careers_url": "https://careers.shine.co/",
+    "source_type": "teamtailor",
+    "source_identifier": "shine",
+    "industry": null,
+    "region": "fr"
+  },
+  {
+    "name": "Showpad",
+    "slug": "showpad",
+    "careers_url": "https://www.showpad.com/careers",
+    "source_type": "greenhouse",
+    "source_identifier": "showpad",
+    "industry": null,
+    "region": "be"
+  },
+  {
+    "name": "Truecaller",
+    "slug": "truecaller",
+    "careers_url": "https://www.truecaller.com/careers",
+    "source_type": "greenhouse",
+    "source_identifier": "truecaller",
+    "industry": null,
+    "region": "nordics"
+  },
+  {
+    "name": "Epidemic Sound",
+    "slug": "epidemic-sound",
+    "careers_url": "https://www.epidemicsound.com/careers/",
+    "source_type": "ashby",
+    "source_identifier": "epidemic-sound",
+    "industry": null,
+    "region": "nordics"
+  },
+  {
+    "name": "Mentimeter",
+    "slug": "mentimeter",
+    "careers_url": "https://www.mentimeter.com/jobs",
+    "source_type": "greenhouse",
+    "source_identifier": "mentimeter",
+    "industry": null,
+    "region": "nordics"
+  },
+  {
+    "name": "Anyfin",
+    "slug": "anyfin",
+    "careers_url": "https://anyfin.com/sv_SE/404",
+    "source_type": "teamtailor",
+    "source_identifier": "anyfin",
+    "industry": null,
+    "region": "nordics"
+  },
+  {
+    "name": "Cognite",
+    "slug": "cognite",
+    "careers_url": "https://www.cognite.com/en/company/careers",
+    "source_type": "greenhouse",
+    "source_identifier": "cognite",
+    "industry": null,
+    "region": "nordics"
+  },
+  {
+    "name": "Solita",
+    "slug": "solita",
+    "careers_url": "https://www.solita.fi/join-us/",
+    "source_type": "greenhouse",
+    "source_identifier": "solita",
+    "industry": null,
+    "region": "nordics"
+  },
+  {
+    "name": "Reaktor",
+    "slug": "reaktor",
+    "careers_url": "https://www.reaktor.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "reaktor",
+    "industry": null,
+    "region": "nordics"
+  },
+  {
+    "name": "Sunday Natural",
+    "slug": "sunday-natural",
+    "careers_url": "https://sunday.de",
+    "source_type": "ashby",
+    "source_identifier": "sunday-natural",
+    "industry": null,
+    "region": "de"
+  },
+  {
+    "name": "Sixt",
+    "slug": "sixt",
+    "careers_url": "https://sixt.com",
+    "source_type": "smartrecruiters",
+    "source_identifier": "sixt",
+    "industry": null,
+    "region": "de"
+  },
+  {
+    "name": "Westwing",
+    "slug": "westwing",
+    "careers_url": "https://www.westwing.com/careers/",
+    "source_type": "personio",
+    "source_identifier": "westwing",
+    "industry": null,
+    "region": "de"
+  },
+  {
+    "name": "Auto Trader",
+    "slug": "auto-trader",
+    "careers_url": "https://careers.autotrader.co.uk",
+    "source_type": "greenhouse",
+    "source_identifier": "autotrader",
+    "industry": null,
+    "region": "uk"
+  },
+  {
+    "name": "Funding Circle",
+    "slug": "funding-circle",
+    "careers_url": "https://www.fundingcircle.com/uk/careers/",
+    "source_type": "ashby",
+    "source_identifier": "fundingcircle",
+    "industry": null,
+    "region": "uk"
+  },
+  {
+    "name": "ASOS",
+    "slug": "asos",
+    "careers_url": "https://www.asoscareers.com/",
+    "source_type": "smartrecruiters",
+    "source_identifier": "asos",
+    "industry": null,
+    "region": "uk"
+  },
+  {
+    "name": "Isomorphic Labs",
+    "slug": "isomorphic-labs",
+    "careers_url": "https://www.isomorphiclabs.com/careers",
+    "source_type": "greenhouse",
+    "source_identifier": "isomorphiclabs",
+    "industry": null,
+    "region": "uk"
+  },
+  {
+    "name": "Faculty",
+    "slug": "faculty",
+    "careers_url": "https://faculty.ai/en-gb/join-the-team",
+    "source_type": "ashby",
+    "source_identifier": "faculty",
+    "industry": null,
+    "region": "uk"
+  },
+  {
+    "name": "Quantexa",
+    "slug": "quantexa",
+    "careers_url": "https://www.quantexa.com/careers/",
+    "source_type": "ashby",
+    "source_identifier": "quantexa",
+    "industry": null,
+    "region": "uk"
+  },
+  {
+    "name": "Cognism",
+    "slug": "cognism",
+    "careers_url": "https://www.cognism.com/careers",
+    "source_type": "greenhouse",
+    "source_identifier": "cognism",
+    "industry": null,
+    "region": "uk"
+  },
+  {
+    "name": "Zscaler",
+    "slug": "zscaler",
+    "careers_url": "https://www.zscaler.com/careers",
+    "source_type": "greenhouse",
+    "source_identifier": "zscaler",
+    "industry": null,
+    "region": "us"
+  },
+  {
+    "name": "Abnormal Security",
+    "slug": "abnormal-security",
+    "careers_url": "https://abnormal.ai/careers",
+    "source_type": "greenhouse",
+    "source_identifier": "abnormalsecurity",
+    "industry": null,
+    "region": "us"
+  },
+  {
+    "name": "Chainguard",
+    "slug": "chainguard",
+    "careers_url": "https://www.chainguard.dev/careers",
+    "source_type": "greenhouse",
+    "source_identifier": "chainguard",
+    "industry": null,
+    "region": "us"
+  },
+  {
+    "name": "Drata",
+    "slug": "drata",
+    "careers_url": "https://drata.com/about/careers",
+    "source_type": "ashby",
+    "source_identifier": "drata",
+    "industry": null,
+    "region": "us"
+  },
+  {
+    "name": "Secureframe",
+    "slug": "secureframe",
+    "careers_url": "https://secureframe.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "secureframe",
+    "industry": null,
+    "region": "us"
+  },
+  {
+    "name": "Sumo Logic",
+    "slug": "sumo-logic",
+    "careers_url": "https://www.sumologic.com/company/careers",
+    "source_type": "greenhouse",
+    "source_identifier": "sumologic",
+    "industry": null,
+    "region": "us"
+  },
+  {
+    "name": "Pendo",
+    "slug": "pendo",
+    "careers_url": "https://www.pendo.io/careers/",
+    "source_type": "greenhouse",
+    "source_identifier": "pendo",
+    "industry": null,
+    "region": "us"
+  },
+  {
+    "name": "Outreach",
+    "slug": "outreach",
+    "careers_url": "https://www.outreach.ai/company/working-at-outreach",
+    "source_type": "lever",
+    "source_identifier": "outreach",
+    "industry": null,
+    "region": "us"
+  },
+  {
+    "name": "6sense",
+    "slug": "6sense",
+    "careers_url": "https://6sense.com",
+    "source_type": "greenhouse",
+    "source_identifier": "6sense",
+    "industry": null,
+    "region": "us"
+  },
+  {
+    "name": "ZoomInfo",
+    "slug": "zoominfo",
+    "careers_url": "https://www.zoominfo.com/careers",
+    "source_type": "greenhouse",
+    "source_identifier": "zoominfo",
+    "industry": null,
+    "region": "us"
+  },
+  {
+    "name": "Qualtrics",
+    "slug": "qualtrics",
+    "careers_url": "https://www.qualtrics.com/careers/us/en",
+    "source_type": "greenhouse",
+    "source_identifier": "qualtrics",
+    "industry": null,
+    "region": "us"
+  },
+  {
+    "name": "SurveyMonkey",
+    "slug": "surveymonkey",
+    "careers_url": "https://www.surveymonkey.com/careers/",
+    "source_type": "ashby",
+    "source_identifier": "surveymonkey",
+    "industry": null,
+    "region": "us"
+  },
+  {
+    "name": "Calendly",
+    "slug": "calendly",
+    "careers_url": "https://calendly.com/careers",
+    "source_type": "greenhouse",
+    "source_identifier": "calendly",
+    "industry": null,
+    "region": "us"
+  },
+  {
+    "name": "Help Scout",
+    "slug": "help-scout",
+    "careers_url": "https://www.helpscout.com/company/careers/",
+    "source_type": "ashby",
+    "source_identifier": "helpscout",
+    "industry": null,
+    "region": "us"
+  },
+  {
+    "name": "Attentive",
+    "slug": "attentive",
+    "careers_url": "https://www.attentive.com/careers",
+    "source_type": "greenhouse",
+    "source_identifier": "attentive",
+    "industry": null,
+    "region": "us"
+  },
+  {
+    "name": "project44",
+    "slug": "project44",
+    "careers_url": "https://www.project44.com/company/careers/",
+    "source_type": "greenhouse",
+    "source_identifier": "project44",
+    "industry": null,
+    "region": "us"
+  },
+  {
+    "name": "FourKites",
+    "slug": "fourkites",
+    "careers_url": "https://www.fourkites.ai/careers",
+    "source_type": "greenhouse",
+    "source_identifier": "fourkites",
+    "industry": null,
+    "region": "us"
+  },
+  {
+    "name": "Navan",
+    "slug": "navan",
+    "careers_url": "https://navan.com/careers",
+    "source_type": "greenhouse",
+    "source_identifier": "tripactions",
+    "industry": null,
+    "region": "us"
+  },
+  {
+    "name": "Olo",
+    "slug": "olo",
+    "careers_url": "https://www.olo.com/people-culture#careers",
+    "source_type": "lever",
+    "source_identifier": "olo",
+    "industry": null,
+    "region": "us"
+  },
+  {
+    "name": "Bill.com",
+    "slug": "bill-com",
+    "careers_url": "https://www.bill.com/careers",
+    "source_type": "greenhouse",
+    "source_identifier": "billcom",
+    "industry": null,
+    "region": "us"
+  },
+  {
+    "name": "Float",
+    "slug": "float",
+    "careers_url": "https://floatfinancial.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "float",
+    "industry": null,
+    "region": "ca"
+  },
+  {
+    "name": "D2L",
+    "slug": "d2l",
+    "careers_url": "https://www.d2l.com/careers/",
+    "source_type": "greenhouse",
+    "source_identifier": "d2l",
+    "industry": null,
+    "region": "ca"
+  },
+  {
+    "name": "Upstart",
+    "slug": "upstart",
+    "careers_url": "https://careers.upstart.com/home",
+    "source_type": "greenhouse",
+    "source_identifier": "upstart",
+    "industry": null,
+    "region": "us"
+  },
+  {
+    "name": "NerdWallet",
+    "slug": "nerdwallet",
+    "careers_url": "https://www.nerdwallet.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "nerdwallet",
+    "industry": null,
+    "region": "us"
+  },
+  {
+    "name": "Greenlight",
+    "slug": "greenlight",
+    "careers_url": "https://greenlight.com/careers",
+    "source_type": "lever",
+    "source_identifier": "greenlight",
+    "industry": null,
+    "region": "us"
+  },
+  {
+    "name": "Step",
+    "slug": "step",
+    "careers_url": "https://step.com/careers",
+    "source_type": "greenhouse",
+    "source_identifier": "step",
+    "industry": null,
+    "region": "us"
+  },
+  {
+    "name": "Ripple",
+    "slug": "ripple",
+    "careers_url": "https://ripple.com/careers/",
+    "source_type": "greenhouse",
+    "source_identifier": "ripple",
+    "industry": null,
+    "region": "us"
+  },
+  {
+    "name": "Consensys",
+    "slug": "consensys",
+    "careers_url": "https://consensys.com/",
+    "source_type": "greenhouse",
+    "source_identifier": "consensys",
+    "industry": null,
+    "region": "us"
+  },
+  {
+    "name": "Alchemy",
+    "slug": "alchemy",
+    "careers_url": "https://www.alchemy.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "alchemy",
+    "industry": null,
+    "region": "us"
+  },
+  {
+    "name": "Phantom",
+    "slug": "phantom",
+    "careers_url": "https://phantom.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "phantom",
+    "industry": null,
+    "region": "us"
+  },
+  {
+    "name": "Leidos",
+    "slug": "leidos",
+    "careers_url": "https://www.leidos.com/careers",
+    "source_type": "workday",
+    "source_identifier": "leidos.wd5/External",
+    "industry": "Defense Technology",
+    "region": "us"
+  },
+  {
+    "name": "Analog Devices",
+    "slug": "analog-devices",
+    "careers_url": "https://analogdevices.wd1.myworkdayjobs.com/External",
+    "source_type": "workday",
+    "source_identifier": "analogdevices.wd1/External",
+    "industry": "Semiconductors",
+    "region": "us"
+  },
+  {
+    "name": "GE Vernova",
+    "slug": "ge-vernova",
+    "careers_url": "https://www.gevernova.com/careers",
+    "source_type": "workday",
+    "source_identifier": "gevernova.wd5/Vernova_ExternalSite",
+    "industry": "Energy Technology",
+    "region": "us"
+  },
+  {
+    "name": "Motorola Solutions",
+    "slug": "motorola-solutions",
+    "careers_url": "https://www.motorolasolutions.com/en_us/about/careers.html",
+    "source_type": "workday",
+    "source_identifier": "motorolasolutions.wd5/Careers",
+    "industry": "Communications",
+    "region": "us"
+  },
+  {
+    "name": "PwC",
+    "slug": "pwc",
+    "careers_url": "https://www.pwc.com/gx/en/careers.html",
+    "source_type": "workday",
+    "source_identifier": "pwc.wd3/Global_Experienced_Careers",
+    "industry": "Consulting",
+    "region": "us"
+  },
+  {
+    "name": "Cadence",
+    "slug": "cadence",
+    "careers_url": "https://www.cadence.com/en_US/home/company/careers.html",
+    "source_type": "workday",
+    "source_identifier": "cadence.wd1/External_Careers",
+    "industry": "Design Software",
+    "region": "us"
+  },
+  {
+    "name": "State Street",
+    "slug": "state-street",
+    "careers_url": "https://www.statestreet.com/careers",
+    "source_type": "workday",
+    "source_identifier": "statestreet.wd1/Global",
+    "industry": "Financial Technology",
+    "region": "us"
+  },
+  {
+    "name": "Boeing",
+    "slug": "boeing",
+    "careers_url": "https://jobs.boeing.com",
+    "source_type": "workday",
+    "source_identifier": "boeing.wd1/EXTERNAL_CAREERS",
+    "industry": "Aerospace",
+    "region": "us"
+  },
+  {
+    "name": "RELX",
+    "slug": "relx",
+    "careers_url": "https://www.relx.com/careers",
+    "source_type": "workday",
+    "source_identifier": "relx.wd3/RELX",
+    "industry": "Information Services",
+    "region": "us"
+  },
+  {
+    "name": "eBay",
+    "slug": "ebay",
+    "careers_url": "https://careers.ebayinc.com",
+    "source_type": "workday",
+    "source_identifier": "ebay.wd5/apply",
+    "industry": "Marketplaces",
+    "region": "us"
+  },
+  {
+    "name": "The Home Depot",
+    "slug": "the-home-depot",
+    "careers_url": "https://careers.homedepot.com",
+    "source_type": "workday",
+    "source_identifier": "homedepot.wd5/CareerDepot",
+    "industry": "Retail Technology",
+    "region": "us"
+  },
+  {
+    "name": "Target",
+    "slug": "target",
+    "careers_url": "https://corporate.target.com/careers",
+    "source_type": "workday",
+    "source_identifier": "target.wd5/targetcareers",
+    "industry": "Retail Technology",
+    "region": "us"
+  },
+  {
+    "name": "GE Aerospace",
+    "slug": "ge-aerospace",
+    "careers_url": "https://www.geaerospace.com/careers",
+    "source_type": "workday",
+    "source_identifier": "geaerospace.wd5/GE_ExternalSite",
+    "industry": "Aerospace",
+    "region": "us"
+  },
+  {
+    "name": "CVS Health",
+    "slug": "cvs-health",
+    "careers_url": "https://jobs.cvshealth.com",
+    "source_type": "workday",
+    "source_identifier": "cvshealth.wd1/CVS_Health_Careers",
+    "industry": "Health Technology",
+    "region": "us"
+  },
+  {
+    "name": "TD Bank",
+    "slug": "td-bank",
+    "careers_url": "https://jobs.td.com",
+    "source_type": "workday",
+    "source_identifier": "td.wd3/TD_Bank_Careers",
+    "industry": "Financial Technology",
+    "region": "us"
+  },
+  {
+    "name": "Vanguard",
+    "slug": "vanguard",
+    "careers_url": "https://www.vanguardjobs.com",
+    "source_type": "workday",
+    "source_identifier": "vanguard.wd5/vanguard_external",
+    "industry": "Financial Technology",
+    "region": "us"
+  },
+  {
+    "name": "Genesys",
+    "slug": "genesys",
+    "careers_url": "https://www.genesys.com/company/careers",
+    "source_type": "workday",
+    "source_identifier": "genesys.wd1/Genesys",
+    "industry": "Customer Experience Software",
+    "region": "us"
+  },
+  {
+    "name": "3M",
+    "slug": "3m",
+    "careers_url": "https://3m.wd1.myworkdayjobs.com/Search",
+    "source_type": "workday",
+    "source_identifier": "3m.wd1/Search",
+    "industry": "Industrial Technology",
+    "region": "us"
+  },
+  {
+    "name": "Manulife",
+    "slug": "manulife",
+    "careers_url": "https://www.manulife.com/en/careers.html",
+    "source_type": "workday",
+    "source_identifier": "manulife.wd3/MFCJH_Jobs",
+    "industry": "Financial Technology",
+    "region": "us"
+  },
+  {
+    "name": "Truist",
+    "slug": "truist",
+    "careers_url": "https://careers.truist.com",
+    "source_type": "workday",
+    "source_identifier": "truist.wd1/Careers",
+    "industry": "Financial Technology",
+    "region": "us"
+  },
+  {
+    "name": "Ciena",
+    "slug": "ciena",
+    "careers_url": "https://www.ciena.com/about/careers",
+    "source_type": "workday",
+    "source_identifier": "ciena.wd5/Careers",
+    "industry": "Networking",
+    "region": "us"
+  },
+  {
+    "name": "Lowe's",
+    "slug": "lowe-s",
+    "careers_url": "https://talent.lowes.com",
+    "source_type": "workday",
+    "source_identifier": "lowes.wd5/LWS_External_CS",
+    "industry": "Retail Technology",
+    "region": "us"
+  },
+  {
+    "name": "BMO",
+    "slug": "bmo",
+    "careers_url": "https://jobs.bmo.com",
+    "source_type": "workday",
+    "source_identifier": "bmo.wd3/External",
+    "industry": "Financial Technology",
+    "region": "us"
+  },
+  {
+    "name": "Equifax",
+    "slug": "equifax",
+    "careers_url": "https://careers.equifax.com",
+    "source_type": "workday",
+    "source_identifier": "equifax.wd5/External",
+    "industry": "Information Services",
+    "region": "us"
+  },
+  {
+    "name": "U.S. Bank",
+    "slug": "u-s-bank",
+    "careers_url": "https://careers.usbank.com",
+    "source_type": "workday",
+    "source_identifier": "usbank.wd1/US_Bank_Careers",
+    "industry": "Financial Technology",
+    "region": "us"
   }
 ]
