@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import argparse
 import sys
+import time
 from collections import Counter
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -34,10 +35,19 @@ SOURCES = {
 
 def fetch(base: str) -> tuple[list[dict], list[dict]]:
     with httpx.Client(base_url=base, timeout=90) as client:
-        companies = client.get("/api/companies").json()
+        def get(path: str, **params):
+            """The server limits each caller to about 120 requests a minute; wait when it says so."""
+            for _ in range(6):
+                resp = client.get(path, params=params)
+                if resp.status_code != 429:
+                    return resp.json()
+                time.sleep(float(resp.headers.get("retry-after", "15")))
+            raise SystemExit("the server kept answering 'too many requests'; try again in a minute")
+
+        companies = get("/api/companies")
         jobs, offset = [], 0
         while True:
-            page = client.get("/api/jobs", params={"limit": 200, "offset": offset}).json()
+            page = get("/api/jobs", limit=200, offset=offset)
             jobs += page["items"]
             offset += 200
             if offset >= page["total"]:
