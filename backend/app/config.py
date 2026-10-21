@@ -17,6 +17,11 @@ class Settings(BaseSettings):
     # which was an unreliable way to trigger real background work from a 3rd-party watchdog.
     AUTO_SYNC_INTERVAL_HOURS: float = 2
 
+    # "light" (the default, for the free server): skip the heavy sources (Workday's many searches) and read fewer Arbeitnow pages.
+    # "full" (the scheduled snapshot job on GitHub Actions, which costs the server nothing): read everything. The server restores
+    # that snapshot whenever it starts, so heavy sources stay fresh without the server crawling them.
+    CRAWL_PROFILE: str = "light"
+
     # Jobs posted longer ago than this are never stored or shown (stale/ghost listings; keeps the DB small).
     MAX_JOB_AGE_DAYS: int = 60
 

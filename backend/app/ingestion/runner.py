@@ -349,11 +349,14 @@ async def sync_all_sources(company_id_filter: int | None = None, include_aggrega
         }
 
         # 1. Company ATS Sync in controlled batches of 10
-        query = """
+        # Workday costs about ten requests per employer; on the free server those come from the restored snapshot instead.
+        heavy = ("workday",) if settings.CRAWL_PROFILE != "full" else ()
+        sources = [t for t in ('greenhouse', 'lever', 'ashby', 'workday', 'amazon', 'custom',
+                               'smartrecruiters', 'workable', 'recruitee', 'teamtailor', 'personio') if t not in heavy]
+        query = f"""
             SELECT * FROM companies
             WHERE is_active = 1
-              AND source_type IN ('greenhouse', 'lever', 'ashby', 'workday', 'amazon', 'custom',
-                                'smartrecruiters', 'workable', 'recruitee', 'teamtailor', 'personio')
+              AND source_type IN ({",".join("'" + t + "'" for t in sources)})
         """
         params = []
         if company_id_filter:

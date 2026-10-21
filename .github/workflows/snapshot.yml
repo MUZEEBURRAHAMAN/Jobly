@@ -6,7 +6,7 @@ name: Publish job snapshot
 # To stop it: disable this workflow in the repo's Actions tab, or delete this file.
 on:
   schedule:
-    - cron: "17 */6 * * *"        # every 6 hours
+    - cron: "17 */4 * * *"        # every 4 hours
   workflow_dispatch: {}
 
 permissions:
@@ -32,6 +32,7 @@ jobs:
         env:
           DATABASE_PATH: ${{ runner.temp }}/jobly.db
           SNAPSHOT_REPO: ""        # don't try to restore while building
+          CRAWL_PROFILE: full      # read everything here, so the free server doesn't have to (it restores this snapshot)
         run: python -m backend.app.snapshot build jobly.db.gz
       - name: Publish release asset
         env:

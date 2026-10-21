@@ -13,12 +13,13 @@ from email.utils import parsedate_to_datetime
 from typing import Any
 import httpx
 import feedparser
+from ..config import settings
 from ..matching import classify_role
 from .base import NormalizedJob, clean_text
 
 logger = logging.getLogger(__name__)
 
-ARBEITNOW_PAGES = 6
+ARBEITNOW_PAGES = 6        # the full crawl; the light profile (the free server) reads 2
 HEADERS = {"User-Agent": "Mozilla/5.0 (compatible; HiringRadar/1.0; +https://hiringradar.app)"}
 
 
@@ -114,7 +115,7 @@ async def fetch_arbeitnow_jobs(client: httpx.AsyncClient | None = None) -> list[
 
     try:
         data: list[dict] = []
-        for page in range(1, ARBEITNOW_PAGES + 1):
+        for page in range(1, (ARBEITNOW_PAGES if settings.CRAWL_PROFILE == "full" else 2) + 1):
             resp = await client.get(f"https://www.arbeitnow.com/api/job-board-api?page={page}", headers=HEADERS)
             if resp.status_code != 200:
                 logger.warning(f"[Arbeitnow] HTTP {resp.status_code} on page {page}")

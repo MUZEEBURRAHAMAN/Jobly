@@ -3,7 +3,7 @@ import tempfile
 import unittest
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
-from unittest.mock import patch
+from unittest.mock import AsyncMock, patch
 
 from backend.app.config import settings
 from backend.app.db import get_db_connection, get_utc_now, init_db
@@ -22,6 +22,24 @@ class TestBootstrap(unittest.IsolatedAsyncioTestCase):
     async def asyncTearDown(self):
         self._patch.stop()
         self._tmp.cleanup()
+
+    async def test_light_crawl_skips_workday_and_full_crawl_reads_it(self):
+        from backend.app.ingestion import runner
+        now = get_utc_now()
+        async with get_db_connection() as db:
+            for name, src in [("Big Co", "workday"), ("Small Co", "greenhouse")]:
+                await db.execute("INSERT INTO companies (name, slug, careers_url, source_type, source_identifier, is_active, created_at, updated_at) VALUES (?,?,?,?,?,1,?,?)",
+                                 (name, name.lower().replace(" ", "-"), "https://example.com", src, "x", now, now))
+            await db.commit()
+        for profile, expected in [("light", ["Small Co"]), ("full", ["Big Co", "Small Co"])]:
+            seen = []
+
+            async def fake(company, client, seen=seen):
+                seen.append(company["name"]); return company, [], None
+
+            with patch.object(settings, "CRAWL_PROFILE", profile), patch.object(runner, "fetch_company_jobs", AsyncMock(side_effect=fake)):
+                await runner.sync_all_sources(include_aggregators=False)
+            self.assertEqual(sorted(seen), expected, profile)
 
     async def test_retired_boards_and_sources_are_removed_with_their_jobs(self):
         now = get_utc_now()
