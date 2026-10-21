@@ -9,3 +9,5 @@
 - Boards that close are reported by `scripts/verify_employers.py --recheck`. Remove them here and add the slug to
   `RETIRED_COMPANY_SLUGS` in `backend/app/seed.py` so their old jobs are deleted too.
 - Heavy sources (Workday) are read only by the scheduled snapshot job (`CRAWL_PROFILE=full`); the server restores its snapshot.
+
+Last employer-list update: 2026-10-21
