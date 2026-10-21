@@ -48,6 +48,7 @@ async def health():
         "timestamp": get_utc_now(),
         # What the boot-time warm start did (no secrets): lets us see a missing setting without access to the host's logs
         "snapshot": dict(restore_status),
+        "crawl_profile": settings.CRAWL_PROFILE,
     }
 
 def _like(term: str) -> str:
