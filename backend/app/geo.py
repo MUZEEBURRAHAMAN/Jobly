@@ -6,8 +6,11 @@ Locations are written by employers, so this is a best effort: a location it can'
 """
 from __future__ import annotations
 
+import json
 import re
+import unicodedata
 from functools import lru_cache
+from pathlib import Path
 
 # country -> (latitude, longitude of a point inside it, keywords). Keywords are matched as whole words, lowercase.
 COUNTRIES: dict[str, tuple[float, float, tuple[str, ...]]] = {
@@ -147,7 +150,7 @@ _CODE_RX = re.compile(r",\s*(?:" + "|".join(STATE_CODES) + r")\b")
 def place_of(location: str | None) -> tuple[str | None, str | None]:
     """(country, hub name) for a location, or (None, None) when it can't be placed."""
     raw = location or ""
-    text = raw.lower().strip()
+    text = raw.lower().strip().replace("porto alegre", "brazil")   # "porto" alone is Portugal
     if not text:
         return None, None
     for hub, rx in _HUB_RX:
@@ -158,4 +161,96 @@ def place_of(location: str | None) -> tuple[str | None, str | None]:
             return name, None
     if _CODE_RX.search(raw) or _STATE_RX.search(text):
         return "United States", None
+    return None, None
+
+
+# ---------------------------------------------------------------------------------------------------------------------
+# Wider matching from data/world.json (GeoNames, CC BY 4.0; built by scripts/make_geo_data.py): every country, and cities whose
+# name is unambiguous. Loaded the first time it is needed.
+_WORLD_FILE = Path(__file__).parent / "data" / "world.json"
+_WORLD: dict | None = None
+_GENERIC = re.compile(r"\b(remote(ly)?|hybrid|on[- ]?site|in[- ]office|office|hq|headquarters|based|eligible|home|worldwide|global|anywhere|work from|wfh|metro|area|region|city)\b")
+# Country names that are far more often something else in job data (the US state of Georgia, Jersey City, ...)
+_AMBIGUOUS_NAMES = {"georgia", "jersey", "guinea", "niger", "chad", "turkey", "mali", "oman", "peru"}
+# US state codes that are not also a word or a country code ("IN", "ID", "DE", "OR", "ME", "OK" are left out)
+_STATE_CODES_SAFE = {"AL", "AK", "AZ", "CA", "CO", "CT", "FL", "GA", "IL", "KY", "LA", "MA", "MD", "MI", "MN", "MO", "NC", "NJ", "NV", "NY", "OH", "PA", "SC", "TN", "TX", "UT", "VA", "WA", "WI"}
+_ISO3_SKIP = {"AND", "ARE", "CAN", "MAR", "NOR", "PER", "SUN", "TOP", "NEW", "PAR"}
+
+
+def _world() -> dict:
+    global _WORLD
+    if _WORLD is None:
+        raw = json.loads(_WORLD_FILE.read_text(encoding="utf-8")) if _WORLD_FILE.exists() else {"countries": {}, "cities": {}, "aliases": {}}
+        by_name = {c["name"].lower(): iso for iso, c in raw["countries"].items()}
+        iso3 = {c["iso3"]: c["name"] for c in raw["countries"].values() if c["iso3"] not in _ISO3_SKIP}
+        name_of = {iso: c["name"] for iso, c in raw["countries"].items()}
+        aliases = {alias: name_of[iso] for alias, iso in raw["aliases"].items() if iso in name_of}
+        _WORLD = {"raw": raw, "by_name": {n: name_of[i] for n, i in by_name.items()} | aliases, "iso3": iso3,
+                  "cities": {c: name_of[i] for c, i in raw["cities"].items() if i in name_of}}
+    return _WORLD
+
+
+def country_point(country: str) -> tuple[float, float]:
+    """A latitude and longitude inside a country, for the map."""
+    if country in COUNTRIES:
+        return COUNTRIES[country][0], COUNTRIES[country][1]
+    for c in _world()["raw"]["countries"].values():
+        if c["name"] == country:
+            return c["lat"], c["lng"]
+    return 0.0, 0.0
+
+
+def _fold(text: str) -> str:
+    text = unicodedata.normalize("NFKD", text).encode("ascii", "ignore").decode().lower()
+    return re.sub(r"\s+", " ", re.sub(r"[^a-z0-9' ]", " ", text)).strip()
+
+
+def _grams(words: list[str], longest: int = 4):
+    for n in range(longest, 0, -1):
+        for i in range(len(words) - n + 1):
+            yield " ".join(words[i:i + n])
+
+
+@lru_cache(maxsize=8192)
+def place_in_text(text: str | None, strict: bool = False) -> str | None:
+    """The country named in a piece of free text: a country name, "US"/"UK", a three-letter code ("IND-Trivandrum") or an unambiguous
+    city. `strict` (for job titles, where "SWE-3", "GTM" or "Media" must not read as Sweden, Guatemala or Algeria) accepts only a
+    country name or "US"/"UK". None when the text names none."""
+    raw = text or ""
+    if not raw.strip():
+        return None
+    world = _world()
+    for token in re.findall(r"\b[A-Z]{2,3}\b", raw):   # codes only count when written in capitals
+        if token in ("US", "UK"):
+            return "United States" if token == "US" else "United Kingdom"
+        if not strict and token in _STATE_CODES_SAFE:   # "McLean VA", "Malvern PA"
+            return "United States"
+        if not strict and token in world["iso3"]:
+            return world["iso3"][token]
+    words = _fold(_GENERIC.sub(" ", raw.lower())).split()
+    for gram in _grams(words):
+        if gram in world["by_name"] and gram not in _AMBIGUOUS_NAMES:
+            return world["by_name"][gram]
+    if not strict:
+        for gram in _grams(words, 3):
+            if gram in world["cities"]:
+                return world["cities"][gram]
+    return None
+
+
+def place_of_job(location: str | None, title: str | None = None) -> tuple[str | None, str | None]:
+    """(country, hub) for a job: its location text first, then the wider country and city match, then a country named at the end of
+    the title ("Product Designer - Germany", "Engineer (Canada)")."""
+    country, hub = place_of(location)
+    if country:
+        return country, hub
+    country = place_in_text(location)
+    if country:
+        return country, None
+    if title:
+        tail = re.split(r"\s[-–—|]\s|[(),|:]", title)[-3:]
+        for segment in reversed(tail):
+            country = place_in_text(segment, strict=True)
+            if country:
+                return country, None
     return None, None

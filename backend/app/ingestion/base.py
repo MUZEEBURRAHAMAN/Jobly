@@ -101,3 +101,15 @@ def normalize_posted_at(value: Any, now: datetime | None = None) -> str | None:
     if dt < _EARLIEST:
         return None
     return dt.isoformat()
+
+
+def with_places(primary: str | None, *extras: str | None) -> str | None:
+    """A job's location text, with the places the source also gives us added when the main text names no country
+    ("Remote" + secondary locations ["Australia", "Singapore"] -> "Remote, Australia, Singapore")."""
+    from ..geo import place_of_job  # imported here: geo reads a data file, and most callers never need it
+    primary = clean_text(primary)
+    if primary and place_of_job(primary)[0]:
+        return primary
+    more = [clean_text(e) for e in extras if clean_text(e)]
+    more = list(dict.fromkeys(more))[:3]
+    return ", ".join(([primary] if primary else []) + more) or None

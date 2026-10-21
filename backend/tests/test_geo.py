@@ -102,3 +102,42 @@ class TestGeoEndpoint(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(stats["tech_jobs_today"], stats["new_jobs_today"] - 1)
         self.assertGreaterEqual(stats["tech_jobs_week"], stats["tech_jobs_today"])
         self.assertLessEqual(stats["tech_jobs_week"], stats["tech_jobs"])
+
+
+class TestWiderMatching(unittest.TestCase):
+    """Countries and unambiguous cities beyond the hand-made list, in a job's location text and at the end of its title."""
+
+    def test_location_text(self):
+        from backend.app.geo import place_of_job
+        cases = {
+            "US, Remote": "United States", "Remote Eligible, US": "United States", "IND-Trivandrum-Equifax Analytics-PEC": "India",
+            "HSINCHU": "Taiwan", "Ljubljana, Slovenia": "Slovenia", "Makati City": "Philippines", "Yerevan": "Armenia", "Edmonton": "Canada",
+            "Vancouver, British Columbia, CAN": "Canada", "Sydney, New South Wales, Australia": "Australia", "Porto Alegre, Rio Grande do Sul, Brazil": "Brazil",
+            "Amsterdam": "Netherlands", "McLean VA": "United States", "IL   Work from home": "United States",
+        }
+        for text, country in cases.items():
+            self.assertEqual(place_of_job(text)[0], country, text)
+
+    def test_ambiguous_or_placeless_text_is_left_alone(self):
+        from backend.app.geo import place_of_job
+        for text in ["Cambridge", "Remote", "Hybrid", "Global", "Europe", "2 Locations", "Mobile", "Design", "Home based - Worldwide", "Product", ""]:
+            self.assertEqual(place_of_job(text)[0], None, text)
+
+    def test_the_end_of_a_title_can_name_a_country_but_abbreviations_cannot(self):
+        from backend.app.geo import place_of_job
+        self.assertEqual(place_of_job("Remote", "Product Designer - Germany")[0], "Germany")
+        self.assertEqual(place_of_job("Remote", "Engineer (Canada)")[0], "Canada")
+        for title in ["Senior AI Engineer (SWE-3)", "Product Manager, GTM Engineering", "Staff Engineer, Retail Media & Audiences", "Platform Engineer, Systems"]:
+            self.assertEqual(place_of_job("Remote", title)[0], None, title)
+        self.assertEqual(place_of_job("Toronto", "Engineer - Germany")[0], "Canada")   # a real location beats the title
+
+    def test_every_country_the_map_can_show_has_a_point(self):
+        from backend.app.geo import country_point
+        for country in ("United States", "Slovenia", "Armenia", "Philippines", "Taiwan"):
+            lat, lng = country_point(country)
+            self.assertTrue((lat, lng) != (0.0, 0.0) and -90 <= lat <= 90 and -180 <= lng <= 180, country)
+
+    def test_hand_made_countries_use_the_same_names_as_the_world_table(self):
+        from backend.app.geo import COUNTRIES, _world
+        names = {c["name"] for c in _world()["raw"]["countries"].values()}
+        self.assertEqual([c for c in COUNTRIES if c not in names], [])

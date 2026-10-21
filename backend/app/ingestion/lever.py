@@ -1,6 +1,6 @@
 import httpx
 import logging
-from .base import NormalizedJob, clean_text
+from .base import NormalizedJob, clean_text, with_places
 
 logger = logging.getLogger(__name__)
 
@@ -37,7 +37,7 @@ async def fetch_lever_jobs(
             external_id = str(item.get("id"))
             app_url = item.get("hostedUrl") or item.get("applyUrl") or f"https://jobs.lever.co/{site_name}/{external_id}"
             categories = item.get("categories") or {}
-            location = clean_text(categories.get("location"))
+            location = with_places(categories.get("location"), *(categories.get("allLocations") or []))
 
             normalized.append(
                 NormalizedJob(
@@ -46,7 +46,7 @@ async def fetch_lever_jobs(
                     external_id=external_id,
                     title=title,
                     application_url=app_url,
-                    location=location or None,
+                    location=location,
                     description=clean_text(item.get("descriptionPlain")),
                     source_updated_at=item.get("createdAt"),
                     raw_data={

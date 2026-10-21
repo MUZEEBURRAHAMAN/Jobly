@@ -20,7 +20,7 @@ from pathlib import Path
 import httpx
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from backend.app.geo import place_of  # noqa: E402
+from backend.app.geo import place_of_job  # noqa: E402
 
 ROLES = {
     "product_design": "Product design", "frontend_engineering": "Frontend engineering", "product_management": "Product management",
@@ -59,7 +59,7 @@ def report(companies: list[dict], jobs: list[dict], now: datetime) -> str:
         return bool(job.get("posted_at")) and now - datetime.fromisoformat(job["posted_at"]) <= timedelta(days=days)
 
     for j in jobs:
-        j["country"] = place_of(j["location"])[0]
+        j["country"] = place_of_job(j["location"], j["title"])[0]
     role_jobs = [j for j in jobs if j["normalized_role"] in ROLES]
     n = lambda it: sum(1 for _ in it)  # noqa: E731
     out = [f"# Jobly coverage, {now:%Y-%m-%d %H:%M} UTC", ""]

@@ -130,3 +130,31 @@ class TestPersonio(unittest.IsolatedAsyncioTestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestLocationsFromSources(unittest.IsolatedAsyncioTestCase):
+    async def test_workday_uses_the_link_for_n_locations(self):
+        from backend.app.ingestion.workday import fetch_workday_jobs
+        rows = [{"title": "Senior Software Engineer", "externalPath": "/job/Israel-Raanana/Senior-Software-Engineer_R1", "locationsText": "2 Locations", "postedOn": "Posted Today"},
+                {"title": "Software Engineer", "externalPath": "/job/US-CA-Santa-Clara/Software-Engineer_R2", "locationsText": "3 Locations", "postedOn": "Posted Today"},
+                {"title": "Software Engineer II", "externalPath": "/job/Pune/Software-Engineer-II_R3", "locationsText": "Pune, India", "postedOn": "Posted Today"}]
+        handler = lambda r: httpx.Response(200, json={"total": 3, "jobPostings": rows})
+        async with client(handler) as c:
+            jobs = await fetch_workday_jobs("acme.wd1/External", "Acme", c, queries=("software engineer",))
+        self.assertEqual({j.external_id: j.location for j in jobs}, {"R1": "Israel Raanana", "R2": "US CA Santa Clara", "R3": "Pune, India"})
+
+    async def test_ashby_adds_secondary_locations_to_a_bare_remote(self):
+        from backend.app.ingestion.ashby import fetch_ashby_jobs
+        payload = {"jobs": [{"id": "1", "title": "Engineer", "location": "Remote", "jobUrl": "https://jobs.ashbyhq.com/x/1", "publishedAt": "2026-10-01T00:00:00Z",
+                             "secondaryLocations": [{"location": "Australia"}, {"location": "Singapore"}], "address": {"postalAddress": {}}},
+                            {"id": "2", "title": "Designer", "location": "London, United Kingdom", "jobUrl": "https://jobs.ashbyhq.com/x/2", "secondaryLocations": [{"location": "Paris"}]}]}
+        async with client(lambda r: httpx.Response(200, json=payload)) as c:
+            jobs = await fetch_ashby_jobs("x", "X", c)
+        self.assertEqual([j.location for j in jobs], ["Remote, Australia, Singapore", "London, United Kingdom"])
+
+    async def test_lever_adds_all_locations_to_a_bare_remote(self):
+        from backend.app.ingestion.lever import fetch_lever_jobs
+        payload = [{"id": "a", "text": "Engineer", "hostedUrl": "https://jobs.lever.co/x/a", "categories": {"location": "Remote", "allLocations": ["Germany", "Spain"]}}]
+        async with client(lambda r: httpx.Response(200, json=payload)) as c:
+            jobs = await fetch_lever_jobs("x", "X", c)
+        self.assertEqual(jobs[0].location, "Remote, Germany, Spain")

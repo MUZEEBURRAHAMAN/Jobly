@@ -24,7 +24,7 @@ import httpx
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
-from backend.app.geo import place_of  # noqa: E402
+from backend.app.geo import place_of_job  # noqa: E402
 from backend.app.ingestion.ashby import fetch_ashby_jobs  # noqa: E402
 from backend.app.ingestion.greenhouse import fetch_greenhouse_jobs  # noqa: E402
 from backend.app.ingestion.lever import fetch_lever_jobs  # noqa: E402
@@ -81,7 +81,7 @@ def same_company(candidate: str, board_name: str | None) -> bool:
 def score(jobs) -> dict:
     mine = [(j, classify_role(j.title, j.normalized_role)) for j in jobs]
     role = [j for j, r in mine if r]
-    countries = Counter(place_of(j.location)[0] for j in role)
+    countries = Counter(place_of_job(j.location, j.title)[0] for j in role)
     outside = sum(n for c, n in countries.items() if c and c != "United States")
     return {"jobs": len(jobs), "role": len(role), "outside": outside, "countries": [(c or "not stated", n) for c, n in countries.most_common(4)]}
 

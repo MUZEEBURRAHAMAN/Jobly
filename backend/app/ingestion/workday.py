@@ -1,4 +1,5 @@
 import logging
+import re
 from typing import Any
 import httpx
 from ..matching import classify_role
@@ -100,6 +101,9 @@ async def _search(client, endpoint, base_host, site_id, company_name, query, max
                     ext_id = str(hash(title + app_url))
 
                 location = item.get("locationsText")
+                if location and re.match(r"^\d+ locations?$", location.strip(), re.I) and ext_path.count("/") >= 3:
+                    # "2 Locations" says nothing; the link names the first one: /job/US-CA-Santa-Clara/Title_R1
+                    location = ext_path.split("/")[2].replace("-", " ")
                 posted_on = item.get("postedOn")
 
                 if ext_id in seen:

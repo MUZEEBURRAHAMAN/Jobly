@@ -1,6 +1,6 @@
 import httpx
 import logging
-from .base import NormalizedJob, clean_text
+from .base import NormalizedJob, clean_text, with_places
 
 logger = logging.getLogger(__name__)
 
@@ -37,7 +37,9 @@ async def fetch_ashby_jobs(
 
             external_id = str(item.get("id") or item.get("jobUrl") or title)
             app_url = item.get("jobUrl") or f"https://jobs.ashbyhq.com/{board_name}/{external_id}"
-            location = clean_text(item.get("location"))
+            postal = ((item.get("address") or {}).get("postalAddress") or {})
+            extras = [postal.get("addressCountry")] + [x.get("location") for x in (item.get("secondaryLocations") or [])]
+            location = with_places(item.get("location"), *extras)
 
             normalized.append(
                 NormalizedJob(
@@ -46,7 +48,7 @@ async def fetch_ashby_jobs(
                     external_id=external_id,
                     title=title,
                     application_url=app_url,
-                    location=location or None,
+                    location=location,
                     description=clean_text(item.get("descriptionPlain")),
                     source_updated_at=item.get("publishedAt"),
                     raw_data={

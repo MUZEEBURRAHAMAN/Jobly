@@ -113,14 +113,12 @@ async def fetch_wwr_jobs() -> list[NormalizedJob]:
                 # Description from RSS summary (often contains HTML)
                 description = clean_text(entry.get("summary", ""))[:1000]
 
-                # Location tag — WWR usually says "Anywhere" or a region
-                location_tag = ""
-                for tag in entry.get("tags", []):
-                    term = tag.get("term", "")
-                    if term and term.lower() not in ("job", ""):
-                        location_tag = term
-                        break
-                location = location_tag or "Remote / Anywhere"
+                # Where the job is: the listing's own country (with a flag emoji in front), then the region. The old "tags" held
+                # the category ("Design", "Full-Stack Programming"), which is not a place.
+                country = re.sub(r"^[^\w(]+", "", entry.get("country", "") or "").strip()
+                state = (entry.get("state", "") or "").strip()
+                region = (entry.get("region", "") or "").strip()
+                location = ", ".join(x for x in (state, country) if x) or region or "Remote / Anywhere"
 
                 all_jobs.append(
                     NormalizedJob(

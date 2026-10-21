@@ -42,7 +42,7 @@ We may block traffic that does this. If you'd like to build something on Jobly's
 
 The Jobly name, logo, extension and website belong to their maker. You may use them to find jobs; please don't copy, resell or rebrand them.
 
-Jobly is built with work by others: the Switzer typeface by Indian Type Foundry (ITF Free Font License), icons from Hugeicons (MIT license) and illustrations from hairline.
+Jobly is built with work by others: the Switzer typeface by Indian Type Foundry (ITF Free Font License), icons from Hugeicons (MIT license), illustrations from hairline, and place names from [GeoNames](https://www.geonames.org), licensed under [Creative Commons Attribution 4.0](https://creativecommons.org/licenses/by/4.0/).
 
 ## Changes to these terms
 

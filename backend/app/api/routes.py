@@ -17,7 +17,7 @@ from ..schemas import (
     PreferencesSchema, StatsOut, GeoOut, GeoPlace, GeoCountry
 )
 from ..matching import matches_preferences
-from ..geo import COUNTRIES, HUBS, place_of
+from ..geo import HUBS, country_point, place_of_job
 from ..ingestion.runner import sync_all_sources
 from ..ingestion.runner import age_cutoff_iso
 from ..security import UnsafeURL, require_admin, validate_public_url
@@ -536,7 +536,7 @@ async def get_geo():
     window = age_cutoff_iso(settings.MAX_JOB_AGE_DAYS)
     async with get_db_connection() as db:
         cur = await db.execute(
-            "SELECT location, normalized_role, company_id FROM jobs "
+            "SELECT location, title, normalized_role, company_id FROM jobs "
             "WHERE status = 'active' AND normalized_role IS NOT NULL AND (posted_at IS NULL OR posted_at >= ?)",
             (window,),
         )
@@ -552,7 +552,7 @@ async def get_geo():
     for row in rows:
         role, firm = row["normalized_role"], row["company_id"]
         roles[role] = roles.get(role, 0) + 1
-        country, hub = place_of(row["location"])
+        country, hub = place_of_job(row["location"], row["title"])
         if country is None:
             unplaced += 1
             continue
@@ -566,7 +566,7 @@ async def get_geo():
 
     places = []
     for (kind, name, country), by_role in place_roles.items():
-        lat, lng = (hubs[name][2], hubs[name][3]) if kind == "hub" else COUNTRIES[country][:2]
+        lat, lng = (hubs[name][2], hubs[name][3]) if kind == "hub" else country_point(country)
         places.append(GeoPlace(name=name, kind=kind, country=country, lat=lat, lng=lng, jobs=sum(by_role.values()),
                                employers=len(place_firms[(kind, name, country)]), roles=by_role))
     places.sort(key=lambda p: -p.jobs)
