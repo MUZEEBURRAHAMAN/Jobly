@@ -152,6 +152,14 @@ class TestLocationsFromSources(unittest.IsolatedAsyncioTestCase):
             jobs = await fetch_ashby_jobs("x", "X", c)
         self.assertEqual([j.location for j in jobs], ["Remote, Australia, Singapore", "London, United Kingdom"])
 
+    async def test_ashby_skips_unlisted_postings(self):
+        from backend.app.ingestion.ashby import fetch_ashby_jobs
+        payload = {"jobs": [{"id": "1", "title": "Listed", "location": "Berlin, Germany", "jobUrl": "https://jobs.ashbyhq.com/x/1", "isListed": True},
+                            {"id": "2", "title": "Hidden", "location": "Berlin, Germany", "jobUrl": "https://jobs.ashbyhq.com/x/2", "isListed": False}]}
+        async with client(lambda r: httpx.Response(200, json=payload)) as c:
+            jobs = await fetch_ashby_jobs("x", "X", c)
+        self.assertEqual([j.title for j in jobs], ["Listed"])
+
     async def test_lever_adds_all_locations_to_a_bare_remote(self):
         from backend.app.ingestion.lever import fetch_lever_jobs
         payload = [{"id": "a", "text": "Engineer", "hostedUrl": "https://jobs.lever.co/x/a", "categories": {"location": "Remote", "allLocations": ["Germany", "Spain"]}}]

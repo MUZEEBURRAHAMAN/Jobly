@@ -22,6 +22,10 @@ Jobly collects public job postings from company career pages and job boards and 
 - Listings can be wrong, out of date or already filled. Jobly hides anything older than 60 days and removes jobs the employer no longer lists, but it can't promise that every listing is current. Always check the employer's own page.
 - If a listing looks like a scam or is clearly wrong, use **Report this listing** in the extension or [write to us](/support).
 
+### If you are an employer
+
+Jobly shows jobs that employers publish on their own public job boards. If a listing is wrong, or you would rather it wasn't shown, write to us with the link and we will correct or remove it. Taking the job off your own careers page also removes it from Jobly at the next refresh, within a few hours.
+
 ## Free, with no guarantees
 
 Jobly is free and has no paid tier. The server runs on a free hosting plan, so it can be slow to wake up or briefly unavailable. We may change, pause or end any part of the service.

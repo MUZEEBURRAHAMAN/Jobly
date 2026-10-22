@@ -2,7 +2,7 @@
 title: Privacy policy
 eyebrow: Privacy
 description: What Jobly keeps on your device, what it sends to its server, and what it never collects. No account, no analytics, no tracking.
-updated: 2026-10-18
+updated: 2026-10-22
 figure: padlock
 ---
 
@@ -45,7 +45,9 @@ Two forms on this site send us a message. Both are optional and both are handled
 - **Support form:** your email address and your message, plus your name if you give it. We use them only to reply.
 - **Uninstall feedback:** after you uninstall the extension, Chrome opens a short page asking why. The reason you pick and any note you type are sent. It asks for no email and the page has no identifier linking it to you.
 
-We delete form messages once we have dealt with them, and at the latest after 12 months.
+Netlify also records the IP address of whoever submits a form. It uses it against spam, we can't switch it off, and it is stored with the message.
+
+We delete form messages once we have dealt with them, and at the latest after 12 months. Deleting is done by hand, so if you'd like your message removed sooner, write to us and we will.
 
 ## What we never do
 
@@ -59,9 +61,17 @@ We delete form messages once we have dealt with them, and at the latest after 12
 | Service | Why | What it can see |
 | --- | --- | --- |
 | Render (hosting) and Cloudflare (network) | Runs Jobly's server | Short-lived technical logs such as IP address, time and the address requested (which can include your search words) |
-| Netlify | Hosts this website and its forms | Technical logs, and what you type into a form |
+| Netlify | Hosts this website and its forms | Technical logs including IP address, and what you type into a form together with the IP address it came from |
 | Google favicon service (t2.gstatic.com) | Shows company logos in the extension | The company domains your browser asks logos for, and your IP address |
 | Chrome Web Store and your Google account | Installing and updating the extension, syncing the theme | Covered by Google's own policies |
+
+## Where your data goes
+
+Jobly's server (Render, with Cloudflare in front) and this website (Netlify) run in the United States, so requests from other countries cross borders. Netlify says it relies on the EU-U.S. Data Privacy Framework and the European Commission's standard contractual clauses for such transfers. Almost nothing that identifies you is stored: your preferences stay in your browser, and the only things we keep are messages you choose to send us.
+
+## Your rights
+
+You can ask us what we hold about you, to correct it, or to delete it. Because we keep so little (only the messages you send through the forms), this usually means finding and removing a message. Write to the address below and we will answer within 30 days. If you are in the EU or UK you can also complain to your data protection authority.
 
 ## Permissions the extension asks for
 

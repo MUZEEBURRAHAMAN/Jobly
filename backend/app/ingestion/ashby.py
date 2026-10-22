@@ -32,7 +32,7 @@ async def fetch_ashby_jobs(
         normalized: list[NormalizedJob] = []
         for item in raw_jobs:
             title = clean_text(item.get("title"))
-            if not title:
+            if not title or item.get("isListed") is False:   # unlisted postings are meant to be reached by direct link only
                 continue
 
             external_id = str(item.get("id") or item.get("jobUrl") or title)
