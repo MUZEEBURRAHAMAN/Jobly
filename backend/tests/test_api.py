@@ -244,6 +244,30 @@ class TestWrites(APITestCase):
             self.assertEqual(ok.json()["status"], "completed")
 
 
+class TestPublicSyncIsRare(APITestCase):
+    """A stranger pressing Refresh over and over must not be able to make the free server crawl over and over."""
+
+    async def test_no_crawl_while_data_is_fresh_and_one_per_cooldown_otherwise(self):
+        from backend.app.api import routes
+        from backend.app.config import settings
+        started = []
+
+        async def fake_sync():
+            started.append(1)
+
+        with patch.object(routes, "_guarded_sync_once", fake_sync):
+            routes._last_sync_timestamp = 0.0
+            # the seeded jobs were just seen: the data is fresh, so nothing is started
+            fresh = (await self.client.post("/api/sync")).json()
+            self.assertEqual((fresh["status"], started), ("cached", []))
+            # with a zero cooldown the data counts as stale: one crawl starts, the next press is refused
+            with patch.object(settings, "PUBLIC_SYNC_COOLDOWN_SECONDS", 0):
+                self.assertEqual((await self.client.post("/api/sync")).json()["status"], "enqueued")
+            routes._last_sync_timestamp = routes.time.time()
+            self.assertEqual((await self.client.post("/api/sync")).json()["status"], "cached")
+        routes._last_sync_timestamp = 0.0
+
+
 class TestCompanyManagement(APITestCase):
     payload = {"name": "Initech", "source_type": "custom", "source_identifier": "initech",
                "careers_url": "http://93.184.216.34/jobs"}

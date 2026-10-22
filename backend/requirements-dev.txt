@@ -1,2 +1,3 @@
 pytest>=8.0
 geonamescache
+pillow>=13.0.0   # screenshots and icons only (extension/e2e, scripts/): the server does not import it

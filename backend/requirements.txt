@@ -3,7 +3,6 @@ aiosqlite==0.22.1
 fastapi==0.143.3
 feedparser==6.0.14
 httpx==0.28.1
-pillow==12.3.0
 pydantic-settings==2.16.0
 pydantic==2.14.1
 python-dateutil==2.9.0.post0

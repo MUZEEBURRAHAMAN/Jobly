@@ -29,7 +29,6 @@ router = APIRouter()
 # Global lock & cooldown to protect low-RAM instances from concurrent OOM spikes
 _sync_lock = asyncio.Lock()
 _last_sync_timestamp: float = 0.0
-SYNC_COOLDOWN_SECONDS = 180  # 3 minutes cooldown between background syncs
 
 _periodic_sync_task: asyncio.Task | None = None
 
@@ -457,13 +456,20 @@ async def trigger_sync(
         }
 
     now_ts = time.time()
-    # Enforce a 3-minute cooldown between background syncs to avoid overloading low-RAM containers
-    if not wait_for_completion and (now_ts - _last_sync_timestamp < SYNC_COOLDOWN_SECONDS):
-        remaining = int(SYNC_COOLDOWN_SECONDS - (now_ts - _last_sync_timestamp))
+    # Public crawls are rare: one per cooldown for the whole server, and none while the data is already that fresh.
+    # (A crawl loads a free 512 MB server and every employer's job board, so a stranger must not be able to repeat it.)
+    cooldown = settings.PUBLIC_SYNC_COOLDOWN_SECONDS
+    if not wait_for_completion and (now_ts - _last_sync_timestamp < cooldown):
+        remaining = int(cooldown - (now_ts - _last_sync_timestamp))
         return {
             "status": "cached",
             "message": f"Sync was recently performed. Next background sync available in {remaining}s."
         }
+    if not wait_for_completion:
+        async with get_db_connection() as db:
+            newest = (await (await db.execute("SELECT MAX(last_seen_at) AS t FROM jobs")).fetchone())["t"]
+        if newest and datetime.now(timezone.utc) - datetime.fromisoformat(newest) < timedelta(seconds=cooldown):
+            return {"status": "cached", "message": "The jobs were refreshed a few minutes ago."}
 
     if wait_for_completion:
         async with _sync_lock:

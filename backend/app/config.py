@@ -47,6 +47,9 @@ class Settings(BaseSettings):
     RATE_LIMIT_PER_MIN: int = 120
     RATE_LIMIT_WRITES_PER_MIN: int = 30
     RATE_LIMIT_SYNC_PER_MIN: int = 3
+    # Anyone can press "Refresh jobs" in the extension, which asks the server to crawl. At most one such crawl per this many seconds
+    # for the whole server, and none at all while the data is younger than that (the scheduled crawl keeps it fresh anyway).
+    PUBLIC_SYNC_COOLDOWN_SECONDS: int = 1800
 
     class Config:
         env_file = ".env"

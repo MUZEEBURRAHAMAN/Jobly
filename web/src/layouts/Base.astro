@@ -9,7 +9,9 @@ import { SITE } from '../lib/site';
 import { ogKey } from '../lib/pages';
 
 interface Props { title?: string; description: string; path?: string; noindex?: boolean }
-const { title, description, path = Astro.url.pathname, noindex = false } = Astro.props;
+const { title, description, path: rawPath = Astro.url.pathname, noindex = false } = Astro.props;
+// The build writes /privacy.html and /index.html; the site is served (and listed in the sitemap) as /privacy and /.
+const path = rawPath.replace(/\/index\.html$/, '/').replace(/\.html$/, '').replace(/(.)\/$/, '$1') || '/';
 const fullTitle = title ? `${title} · ${SITE.name}` : `${SITE.name}: fresh jobs from company career pages`;
 const canonical = new URL(path, SITE.url).href;
 // One social image per page when scripts/make-og.mjs has drawn it; otherwise the default.
