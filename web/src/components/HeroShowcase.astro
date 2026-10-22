@@ -52,8 +52,8 @@ const tabs = [
       <div class="win-body">
         {tabs.map((t, i) => (
           <div class="win-panel" role="tabpanel" id={`panel-${t.id}`} aria-labelledby={`tab-${t.id}`} hidden={i !== 0} data-panel={t.id}>
-            <img class="only-light" src={`/img/dashboard-${t.id}-light.webp`} srcset={`/img/dashboard-${t.id}-light-720.webp 720w, /img/dashboard-${t.id}-light-1080.webp 1080w, /img/dashboard-${t.id}-light.webp 1440w`} sizes="(max-width: 1200px) calc(100vw - 32px), 1120px" width="1440" height="900" alt={t.alt} decoding="async" loading="lazy" />
-            <img class="only-dark" src={`/img/dashboard-${t.id}-dark.webp`} srcset={`/img/dashboard-${t.id}-dark-720.webp 720w, /img/dashboard-${t.id}-dark-1080.webp 1080w, /img/dashboard-${t.id}-dark.webp 1440w`} sizes="(max-width: 1200px) calc(100vw - 32px), 1120px" width="1440" height="900" alt={t.alt} decoding="async" loading="lazy" />
+            <img class="only-light" src={`/img/dashboard-${t.id}-light.webp`} srcset={`/img/dashboard-${t.id}-light-720.webp 720w, /img/dashboard-${t.id}-light-1080.webp 1080w, /img/dashboard-${t.id}-light.webp 1440w`} sizes="(max-width: 1200px) calc(100vw - 32px), 1080px" width="1440" height="900" alt={t.alt} decoding="async" loading="lazy" />
+            <img class="only-dark" src={`/img/dashboard-${t.id}-dark.webp`} srcset={`/img/dashboard-${t.id}-dark-720.webp 720w, /img/dashboard-${t.id}-dark-1080.webp 1080w, /img/dashboard-${t.id}-dark.webp 1440w`} sizes="(max-width: 1200px) calc(100vw - 32px), 1080px" width="1440" height="900" alt={t.alt} decoding="async" loading="lazy" />
           </div>
         ))}
       </div>
