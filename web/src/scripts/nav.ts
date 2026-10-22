@@ -13,12 +13,22 @@ const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)');
 let openRoot: HTMLElement | null = null;
 let hoverTimer = 0;
 
+// Menu preview screenshots download the first time a menu opens, not on every page view.
+// loading=lazy keeps the other theme's copy (display:none) from downloading.
+function loadPreviews(root: HTMLElement) {
+  root.querySelectorAll<HTMLImageElement>('img[data-src]').forEach((img) => {
+    img.loading = 'lazy';
+    img.src = img.dataset.src!;
+    img.removeAttribute('data-src');
+  });
+}
+
 function setOpen(root: HTMLElement, open: boolean) {
   const trigger = root.querySelector<HTMLButtonElement>('[data-menu-trigger]')!;
   const panel = root.querySelector<HTMLElement>('[data-menu]')!;
   trigger.setAttribute('aria-expanded', String(open));
   panel.toggleAttribute('data-open', open);
-  if (open) { if (openRoot && openRoot !== root) setOpen(openRoot, false); openRoot = root; loadLiveStats(); mountLiveArt(root); }
+  if (open) { if (openRoot && openRoot !== root) setOpen(openRoot, false); openRoot = root; loadLiveStats(); mountLiveArt(root); loadPreviews(root); }
   else if (openRoot === root) openRoot = null;
 }
 

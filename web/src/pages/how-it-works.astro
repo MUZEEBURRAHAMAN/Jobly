@@ -42,8 +42,8 @@ const flow = [
           {views.map((v, i) => (
             <article class:list={['view', { flip: i % 2 }]} data-reveal>
               <div class="v-shot">
-                <img class="only-light" src={`/img/dashboard-${v.id}-light.webp`} srcset={`/img/dashboard-${v.id}-light-720.webp 720w, /img/dashboard-${v.id}-light.webp 1440w`} sizes="(max-width: 860px) calc(100vw - 32px), 640px" width="1440" height="900" alt="" loading="lazy" decoding="async" />
-                <img class="only-dark" src={`/img/dashboard-${v.id}-dark.webp`} srcset={`/img/dashboard-${v.id}-dark-720.webp 720w, /img/dashboard-${v.id}-dark.webp 1440w`} sizes="(max-width: 860px) calc(100vw - 32px), 640px" width="1440" height="900" alt="" loading="lazy" decoding="async" />
+                <img class="only-light" src={`/img/dashboard-${v.id}-light.webp`} srcset={`/img/dashboard-${v.id}-light-720.webp 720w, /img/dashboard-${v.id}-light-1080.webp 1080w, /img/dashboard-${v.id}-light.webp 1440w`} sizes="(max-width: 860px) calc(100vw - 32px), 640px" width="1440" height="900" alt="" loading="lazy" decoding="async" />
+                <img class="only-dark" src={`/img/dashboard-${v.id}-dark.webp`} srcset={`/img/dashboard-${v.id}-dark-720.webp 720w, /img/dashboard-${v.id}-dark-1080.webp 1080w, /img/dashboard-${v.id}-dark.webp 1440w`} sizes="(max-width: 860px) calc(100vw - 32px), 640px" width="1440" height="900" alt="" loading="lazy" decoding="async" />
               </div>
               <div class="v-copy">
                 <span class="v-num">0{i + 1}</span>

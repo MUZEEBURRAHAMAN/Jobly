@@ -86,6 +86,6 @@ for (const theme of ['light', 'dark']) {
 await hi.ctx.close();
 
 execFileSync(py, ['-c', `import glob,sys\nfrom PIL import Image\nfor f in glob.glob(r"${STORE}/*.png"):\n    Image.open(f).convert("RGB").save(f, optimize=True)`]);
-execFileSync(py, ['-c', `import glob,os\nfrom PIL import Image\nfor f in glob.glob(r"${WEB}/dashboard-*.png"):\n    im = Image.open(f).convert("RGB")\n    im.save(f[:-4] + ".webp", quality=82, method=6)\n    im.resize((720, round(im.height * 720 / im.width)), Image.LANCZOS).save(f[:-4] + "-720.webp", quality=82, method=6)\n    os.remove(f)`]);
+execFileSync(py, ['-c', `import glob,os\nfrom PIL import Image\nfor f in glob.glob(r"${WEB}/dashboard-*.png"):\n    im = Image.open(f).convert("RGB")\n    im.save(f[:-4] + ".webp", quality=82, method=6)\n    [im.resize((n, round(im.height * n / im.width)), Image.LANCZOS).save(f[:-4] + "-%d.webp" % n, quality=82, method=6) for n in (720, 1080)]\n    os.remove(f)`]);
 console.log('done');
 process.exit(0);
