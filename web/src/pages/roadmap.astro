@@ -6,15 +6,9 @@ import FinalCta from '../components/landing/FinalCta.astro';
 
 // Releases, newest plan first. "Later" items are ideas, not promises, and nothing here has a date.
 type Group = { h: string; items: string[] };
-type Release = { v: string; tag: 'launching' | 'next' | 'upcoming'; title: string; lead: string; groups: Group[] };
+type Release = { v: string; tag: 'next' | 'upcoming'; title: string; lead: string; groups: Group[] };
 const releases: Release[] = [
-  { v: 'v0.1.0', tag: 'launching', title: 'Launch', lead: 'The first public version: fresh tech jobs with real posting dates, alerts and filters.', groups: [
-    { h: 'Getting it out', items: [
-      'Chrome Web Store listing, so Jobly installs in one click.',
-      'This website: guides, comparisons and live job pages for each role.',
-    ] },
-  ] },
-  { v: 'v0.2.0', tag: 'next', title: 'Application tracker', lead: 'Keep every application in one place. Everything stays on your device, with no account.', groups: [
+  { v: 'v0.2.0', tag: 'next', title: 'Application tracker', lead: 'Keep every application in one place.', groups: [
     { h: 'Track applications', items: [
       'A status on every saved job: Saved, Applied, Interview, Offer or Rejected.',
       'Notes on each job, such as the recruiter’s name, salary talk and questions to ask.',
@@ -36,7 +30,7 @@ const releases: Release[] = [
       'A count of new matches on the toolbar icon.',
     ] },
   ] },
-  { v: 'v0.4.0', tag: 'upcoming', title: 'Apply faster, privately', lead: 'Less retyping, without giving Jobly access to the pages you visit.', groups: [
+  { v: 'v0.4.0', tag: 'upcoming', title: 'Apply faster, privately', lead: 'Less retyping between job pages and your applications.', groups: [
     { h: 'Capture and reuse', items: [
       'Save any job from any website with a right-click “Save to Jobly”. It reads the page title and address only when you click.',
       'A copy kit: one-click copy of your name, links and a short intro to paste into forms.',
@@ -57,12 +51,38 @@ const wont = [
   { t: 'Autofill on every site', d: 'It needs access to every page you visit. Jobly promises it can’t see your tabs, so it won’t.' },
   { t: 'Accounts', d: 'Your data stays in your browser, so there is nothing to sign in to.' },
 ];
-const TAGS = { launching: 'Launching', next: 'Next', upcoming: 'Upcoming' } as const;
+const TAGS = { next: 'Next', upcoming: 'Upcoming' } as const;
 const changelog = [
+  { date: '2026-10-23', title: 'A faster home page', items: [
+    'The home page loads only the screenshot for your theme, and phones get a smaller one.',
+    'This roadmap now lists the releases we are working on.',
+  ] },
+  { date: '2026-10-22', title: 'Cleaner pages and fewer false listings', items: [
+    'Every page has a clean web address and its own share image.',
+    'Jobs that Ashby marks as unlisted are no longer shown.',
+    'The legal pages say more about the form IP address, transfers and your rights.',
+  ] },
+  { date: '2026-10-21', title: 'Many more jobs and employers', items: [
+    'More than 400 employers read through their own career pages, plus remote job boards.',
+    'Five more hiring systems: SmartRecruiters, Workable, Recruitee, Teamtailor and Personio. Workday and Arbeitnow are read more deeply.',
+    'Cards from We Work Remotely, Himalayas and Arbeitnow say which board they came from.',
+    'The world map places far more jobs, using each job’s city or country.',
+    'Remotive was removed because its terms don’t fit how Jobly works.',
+  ] },
+  { date: '2026-10-20', title: 'Employers outside the US', items: [
+    'More than 60 employers outside the United States were added.',
+    'Jobly’s server restores its job list in seconds after a restart.',
+    'The privacy policy explains the in-memory request count.',
+  ] },
+  { date: '2026-10-19', title: 'Honest headline numbers', items: [
+    'Counts on the website cover tech-role jobs only, not every job Jobly stores.',
+  ] },
   { date: '2026-10-18', title: 'A new website, and fewer logs', items: [
     'New website with guides, how dates work, a live list of companies, privacy, security and support pages.',
     'After uninstalling, Chrome opens a short optional feedback page. It carries no identifier.',
     'Jobly’s server no longer keeps an access log, so your search words aren’t written to its logs.',
+    'A world map of where the jobs are, with live numbers.',
+    'A job’s role comes from its title, not from the job board’s own category.',
   ] },
   { date: '2026-10-17', title: 'Your data stays on your device', items: [
     'Preferences, saved jobs and alerts now live only in your browser. The server keeps no record of who asked for what.',
@@ -89,6 +109,7 @@ const fmt = (d: string) => new Date(d + 'T12:00:00Z').toLocaleDateString('en-GB'
 
   <section class="container section rel-wrap" aria-labelledby="rel-title">
     <h2 class="sr-only" id="rel-title">Upcoming releases</h2>
+    <p class="now"><span class="now-tag">Now</span>Jobly v0.1.0 is built, and its Chrome Web Store listing is in progress. Everything below comes after it.</p>
     <ol class="rels">
       {releases.map((r) => (
         <li class="rel" data-reveal>
@@ -143,13 +164,14 @@ const fmt = (d: string) => new Date(d + 'T12:00:00Z').toLocaleDateString('en-GB'
 
 <style>
   .rels { list-style: none; padding: 0; display: grid; }
+  .now { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 28px; color: var(--muted); }
+  .now-tag { font-size: 0.75rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; padding: 4px 10px; border-radius: 999px; border: 1px solid var(--border); background: var(--card); color: var(--success); }
   .rel { display: grid; grid-template-columns: 200px minmax(0, 1fr); gap: 32px; padding-block: 32px; border-top: 1px solid var(--border-strong); }
   .rel:last-child { border-bottom: 1px solid var(--border-strong); }
   .rel-side { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; padding-top: 4px; }
   .ver { font-size: var(--text-sm); font-weight: 500; color: var(--brand); }
   .tag { font-size: 0.75rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; padding: 4px 10px; border-radius: 999px; border: 1px solid var(--border); background: var(--card); color: var(--muted); }
   .tag.next { color: var(--brand); border-color: var(--brand); }
-  .tag.launching { color: var(--success); }
   .rel-main h3 { font-size: 1.5rem; font-weight: 500; letter-spacing: -0.02em; }
   .lead-sm { margin-top: 8px; color: var(--muted); max-width: 62ch; line-height: 1.6; }
   .grp { margin-top: 22px; }
