@@ -116,6 +116,7 @@ async def list_jobs(
     has_salary: bool = False,
     freshness_days: int | None = Query(default=None, ge=0, le=3650),
     only_matching: bool = False,
+    yc: bool = False,   # only employers in Y Combinator's public directory
     limit: int = Query(default=30, ge=1, le=200),
     offset: int = Query(default=0, ge=0, le=1_000_000),
     prefs_dict: dict[str, Any] = Depends(prefs_param),
@@ -128,9 +129,13 @@ async def list_jobs(
             conditions.append("company_id = ?")
             params.append(company_id)
 
-        if role:
+        if role == "tech":   # any of the five roles (every classified job)
+            conditions.append("normalized_role IS NOT NULL")
+        elif role:
             conditions.append("normalized_role = ?")
             params.append(role)
+        if yc:
+            conditions.append("company_id IN (SELECT id FROM companies WHERE yc_batch IS NOT NULL)")
         if only_matching and prefs_dict:
             pref_conds, pref_params = pref_conditions(prefs_dict, skip_roles=bool(role))
             conditions.extend(pref_conds)
@@ -208,7 +213,8 @@ async def list_jobs(
                    title, normalized_role, seniority, work_mode, location,
                    application_url, first_seen_at, last_seen_at, posted_at,
                    status, salary_summary, min_salary, max_salary,
-                   geo_hub, experience_tier
+                   geo_hub, experience_tier,
+                   (SELECT yc_batch FROM companies WHERE companies.id = jobs.company_id) AS yc_batch
             FROM jobs
             {where_clause}
             ORDER BY (posted_at IS NULL) ASC, posted_at DESC, id DESC
@@ -246,7 +252,8 @@ async def list_jobs(
                     min_salary=job_dict.get("min_salary"),
                     max_salary=job_dict.get("max_salary"),
                     geo_hub=job_dict.get("geo_hub"),
-                    experience_tier=job_dict.get("experience_tier")
+                    experience_tier=job_dict.get("experience_tier"),
+                    yc_batch=job_dict.get("yc_batch"),
                 )
             )
 
@@ -320,6 +327,7 @@ async def list_companies():
                 source_identifier=r["source_identifier"],
                 industry=r["industry"],
                 logo_url=r["logo_url"],
+                yc_batch=r["yc_batch"],
                 is_active=bool(r["is_active"]),
                 job_count=r["job_count"],
                 created_at=r["created_at"],

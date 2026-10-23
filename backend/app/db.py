@@ -87,6 +87,11 @@ async def init_db():
             if col_name not in existing_cols:
                 await db.execute(f"ALTER TABLE jobs ADD COLUMN {col_name} {col_type};")
 
+        # Companies: the Y Combinator batch ("W21") for employers in YC's public directory; NULL for all others.
+        pragma_cur = await db.execute("PRAGMA table_info(companies);")
+        if "yc_batch" not in {row["name"] for row in await pragma_cur.fetchall()}:
+            await db.execute("ALTER TABLE companies ADD COLUMN yc_batch TEXT;")
+
         await db.execute("CREATE INDEX IF NOT EXISTS idx_jobs_status ON jobs(status);")
         await db.execute("CREATE INDEX IF NOT EXISTS idx_jobs_role ON jobs(normalized_role);")
         await db.execute("CREATE INDEX IF NOT EXISTS idx_jobs_company ON jobs(company_id);")

@@ -47,6 +47,28 @@ class TestBasics(APITestCase):
 
 
 class TestJobsList(APITestCase):
+    async def test_role_tech_means_any_classified_job(self):
+        everyone = (await self.client.get("/api/jobs?limit=200")).json()["items"]
+        tech = (await self.client.get("/api/jobs?role=tech&limit=200")).json()["items"]
+        self.assertEqual(len(tech), len([j for j in everyone if j["normalized_role"]]))
+        self.assertTrue(all(j["normalized_role"] for j in tech))
+
+    async def test_yc_filter_returns_only_tagged_employers_and_shows_the_batch(self):
+        from backend.app.db import get_db_connection
+        async with get_db_connection() as db:
+            await db.execute("UPDATE companies SET yc_batch = 'W21' WHERE name = 'Globex'"); await db.commit()
+        try:
+            data = (await self.client.get("/api/jobs?yc=true&limit=50")).json()
+            self.assertGreater(len(data["items"]), 0)
+            self.assertEqual({j["company_name"] for j in data["items"]}, {"Globex"})
+            self.assertEqual({j["yc_batch"] for j in data["items"]}, {"W21"})
+            everyone = (await self.client.get("/api/jobs?limit=50")).json()["items"]
+            self.assertEqual({j["yc_batch"] for j in everyone if j["company_name"] == "Acme"}, {None})
+            self.assertEqual({c["yc_batch"] for c in (await self.client.get("/api/companies")).json() if c["name"] == "Globex"}, {"W21"})
+        finally:
+            async with get_db_connection() as db:
+                await db.execute("UPDATE companies SET yc_batch = NULL"); await db.commit()
+
     async def test_jobs_list(self):
         data = (await self.client.get("/api/jobs?limit=10")).json()
         self.assertEqual(len(data["items"]), 10)

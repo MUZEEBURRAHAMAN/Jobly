@@ -10,4 +10,9 @@
   `RETIRED_COMPANY_SLUGS` in `backend/app/seed.py` so their old jobs are deleted too.
 - Heavy sources (Workday) are read only by the scheduled snapshot job (`CRAWL_PROFILE=full`); the server restores its snapshot.
 
-Last employer-list update: 2026-10-21
+- `yc_batch` (for example `W21`) marks employers listed in Y Combinator's public directory. The server stores it, `/api/jobs?yc=true`
+  filters by it, and the website's /jobs/yc page uses that. Candidates come from the public directory (names and websites only); a
+  second look at each match (does the company's own website or name appear in its jobs?) removes boards that belong to a different
+  company with the same name.
+
+Last employer-list update: 2026-10-23

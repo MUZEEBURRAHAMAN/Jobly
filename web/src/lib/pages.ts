@@ -19,6 +19,7 @@ export async function listPages(): Promise<PageInfo[]> {
     { path: '/how-it-works', title: 'From the careers page to your toolbar.', eyebrow: 'How it works', summary: 'How Jobly finds, matches and alerts you to new jobs, and how to install it.', section: 'Main' },
     { path: '/how-dates-work', title: 'Every date, straight from the source.', eyebrow: 'How dates work', summary: 'Where each posting date comes from, the 60-day rule, and the limits.', section: 'Main' },
     { path: '/jobs', title: 'The newest tech jobs, by role.', eyebrow: 'Jobs', summary: 'Live lists of the newest jobs for five tech role families.', section: 'Jobs' },
+    { path: '/jobs/yc', title: 'Jobs at Y Combinator startups.', eyebrow: 'Y Combinator startups', summary: 'Open tech jobs at Y Combinator startups, from each company’s own career page, with the real posting date.', section: 'Jobs' },
     { path: '/companies', title: 'Every company Jobly reads.', eyebrow: 'Companies', summary: 'The full list of career pages and job boards Jobly reads, with open jobs.', section: 'Main' },
     { path: '/guides', title: 'Search smarter, apply sooner.', eyebrow: 'Guides', summary: 'Practical guides for a faster job search.', section: 'Guides' },
     { path: '/alternatives', title: 'Jobly and the tools you already use.', eyebrow: 'Alternatives', summary: 'Honest comparisons with LinkedIn Jobs, Indeed, Simplify and HiringCafe.', section: 'Alternatives' },

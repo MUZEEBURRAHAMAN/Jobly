@@ -7,7 +7,7 @@
 
 Each candidate (scripts/employer_candidates.csv) is tried on Greenhouse, Ashby, Lever, SmartRecruiters, Workable, Recruitee, Teamtailor and Personio under a few board names, using the
 same readers the server uses. An employer is eligible when its board answers and has at least --min-role jobs in Jobly's
-five roles outside the United States (for candidates tagged "us": anywhere). Nothing is written unless --write is given.
+five roles outside the United States (for candidates tagged "us" or "yc": anywhere). Nothing is written unless --write is given.
 """
 from __future__ import annotations
 
@@ -41,6 +41,7 @@ READERS = {
 COMPANIES = ROOT / "backend" / "app" / "data" / "companies.json"
 CANDIDATES = ROOT / "scripts" / "employer_candidates.csv"
 TRIED = ROOT / "scripts" / "employer_tried.txt"
+ANYWHERE = {"us", "yc"}   # regions whose role jobs count wherever they are
 USER_AGENT = "HiringRadar/1.0 (job discovery; +https://joblyextension.netlify.app)"
 
 
@@ -61,7 +62,8 @@ def read_candidates(regions: set[str] | None) -> list[dict]:
         extra = [x.strip() for x in parts[3].split(",")] if len(parts) > 3 and parts[3] else []
         if regions and region not in regions:
             continue
-        out.append({"name": name, "domain": domain, "region": region, "slugs": slug_variants(name, extra)})
+        batch = parts[4] if len(parts) > 4 and parts[4] else None
+        out.append({"name": name, "domain": domain, "region": region, "batch": batch, "slugs": slug_variants(name, extra)})
     seen, unique = set(), []
     for c in out:  # a name listed twice (for two regions) is tested once
         if c["name"].lower() not in seen:
@@ -157,7 +159,7 @@ async def main() -> None:
             kind, slug, sc = hit
             if (kind, slug.lower()) in known_ids:
                 rows.append((cand, hit, "already in the list")); continue
-            ok = (sc["role"] if cand["region"] == "us" else sc["outside"]) >= args.min_role
+            ok = (sc["role"] if cand["region"] in ANYWHERE else sc["outside"]) >= args.min_role
             rows.append((cand, hit, "ELIGIBLE" if ok else f"only {sc['outside']} role jobs outside the US"))
             if ok:
                 eligible.append((cand, kind, slug, sc))
@@ -183,7 +185,7 @@ async def main() -> None:
                 base = re.sub(r"[^a-z0-9]+", "-", cand["name"].lower()).strip("-")
                 unique = base if base not in known_slugs else f"{base}-{kind}"
                 existing.append({"name": cand["name"], "slug": unique, "careers_url": url, "source_type": kind, "source_identifier": slug,
-                                 "industry": None, "region": cand["region"]})
+                                 "industry": None, "region": cand["region"], **({"yc_batch": cand["batch"]} if cand["batch"] else {})})
                 known_slugs.add(unique); added += 1
             COMPANIES.write_text(json.dumps(existing, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
             print(f"wrote {added} employers to {COMPANIES.relative_to(ROOT)} ({len(existing)} in total)")

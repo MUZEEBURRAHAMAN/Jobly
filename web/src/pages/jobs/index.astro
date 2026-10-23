@@ -25,12 +25,26 @@ import { ROLES } from '../../lib/roles';
       ))}
     </ul>
   </section>
+  <section class="container yc-wrap">
+    <a class="yc" href="/jobs/yc" data-reveal>
+      <span class="yc-text"><strong>Y Combinator startups</strong><span>Open roles at companies from Y Combinator’s public directory, all five roles in one list.</span></span>
+      <span class="go">See the jobs <Icon name="arrow-right" size={15} class="arrow" /></span>
+    </a>
+  </section>
   <div class="stack-next"><JobMap /></div>
   <FinalCta title="Let new jobs come to you." />
   <script>import '../../scripts/role-counts';</script>
 </Base>
 
 <style>
+  .yc-wrap { padding-bottom: var(--section-y); }
+  .yc { display: flex; align-items: center; justify-content: space-between; gap: 24px; flex-wrap: wrap; padding: 24px 28px; border-radius: 22px; background: var(--card); border: 1px solid var(--border);
+    transition: border-color var(--dur) ease, box-shadow var(--dur) ease; }
+  .yc:hover { border-color: var(--border-strong); box-shadow: var(--shadow-md); }
+  .yc-text { display: grid; gap: 4px; max-width: 60ch; }
+  .yc-text strong { font-size: 1.375rem; font-weight: 500; letter-spacing: -0.025em; }
+  .yc-text span { color: var(--muted); }
+  .yc .go { display: inline-flex; align-items: center; gap: 6px; font-weight: 500; }
   .roles { padding-block: clamp(40px, 5vw, 64px) var(--section-y); }
   .grid { list-style: none; padding: 0; display: grid; grid-template-columns: repeat(6, 1fr); gap: 16px; }
   .grid li { grid-column: span 2; }

@@ -16,7 +16,7 @@ _REQUIRED = ("name", "slug", "source_type", "source_identifier")
 # Sources Jobly no longer reads, and employers whose job board has been closed or moved. Their stored rows (a restored snapshot may
 # still hold them) are deleted at start and after every crawl, so old listings can't linger until they age out.
 RETIRED_SOURCES = ("remotive",)
-RETIRED_COMPANY_SLUGS = ("anthropic", "canva", "webflow", "framer", "raycast", "liveblocks", "confluent", "retool", "clay", "deel", "amplitude")
+RETIRED_COMPANY_SLUGS = ("anthropic", "canva", "framer", "raycast", "liveblocks", "confluent", "retool", "clay", "deel")
 
 
 async def retire_stale_rows(db=None) -> int:
@@ -57,14 +57,19 @@ async def seed_companies_if_missing() -> int:
         cursor = await db.execute("SELECT slug FROM companies")
         known = {row["slug"] for row in await cursor.fetchall()}
         for c in companies:
-            if not isinstance(c, dict) or any(not c.get(k) for k in _REQUIRED) or c["slug"] in known:
+            if not isinstance(c, dict) or any(not c.get(k) for k in _REQUIRED):
+                continue
+            batch = str(c["yc_batch"])[:8] if c.get("yc_batch") else None
+            if c["slug"] in known:
+                if batch:   # employers added before the YC tag existed pick it up here
+                    await db.execute("UPDATE companies SET yc_batch = ? WHERE slug = ? AND IFNULL(yc_batch, '') <> ?", (batch, c["slug"], batch))
                 continue
             await db.execute(
-                """INSERT INTO companies (name, slug, careers_url, source_type, source_identifier, industry, logo_url,
+                """INSERT INTO companies (name, slug, careers_url, source_type, source_identifier, industry, logo_url, yc_batch,
                                           is_active, created_at, updated_at)
-                   VALUES (?, ?, ?, ?, ?, ?, ?, 1, ?, ?)""",
+                   VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1, ?, ?)""",
                 (c["name"], c["slug"], sanitize_http_url(c.get("careers_url")), str(c["source_type"]).lower(),
-                 c["source_identifier"], c.get("industry"), sanitize_http_url(c.get("logo_url")), now, now),
+                 c["source_identifier"], c.get("industry"), sanitize_http_url(c.get("logo_url")), batch, now, now),
             )
             known.add(c["slug"])
             inserted += 1

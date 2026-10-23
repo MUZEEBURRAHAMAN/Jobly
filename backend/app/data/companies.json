@@ -51,7 +51,8 @@
     "source_type": "greenhouse",
     "source_identifier": "scaleai",
     "industry": "AI Data Infrastructure",
-    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60",
+    "yc_batch": "S16"
   },
   {
     "name": "Midjourney",
@@ -339,7 +340,8 @@
     "source_type": "ashby",
     "source_identifier": "posthog",
     "industry": "Product Analytics Suite",
-    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60",
+    "yc_batch": "W20"
   },
   {
     "name": "Sentry",
@@ -357,7 +359,8 @@
     "source_type": "ashby",
     "source_identifier": "replit",
     "industry": "Software Creation Cloud",
-    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60",
+    "yc_batch": "W18"
   },
   {
     "name": "Render",
@@ -447,7 +450,8 @@
     "source_type": "greenhouse",
     "source_identifier": "algolia",
     "industry": "AI Search & Discovery",
-    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60",
+    "yc_batch": "W14"
   },
   {
     "name": "Sanity",
@@ -510,7 +514,8 @@
     "source_type": "greenhouse",
     "source_identifier": "stripe",
     "industry": "Financial Infrastructure",
-    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60",
+    "yc_batch": "S09"
   },
   {
     "name": "Ramp",
@@ -618,7 +623,8 @@
     "source_type": "ashby",
     "source_identifier": "vanta",
     "industry": "Automated Security & Trust",
-    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60",
+    "yc_batch": "W18"
   },
   {
     "name": "Gusto",
@@ -627,7 +633,8 @@
     "source_type": "greenhouse",
     "source_identifier": "gusto",
     "industry": "Modern HR, Payroll & Benefits",
-    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60",
+    "yc_batch": "W12"
   },
   {
     "name": "Intercom",
@@ -663,7 +670,8 @@
     "source_type": "greenhouse",
     "source_identifier": "lattice",
     "industry": "People Success Platform",
-    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60",
+    "yc_batch": "W16"
   },
   {
     "name": "Culture Amp",
@@ -681,7 +689,8 @@
     "source_type": "ashby",
     "source_identifier": "zapier",
     "industry": "Workflow Automation Cloud",
-    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60",
+    "yc_batch": "S12"
   },
   {
     "name": "Braze",
@@ -726,7 +735,8 @@
     "source_type": "greenhouse",
     "source_identifier": "checkr",
     "industry": "People Infrastructure & Backgrounds",
-    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60",
+    "yc_batch": "S14"
   },
   {
     "name": "Verkada",
@@ -789,7 +799,8 @@
     "source_type": "greenhouse",
     "source_identifier": "flexport",
     "industry": "Supply Chain & Logistics OS",
-    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60",
+    "yc_batch": "W14"
   },
   {
     "name": "Gympass",
@@ -888,7 +899,8 @@
     "source_type": "greenhouse",
     "source_identifier": "instacart",
     "industry": "Online Grocery & Retail AI",
-    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60",
+    "yc_batch": "S12"
   },
   {
     "name": "Lyft",
@@ -906,7 +918,8 @@
     "source_type": "greenhouse",
     "source_identifier": "faire",
     "industry": "Online Wholesale Marketplace",
-    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60",
+    "yc_batch": "W17"
   },
   {
     "name": "Patreon",
@@ -996,7 +1009,8 @@
     "source_type": "lever",
     "source_identifier": "meesho",
     "industry": "Indian E-Commerce Unicorn",
-    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60",
+    "yc_batch": "S16"
   },
   {
     "name": "InMobi",
@@ -1023,7 +1037,8 @@
     "source_type": "greenhouse",
     "source_identifier": "groww",
     "industry": "Indian Investment Tech",
-    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60",
+    "yc_batch": "W18"
   },
   {
     "name": "Cresta",
@@ -1113,7 +1128,8 @@
     "source_type": "greenhouse",
     "source_identifier": "razorpaysoftwareprivatelimited",
     "industry": "Fintech & Payments",
-    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60"
+    "logo_url": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60",
+    "yc_batch": "W15"
   },
   {
     "name": "Runway",
@@ -1437,7 +1453,8 @@
     "source_type": "greenhouse",
     "source_identifier": "assemblyai",
     "industry": "Speech AI APIs",
-    "logo_url": "https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://www.assemblyai.com/careers&size=128"
+    "logo_url": "https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://www.assemblyai.com/careers&size=128",
+    "yc_batch": "S17"
   },
   {
     "name": "LlamaIndex",
@@ -1914,7 +1931,8 @@
     "source_type": "greenhouse",
     "source_identifier": "xendit",
     "industry": null,
-    "region": "sea"
+    "region": "sea",
+    "yc_batch": "S15"
   },
   {
     "name": "Airwallex",
@@ -2508,7 +2526,8 @@
     "source_type": "greenhouse",
     "source_identifier": "relativity",
     "industry": null,
-    "region": "us"
+    "region": "us",
+    "yc_batch": "W16"
   },
   {
     "name": "Planet Labs",
@@ -2571,7 +2590,8 @@
     "source_type": "ashby",
     "source_identifier": "deepgram",
     "industry": null,
-    "region": "us"
+    "region": "us",
+    "yc_batch": "W16"
   },
   {
     "name": "Moon Active",
@@ -2688,7 +2708,8 @@
     "source_type": "ashby",
     "source_identifier": "langdock",
     "industry": null,
-    "region": "de"
+    "region": "de",
+    "yc_batch": "S23"
   },
   {
     "name": "Moss",
@@ -2895,7 +2916,8 @@
     "source_type": "greenhouse",
     "source_identifier": "ginkgobioworks",
     "industry": null,
-    "region": "us"
+    "region": "us",
+    "yc_batch": "S14"
   },
   {
     "name": "Insitro",
@@ -3616,5 +3638,3214 @@
     "source_identifier": "usbank.wd1/US_Bank_Careers",
     "industry": "Financial Technology",
     "region": "us"
+  },
+  {
+    "name": "CircuitHub",
+    "slug": "circuithub",
+    "careers_url": "https://www.circuithub.com/company/careers",
+    "source_type": "ashby",
+    "source_identifier": "circuithub",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W12"
+  },
+  {
+    "name": "Rescale",
+    "slug": "rescale",
+    "careers_url": "https://rescale.com/company/careers/",
+    "source_type": "ashby",
+    "source_identifier": "rescale",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W12"
+  },
+  {
+    "name": "Amplitude",
+    "slug": "amplitude",
+    "careers_url": "https://www.amplitude.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "amplitude",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W12"
+  },
+  {
+    "name": "Y Combinator",
+    "slug": "y-combinator",
+    "careers_url": "https://www.ycombinator.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "ycombinator",
+    "industry": null,
+    "region": "yc"
+  },
+  {
+    "name": "HackerRank",
+    "slug": "hackerrank",
+    "careers_url": "https://www.hackerrank.com/careers/home",
+    "source_type": "greenhouse",
+    "source_identifier": "hackerrank",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S11"
+  },
+  {
+    "name": "Sift",
+    "slug": "sift",
+    "careers_url": "https://sift.com/careers/",
+    "source_type": "ashby",
+    "source_identifier": "sift",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S11"
+  },
+  {
+    "name": "Padlet",
+    "slug": "padlet",
+    "careers_url": "https://padlet.jobs",
+    "source_type": "ashby",
+    "source_identifier": "padlet",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W13"
+  },
+  {
+    "name": "InfluxData",
+    "slug": "influxdata",
+    "careers_url": "https://www.influxdata.com/careers/",
+    "source_type": "ashby",
+    "source_identifier": "influxdata",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W13"
+  },
+  {
+    "name": "RADAR",
+    "slug": "radar",
+    "careers_url": "https://goradar.com/jobs/",
+    "source_type": "ashby",
+    "source_identifier": "radar",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W13"
+  },
+  {
+    "name": "Webflow",
+    "slug": "webflow",
+    "careers_url": "https://webflow.com/company/careers",
+    "source_type": "ashby",
+    "source_identifier": "webflow",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S13"
+  },
+  {
+    "name": "Cambly",
+    "slug": "cambly",
+    "careers_url": "https://www.cambly.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "cambly",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W14"
+  },
+  {
+    "name": "Hive",
+    "slug": "hive",
+    "careers_url": "https://www.hive.co/careers",
+    "source_type": "lever",
+    "source_identifier": "hive",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S14"
+  },
+  {
+    "name": "Qventus",
+    "slug": "qventus",
+    "careers_url": "https://www.qventus.com/company/working-qventus/",
+    "source_type": "greenhouse",
+    "source_identifier": "qventus",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W15"
+  },
+  {
+    "name": "Tempo",
+    "slug": "tempo",
+    "careers_url": "https://tempo.fit/careers",
+    "source_type": "ashby",
+    "source_identifier": "tempo",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W15"
+  },
+  {
+    "name": "Mashgin",
+    "slug": "mashgin",
+    "careers_url": "https://www.mashgin.com/careers",
+    "source_type": "lever",
+    "source_identifier": "mashgin",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W15"
+  },
+  {
+    "name": "SnapMagic",
+    "slug": "snapmagic",
+    "careers_url": "https://www.snapmagic.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "snapmagic",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S15"
+  },
+  {
+    "name": "Reach",
+    "slug": "reach",
+    "careers_url": "https://reachpower.com/careers/",
+    "source_type": "ashby",
+    "source_identifier": "reach",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S15"
+  },
+  {
+    "name": "GiveCampus",
+    "slug": "givecampus",
+    "careers_url": "https://go.givecampus.com/about-us/careers/",
+    "source_type": "greenhouse",
+    "source_identifier": "givecampus",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S15"
+  },
+  {
+    "name": "Bitmovin",
+    "slug": "bitmovin",
+    "careers_url": "https://bitmovin.com",
+    "source_type": "greenhouse",
+    "source_identifier": "bitmovin",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S15"
+  },
+  {
+    "name": "Instawork",
+    "slug": "instawork",
+    "careers_url": "https://www.instawork.com/careers",
+    "source_type": "greenhouse",
+    "source_identifier": "instawork",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S15"
+  },
+  {
+    "name": "Eight Sleep",
+    "slug": "eight-sleep",
+    "careers_url": "https://www.eightsleep.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "eightsleep",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S15"
+  },
+  {
+    "name": "Human Interest",
+    "slug": "human-interest",
+    "careers_url": "https://humaninterest.com/careers/",
+    "source_type": "greenhouse",
+    "source_identifier": "humaninterest",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S15"
+  },
+  {
+    "name": "Castle",
+    "slug": "castle",
+    "careers_url": "https://castle.io",
+    "source_type": "ashby",
+    "source_identifier": "castle",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W16"
+  },
+  {
+    "name": "Netomi",
+    "slug": "netomi",
+    "careers_url": "https://www.netomi.com/",
+    "source_type": "lever",
+    "source_identifier": "netomi",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W16"
+  },
+  {
+    "name": "Thunkable",
+    "slug": "thunkable",
+    "careers_url": "https://thunkable.com",
+    "source_type": "lever",
+    "source_identifier": "thunkable",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W16"
+  },
+  {
+    "name": "Gecko Robotics",
+    "slug": "gecko-robotics",
+    "careers_url": "https://www.geckorobotics.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "gecko-robotics",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W16"
+  },
+  {
+    "name": "Sendbird",
+    "slug": "sendbird",
+    "careers_url": "https://delight.ai/careers",
+    "source_type": "greenhouse",
+    "source_identifier": "sendbird",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W16"
+  },
+  {
+    "name": "Astranis",
+    "slug": "astranis",
+    "careers_url": "https://www.astranis.com/careers",
+    "source_type": "greenhouse",
+    "source_identifier": "astranis",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W16"
+  },
+  {
+    "name": "BillionToOne",
+    "slug": "billiontoone",
+    "careers_url": "https://www.billiontoone.com/careers",
+    "source_type": "greenhouse",
+    "source_identifier": "billiontoone",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S17"
+  },
+  {
+    "name": "Vetcove",
+    "slug": "vetcove",
+    "careers_url": "https://shop.vetcove.com/careers/",
+    "source_type": "ashby",
+    "source_identifier": "vetcove",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S16"
+  },
+  {
+    "name": "Nova Credit",
+    "slug": "nova-credit",
+    "careers_url": "https://www.novacredit.com/careers",
+    "source_type": "greenhouse",
+    "source_identifier": "novacredit",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S16"
+  },
+  {
+    "name": "Multiply Labs",
+    "slug": "multiply-labs",
+    "careers_url": "https://www.multiplylabs.com/careers",
+    "source_type": "lever",
+    "source_identifier": "multiplylabs",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S16"
+  },
+  {
+    "name": "People.ai",
+    "slug": "people-ai",
+    "careers_url": "https://www.backstory.ai/about-us/careers",
+    "source_type": "lever",
+    "source_identifier": "people-ai",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S16"
+  },
+  {
+    "name": "ClassDojo",
+    "slug": "classdojo",
+    "careers_url": "https://www.classdojo.com/jobs/",
+    "source_type": "ashby",
+    "source_identifier": "classdojo",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S12"
+  },
+  {
+    "name": "Speak",
+    "slug": "speak",
+    "careers_url": "https://www.speak.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "speak",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W17"
+  },
+  {
+    "name": "Clipboard",
+    "slug": "clipboard",
+    "careers_url": "https://www.clipboard.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "clipboard",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W17"
+  },
+  {
+    "name": "Snappr",
+    "slug": "snappr",
+    "careers_url": "https://www.snappr.com/careers",
+    "source_type": "lever",
+    "source_identifier": "snappr",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W17"
+  },
+  {
+    "name": "Skyways",
+    "slug": "skyways",
+    "careers_url": "https://www.skyways.com/careers",
+    "source_type": "lever",
+    "source_identifier": "skyways",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S17"
+  },
+  {
+    "name": "Prelim",
+    "slug": "prelim",
+    "careers_url": "https://www.prelim.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "prelim",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S17"
+  },
+  {
+    "name": "May Mobility",
+    "slug": "may-mobility",
+    "careers_url": "https://maymobility.com/careers",
+    "source_type": "greenhouse",
+    "source_identifier": "maymobility",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S17"
+  },
+  {
+    "name": "Spellbrush",
+    "slug": "spellbrush",
+    "careers_url": "https://spellbrush.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "spellbrush",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W18"
+  },
+  {
+    "name": "Assembly",
+    "slug": "assembly",
+    "careers_url": "https://assembly.com/jobs",
+    "source_type": "ashby",
+    "source_identifier": "assembly",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W18"
+  },
+  {
+    "name": "Promise",
+    "slug": "promise",
+    "careers_url": "https://www.promise-pay.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "promise",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W18"
+  },
+  {
+    "name": "Modern Health",
+    "slug": "modern-health",
+    "careers_url": "https://www.modernhealth.com/careers",
+    "source_type": "greenhouse",
+    "source_identifier": "modernhealth",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W18"
+  },
+  {
+    "name": "Pelago",
+    "slug": "pelago",
+    "careers_url": "https://www.pelagohealth.com/careers/",
+    "source_type": "greenhouse",
+    "source_identifier": "pelago",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W18"
+  },
+  {
+    "name": "CaptivateIQ",
+    "slug": "captivateiq",
+    "careers_url": "https://www.captivateiq.com/careers",
+    "source_type": "lever",
+    "source_identifier": "captivateiq",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W18"
+  },
+  {
+    "name": "Swayable",
+    "slug": "swayable",
+    "careers_url": "https://app.swayable.com/careers/",
+    "source_type": "greenhouse",
+    "source_identifier": "swayable",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W18"
+  },
+  {
+    "name": "Modern Treasury",
+    "slug": "modern-treasury",
+    "careers_url": "https://www.moderntreasury.com/about#careers",
+    "source_type": "ashby",
+    "source_identifier": "moderntreasury",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S18"
+  },
+  {
+    "name": "Verse Medical",
+    "slug": "verse-medical",
+    "careers_url": "https://www.versemedical.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "versemedical",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S18"
+  },
+  {
+    "name": "RevenueCat",
+    "slug": "revenuecat",
+    "careers_url": "https://jobs.ashbyhq.com/revenuecat",
+    "source_type": "ashby",
+    "source_identifier": "revenuecat",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S18"
+  },
+  {
+    "name": "Titan",
+    "slug": "titan",
+    "careers_url": "https://www.titan.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "titan",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S18"
+  },
+  {
+    "name": "Duffel",
+    "slug": "duffel",
+    "careers_url": "https://duffel.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "duffel",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S18"
+  },
+  {
+    "name": "Mytos",
+    "slug": "mytos",
+    "careers_url": "https://www.mytos.bio/careers",
+    "source_type": "lever",
+    "source_identifier": "mytos",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S18"
+  },
+  {
+    "name": "Canary Technologies",
+    "slug": "canary-technologies",
+    "careers_url": "https://www.canarytechnologies.com/jobs",
+    "source_type": "lever",
+    "source_identifier": "canarytechnologies",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S18"
+  },
+  {
+    "name": "Prodigal",
+    "slug": "prodigal",
+    "careers_url": "https://www.prodigaltech.com/careers",
+    "source_type": "greenhouse",
+    "source_identifier": "prodigal",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S18"
+  },
+  {
+    "name": "Mutiny",
+    "slug": "mutiny",
+    "careers_url": "https://www.mutinyhq.com/join-us",
+    "source_type": "ashby",
+    "source_identifier": "mutiny",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S18"
+  },
+  {
+    "name": "Overview",
+    "slug": "overview",
+    "careers_url": "https://www.overview.ai/company/careers/",
+    "source_type": "ashby",
+    "source_identifier": "overview",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W19"
+  },
+  {
+    "name": "Kalshi",
+    "slug": "kalshi",
+    "careers_url": "https://kalshi.com",
+    "source_type": "ashby",
+    "source_identifier": "kalshi",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W19"
+  },
+  {
+    "name": "Dyneti Technologies",
+    "slug": "dyneti-technologies",
+    "careers_url": "https://dyneti.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "dyneti",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W19"
+  },
+  {
+    "name": "Postscript",
+    "slug": "postscript",
+    "careers_url": "https://postscript.io/careers",
+    "source_type": "greenhouse",
+    "source_identifier": "postscript",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W19"
+  },
+  {
+    "name": "Middesk",
+    "slug": "middesk",
+    "careers_url": "https://www.middesk.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "middesk",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W19"
+  },
+  {
+    "name": "Ashby",
+    "slug": "ashby",
+    "careers_url": "https://www.ashbyhq.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "ashby",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W19"
+  },
+  {
+    "name": "Probably Genetic",
+    "slug": "probably-genetic",
+    "careers_url": "https://probablygenetic.com",
+    "source_type": "ashby",
+    "source_identifier": "probablygenetic",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W19"
+  },
+  {
+    "name": "Bunkerhill Health",
+    "slug": "bunkerhill-health",
+    "careers_url": "https://www.bunkerhillhealth.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "bunkerhillhealth",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W19"
+  },
+  {
+    "name": "Alpaca",
+    "slug": "alpaca",
+    "careers_url": "https://alpaca.markets",
+    "source_type": "greenhouse",
+    "source_identifier": "alpaca",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W19"
+  },
+  {
+    "name": "Zippi",
+    "slug": "zippi",
+    "careers_url": "https://zippi.com.br",
+    "source_type": "lever",
+    "source_identifier": "zippi",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S19"
+  },
+  {
+    "name": "Odeko",
+    "slug": "odeko",
+    "careers_url": "https://odeko.com",
+    "source_type": "greenhouse",
+    "source_identifier": "odeko",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S19"
+  },
+  {
+    "name": "Short Story",
+    "slug": "short-story",
+    "careers_url": "https://my.shortstorybox.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "shortstory",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S19"
+  },
+  {
+    "name": "TRM Labs",
+    "slug": "trm-labs",
+    "careers_url": "https://www.trmlabs.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "trm-labs",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S19"
+  },
+  {
+    "name": "Prolific",
+    "slug": "prolific",
+    "careers_url": "https://www.prolific.com/careers",
+    "source_type": "greenhouse",
+    "source_identifier": "prolific",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S19"
+  },
+  {
+    "name": "FamPay",
+    "slug": "fampay",
+    "careers_url": "https://www.famapp.in/careers/",
+    "source_type": "lever",
+    "source_identifier": "fampay",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S19"
+  },
+  {
+    "name": "Recidiviz",
+    "slug": "recidiviz",
+    "careers_url": "https://www.recidiviz.org/careers",
+    "source_type": "greenhouse",
+    "source_identifier": "recidiviz",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S19"
+  },
+  {
+    "name": "Curri",
+    "slug": "curri",
+    "careers_url": "https://www.curri.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "curri",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S19"
+  },
+  {
+    "name": "Deepnote",
+    "slug": "deepnote",
+    "careers_url": "https://deepnote.com",
+    "source_type": "ashby",
+    "source_identifier": "deepnote",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S19"
+  },
+  {
+    "name": "Vorticity",
+    "slug": "vorticity",
+    "careers_url": "https://www.vorticity.xyz/careers",
+    "source_type": "ashby",
+    "source_identifier": "vorticity",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S19"
+  },
+  {
+    "name": "Accord",
+    "slug": "accord",
+    "careers_url": "https://inaccord.com",
+    "source_type": "ashby",
+    "source_identifier": "accord",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W20"
+  },
+  {
+    "name": "Ditto",
+    "slug": "ditto",
+    "careers_url": "https://www.dittowords.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "ditto",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W20"
+  },
+  {
+    "name": "Handoff",
+    "slug": "handoff",
+    "careers_url": "https://www.handoff.ai/careers",
+    "source_type": "lever",
+    "source_identifier": "handoff",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W20"
+  },
+  {
+    "name": "Ello",
+    "slug": "ello",
+    "careers_url": "https://jobs.ashbyhq.com/ello",
+    "source_type": "ashby",
+    "source_identifier": "ello",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W20"
+  },
+  {
+    "name": "Vori",
+    "slug": "vori",
+    "careers_url": "https://www.vori.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "vori",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W20"
+  },
+  {
+    "name": "Candid Health",
+    "slug": "candid-health",
+    "careers_url": "https://candidhealth.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "candidhealth",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W20"
+  },
+  {
+    "name": "Riot",
+    "slug": "riot",
+    "careers_url": "https://tryriot.com",
+    "source_type": "lever",
+    "source_identifier": "tryriot",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W20"
+  },
+  {
+    "name": "AIOS",
+    "slug": "aios",
+    "careers_url": "https://aiosmedical.notion.site/careers",
+    "source_type": "ashby",
+    "source_identifier": "aios",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W20"
+  },
+  {
+    "name": "Junction",
+    "slug": "junction",
+    "careers_url": "https://www.junction.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "junction",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W20"
+  },
+  {
+    "name": "PostEra",
+    "slug": "postera",
+    "careers_url": "https://postera.ai",
+    "source_type": "lever",
+    "source_identifier": "postera",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W20"
+  },
+  {
+    "name": "Stable",
+    "slug": "stable",
+    "careers_url": "https://www.usestable.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "stable",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W20"
+  },
+  {
+    "name": "Recall.ai",
+    "slug": "recall-ai",
+    "careers_url": "https://www.recall.ai/careers",
+    "source_type": "ashby",
+    "source_identifier": "recall",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W20"
+  },
+  {
+    "name": "Belvo",
+    "slug": "belvo",
+    "careers_url": "https://belvo.com/careers/",
+    "source_type": "ashby",
+    "source_identifier": "belvo",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W20"
+  },
+  {
+    "name": "Luminai",
+    "slug": "luminai",
+    "careers_url": "https://www.luminai.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "luminai",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S20"
+  },
+  {
+    "name": "Roboflow",
+    "slug": "roboflow",
+    "careers_url": "https://roboflow.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "roboflow",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S20"
+  },
+  {
+    "name": "AtoB",
+    "slug": "atob",
+    "careers_url": "https://atob.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "atob",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S20"
+  },
+  {
+    "name": "Blissway",
+    "slug": "blissway",
+    "careers_url": "https://blissway.com",
+    "source_type": "ashby",
+    "source_identifier": "blissway",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S20"
+  },
+  {
+    "name": "doola",
+    "slug": "doola",
+    "careers_url": "https://www.doola.com/careers/",
+    "source_type": "lever",
+    "source_identifier": "doola",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S20"
+  },
+  {
+    "name": "Atomic",
+    "slug": "atomic",
+    "careers_url": "https://www.atomicvest.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "atomic",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S20"
+  },
+  {
+    "name": "Flint",
+    "slug": "flint",
+    "careers_url": "https://withflint.com",
+    "source_type": "ashby",
+    "source_identifier": "flint",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S20"
+  },
+  {
+    "name": "Hotplate",
+    "slug": "hotplate",
+    "careers_url": "https://www.hotplate.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "hotplate",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S20"
+  },
+  {
+    "name": "Arketa",
+    "slug": "arketa",
+    "careers_url": "https://www.arketa.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "arketa",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S20"
+  },
+  {
+    "name": "Ready",
+    "slug": "ready",
+    "careers_url": "https://ready.net/careers",
+    "source_type": "ashby",
+    "source_identifier": "ready",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S20"
+  },
+  {
+    "name": "Taktile",
+    "slug": "taktile",
+    "careers_url": "https://taktile.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "taktile",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S20"
+  },
+  {
+    "name": "Glimpse",
+    "slug": "glimpse",
+    "careers_url": "https://tryglimpse.com",
+    "source_type": "ashby",
+    "source_identifier": "glimpse",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S20"
+  },
+  {
+    "name": "Finch",
+    "slug": "finch",
+    "careers_url": "https://www.tryfinch.com/careers",
+    "source_type": "lever",
+    "source_identifier": "finch",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S20"
+  },
+  {
+    "name": "Fieldguide",
+    "slug": "fieldguide",
+    "careers_url": "https://www.fieldguide.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "fieldguide",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S20"
+  },
+  {
+    "name": "Atomic Industries",
+    "slug": "atomic-industries",
+    "careers_url": "https://atomic.industries/careers",
+    "source_type": "ashby",
+    "source_identifier": "atomic",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W21"
+  },
+  {
+    "name": "authzed",
+    "slug": "authzed",
+    "careers_url": "https://authzed.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "authzed",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W21"
+  },
+  {
+    "name": "Humaans",
+    "slug": "humaans",
+    "careers_url": "https://humaans.io/careers",
+    "source_type": "ashby",
+    "source_identifier": "humaans",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W21"
+  },
+  {
+    "name": "MedMe Health",
+    "slug": "medme-health",
+    "careers_url": "https://medmehealth.com",
+    "source_type": "recruitee",
+    "source_identifier": "medmehealth",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W21"
+  },
+  {
+    "name": "SigNoz",
+    "slug": "signoz",
+    "careers_url": "https://jobs.ashbyhq.com/SigNoz",
+    "source_type": "ashby",
+    "source_identifier": "signoz",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W21"
+  },
+  {
+    "name": "SpruceID",
+    "slug": "spruceid",
+    "careers_url": "https://jobs.ashbyhq.com/spruceid",
+    "source_type": "ashby",
+    "source_identifier": "spruceid",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W21"
+  },
+  {
+    "name": "Smartcuts",
+    "slug": "smartcuts",
+    "careers_url": "https://trysmartcuts.com",
+    "source_type": "lever",
+    "source_identifier": "smartcuts",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W21"
+  },
+  {
+    "name": "Encord",
+    "slug": "encord",
+    "careers_url": "https://encord.com/careers/",
+    "source_type": "ashby",
+    "source_identifier": "encord",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W21"
+  },
+  {
+    "name": "Axle Health",
+    "slug": "axle-health",
+    "careers_url": "https://www.axlehealth.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "axle-health",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W21"
+  },
+  {
+    "name": "Gridware",
+    "slug": "gridware",
+    "careers_url": "https://www.gridware.io/careers",
+    "source_type": "lever",
+    "source_identifier": "gridware",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W21"
+  },
+  {
+    "name": "Camber",
+    "slug": "camber",
+    "careers_url": "https://www.camber.health/company/careers",
+    "source_type": "ashby",
+    "source_identifier": "camber",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W21"
+  },
+  {
+    "name": "Vapi",
+    "slug": "vapi",
+    "careers_url": "https://vapi.ai/careers",
+    "source_type": "ashby",
+    "source_identifier": "vapi",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W21"
+  },
+  {
+    "name": "Kodo",
+    "slug": "kodo",
+    "careers_url": "https://www.kodo.com/careers",
+    "source_type": "smartrecruiters",
+    "source_identifier": "kodo",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W21"
+  },
+  {
+    "name": "Anima",
+    "slug": "anima",
+    "careers_url": "https://www.animahealth.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "anima",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W21"
+  },
+  {
+    "name": "Popl",
+    "slug": "popl",
+    "careers_url": "https://careers.popl.co",
+    "source_type": "ashby",
+    "source_identifier": "popl",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W21"
+  },
+  {
+    "name": "LiveFlow",
+    "slug": "liveflow",
+    "careers_url": "https://liveflow.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "liveflow",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W21"
+  },
+  {
+    "name": "Great Question",
+    "slug": "great-question",
+    "careers_url": "https://greatquestion.co",
+    "source_type": "ashby",
+    "source_identifier": "greatquestion",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W21"
+  },
+  {
+    "name": "Enode",
+    "slug": "enode",
+    "careers_url": "https://enode.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "enode",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W21"
+  },
+  {
+    "name": "Topline Pro",
+    "slug": "topline-pro",
+    "careers_url": "https://www.toplinepro.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "topline-pro",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W21"
+  },
+  {
+    "name": "Quicknode",
+    "slug": "quicknode",
+    "careers_url": "https://www.quicknode.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "quicknode",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W21"
+  },
+  {
+    "name": "Ziina",
+    "slug": "ziina",
+    "careers_url": "https://ziina.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "ziina",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W21"
+  },
+  {
+    "name": "FlutterFlow",
+    "slug": "flutterflow",
+    "careers_url": "https://flutterflow.io",
+    "source_type": "ashby",
+    "source_identifier": "flutterflow",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W21"
+  },
+  {
+    "name": "Gigs",
+    "slug": "gigs",
+    "careers_url": "https://gigs.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "gigs",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W21"
+  },
+  {
+    "name": "Shepherd",
+    "slug": "shepherd",
+    "careers_url": "https://www.shepherdinsurance.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "shepherd",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W21"
+  },
+  {
+    "name": "Epsilon3",
+    "slug": "epsilon3",
+    "careers_url": "https://epsilon3.io",
+    "source_type": "lever",
+    "source_identifier": "epsilon3",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S21"
+  },
+  {
+    "name": "Legion Health",
+    "slug": "legion-health",
+    "careers_url": "https://legionhealth.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "legionhealth",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S21"
+  },
+  {
+    "name": "Odys Aviation",
+    "slug": "odys-aviation",
+    "careers_url": "https://www.odysaviation.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "odys-aviation",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S21"
+  },
+  {
+    "name": "Serif Health",
+    "slug": "serif-health",
+    "careers_url": "https://www.serifhealth.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "serifhealth",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W22"
+  },
+  {
+    "name": "ARQ",
+    "slug": "arq",
+    "careers_url": "https://www.arqfinance.com/en-MX/careers",
+    "source_type": "ashby",
+    "source_identifier": "arq",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S21"
+  },
+  {
+    "name": "Confido",
+    "slug": "confido",
+    "careers_url": "https://www.confidotech.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "confido",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S21"
+  },
+  {
+    "name": "Double",
+    "slug": "double",
+    "careers_url": "https://doublehq.com",
+    "source_type": "ashby",
+    "source_identifier": "double",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S21"
+  },
+  {
+    "name": "Tavus",
+    "slug": "tavus",
+    "careers_url": "https://www.tavus.io/careers",
+    "source_type": "ashby",
+    "source_identifier": "tavus",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S21"
+  },
+  {
+    "name": "Kodex",
+    "slug": "kodex",
+    "careers_url": "https://kodexglobal.com",
+    "source_type": "ashby",
+    "source_identifier": "kodex",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S21"
+  },
+  {
+    "name": "Bree",
+    "slug": "bree",
+    "careers_url": "https://trybree.com",
+    "source_type": "ashby",
+    "source_identifier": "bree",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S21"
+  },
+  {
+    "name": "OneSchema",
+    "slug": "oneschema",
+    "careers_url": "https://www.oneschema.co/careers",
+    "source_type": "ashby",
+    "source_identifier": "oneschema",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S21"
+  },
+  {
+    "name": "Aleph",
+    "slug": "aleph",
+    "careers_url": "https://www.getaleph.com/careers",
+    "source_type": "lever",
+    "source_identifier": "aleph",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S21"
+  },
+  {
+    "name": "Adaptyv",
+    "slug": "adaptyv",
+    "careers_url": "https://www.adaptyvbio.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "adaptyv",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S21"
+  },
+  {
+    "name": "Meticulous",
+    "slug": "meticulous",
+    "careers_url": "https://meticulous.ai",
+    "source_type": "ashby",
+    "source_identifier": "meticulous",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S21"
+  },
+  {
+    "name": "Coast",
+    "slug": "coast",
+    "careers_url": "https://trycoast.com",
+    "source_type": "greenhouse",
+    "source_identifier": "coast",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S21"
+  },
+  {
+    "name": "Mach9",
+    "slug": "mach9",
+    "careers_url": "https://mach9.ai/careers",
+    "source_type": "ashby",
+    "source_identifier": "mach9",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S21"
+  },
+  {
+    "name": "Stepful",
+    "slug": "stepful",
+    "careers_url": "https://www.stepful.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "stepful",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S21"
+  },
+  {
+    "name": "Turion Space",
+    "slug": "turion-space",
+    "careers_url": "https://www.turionspace.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "turion-space",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S21"
+  },
+  {
+    "name": "Charge Robotics",
+    "slug": "charge-robotics",
+    "careers_url": "https://www.chargerobotics.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "charge-robotics",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S21"
+  },
+  {
+    "name": "Nash",
+    "slug": "nash",
+    "careers_url": "https://www.nash.ai/careers",
+    "source_type": "ashby",
+    "source_identifier": "nash",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S21"
+  },
+  {
+    "name": "Agave",
+    "slug": "agave",
+    "careers_url": "https://useagave.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "agave",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W22"
+  },
+  {
+    "name": "Sieve",
+    "slug": "sieve",
+    "careers_url": "https://www.sieve.ai/careers",
+    "source_type": "ashby",
+    "source_identifier": "sieve",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W22"
+  },
+  {
+    "name": "Invert",
+    "slug": "invert",
+    "careers_url": "https://invertbio.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "invert",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W22"
+  },
+  {
+    "name": "Sphere",
+    "slug": "sphere",
+    "careers_url": "https://www.getsphere.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "sphere",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W22"
+  },
+  {
+    "name": "Mintlify",
+    "slug": "mintlify",
+    "careers_url": "https://www.mintlify.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "mintlify",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W22"
+  },
+  {
+    "name": "PermitFlow",
+    "slug": "permitflow",
+    "careers_url": "https://jobs.ashbyhq.com/permitflow?utm_source=vNp3YKE9bQ",
+    "source_type": "ashby",
+    "source_identifier": "permitflow",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W22"
+  },
+  {
+    "name": "Complete",
+    "slug": "complete",
+    "careers_url": "https://www.complete.so/careers",
+    "source_type": "ashby",
+    "source_identifier": "complete",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W22"
+  },
+  {
+    "name": "Posh",
+    "slug": "posh",
+    "careers_url": "https://poshenergy.com",
+    "source_type": "ashby",
+    "source_identifier": "posh",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W22"
+  },
+  {
+    "name": "voize",
+    "slug": "voize",
+    "careers_url": "https://voize.de",
+    "source_type": "ashby",
+    "source_identifier": "voize",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W22"
+  },
+  {
+    "name": "Cinder",
+    "slug": "cinder",
+    "careers_url": "https://cinder.ai/careers",
+    "source_type": "ashby",
+    "source_identifier": "cinder",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W22"
+  },
+  {
+    "name": "Broccoli AI",
+    "slug": "broccoli-ai",
+    "careers_url": "https://www.broccoli.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "broccoli",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W22"
+  },
+  {
+    "name": "Attain",
+    "slug": "attain",
+    "careers_url": "https://joinattain.com",
+    "source_type": "greenhouse",
+    "source_identifier": "attain",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W22"
+  },
+  {
+    "name": "Spade",
+    "slug": "spade",
+    "careers_url": "https://www.spade.com/careers/",
+    "source_type": "ashby",
+    "source_identifier": "spade",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W22"
+  },
+  {
+    "name": "Stream",
+    "slug": "stream",
+    "careers_url": "https://stream.claims",
+    "source_type": "ashby",
+    "source_identifier": "stream",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S22"
+  },
+  {
+    "name": "Julius",
+    "slug": "julius",
+    "careers_url": "https://jobs.ashbyhq.com/julius?utm_source=b7Q8WxXqpk",
+    "source_type": "ashby",
+    "source_identifier": "julius",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S22"
+  },
+  {
+    "name": "Chariot",
+    "slug": "chariot",
+    "careers_url": "https://www.givechariot.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "chariot",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S22"
+  },
+  {
+    "name": "Tailor",
+    "slug": "tailor",
+    "careers_url": "https://careers.tailor.tech",
+    "source_type": "ashby",
+    "source_identifier": "tailor",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S22"
+  },
+  {
+    "name": "Novig",
+    "slug": "novig",
+    "careers_url": "https://novig.com",
+    "source_type": "ashby",
+    "source_identifier": "novig",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S22"
+  },
+  {
+    "name": "Blee",
+    "slug": "blee",
+    "careers_url": "https://www.blee.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "blee",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S22"
+  },
+  {
+    "name": "Juicebox",
+    "slug": "juicebox",
+    "careers_url": "https://juicebox.ai/careers",
+    "source_type": "ashby",
+    "source_identifier": "juicebox",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S22"
+  },
+  {
+    "name": "Tank Payments",
+    "slug": "tank-payments",
+    "careers_url": "https://tankpayments.com",
+    "source_type": "ashby",
+    "source_identifier": "tank-payments",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S22"
+  },
+  {
+    "name": "Aurelian",
+    "slug": "aurelian",
+    "careers_url": "https://www.aurelian.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "aurelian",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S22"
+  },
+  {
+    "name": "Metriport",
+    "slug": "metriport",
+    "careers_url": "https://jobs.ashbyhq.com/metriport",
+    "source_type": "ashby",
+    "source_identifier": "metriport",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S22"
+  },
+  {
+    "name": "Quindar",
+    "slug": "quindar",
+    "careers_url": "https://quindar.space/careers/",
+    "source_type": "ashby",
+    "source_identifier": "quindar",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S22"
+  },
+  {
+    "name": "Ekho",
+    "slug": "ekho",
+    "careers_url": "https://www.ekho.com/careers/",
+    "source_type": "ashby",
+    "source_identifier": "ekho",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S22"
+  },
+  {
+    "name": "AiPrise",
+    "slug": "aiprise",
+    "careers_url": "https://aiprise.com",
+    "source_type": "ashby",
+    "source_identifier": "aiprise",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S22"
+  },
+  {
+    "name": "Firecrawl",
+    "slug": "firecrawl",
+    "careers_url": "https://www.firecrawl.dev/careers",
+    "source_type": "ashby",
+    "source_identifier": "firecrawl",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S22"
+  },
+  {
+    "name": "Oneleet",
+    "slug": "oneleet",
+    "careers_url": "https://oneleet.com",
+    "source_type": "ashby",
+    "source_identifier": "oneleet",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S22"
+  },
+  {
+    "name": "Knowtex",
+    "slug": "knowtex",
+    "careers_url": "https://www.knowtex.ai/careers",
+    "source_type": "ashby",
+    "source_identifier": "knowtex",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S22"
+  },
+  {
+    "name": "Cambio",
+    "slug": "cambio",
+    "careers_url": "https://www.cambio.ai/careers",
+    "source_type": "ashby",
+    "source_identifier": "cambio",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S22"
+  },
+  {
+    "name": "Axle",
+    "slug": "axle",
+    "careers_url": "https://www.ycombinator.com/companies/axle/jobs",
+    "source_type": "greenhouse",
+    "source_identifier": "axle",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S22"
+  },
+  {
+    "name": "Avoca",
+    "slug": "avoca",
+    "careers_url": "https://www.avoca.ai/careers",
+    "source_type": "ashby",
+    "source_identifier": "avoca",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W23"
+  },
+  {
+    "name": "Infisical",
+    "slug": "infisical",
+    "careers_url": "https://infisical.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "infisical",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W23"
+  },
+  {
+    "name": "Credal.ai",
+    "slug": "credal-ai",
+    "careers_url": "https://credal.ai/careers",
+    "source_type": "ashby",
+    "source_identifier": "credal",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W23"
+  },
+  {
+    "name": "Magic Patterns",
+    "slug": "magic-patterns",
+    "careers_url": "https://www.magicpatterns.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "magicpatterns",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W23"
+  },
+  {
+    "name": "Latent",
+    "slug": "latent",
+    "careers_url": "https://www.latenthealth.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "latent",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W23"
+  },
+  {
+    "name": "Nango",
+    "slug": "nango",
+    "careers_url": "https://nango.dev/careers",
+    "source_type": "ashby",
+    "source_identifier": "nango",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W23"
+  },
+  {
+    "name": "Numeral",
+    "slug": "numeral",
+    "careers_url": "https://www.numeral.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "numeral",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W23"
+  },
+  {
+    "name": "Salient",
+    "slug": "salient",
+    "careers_url": "https://trysalient.com",
+    "source_type": "ashby",
+    "source_identifier": "salient",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W23"
+  },
+  {
+    "name": "Tennr",
+    "slug": "tennr",
+    "careers_url": "https://www.tennr.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "tennr",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W23"
+  },
+  {
+    "name": "Coperniq",
+    "slug": "coperniq",
+    "careers_url": "https://coperniq.io",
+    "source_type": "ashby",
+    "source_identifier": "coperniq",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W23"
+  },
+  {
+    "name": "Vooma",
+    "slug": "vooma",
+    "careers_url": "https://vooma.ai",
+    "source_type": "ashby",
+    "source_identifier": "vooma",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W23"
+  },
+  {
+    "name": "Cosine",
+    "slug": "cosine",
+    "careers_url": "https://cosine.sh/careers",
+    "source_type": "ashby",
+    "source_identifier": "cosine",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W23"
+  },
+  {
+    "name": "Kivo Health",
+    "slug": "kivo-health",
+    "careers_url": "https://kivohealth.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "kivo-health",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W23"
+  },
+  {
+    "name": "Inkeep",
+    "slug": "inkeep",
+    "careers_url": "https://inkeep.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "inkeep",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W23"
+  },
+  {
+    "name": "Vitalize",
+    "slug": "vitalize",
+    "careers_url": "https://www.vitalize.care/careers",
+    "source_type": "ashby",
+    "source_identifier": "vitalize",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W23"
+  },
+  {
+    "name": "Pylon",
+    "slug": "pylon",
+    "careers_url": "https://www.usepylon.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "pylon",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W23"
+  },
+  {
+    "name": "Invopop",
+    "slug": "invopop",
+    "careers_url": "https://invopop.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "invopop",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W23"
+  },
+  {
+    "name": "Rivet",
+    "slug": "rivet",
+    "careers_url": "https://rivet.dev/careers/",
+    "source_type": "ashby",
+    "source_identifier": "rivet",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W23"
+  },
+  {
+    "name": "Conduit",
+    "slug": "conduit",
+    "careers_url": "https://helloconduit.com",
+    "source_type": "ashby",
+    "source_identifier": "conduit",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W23"
+  },
+  {
+    "name": "Vector",
+    "slug": "vector",
+    "careers_url": "https://vector.co",
+    "source_type": "ashby",
+    "source_identifier": "vector",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W23"
+  },
+  {
+    "name": "Escape",
+    "slug": "escape",
+    "careers_url": "https://escape.tech/careers",
+    "source_type": "ashby",
+    "source_identifier": "escape",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W23"
+  },
+  {
+    "name": "LiteLLM",
+    "slug": "litellm",
+    "careers_url": "https://jobs.ashbyhq.com/litellm",
+    "source_type": "ashby",
+    "source_identifier": "litellm",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W23"
+  },
+  {
+    "name": "Automat",
+    "slug": "automat",
+    "careers_url": "https://runautomat.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "automat",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W23"
+  },
+  {
+    "name": "HockeyStack",
+    "slug": "hockeystack",
+    "careers_url": "https://www.hockeystack.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "hockeystack",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S23"
+  },
+  {
+    "name": "Artie",
+    "slug": "artie",
+    "careers_url": "https://www.artie.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "artie",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S23"
+  },
+  {
+    "name": "Twenty",
+    "slug": "twenty",
+    "careers_url": "https://careers.twenty.com",
+    "source_type": "ashby",
+    "source_identifier": "twenty",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S23"
+  },
+  {
+    "name": "Elyos AI",
+    "slug": "elyos-ai",
+    "careers_url": "https://elyos.ai/careers",
+    "source_type": "ashby",
+    "source_identifier": "elyos",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S23"
+  },
+  {
+    "name": "Hyperbound",
+    "slug": "hyperbound",
+    "careers_url": "https://www.hyperbound.ai/careers",
+    "source_type": "ashby",
+    "source_identifier": "hyperbound",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S23"
+  },
+  {
+    "name": "Bland AI",
+    "slug": "bland-ai",
+    "careers_url": "https://www.bland.ai/careers",
+    "source_type": "ashby",
+    "source_identifier": "bland",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S23"
+  },
+  {
+    "name": "Casca",
+    "slug": "casca",
+    "careers_url": "https://www.cascading.ai/careers",
+    "source_type": "ashby",
+    "source_identifier": "casca",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S23"
+  },
+  {
+    "name": "Prosper",
+    "slug": "prosper",
+    "careers_url": "https://www.getprosper.ai/careers",
+    "source_type": "lever",
+    "source_identifier": "prosper",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S23"
+  },
+  {
+    "name": "Electric Air",
+    "slug": "electric-air",
+    "careers_url": "https://www.electricair.io/careers",
+    "source_type": "ashby",
+    "source_identifier": "electricair",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S23"
+  },
+  {
+    "name": "Solve Intelligence",
+    "slug": "solve-intelligence",
+    "careers_url": "https://www.solveintelligence.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "solveintelligence",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S23"
+  },
+  {
+    "name": "Airgoods",
+    "slug": "airgoods",
+    "careers_url": "https://www.airgoods.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "airgoods",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S23"
+  },
+  {
+    "name": "Campfire",
+    "slug": "campfire",
+    "careers_url": "https://campfire.ai/careers",
+    "source_type": "ashby",
+    "source_identifier": "campfire",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S23"
+  },
+  {
+    "name": "Terminal",
+    "slug": "terminal",
+    "careers_url": "https://www.withterminal.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "terminal",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S23"
+  },
+  {
+    "name": "Outset",
+    "slug": "outset",
+    "careers_url": "https://outset.ai/careers",
+    "source_type": "ashby",
+    "source_identifier": "outset",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S23"
+  },
+  {
+    "name": "FleetWorks",
+    "slug": "fleetworks",
+    "careers_url": "https://www.fleetworks.ai/jobs",
+    "source_type": "ashby",
+    "source_identifier": "fleetworks",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S23"
+  },
+  {
+    "name": "Decoda Health",
+    "slug": "decoda-health",
+    "careers_url": "https://jobs.ashbyhq.com/decodahealth",
+    "source_type": "ashby",
+    "source_identifier": "decodahealth",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S23"
+  },
+  {
+    "name": "Bretton AI",
+    "slug": "bretton-ai",
+    "careers_url": "https://www.bretton.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "brettonai",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S23"
+  },
+  {
+    "name": "Fortuna Health",
+    "slug": "fortuna-health",
+    "careers_url": "https://fortunahealth.com",
+    "source_type": "ashby",
+    "source_identifier": "fortuna-health",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S23"
+  },
+  {
+    "name": "Sola",
+    "slug": "sola",
+    "careers_url": "https://jobs.ashbyhq.com/sola",
+    "source_type": "ashby",
+    "source_identifier": "sola",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S23"
+  },
+  {
+    "name": "SafetyKit",
+    "slug": "safetykit",
+    "careers_url": "https://www.safetykit.com/jobs",
+    "source_type": "ashby",
+    "source_identifier": "safetykit",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S23"
+  },
+  {
+    "name": "Andromeda Surgical",
+    "slug": "andromeda-surgical",
+    "careers_url": "https://www.andromedasurgical.com/careers/",
+    "source_type": "ashby",
+    "source_identifier": "andromedasurgical",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S23"
+  },
+  {
+    "name": "Pure",
+    "slug": "pure",
+    "careers_url": "https://collectpure.com",
+    "source_type": "ashby",
+    "source_identifier": "pure",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S23"
+  },
+  {
+    "name": "Shadeform",
+    "slug": "shadeform",
+    "careers_url": "https://shadeform.com/jobs",
+    "source_type": "ashby",
+    "source_identifier": "shadeform",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S23"
+  },
+  {
+    "name": "Nowadays",
+    "slug": "nowadays",
+    "careers_url": "https://www.nowadays.ai/careers",
+    "source_type": "ashby",
+    "source_identifier": "nowadays",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S23"
+  },
+  {
+    "name": "Healthtech 1",
+    "slug": "healthtech-1",
+    "careers_url": "https://www.healthtech1.uk/careers",
+    "source_type": "ashby",
+    "source_identifier": "healthtech-1",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S23"
+  },
+  {
+    "name": "Event Horizon Labs",
+    "slug": "event-horizon-labs",
+    "careers_url": "https://ehl.markets",
+    "source_type": "ashby",
+    "source_identifier": "event-horizon-labs",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W24"
+  },
+  {
+    "name": "Legora",
+    "slug": "legora",
+    "careers_url": "https://legora.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "legora",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W24"
+  },
+  {
+    "name": "Greptile",
+    "slug": "greptile",
+    "careers_url": "https://www.greptile.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "greptile",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W24"
+  },
+  {
+    "name": "Reducto",
+    "slug": "reducto",
+    "careers_url": "https://reducto.ai/careers",
+    "source_type": "ashby",
+    "source_identifier": "reducto",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W24"
+  },
+  {
+    "name": "Garage",
+    "slug": "garage",
+    "careers_url": "https://www.shopgarage.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "garage",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W24"
+  },
+  {
+    "name": "Pivot Robotics",
+    "slug": "pivot-robotics",
+    "careers_url": "https://www.pivotrobotics.com/company/careers/",
+    "source_type": "ashby",
+    "source_identifier": "pivotrobotics",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W24"
+  },
+  {
+    "name": "PointOne",
+    "slug": "pointone",
+    "careers_url": "https://pointone.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "pointone",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W24"
+  },
+  {
+    "name": "Arini",
+    "slug": "arini",
+    "careers_url": "https://www.arini.ai/careers",
+    "source_type": "ashby",
+    "source_identifier": "arini",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W24"
+  },
+  {
+    "name": "FurtherAI",
+    "slug": "furtherai",
+    "careers_url": "https://furtherai.com",
+    "source_type": "ashby",
+    "source_identifier": "furtherai",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W24"
+  },
+  {
+    "name": "Artisan",
+    "slug": "artisan",
+    "careers_url": "https://www.artisan.co/careers",
+    "source_type": "ashby",
+    "source_identifier": "artisan",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W24"
+  },
+  {
+    "name": "Greenboard",
+    "slug": "greenboard",
+    "careers_url": "https://www.greenboard.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "greenboard",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W24"
+  },
+  {
+    "name": "Clarion",
+    "slug": "clarion",
+    "careers_url": "https://clarionhealth.com",
+    "source_type": "ashby",
+    "source_identifier": "clarion",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W24"
+  },
+  {
+    "name": "Tamarind Bio",
+    "slug": "tamarind-bio",
+    "careers_url": "https://www.ycombinator.com/companies/tamarind-bio/jobs",
+    "source_type": "ashby",
+    "source_identifier": "tamarindbio",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W24"
+  },
+  {
+    "name": "Centralize",
+    "slug": "centralize",
+    "careers_url": "https://usecentralize.com",
+    "source_type": "ashby",
+    "source_identifier": "centralize",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W24"
+  },
+  {
+    "name": "Astro Mechanica",
+    "slug": "astro-mechanica",
+    "careers_url": "https://www.astromecha.co/careers",
+    "source_type": "ashby",
+    "source_identifier": "astro-mechanica",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W24"
+  },
+  {
+    "name": "Hazel",
+    "slug": "hazel",
+    "careers_url": "https://hazelai.com",
+    "source_type": "ashby",
+    "source_identifier": "hazel",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W24"
+  },
+  {
+    "name": "Opencall",
+    "slug": "opencall",
+    "careers_url": "https://opencall.ai",
+    "source_type": "ashby",
+    "source_identifier": "opencall",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W24"
+  },
+  {
+    "name": "Raindrop",
+    "slug": "raindrop",
+    "careers_url": "https://www.raindrop.ai/careers/",
+    "source_type": "ashby",
+    "source_identifier": "raindrop",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W24"
+  },
+  {
+    "name": "Circleback",
+    "slug": "circleback",
+    "careers_url": "https://circleback.ai/jobs",
+    "source_type": "ashby",
+    "source_identifier": "circleback",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W24"
+  },
+  {
+    "name": "Artos",
+    "slug": "artos",
+    "careers_url": "https://artosai.com",
+    "source_type": "ashby",
+    "source_identifier": "artosai",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W24"
+  },
+  {
+    "name": "Retell AI",
+    "slug": "retell-ai",
+    "careers_url": "https://www.retellai.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "retell-ai",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W24"
+  },
+  {
+    "name": "Spur",
+    "slug": "spur",
+    "careers_url": "https://www.spurtest.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "spur",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S24"
+  },
+  {
+    "name": "Reform",
+    "slug": "reform",
+    "careers_url": "https://reformhq.com",
+    "source_type": "ashby",
+    "source_identifier": "reform",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W24"
+  },
+  {
+    "name": "Blacksmith",
+    "slug": "blacksmith",
+    "careers_url": "https://www.blacksmith.sh/careers",
+    "source_type": "ashby",
+    "source_identifier": "blacksmith",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W24"
+  },
+  {
+    "name": "Mem0",
+    "slug": "mem0",
+    "careers_url": "https://mem0.ai/careers",
+    "source_type": "ashby",
+    "source_identifier": "mem0",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S24"
+  },
+  {
+    "name": "Spaceium Inc",
+    "slug": "spaceium-inc",
+    "careers_url": "https://spaceium.com",
+    "source_type": "greenhouse",
+    "source_identifier": "spaceium",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S24"
+  },
+  {
+    "name": "ClaimSorted",
+    "slug": "claimsorted",
+    "careers_url": "https://claimsorted.com",
+    "source_type": "ashby",
+    "source_identifier": "claimsorted",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S24"
+  },
+  {
+    "name": "Codes Health",
+    "slug": "codes-health",
+    "careers_url": "https://codeshealth.com",
+    "source_type": "ashby",
+    "source_identifier": "codes-health",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S24"
+  },
+  {
+    "name": "Phonely",
+    "slug": "phonely",
+    "careers_url": "https://www.phonely.ai/careers",
+    "source_type": "ashby",
+    "source_identifier": "phonely",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S24"
+  },
+  {
+    "name": "FirstWork",
+    "slug": "firstwork",
+    "careers_url": "https://www.firstwork.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "firstwork",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S24"
+  },
+  {
+    "name": "Dodo",
+    "slug": "dodo",
+    "careers_url": "https://dodo.ai/careers",
+    "source_type": "ashby",
+    "source_identifier": "dodo",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S24"
+  },
+  {
+    "name": "Pulse",
+    "slug": "pulse",
+    "careers_url": "https://www.runpulse.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "pulse",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S24"
+  },
+  {
+    "name": "Substrate",
+    "slug": "substrate",
+    "careers_url": "https://substrate.cc",
+    "source_type": "ashby",
+    "source_identifier": "substrate",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S24"
+  },
+  {
+    "name": "Anthrogen",
+    "slug": "anthrogen",
+    "careers_url": "https://anthrogen.com",
+    "source_type": "ashby",
+    "source_identifier": "anthrogen",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S24"
+  },
+  {
+    "name": "Kastle",
+    "slug": "kastle",
+    "careers_url": "https://kastle.ai",
+    "source_type": "ashby",
+    "source_identifier": "kastle",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S24"
+  },
+  {
+    "name": "Conveo",
+    "slug": "conveo",
+    "careers_url": "https://conveo.ai/careers",
+    "source_type": "ashby",
+    "source_identifier": "conveo",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S24"
+  },
+  {
+    "name": "FINNY AI",
+    "slug": "finny-ai",
+    "careers_url": "https://finny.com/join-our-team/",
+    "source_type": "ashby",
+    "source_identifier": "finny",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S24"
+  },
+  {
+    "name": "David AI",
+    "slug": "david-ai",
+    "careers_url": "https://www.withdavid.ai/jobs",
+    "source_type": "ashby",
+    "source_identifier": "david-ai",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S24"
+  },
+  {
+    "name": "Thunder Compute",
+    "slug": "thunder-compute",
+    "careers_url": "https://www.thundercompute.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "thundercompute",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S24"
+  },
+  {
+    "name": "Brighterway",
+    "slug": "brighterway",
+    "careers_url": "https://www.brighterway.ai/careers",
+    "source_type": "ashby",
+    "source_identifier": "brighterway",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S24"
+  },
+  {
+    "name": "Simple AI",
+    "slug": "simple-ai",
+    "careers_url": "https://www.usesimple.ai/careers",
+    "source_type": "ashby",
+    "source_identifier": "simple-ai",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S24"
+  },
+  {
+    "name": "Usul",
+    "slug": "usul",
+    "careers_url": "https://usul.com",
+    "source_type": "ashby",
+    "source_identifier": "usul",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S24"
+  },
+  {
+    "name": "Vera Health",
+    "slug": "vera-health",
+    "careers_url": "https://vera-health.notion.site/careersvera",
+    "source_type": "ashby",
+    "source_identifier": "verahealth",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S24"
+  },
+  {
+    "name": "Conductor",
+    "slug": "conductor",
+    "careers_url": "https://conductor.build",
+    "source_type": "ashby",
+    "source_identifier": "conductor",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S24"
+  },
+  {
+    "name": "telli",
+    "slug": "telli",
+    "careers_url": "https://www.telli.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "telli",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "F24"
+  },
+  {
+    "name": "CTGT",
+    "slug": "ctgt",
+    "careers_url": "https://ctgt.ai",
+    "source_type": "ashby",
+    "source_identifier": "ctgt",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "F24"
+  },
+  {
+    "name": "Abundant",
+    "slug": "abundant",
+    "careers_url": "https://abundant.ai",
+    "source_type": "ashby",
+    "source_identifier": "abundant",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "F24"
+  },
+  {
+    "name": "Ryvn",
+    "slug": "ryvn",
+    "careers_url": "https://ryvn.ai/careers",
+    "source_type": "ashby",
+    "source_identifier": "ryvn",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "F24"
+  },
+  {
+    "name": "Bild AI",
+    "slug": "bild-ai",
+    "careers_url": "https://jobs.ashbyhq.com/bild-ai",
+    "source_type": "ashby",
+    "source_identifier": "bild-ai",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W25"
+  },
+  {
+    "name": "Weave",
+    "slug": "weave",
+    "careers_url": "https://weaveos.com",
+    "source_type": "ashby",
+    "source_identifier": "weave",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W25"
+  },
+  {
+    "name": "SalesPatriot",
+    "slug": "salespatriot",
+    "careers_url": "https://salespatriot.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "salespatriot",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W25"
+  },
+  {
+    "name": "Mosaic",
+    "slug": "mosaic",
+    "careers_url": "https://mosaic.so",
+    "source_type": "ashby",
+    "source_identifier": "mosaic",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W25"
+  },
+  {
+    "name": "HUD",
+    "slug": "hud",
+    "careers_url": "https://hud.ai",
+    "source_type": "ashby",
+    "source_identifier": "hud",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W25"
+  },
+  {
+    "name": "Solidroad",
+    "slug": "solidroad",
+    "careers_url": "https://www.solidroad.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "solidroad",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W25"
+  },
+  {
+    "name": "Harper",
+    "slug": "harper",
+    "careers_url": "https://www.harperinsure.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "harperinsure",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W25"
+  },
+  {
+    "name": "Mesh",
+    "slug": "mesh",
+    "careers_url": "https://usemesh.com",
+    "source_type": "greenhouse",
+    "source_identifier": "mesh",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W25"
+  },
+  {
+    "name": "Orbital Operations",
+    "slug": "orbital-operations",
+    "careers_url": "https://orbitalops.tech",
+    "source_type": "greenhouse",
+    "source_identifier": "orbitaloperations",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W25"
+  },
+  {
+    "name": "AfterQuery",
+    "slug": "afterquery",
+    "careers_url": "https://www.afterquery.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "afterquery",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W25"
+  },
+  {
+    "name": "Mercura",
+    "slug": "mercura",
+    "careers_url": "https://mercura.ai/careers",
+    "source_type": "ashby",
+    "source_identifier": "mercura",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W25"
+  },
+  {
+    "name": "Chestnut",
+    "slug": "chestnut",
+    "careers_url": "https://chestnutmortgage.com",
+    "source_type": "ashby",
+    "source_identifier": "chestnut",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "X25"
+  },
+  {
+    "name": "Avallon AI",
+    "slug": "avallon-ai",
+    "careers_url": "https://avallon.ai",
+    "source_type": "ashby",
+    "source_identifier": "avallon",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "X25"
+  },
+  {
+    "name": "Auctor",
+    "slug": "auctor",
+    "careers_url": "https://www.getauctor.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "auctor",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "X25"
+  },
+  {
+    "name": "Claim Health",
+    "slug": "claim-health",
+    "careers_url": "https://claimhealth.com",
+    "source_type": "ashby",
+    "source_identifier": "claim-health",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "X25"
+  },
+  {
+    "name": "Sim",
+    "slug": "sim",
+    "careers_url": "https://www.sim.ai/careers",
+    "source_type": "ashby",
+    "source_identifier": "sim",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "X25"
+  },
+  {
+    "name": "Jeevy Fabrication",
+    "slug": "jeevy-fabrication",
+    "careers_url": "https://www.jeevyfabrication.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "jeevyfabrication",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "X25"
+  },
+  {
+    "name": "Lucis",
+    "slug": "lucis",
+    "careers_url": "https://www.lucis.life/careers",
+    "source_type": "ashby",
+    "source_identifier": "lucis",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "X25"
+  },
+  {
+    "name": "Sygaldry Technologies",
+    "slug": "sygaldry-technologies",
+    "careers_url": "https://sygaldry.com",
+    "source_type": "ashby",
+    "source_identifier": "sygaldry-technologies",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "X25"
+  },
+  {
+    "name": "Eloquent AI",
+    "slug": "eloquent-ai",
+    "careers_url": "https://www.eloquentai.co/careers",
+    "source_type": "ashby",
+    "source_identifier": "eloquentai",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "X25"
+  },
+  {
+    "name": "Lapel",
+    "slug": "lapel",
+    "careers_url": "https://lapel.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "lapel",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "X25"
+  },
+  {
+    "name": "Dedalus Labs",
+    "slug": "dedalus-labs",
+    "careers_url": "https://www.dedaluslabs.ai/careers",
+    "source_type": "ashby",
+    "source_identifier": "dedalus-labs",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S25"
+  },
+  {
+    "name": "AgentMail",
+    "slug": "agentmail",
+    "careers_url": "https://www.agentmail.to/careers",
+    "source_type": "ashby",
+    "source_identifier": "agentmail",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S25"
+  },
+  {
+    "name": "Comena",
+    "slug": "comena",
+    "careers_url": "https://comena.ai",
+    "source_type": "ashby",
+    "source_identifier": "comena",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S25"
+  },
+  {
+    "name": "Relling",
+    "slug": "relling",
+    "careers_url": "https://rellingsystems.com/about/careers",
+    "source_type": "ashby",
+    "source_identifier": "relling",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S25"
+  },
+  {
+    "name": "Finto",
+    "slug": "finto",
+    "careers_url": "https://www.gofinto.com",
+    "source_type": "ashby",
+    "source_identifier": "finto",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S25"
+  },
+  {
+    "name": "idler",
+    "slug": "idler",
+    "careers_url": "https://idler.ai/careers",
+    "source_type": "ashby",
+    "source_identifier": "idler",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S25"
+  },
+  {
+    "name": "Reacher",
+    "slug": "reacher",
+    "careers_url": "https://reacherapp.com",
+    "source_type": "ashby",
+    "source_identifier": "reacher",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S25"
+  },
+  {
+    "name": "Interfere",
+    "slug": "interfere",
+    "careers_url": "https://interfere.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "interfere",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S25"
+  },
+  {
+    "name": "burnt",
+    "slug": "burnt",
+    "careers_url": "https://www.getburnt.ai/careers",
+    "source_type": "greenhouse",
+    "source_identifier": "burnt",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S25"
+  },
+  {
+    "name": "Nox Metals",
+    "slug": "nox-metals",
+    "careers_url": "https://noxmetals.co/careers",
+    "source_type": "ashby",
+    "source_identifier": "nox-metals",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "S25"
+  },
+  {
+    "name": "Icarus",
+    "slug": "icarus",
+    "careers_url": "https://icarus.one",
+    "source_type": "greenhouse",
+    "source_identifier": "icarus",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "F25"
+  },
+  {
+    "name": "DiligenceSquared",
+    "slug": "diligencesquared",
+    "careers_url": "https://www.diligencesquared.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "diligencesquared",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "F25"
+  },
+  {
+    "name": "Clara",
+    "slug": "clara",
+    "careers_url": "https://askclara.com",
+    "source_type": "greenhouse",
+    "source_identifier": "clara",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "X26"
+  },
+  {
+    "name": "One Robot",
+    "slug": "one-robot",
+    "careers_url": "https://www.onerobot.io/jobs",
+    "source_type": "ashby",
+    "source_identifier": "onerobot",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W26"
+  },
+  {
+    "name": "Lance",
+    "slug": "lance",
+    "careers_url": "https://lance.live",
+    "source_type": "ashby",
+    "source_identifier": "lance",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W26"
+  },
+  {
+    "name": "Stilta",
+    "slug": "stilta",
+    "careers_url": "https://www.stilta.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "stilta",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W26"
+  },
+  {
+    "name": "Parameter",
+    "slug": "parameter",
+    "careers_url": "https://www.parameter.ai/careers",
+    "source_type": "ashby",
+    "source_identifier": "parameter",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W26"
+  },
+  {
+    "name": "Pax Historia",
+    "slug": "pax-historia",
+    "careers_url": "https://paxhistoria.co",
+    "source_type": "ashby",
+    "source_identifier": "pax-historia",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W26"
+  },
+  {
+    "name": "Cardboard",
+    "slug": "cardboard",
+    "careers_url": "https://www.cardboard.ai/careers",
+    "source_type": "ashby",
+    "source_identifier": "cardboard",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W26"
+  },
+  {
+    "name": "9 Mothers",
+    "slug": "9-mothers",
+    "careers_url": "https://9mothers.com/careers",
+    "source_type": "ashby",
+    "source_identifier": "9-mothers",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "X26"
+  },
+  {
+    "name": "Human Archive",
+    "slug": "human-archive",
+    "careers_url": "https://humanarchive.ai",
+    "source_type": "ashby",
+    "source_identifier": "humanarchive",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W26"
+  },
+  {
+    "name": "Pocket",
+    "slug": "pocket",
+    "careers_url": "https://heypocket.com",
+    "source_type": "ashby",
+    "source_identifier": "pocket",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W26"
+  },
+  {
+    "name": "Polymath",
+    "slug": "polymath",
+    "careers_url": "https://polymathlabs.ai/careers",
+    "source_type": "ashby",
+    "source_identifier": "polymath",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W26"
+  },
+  {
+    "name": "Brumby",
+    "slug": "brumby",
+    "careers_url": "https://brumby.com/careers/",
+    "source_type": "ashby",
+    "source_identifier": "brumby",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "W26"
+  },
+  {
+    "name": "Dispatch",
+    "slug": "dispatch",
+    "careers_url": "https://www.dispatch.space/careers",
+    "source_type": "ashby",
+    "source_identifier": "dispatch",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "X26"
+  },
+  {
+    "name": "Klarify",
+    "slug": "klarify",
+    "careers_url": "https://jobs.ashbyhq.com/klarify",
+    "source_type": "ashby",
+    "source_identifier": "klarify",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "X26"
+  },
+  {
+    "name": "Complir",
+    "slug": "complir",
+    "careers_url": "https://www.complir.io/careers",
+    "source_type": "ashby",
+    "source_identifier": "complir",
+    "industry": null,
+    "region": "yc",
+    "yc_batch": "X26"
   }
 ]

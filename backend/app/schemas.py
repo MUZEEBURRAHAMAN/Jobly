@@ -32,6 +32,7 @@ class JobOut(BaseModel):
     max_salary: float | None = None
     geo_hub: str | None = None
     experience_tier: str | None = None
+    yc_batch: str | None = None   # Y Combinator batch of the employer, e.g. "W21"
 
     @field_validator("application_url", mode="before")
     @classmethod
@@ -56,6 +57,7 @@ class CompanyOut(BaseModel):
     source_identifier: str
     industry: str | None = None
     logo_url: str | None = None
+    yc_batch: str | None = None
     is_active: bool
     job_count: int = 0
     created_at: str

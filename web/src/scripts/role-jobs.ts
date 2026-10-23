@@ -1,12 +1,13 @@
 // Role pages: the latest jobs for one role, live from Jobly's server, with date and remote filters.
 import { apiGet, formatNumber } from './api';
 
-type Job = { id: number; title: string; company_name: string; location: string | null; posted_at: string | null; application_url: string; work_mode: string | null; seniority: string | null; salary_summary: string | null };
+type Job = { id: number; title: string; company_name: string; location: string | null; posted_at: string | null; application_url: string; work_mode: string | null; seniority: string | null; salary_summary: string | null; yc_batch?: string | null };
 type Page = { items: Job[]; total: number };
 
 const root = document.querySelector<HTMLElement>('[data-role-jobs]');
 if (root) {
-  const role = root.dataset.role!;
+  const yc = root.hasAttribute('data-yc');   // only employers from Y Combinator's public directory
+  const role = () => root.querySelector<HTMLInputElement>('input[name="role"]:checked')?.value ?? root.dataset.role!;
   const list = root.querySelector<HTMLOListElement>('[data-list]')!;
   const status = root.querySelector<HTMLElement>('[data-status]')!;
   const more = root.querySelector<HTMLButtonElement>('[data-more]')!;
@@ -34,6 +35,7 @@ if (root) {
     const meta = el('p', 'j-meta');
     const age = ago(j.posted_at);
     if (age) meta.append(el('span', 'j-age', age));
+    if (yc && j.yc_batch) meta.append(el('span', 'j-tag', `YC ${j.yc_batch}`));
     meta.append(el('span', '', j.company_name));
     if (j.location) meta.append(el('span', '', j.location));
     if (j.work_mode && MODE[j.work_mode]) meta.append(el('span', 'j-tag', MODE[j.work_mode]));
@@ -55,7 +57,7 @@ if (root) {
     if (reset) { offset = 0; list.replaceChildren(...Array.from({ length: 5 }, () => el('li', 'skel'))); list.setAttribute('aria-busy', 'true'); }
     more.disabled = true;
     try {
-      const page = await apiGet<Page>('/api/jobs', { role, freshness_days: days(), work_mode: remote.checked ? 'remote' : undefined, limit: PAGE, offset }, {
+      const page = await apiGet<Page>('/api/jobs', { role: role(), yc: yc ? 'true' : undefined, freshness_days: days(), work_mode: remote.checked ? 'remote' : undefined, limit: PAGE, offset }, {
         timeoutMs: 60000, onSlow: () => { if (mine === request) status.textContent = 'Waking up the server, this can take up to a minute…'; },
       });
       if (mine !== request) return;
@@ -75,13 +77,14 @@ if (root) {
   };
 
   root.querySelectorAll('input[name="days"]').forEach((r) => r.addEventListener('change', () => load(true)));
+  root.querySelectorAll('input[name="role"]').forEach((r) => r.addEventListener('change', () => load(true)));
   remote.addEventListener('change', () => load(true));
   more.addEventListener('click', () => load(false));
   load(true);
 
   // The "posted in the last 7 days" badge in the hero.
   const week = document.querySelector<HTMLElement>('[data-week]');
-  if (week) apiGet<Page>('/api/jobs', { role, freshness_days: 7, limit: 1 }, { timeoutMs: 60000 })
+  if (week) apiGet<Page>('/api/jobs', { role: role(), yc: yc ? 'true' : undefined, freshness_days: 7, limit: 1 }, { timeoutMs: 60000 })
     .then((p) => { week.textContent = formatNumber(p.total); })
     .catch(() => { week.parentElement!.hidden = true; });
 }

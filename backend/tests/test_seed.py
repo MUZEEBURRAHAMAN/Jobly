@@ -23,6 +23,18 @@ class TestBootstrap(unittest.IsolatedAsyncioTestCase):
         self._patch.stop()
         self._tmp.cleanup()
 
+    async def test_yc_batch_is_stored_and_added_to_employers_that_already_exist(self):
+        entry = {"name": "Startup Co", "slug": "startup-co", "source_type": "ashby", "source_identifier": "startupco", "careers_url": "https://startup.co/jobs"}
+        listing = Path(self._tmp.name) / "companies.json"
+        with patch.object(settings, "COMPANIES_FILE", listing):
+            listing.write_text(json.dumps([entry]))
+            await seed_companies_if_missing()                                  # employer exists without a tag
+            listing.write_text(json.dumps([{**entry, "yc_batch": "S22"}]))
+            await seed_companies_if_missing()                                  # a later list tags it
+        async with get_db_connection() as db:
+            row = await (await db.execute("SELECT yc_batch FROM companies WHERE slug = 'startup-co'")).fetchone()
+        self.assertEqual(row["yc_batch"], "S22")
+
     async def test_light_crawl_skips_workday_and_full_crawl_reads_it(self):
         from backend.app.ingestion import runner
         now = get_utc_now()
