@@ -2,26 +2,62 @@
 import Base from '../layouts/Base.astro';
 import PageHero from '../components/page/PageHero.astro';
 import SectionHead from '../components/SectionHead.astro';
-import Icon from '../components/Icon.astro';
 import FinalCta from '../components/landing/FinalCta.astro';
 
-// Status of upcoming work. "Exploring" items are ideas, not promises.
-const board = [
-  { id: 'now', title: 'In progress', icon: 'clock', items: [
-    { t: 'Chrome Web Store listing', d: 'Publishing Jobly so it installs in one click.' },
-    { t: 'This website', d: 'Guides, comparisons and live job pages for each role.' },
+// Releases, newest plan first. "Later" items are ideas, not promises, and nothing here has a date.
+type Group = { h: string; items: string[] };
+type Release = { v: string; tag: 'launching' | 'next' | 'upcoming'; title: string; lead: string; groups: Group[] };
+const releases: Release[] = [
+  { v: 'v0.1.0', tag: 'launching', title: 'Launch', lead: 'The first public version: fresh tech jobs with real posting dates, alerts and filters.', groups: [
+    { h: 'Getting it out', items: [
+      'Chrome Web Store listing, so Jobly installs in one click.',
+      'This website: guides, comparisons and live job pages for each role.',
+    ] },
   ] },
-  { id: 'next', title: 'Planned', icon: 'calendar', items: [
-    { t: 'More companies', d: 'Adding career pages people ask for. Suggest one through support.' },
-    { t: 'More hiring systems', d: 'Reading more of the systems companies use for their careers pages.' },
-    { t: 'Clearer job cards', d: 'Showing salary and location details more consistently across sources.' },
+  { v: 'v0.2.0', tag: 'next', title: 'Application tracker', lead: 'Keep every application in one place. Everything stays on your device, with no account.', groups: [
+    { h: 'Track applications', items: [
+      'A status on every saved job: Saved, Applied, Interview, Offer or Rejected.',
+      'Notes on each job, such as the recruiter’s name, salary talk and questions to ask.',
+      'A “Did you apply?” prompt after you click Apply, so the tracker fills itself.',
+      'A warning on job cards when you already applied to that company.',
+    ] },
+    { h: 'Follow up', items: [
+      'Follow-up reminders, such as “check in after 7 days”.',
+      'A small dashboard: applications this week, interviews and your response rate.',
+    ] },
+    { h: 'Your data', items: ['Export and import your saved jobs and tracker as a file (JSON or CSV).'] },
   ] },
-  { id: 'later', title: 'Exploring', icon: 'lightbulb', items: [
-    { t: 'More role families', d: 'Such as data, DevOps and mobile engineering.' },
-    { t: 'Other browsers', d: 'Listing Jobly in the Edge and Firefox add-on stores.' },
-    { t: 'Export saved jobs', d: 'Download your shortlist as a file you can keep.' },
+  { v: 'v0.3.0', tag: 'upcoming', title: 'Smarter matching', lead: 'Tell Jobly what you never want to see, and what to watch closely.', groups: [
+    { h: 'Dealbreakers', items: [
+      'Exclude keywords, set a salary floor, and hide work modes or companies you don’t want.',
+    ] },
+    { h: 'Alerts', items: [
+      'Follow a company: get an alert for any new role at an employer you pick.',
+      'A count of new matches on the toolbar icon.',
+    ] },
+  ] },
+  { v: 'v0.4.0', tag: 'upcoming', title: 'Apply faster, privately', lead: 'Less retyping, without giving Jobly access to the pages you visit.', groups: [
+    { h: 'Capture and reuse', items: [
+      'Save any job from any website with a right-click “Save to Jobly”. It reads the page title and address only when you click.',
+      'A copy kit: one-click copy of your name, links and a short intro to paste into forms.',
+      'Cover letter templates with fill-in fields such as the company and role. No AI.',
+    ] },
+    { h: 'Your devices', items: ['Sync saved jobs and your tracker across your computers through your Chrome account (small size limit).'] },
   ] },
 ];
+const later = [
+  { t: 'Resume keyword check', d: 'Paste your resume and see which keywords a job asks for that it lacks. It would run on your device, and depends on having each job’s description.' },
+  { t: 'More companies and hiring systems', d: 'Adding career pages people ask for, and the systems companies use to publish them.' },
+  { t: 'Clearer job cards', d: 'Showing salary and location details more consistently across sources.' },
+  { t: 'More role families', d: 'Such as data, DevOps and mobile engineering.' },
+  { t: 'Other browsers', d: 'Listing Jobly in the Edge and Firefox add-on stores.' },
+];
+const wont = [
+  { t: 'AI-written resumes and cover letters', d: 'Every request costs money, and Jobly is free. Templates you fill in yourself are planned instead.' },
+  { t: 'Autofill on every site', d: 'It needs access to every page you visit. Jobly promises it can’t see your tabs, so it won’t.' },
+  { t: 'Accounts', d: 'Your data stays in your browser, so there is nothing to sign in to.' },
+];
+const TAGS = { launching: 'Launching', next: 'Next', upcoming: 'Upcoming' } as const;
 const changelog = [
   { date: '2026-10-18', title: 'A new website, and fewer logs', items: [
     'New website with guides, how dates work, a live list of companies, privacy, security and support pages.',
@@ -49,19 +85,38 @@ const fmt = (d: string) => new Date(d + 'T12:00:00Z').toLocaleDateString('en-GB'
 ---
 <Base title="Roadmap" description="What Jobly is working on, what's planned, and everything that shipped, with dates.">
   <PageHero crumbs={[{ label: 'Roadmap' }]} eyebrow="Roadmap" title="What’s next, and what shipped." figure="rail" intensity={0.7}
-    lead="Jobly is shaped by feedback from the people who use it. Here is what’s in progress, what’s planned, and a dated list of every change." />
+    lead="Jobly is shaped by feedback from the people who use it. Here are the releases we are working on, the ideas we are weighing, and a dated list of every change." />
 
-  <section class="container section board-wrap" aria-labelledby="board-title">
-    <h2 class="sr-only" id="board-title">Roadmap</h2>
-    <div class="board" data-stagger>
-      {board.map((col) => (
-        <section class:list={['col', col.id]} aria-labelledby={`${col.id}-t`} data-reveal>
-          <h3 id={`${col.id}-t`}><span class="c-icon" aria-hidden="true"><Icon name={col.icon} size={16} /></span>{col.title}<span class="count">{col.items.length}</span></h3>
-          <ul>{col.items.map((i) => <li><strong>{i.t}</strong><span>{i.d}</span></li>)}</ul>
-        </section>
+  <section class="container section rel-wrap" aria-labelledby="rel-title">
+    <h2 class="sr-only" id="rel-title">Upcoming releases</h2>
+    <ol class="rels">
+      {releases.map((r) => (
+        <li class="rel" data-reveal>
+          <div class="rel-side"><span class="ver">{r.v}</span><span class:list={['tag', r.tag]}>{TAGS[r.tag]}</span></div>
+          <div class="rel-main">
+            <h3>{r.title}</h3>
+            <p class="lead-sm">{r.lead}</p>
+            {r.groups.map((g) => (
+              <div class="grp"><h4>{g.h}</h4><ul>{g.items.map((i) => <li>{i}</li>)}</ul></div>
+            ))}
+          </div>
+        </li>
       ))}
+    </ol>
+    <p class="small note">Plans can change and nothing here has a date. Want something? <a href="/support">Tell us</a>; requests decide what comes next.</p>
+  </section>
+
+  <section class="container section ideas" aria-labelledby="ideas-title">
+    <div class="two">
+      <div data-reveal>
+        <SectionHead eyebrow="Later" id="ideas-title" title="Ideas we are weighing" />
+        <ul class="items">{later.map((i) => <li><strong>{i.t}</strong><span>{i.d}</span></li>)}</ul>
+      </div>
+      <div data-reveal>
+        <SectionHead eyebrow="Not planned" id="wont-title" title="What Jobly won’t do" />
+        <ul class="items">{wont.map((i) => <li><strong>{i.t}</strong><span>{i.d}</span></li>)}</ul>
+      </div>
     </div>
-    <p class="small note">Planned and exploring items can change. Want something? <a href="/support">Tell us</a>; requests decide what comes next.</p>
   </section>
 
   <section class="shell" aria-labelledby="log-title">
@@ -87,18 +142,25 @@ const fmt = (d: string) => new Date(d + 'T12:00:00Z').toLocaleDateString('en-GB'
 </Base>
 
 <style>
-  .board { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
-  .col { padding: 8px; border-radius: 22px; background: var(--panel); border: 1px solid var(--border); }
-  .col h3 { display: flex; align-items: center; gap: 10px; padding: 12px 12px 14px; font-size: 1rem; font-weight: 600; }
-  .c-icon { width: 28px; height: 28px; display: grid; place-items: center; border-radius: 8px; background: var(--card); border: 1px solid var(--border); }
-  .now .c-icon { color: var(--brand); }
-  .next .c-icon { color: var(--success); }
-  .later .c-icon { color: var(--subtle); }
-  .count { margin-left: auto; font-size: var(--text-sm); color: var(--subtle); font-weight: 500; }
-  .col ul { list-style: none; padding: 0; display: grid; gap: 8px; }
-  .col li { padding: 16px; border-radius: 14px; background: var(--card); border: 1px solid var(--border); box-shadow: var(--shadow-sm); display: grid; gap: 4px; }
-  .col strong { font-weight: 500; }
-  .col li span { color: var(--muted); font-size: var(--text-md); line-height: 1.55; }
+  .rels { list-style: none; padding: 0; display: grid; }
+  .rel { display: grid; grid-template-columns: 200px minmax(0, 1fr); gap: 32px; padding-block: 32px; border-top: 1px solid var(--border-strong); }
+  .rel:last-child { border-bottom: 1px solid var(--border-strong); }
+  .rel-side { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; padding-top: 4px; }
+  .ver { font-size: var(--text-sm); font-weight: 500; color: var(--brand); }
+  .tag { font-size: 0.75rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; padding: 4px 10px; border-radius: 999px; border: 1px solid var(--border); background: var(--card); color: var(--muted); }
+  .tag.next { color: var(--brand); border-color: var(--brand); }
+  .tag.launching { color: var(--success); }
+  .rel-main h3 { font-size: 1.5rem; font-weight: 500; letter-spacing: -0.02em; }
+  .lead-sm { margin-top: 8px; color: var(--muted); max-width: 62ch; line-height: 1.6; }
+  .grp { margin-top: 22px; }
+  .grp h4 { font-size: var(--text-sm); font-weight: 600; color: var(--fg); }
+  .grp ul { margin-top: 8px; padding-left: 1.2em; display: grid; gap: 8px; color: var(--muted); line-height: 1.6; max-width: 70ch; }
+  .grp li::marker { color: var(--subtle); }
+  .two { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 40px; }
+  .items { list-style: none; padding: 0; margin-top: 28px; display: grid; gap: 10px; }
+  .items li { padding: 16px; border-radius: 14px; background: var(--card); border: 1px solid var(--border); display: grid; gap: 4px; }
+  .items strong { font-weight: 500; }
+  .items span { color: var(--muted); font-size: var(--text-md); line-height: 1.55; }
   .note { margin-top: 20px; }
   .note a { color: var(--muted); text-decoration: underline; text-underline-offset: 3px; }
   .log { list-style: none; padding: 0; margin-top: 48px; display: grid; }
@@ -107,5 +169,5 @@ const fmt = (d: string) => new Date(d + 'T12:00:00Z').toLocaleDateString('en-GB'
   .entry h3 { font-size: 1.25rem; font-weight: 500; letter-spacing: -0.02em; }
   .entry ul { margin-top: 12px; padding-left: 1.2em; display: grid; gap: 8px; color: var(--muted); line-height: 1.6; max-width: 70ch; }
   .entry li::marker { color: var(--subtle); }
-  @media (max-width: 900px) { .board { grid-template-columns: 1fr; } .log > li { grid-template-columns: 1fr; gap: 8px; } }
+  @media (max-width: 900px) { .rel, .log > li { grid-template-columns: 1fr; gap: 8px; } .rel-side { flex-direction: row; align-items: center; } .two { grid-template-columns: 1fr; } }
 </style>
