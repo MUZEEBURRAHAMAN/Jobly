@@ -34,7 +34,7 @@ export const StatusPill: React.FC<{ status: ConnectionStatus; onRetry?: () => vo
 export const Header: React.FC<HeaderProps> = ({ status, onRetry, isSyncing, onSync, openOptions, theme, onToggleTheme, minimal }) => (
   <header className="topbar">
     <div className="row" style={{ gap: 10, minWidth: 0 }}>
-      <div className="brand-mark" aria-hidden="true">J</div>
+      <img className="brand-mark" src="icons/icon-48.png" alt="" width={32} height={32} aria-hidden="true" />
       <div style={{ minWidth: 0 }}>
         <h1>Jobly</h1>
         <StatusPill status={status} onRetry={onRetry} />

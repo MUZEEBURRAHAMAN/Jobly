@@ -202,7 +202,7 @@ export const OptionsApp: React.FC = () => {
     <div className="dash" data-theme={theme}>
       <header className="topbar" style={{ padding: '12px 24px' }}>
         <div className="row" style={{ gap: 12 }}>
-          <div className="brand-mark" aria-hidden="true">J</div>
+          <img className="brand-mark" src="icons/icon-48.png" alt="" width={32} height={32} aria-hidden="true" />
           <div>
             <h1>Jobly <span className="muted font-medium text-sm">v{appVersion()}</span></h1>
             <StatusPill status={status} onRetry={() => { connect(); }} />
