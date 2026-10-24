@@ -38,7 +38,7 @@ PRIVATE BY DESIGN
 • Jobly can't see your tabs or the pages you visit
 
 GOOD TO KNOW
-• Jobly lists tech roles only, and most of the employers it reads are US companies, plus remote job boards
+• Jobly lists tech roles only. It reads employers in many countries, and US companies are the largest group
 • Apply opens the original listing, usually the employer's own careers page
 • Jobly's server runs on a free plan, so the first load after a quiet period can take up to a minute
 • Jobly isn't affiliated with the employers it lists
