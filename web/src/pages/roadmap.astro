@@ -53,6 +53,10 @@ const wont = [
 ];
 const TAGS = { next: 'Next', upcoming: 'Upcoming' } as const;
 const changelog = [
+  { date: '2026-10-26', title: 'Jobly is on the Chrome Web Store', items: [
+    'Jobly 0.1.0 is published, so it installs in one click from the Chrome Web Store.',
+    'Every Add to Chrome button on this site now goes straight to the listing.',
+  ] },
   { date: '2026-10-23', title: 'Jobs at Y Combinator startups', items: [
     'A new page lists open roles at companies from Y Combinator’s public directory, each tagged with its batch. Jobly isn’t affiliated with Y Combinator.',
     'Hundreds of YC startups were added, read from their own career pages with real posting dates.',
@@ -113,7 +117,7 @@ const fmt = (d: string) => new Date(d + 'T12:00:00Z').toLocaleDateString('en-GB'
 
   <section class="container section rel-wrap" aria-labelledby="rel-title">
     <h2 class="sr-only" id="rel-title">Upcoming releases</h2>
-    <p class="now"><span class="now-tag">Now</span>Jobly v0.1.0 is built, and its Chrome Web Store listing is in progress. Everything below comes after it.</p>
+    <p class="now"><span class="now-tag">Now</span>Jobly v0.1.0 is live on the Chrome Web Store. Everything below comes after it.</p>
     <ol class="rels">
       {releases.map((r) => (
         <li class="rel" data-reveal>

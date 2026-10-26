@@ -3,8 +3,8 @@ export const SITE = {
   name: 'Jobly',
   url: 'https://joblyextension.netlify.app',
   email: 'rahamanmuzeeb1108@gmail.com',
-  // Set once the Chrome Web Store listing is live; until then the buttons explain how to install.
-  storeUrl: '',
+  // The Chrome Web Store listing (live since 2026-10-26). Empty = the buttons fall back to /how-it-works#install.
+  storeUrl: 'https://chromewebstore.google.com/detail/phdobnnjceecemndkgeclghkjcfjfgfl',
   api: (import.meta.env.PUBLIC_API_BASE as string | undefined) || 'https://jobly-yd6l.onrender.com',
   github: 'https://github.com/MUZEEBURRAHAMAN/Jobly',
 };
