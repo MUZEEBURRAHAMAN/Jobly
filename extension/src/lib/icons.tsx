@@ -5,7 +5,8 @@ import {
   SquareArrowUpRightIcon, Cancel01Icon, FilterHorizontalIcon, Search01Icon, Tick02Icon, Bookmark02Icon, Sun03Icon,
   RefreshIcon, Moon02Icon, Building06Icon, Briefcase01Icon, SparklesIcon, Share08Icon, FloppyDiskIcon, ArrowTurnBackwardIcon,
   Add01Icon, Location01Icon, Flag02Icon, CheckmarkCircle02Icon, BookmarkCheck02Icon, Notification03Icon, ArrowRight01Icon,
-  ArrowLeft01Icon, ChromeIcon,
+  ArrowLeft01Icon, ChromeIcon, KanbanIcon, Calendar03Icon, CheckListIcon, Download04Icon, Upload04Icon, Delete02Icon, StarIcon,
+  Clock01Icon, PencilEdit02Icon, Target02Icon, Link01Icon,
 } from '@hugeicons/core-free-icons';
 
 type Node = readonly [string, Readonly<Record<string, string | number>>];
@@ -56,4 +57,15 @@ export const Bell = make(n(Notification03Icon), 'Bell');
 export const ArrowRight = make(n(ArrowRight01Icon), 'ArrowRight');
 export const ArrowLeft = make(n(ArrowLeft01Icon), 'ArrowLeft');
 export const Chrome = make(n(ChromeIcon), 'Chrome');
+export const Kanban = make(n(KanbanIcon), 'Kanban');
+export const Calendar = make(n(Calendar03Icon), 'Calendar');
+export const ListChecks = make(n(CheckListIcon), 'ListChecks');
+export const Download = make(n(Download04Icon), 'Download');
+export const Upload = make(n(Upload04Icon), 'Upload');
+export const Trash = make(n(Delete02Icon), 'Trash');
+export const Star = make(n(StarIcon), 'Star');
+export const Clock = make(n(Clock01Icon), 'Clock');
+export const Pencil = make(n(PencilEdit02Icon), 'Pencil');
+export const Target = make(n(Target02Icon), 'Target');
+export const LinkIcon = make(n(Link01Icon), 'LinkIcon');
 export type IconComponent = ReturnType<typeof make>;

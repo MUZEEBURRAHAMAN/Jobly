@@ -1,5 +1,6 @@
 // End-to-end suite: real Chromium + the built extension + a backend on a fixture database.
 import { launch, open, makeRunner, LOCAL, JSON_HEADERS, sleep, json, API } from './lib.mjs';
+import fs from 'fs';
 
 const t = makeRunner('e2e suite');
 const { ok, step, axe } = t;
@@ -16,7 +17,7 @@ await step('accessibility, both themes', async () => {
     for (const tab of ['Jobs', 'Companies', 'Saved', 'Preferences']) { await p.getByRole('button', { name: new RegExp('^' + tab) }).click(); await sleep(500); await axe(p, `popup/${tab}/${theme}`); }
     await p.getByRole('button', { name: /^Jobs/ }).click(); await p.getByRole('button', { name: /Filters/ }).click(); await axe(p, `popup/filters/${theme}`);
     const d = await open(h, 'options.html', { theme, width: 1280, height: 860 }); await firstCard(d);
-    for (const tab of ['Jobs', 'Companies', 'Saved', 'Alerts', 'Preferences']) { await d.getByRole('button', { name: new RegExp('^' + tab) }).click(); await sleep(500); await axe(d, `dashboard/${tab}/${theme}`); }
+    for (const tab of ['Jobs', 'Companies', 'Saved', 'Tracker', 'Interviews', 'Tasks', 'Alerts', 'Preferences']) { await d.getByRole('button', { name: new RegExp('^' + tab) }).click(); await sleep(500); await axe(d, `dashboard/${tab}/${theme}`); }
     await h.ctx.close();
   }
 });
@@ -204,6 +205,88 @@ await step('production build: https only, no localhost, no CSP errors', async ()
   ok(!reqs.some((u) => /127\.0\.0\.1|localhost|getcatchly/.test(u)), 'no requests to localhost or getcatchly');
   ok(!errors.some((e) => /Content Security Policy/.test(e)), 'no CSP violations');
   const manifest = await h.sw.evaluate(() => chrome.runtime.getManifest()); ok(manifest.host_permissions.every((x) => x.startsWith('https://')) && manifest.host_permissions.length === 1, `host permissions: ${manifest.host_permissions.join(', ')}`);
+  await h.ctx.close();
+});
+
+await step('tracker: track, details, interviews, tasks, import/export, reminders, "Did you apply?"', async () => {
+  const h = await launch();
+  const store = async (k) => (await h.sw.evaluate((key) => chrome.storage.local.get(key), k))[k];
+  const day = (n) => { const d = new Date(Date.now() + n * 86400000); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; };
+  const d = await open(h, 'options.html', { width: 1280, height: 860 }); await firstCard(d);
+  // track from a job card
+  const card = d.locator('article').first(); const label = await card.getAttribute('aria-label'); const company = label.split(' at ').pop();
+  await card.getByRole('combobox', { name: /^Track / }).selectOption('applied'); await sleep(500);
+  let apps = await store('applications');
+  ok(apps?.length === 1 && apps[0].status === 'applied' && !!apps[0].applied_at, 'Track → Applied stores the application with today\'s date');
+  ok(await card.locator('.badge', { hasText: 'Applied' }).count() === 1, 'the card says Applied');
+  const sibling = d.locator('article', { hasText: company }).nth(1);
+  if (await sibling.count()) ok(await sibling.locator('.badge', { hasText: 'You applied here before' }).count() === 1, 'other jobs at the same company warn "You applied here before"');
+  // board + details
+  await d.getByRole('button', { name: /^Tracker/ }).click(); await d.getByRole('heading', { name: 'Tracker', exact: true }).waitFor({ timeout: 5000 });
+  ok(await d.locator('section[aria-labelledby="col-applied"] .board-card').count() === 1, 'it appears in the Applied column');
+  await d.getByRole('button', { name: /^Details for/ }).first().click(); await d.getByRole('dialog').waitFor();
+  await axe(d, 'application details dialog');
+  await d.getByLabel('Notes').fill('Recruiter: Sam'); await d.getByLabel('Follow up on').fill(day(2));
+  await d.getByRole('button', { name: 'Save changes' }).click(); await sleep(500);
+  apps = await store('applications');
+  ok(apps[0].notes === 'Recruiter: Sam' && !!apps[0].follow_up_at, 'notes and the follow-up date are saved');
+  ok(await d.locator('.board-card .badge', { hasText: /Follow up in 2 days/ }).count() === 1, 'the card shows when to follow up');
+  // interview from the details dialog
+  await d.getByRole('button', { name: /^Details for/ }).first().click();
+  await d.getByRole('button', { name: 'Add interview' }).click(); await d.getByRole('dialog', { name: 'Add interview' }).waitFor();
+  await axe(d, 'interview dialog');
+  await d.getByLabel('Round').fill('Technical'); await d.getByLabel('New checklist item').fill('Review system design'); await d.getByRole('button', { name: 'Add', exact: true }).click();
+  await d.getByRole('radio', { name: '4 of 5' }).click();
+  await d.getByRole('button', { name: 'Save interview' }).click(); await sleep(500);
+  const ivs = await store('interviews');
+  ok(ivs?.length === 1 && ivs[0].round === 'Technical' && ivs[0].checklist.length === 5 && ivs[0].rating === 4, 'the interview is saved with its checklist and rating');
+  ok((await store('applications'))[0].status === 'interview', 'adding an interview moves the application to Interviewing');
+  await d.keyboard.press('Escape'); await sleep(300);
+  await d.getByRole('button', { name: /^Interviews/ }).click(); await d.getByText(/Technical ·/).waitFor({ timeout: 5000 }); ok(true, 'the Interviews page lists it');
+  // tasks + weekly goal
+  await d.getByRole('button', { name: /^Tasks/ }).click(); await d.getByText(/of 10 applications this week/).waitFor({ timeout: 5000 });
+  ok(await d.getByText('1 of 10 applications this week').count() === 1, 'the weekly goal counts this week\'s applications');
+  await d.getByLabel('New task').fill('Send a thank-you note'); await d.getByLabel('Due date').fill(day(1)); await d.getByRole('button', { name: 'Add task' }).click(); await sleep(400);
+  ok((await store('tasks'))?.[0]?.text === 'Send a thank-you note', 'a task is stored');
+  await d.getByRole('checkbox', { name: /Send a thank-you note/ }).click(); await sleep(400); // it moves into the collapsed Done list
+  ok((await store('tasks'))[0].done === true, 'ticking a task marks it done');
+  // add by hand, export CSV, import CSV
+  await d.getByRole('button', { name: /^Tracker/ }).click(); await d.getByRole('button', { name: 'Add application' }).click();
+  await d.getByLabel('Company').fill('Initech'); await d.getByLabel('Role').fill('Staff Designer'); await d.getByRole('button', { name: 'Add to tracker' }).click(); await sleep(500);
+  ok((await store('applications')).some((a) => a.company_name === 'Initech' && a.source === 'manual'), 'a job added by hand is tracked');
+  const [csvDl] = await Promise.all([d.waitForEvent('download'), d.getByRole('button', { name: 'Export CSV' }).click()]);
+  const csv = fs.readFileSync(await csvDl.path(), 'utf8');
+  ok(csv.startsWith('Company,Role,Status,Applied') && csv.includes('Initech') && csv.includes('Recruiter: Sam'), 'Export CSV has a header row and every application');
+  await d.locator('input[type="file"]').setInputFiles({ name: 'sheet.csv', mimeType: 'text/csv', buffer: Buffer.from('Company,Position,Stage,Date applied,Notes\nGlobex,Product Designer,Phone screen,2026-10-01,"Referral, from Ana"\n"Acme, Inc",PM,Offer,,\n,No company,,,\n') });
+  await d.getByText(/Imported 2 applications/).waitFor({ timeout: 5000 });
+  apps = await store('applications');
+  ok(apps.some((a) => a.company_name === 'Globex' && a.status === 'interview' && a.notes === 'Referral, from Ana') && apps.some((a) => a.company_name === 'Acme, Inc' && a.status === 'offer'), 'CSV import maps columns and statuses, keeps quoted commas, skips rows without a company');
+  // backup round trip
+  const [bkDl] = await Promise.all([d.waitForEvent('download'), d.getByRole('button', { name: 'Backup' }).click()]);
+  const backup = fs.readFileSync(await bkDl.path(), 'utf8');
+  await h.sw.evaluate(() => chrome.storage.local.set({ applications: [], interviews: [], tasks: [] })); await sleep(400);
+  await d.locator('input[type="file"]').setInputFiles({ name: 'jobly-backup.json', mimeType: 'application/json', buffer: Buffer.from(backup) });
+  await d.getByText(/Backup restored: 4 applications/).waitFor({ timeout: 5000 });
+  ok((await store('interviews')).length === 1 && (await store('tasks')).length === 1, 'a backup restores applications, interviews and tasks');
+  await d.locator('input[type="file"]').setInputFiles({ name: 'evil.json', mimeType: 'application/json', buffer: Buffer.from('{"app":"other"}') });
+  await d.getByText("That isn't a Jobly backup file.").waitFor({ timeout: 5000 }); ok(true, 'a file that is not a Jobly backup is refused');
+  // reminders, worked out on the device
+  await h.sw.evaluate(() => chrome.storage.local.get('applications').then(({ applications }) => chrome.storage.local.set({ applications: applications.map((a, i) => (i === 0 ? { ...a, follow_up_at: new Date(Date.now() - 86400000).toISOString(), follow_up_notified: false } : a)) })));
+  await h.sw.evaluate(() => chrome.storage.local.get('interviews').then(({ interviews }) => chrome.storage.local.set({ interviews: interviews.map((i) => ({ ...i, at: new Date(Date.now() + 30 * 60000).toISOString(), reminded: false })) })));
+  await d.evaluate(() => new Promise((res) => chrome.runtime.sendMessage({ type: 'CHECK_REMINDERS' }, res))); await sleep(500);
+  ok((await store('applications'))[0].follow_up_notified === true, 'a due follow-up is announced once');
+  ok((await store('interviews'))[0].reminded === true, 'an interview 30 minutes away gets its reminder');
+  const reminderAlarm = await h.sw.evaluate(async () => (await chrome.alarms.get('jobly-reminders'))?.periodInMinutes);
+  ok(reminderAlarm === 15, `reminders are checked every ${reminderAlarm} minutes, locally`);
+  await d.close();
+  // "Did you apply?" after opening a job
+  const p = await open(h); await firstCard(p);
+  const fresh = p.locator('article').nth(3); const freshLabel = await fresh.getAttribute('aria-label');
+  const [tab] = await Promise.all([h.ctx.waitForEvent('page'), fresh.getByRole('link', { name: /^Apply to/ }).click()]); await tab.close();
+  await p.getByRole('region', { name: 'Did you apply?' }).waitFor({ timeout: 5000 }); await axe(p, 'did-you-apply prompt');
+  await p.getByRole('button', { name: 'Yes, track it' }).click(); await sleep(500);
+  ok((await store('applications')).some((a) => freshLabel.startsWith(a.title) && a.status === 'applied'), '"Yes, track it" adds the job as Applied');
+  ok(await p.getByRole('region', { name: 'Did you apply?' }).count() === 0, 'the prompt goes away once answered');
   await h.ctx.close();
 });
 

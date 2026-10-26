@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Bell, Bookmark, Briefcase, Building2, Moon, RefreshCw, SlidersHorizontal, Sun } from '../lib/icons';
+import { Bell, Bookmark, Briefcase, Building2, Calendar, Kanban, ListChecks, Moon, RefreshCw, SlidersHorizontal, Sun } from '../lib/icons';
 import { api, ConnectionStatus } from '../lib/api';
 import { IS_DEV_BUILD, MAX_PAGE_SIZE } from '../lib/config';
 import { DEFAULT_FILTERS, JobFilters } from '../lib/filters';
@@ -19,10 +19,16 @@ import { AlertsView } from '../components/AlertsView';
 import { ErrorBoundary } from '../components/ErrorBoundary';
 import { Notice, useNotice } from '../components/Notice';
 import { Welcome } from '../components/Welcome';
+import { TrackerView } from '../components/TrackerView';
+import { InterviewsView } from '../components/InterviewsView';
+import { TasksView } from '../components/TasksView';
+import { ApplyPrompt } from '../components/ApplyPrompt';
+import { useTrackerContext } from '../lib/trackerContext';
+import { dueLabel } from '../lib/dates';
 
-type Tab = 'jobs' | 'companies' | 'saved' | 'alerts' | 'preferences';
+type Tab = 'jobs' | 'companies' | 'saved' | 'tracker' | 'interviews' | 'tasks' | 'alerts' | 'preferences';
 const n = (v: number | undefined) => (v ?? 0).toLocaleString();
-const TABS: Tab[] = ['jobs', 'companies', 'saved', 'alerts', 'preferences'];
+const TABS: Tab[] = ['jobs', 'companies', 'saved', 'tracker', 'interviews', 'tasks', 'alerts', 'preferences'];
 const tabFromHash = (): Tab => { const h = window.location.hash.replace('#', ''); return (TABS as string[]).includes(h) ? (h as Tab) : 'jobs'; };
 
 export const OptionsApp: React.FC = () => {
@@ -52,6 +58,12 @@ export const OptionsApp: React.FC = () => {
   const { notice, show: showNotice, clear: clearNotice } = useNotice();
   const { onboarded, complete: completeOnboarding, reset: resetOnboarding } = useOnboarded();
   const jobsSeq = useRef(0);
+  const tracker = useTrackerContext()!.store;
+  // Follow-ups and tasks that are due today or overdue, for the Tasks badge.
+  const dueNow = (iso: string | null) => !!iso && (dueLabel(iso).overdue || dueLabel(iso).text === 'today');
+  const dueCount = tracker.tasks.filter((t) => !t.done && dueNow(t.due_at)).length
+    + tracker.apps.filter((a) => !['rejected', 'withdrawn', 'offer'].includes(a.status) && dueNow(a.follow_up_at)).length;
+  const upcomingInterviews = tracker.interviews.filter((i) => Date.parse(i.at) >= Date.now()).length;
 
   useEffect(() => {
     applyTheme(theme);
@@ -192,6 +204,9 @@ export const OptionsApp: React.FC = () => {
     { id: 'jobs', label: 'Jobs', icon: Briefcase },
     { id: 'companies', label: 'Companies', icon: Building2 },
     { id: 'saved', label: 'Saved', icon: Bookmark, badge: savedJobs.length },
+    { id: 'tracker', label: 'Tracker', icon: Kanban, badge: tracker.apps.length },
+    { id: 'interviews', label: 'Interviews', icon: Calendar, badge: upcomingInterviews },
+    { id: 'tasks', label: 'Tasks', icon: ListChecks, badge: dueCount },
     { id: 'alerts', label: 'Alerts', icon: Bell, badge: unreadAlerts },
     { id: 'preferences', label: 'Preferences', icon: SlidersHorizontal },
   ];
@@ -229,7 +244,8 @@ export const OptionsApp: React.FC = () => {
         </nav>
 
         <main id="main" className="content">
-          <div className={`content-inner${tab === 'preferences' ? ' narrow' : ''}`}>
+          <div className={`content-inner${tab === 'preferences' || tab === 'tasks' ? ' narrow' : ''}`}>
+            <ApplyPrompt onProblem={(m) => showNotice(m)} />
             {tab === 'jobs' && stats && (
               <div className="stats">
                 {[['For you', stats.matched_jobs], ['Open jobs', stats.total_jobs], ['Companies', stats.active_companies], ['New today', stats.new_jobs_today]].map(([label, value]) => (
@@ -253,6 +269,9 @@ export const OptionsApp: React.FC = () => {
               )}
               {tab === 'companies' && <CompaniesView large companies={companies} mutedCompanyIds={muted} onToggleMuted={toggleMuted} canManage={IS_DEV_BUILD} onAddCompany={handleAddCompany} offline={status === 'offline'} loading={status === 'connecting'} />}
               {tab === 'saved' && <SavedJobsView large savedJobs={savedJobs} onToggleSave={handleToggleSave} onBrowseJobs={() => setTab('jobs')} />}
+              {tab === 'tracker' && <TrackerView store={tracker} savedJobs={savedJobs} notify={showNotice} onBrowseJobs={() => setTab('jobs')} />}
+              {tab === 'interviews' && <InterviewsView store={tracker} onOpenTracker={() => setTab('tracker')} />}
+              {tab === 'tasks' && <TasksView store={tracker} notify={showNotice} />}
               {tab === 'alerts' && <AlertsView large alerts={alerts} newIds={newThisVisit} onMarkAllRead={markAlertsRead} />}
               {tab === 'preferences' && preferences && <PreferencesView preferences={preferences} onSave={handleSavePreferences} onReplayWelcome={resetOnboarding} />}
               {tab === 'preferences' && !preferences && <div className="section" aria-busy="true" aria-label="Loading your preferences">{[0, 1, 2, 3].map((i) => <div key={i} className="skeleton" style={{ height: i ? 56 : 28, width: i ? '100%' : '40%' }} />)}</div>}

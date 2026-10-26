@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
-import { Bookmark, BookmarkCheck, ExternalLink, Flag, MapPin, Share2, Sparkles } from '../lib/icons';
+import { Bookmark, BookmarkCheck, CheckCircle2, ExternalLink, Flag, MapPin, Share2, Sparkles } from '../lib/icons';
 import { ReportModal } from './ReportModal';
 import { Job } from '../types';
 import { getCompanyLogoUrl } from '../lib/companyLogos';
 import { hostOf, safeHttpUrl } from '../lib/url';
 import { BOARD_NAMES, EXPERIENCE_LABELS, timeAgo } from '../lib/format';
+import { useTrackerContext } from '../lib/trackerContext';
+import { AppStatus, STATUSES, statusLabel } from '../lib/tracker';
 
 interface JobCardProps {
   job: Job;
@@ -17,6 +19,16 @@ export const JobCard: React.FC<JobCardProps> = ({ job, onToggleSave }) => {
   const [shareNote, setShareNote] = useState<string | null>(null);
   const applyUrl = safeHttpUrl(job.application_url); // third-party data: never render javascript:/data: links
   const applyHost = hostOf(job.application_url);
+  const tracker = useTrackerContext();
+  const status = tracker?.statusOf(job) ?? null;
+  const appliedBefore = tracker?.appliedAtCompany(job) ?? false;
+
+  const handleTrack = async (value: string) => {
+    if (!tracker) return;
+    const problem = await tracker.track(job, value ? (value as AppStatus) : null);
+    setShareNote(problem ?? (value ? `Tracked as ${statusLabel(value as AppStatus)}` : 'Removed from tracker'));
+    window.setTimeout(() => setShareNote(null), 2500);
+  };
 
   const handleShare = async () => {
     if (!applyUrl) return;
@@ -54,6 +66,8 @@ export const JobCard: React.FC<JobCardProps> = ({ job, onToggleSave }) => {
       </div>
 
       <div className="row wrap" style={{ gap: 6 }}>
+        {status && status !== 'saved' && <span className="badge badge-success"><CheckCircle2 size={12} aria-hidden="true" /> {statusLabel(status)}</span>}
+        {appliedBefore && <span className="badge badge-warning">You applied here before</span>}
         {job.is_match && <span className="badge badge-brand"><Sparkles size={12} duo aria-hidden="true" /> Matches you</span>}
         {job.work_mode === 'remote' && <span className="badge badge-success">Remote</span>}
         {job.experience_tier && EXPERIENCE_LABELS[job.experience_tier] && <span className="badge badge-outline">{EXPERIENCE_LABELS[job.experience_tier]}</span>}
@@ -79,6 +93,13 @@ export const JobCard: React.FC<JobCardProps> = ({ job, onToggleSave }) => {
           <button type="button" className="btn btn-ghost btn-sm btn-icon" onClick={() => setShowReport(true)} title="Report this listing" aria-label={`Report: ${job.title}`}>
             <Flag size={14} aria-hidden="true" />
           </button>
+          {tracker && (
+            <select className="select select-sm track-select" value={status ?? ''} onChange={(e) => void handleTrack(e.target.value)}
+              aria-label={`Track ${job.title} at ${job.company_name}`} title="Add to your application tracker">
+              <option value="">{status ? 'Stop tracking' : 'Track…'}</option>
+              {STATUSES.map((s) => <option key={s.id} value={s.id}>{s.label}</option>)}
+            </select>
+          )}
           <span role="status" className="text-xs muted">{shareNote}</span>
         </div>
         {applyUrl ? (
@@ -87,6 +108,7 @@ export const JobCard: React.FC<JobCardProps> = ({ job, onToggleSave }) => {
             target="_blank"
             rel="noopener noreferrer"
             className="btn btn-sm"
+            onClick={() => tracker?.noteApplyClick(job)}
             title={applyHost ? `Opens ${applyHost}` : undefined}
             aria-label={`Apply to ${job.title} at ${job.company_name}${applyHost ? ` (opens ${applyHost})` : ''}`}
           >

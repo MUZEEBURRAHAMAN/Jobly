@@ -16,6 +16,7 @@ import { SavedJobsView } from '../components/SavedJobsView';
 import { PreferencesView } from '../components/PreferencesView';
 import { Notice, useNotice } from '../components/Notice';
 import { Welcome } from '../components/Welcome';
+import { ApplyPrompt } from '../components/ApplyPrompt';
 
 type Tab = 'jobs' | 'companies' | 'saved' | 'preferences';
 
@@ -205,6 +206,7 @@ export const PopupApp: React.FC = () => {
       <Header status={status} onRetry={() => { connect(); }} isSyncing={isSyncing} onSync={handleSync} openOptions={openOptions} theme={theme} onToggleTheme={toggleTheme} />
 
       <main id="main" className="popup-main">
+        <ApplyPrompt onProblem={(m) => showNotice(m)} />
         {tab === 'jobs' && (
           <JobsFeed
             jobs={savedStore.jobs} loading={loading} preferences={preferences} mutedCompanyIds={muted}
