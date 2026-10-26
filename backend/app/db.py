@@ -81,7 +81,8 @@ async def init_db():
             "max_salary": "INTEGER",
             "geo_hub": "TEXT",
             "experience_tier": "TEXT",
-            "posted_at": "TEXT"          # real posting date from the source (NULL when unknown)
+            "posted_at": "TEXT",         # real posting date from the source (NULL when unknown)
+            "employment_type": "TEXT",   # full_time, part_time, contract, internship (NULL when the posting doesn't say)
         }
         for col_name, col_type in new_cols.items():
             if col_name not in existing_cols:

@@ -4,7 +4,7 @@ import { ReportModal } from './ReportModal';
 import { Job } from '../types';
 import { getCompanyLogoUrl } from '../lib/companyLogos';
 import { hostOf, safeHttpUrl } from '../lib/url';
-import { BOARD_NAMES, EXPERIENCE_LABELS, timeAgo } from '../lib/format';
+import { BOARD_NAMES, EMPLOYMENT_LABELS, EXPERIENCE_LABELS, timeAgo } from '../lib/format';
 import { useTrackerContext } from '../lib/trackerContext';
 import { AppStatus, STATUSES, statusLabel } from '../lib/tracker';
 
@@ -70,6 +70,7 @@ export const JobCard: React.FC<JobCardProps> = ({ job, onToggleSave }) => {
         {appliedBefore && <span className="badge badge-warning">You applied here before</span>}
         {job.is_match && <span className="badge badge-brand"><Sparkles size={12} duo aria-hidden="true" /> Matches you</span>}
         {job.work_mode === 'remote' && <span className="badge badge-success">Remote</span>}
+        {job.employment_type && job.employment_type !== 'full_time' && EMPLOYMENT_LABELS[job.employment_type] && <span className="badge badge-outline">{EMPLOYMENT_LABELS[job.employment_type]}</span>}
         {job.experience_tier && EXPERIENCE_LABELS[job.experience_tier] && <span className="badge badge-outline">{EXPERIENCE_LABELS[job.experience_tier]}</span>}
         {job.salary_summary && <span className="badge badge-outline">{job.salary_summary.split('•')[0].trim()}</span>}
         {BOARD_NAMES[job.source_type] && <span className="badge badge-outline">via {BOARD_NAMES[job.source_type]}</span>}

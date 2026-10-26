@@ -6,7 +6,7 @@ import { readKey, writeKey, STORAGE_KEYS } from './userData';
  * what spreadsheets, Notion and Google Sheets export, so applications kept elsewhere can be brought in.
  */
 
-const BACKUP_KEYS = [STORAGE_KEYS.preferences, STORAGE_KEYS.saved, TRACKER_KEYS.apps, TRACKER_KEYS.interviews, TRACKER_KEYS.tasks, TRACKER_KEYS.settings, 'mutedCompanyIds', 'profile'];
+const BACKUP_KEYS = [STORAGE_KEYS.preferences, STORAGE_KEYS.saved, TRACKER_KEYS.apps, TRACKER_KEYS.interviews, TRACKER_KEYS.tasks, TRACKER_KEYS.settings, 'mutedCompanyIds', 'followedCompanyIds', 'profile'];
 const MAX_FILE_BYTES = 5_000_000;
 
 function download(name: string, type: string, body: string) {
@@ -120,14 +120,14 @@ export async function importFile(file: File): Promise<ImportResult> {
       if (k === TRACKER_KEYS.apps) {
         value = (Array.isArray(value) ? value : []).map((a) => sanitizeApp(a as Partial<Application>)).filter(Boolean);
         apps = (value as unknown[]).length;
-      } else if (['savedJobs', TRACKER_KEYS.interviews, TRACKER_KEYS.tasks, 'mutedCompanyIds'].includes(k)) {
+      } else if (['savedJobs', TRACKER_KEYS.interviews, TRACKER_KEYS.tasks, 'mutedCompanyIds', 'followedCompanyIds'].includes(k)) {
         if (!Array.isArray(value)) continue;
         const arr: unknown[] = value;
         const ok = (o: unknown, fields: string[]) => !!o && typeof o === 'object' && fields.every((f) => typeof (o as Record<string, unknown>)[f] === 'string');
         if (k === TRACKER_KEYS.interviews) value = arr.filter((i) => ok(i, ['id', 'app_key', 'at']) && Array.isArray((i as { checklist?: unknown }).checklist));
         if (k === TRACKER_KEYS.tasks) value = arr.filter((t) => ok(t, ['id', 'text']));
         if (k === 'savedJobs') value = arr.filter((j) => ok(j, ['title', 'company_name']));
-        if (k === 'mutedCompanyIds') value = arr.filter((n) => typeof n === 'number');
+        if (k === 'mutedCompanyIds' || k === 'followedCompanyIds') value = arr.filter((n) => typeof n === 'number');
       }
       if (!(await writeKey(k, value))) throw new Error("Couldn't restore the backup. Your browser storage may be full.");
       restored++;

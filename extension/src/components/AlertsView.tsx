@@ -32,7 +32,7 @@ export const AlertsView: React.FC<AlertsViewProps> = ({ alerts, onMarkAllRead, n
           return (
             <li key={n.id} className="card row" style={{ padding: 12, gap: 12, borderColor: isNew(n) ? 'var(--brand)' : undefined }}>
               <div className="grow">
-                <div className="font-medium break">{isNew(n) && <span className="badge badge-brand" style={{ marginRight: 8 }}>New</span>}{n.title}</div>
+                <div className="font-medium break">{isNew(n) && <span className="badge badge-brand" style={{ marginRight: 8 }}>New</span>}{n.reason === 'follow' && <span className="badge badge-outline" style={{ marginRight: 8 }}>Followed company</span>}{n.title}</div>
                 <div className="text-xs muted">{n.company_name}{n.location ? ` · ${n.location}` : ''} · {timeAgo(n.sent_at)}</div>
               </div>
               {url && <a className="btn btn-outline btn-sm" href={url} target="_blank" rel="noopener noreferrer" aria-label={`View ${n.title} at ${n.company_name}`}>View <ExternalLink size={14} aria-hidden="true" /></a>}

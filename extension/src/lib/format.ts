@@ -36,3 +36,5 @@ export const DEFAULT_ROLE_IDS: string[] = ROLES.map((r) => r.id);
 
 /** Remote job boards whose listings Jobly passes on: the card says where the job was found (their terms ask for that). */
 export const BOARD_NAMES: Record<string, string> = { weworkremotely: 'We Work Remotely', himalayas: 'Himalayas', arbeitnow: 'Arbeitnow' };
+
+export const EMPLOYMENT_LABELS: Record<string, string> = { full_time: 'Full-time', part_time: 'Part-time', contract: 'Contract', internship: 'Internship' };

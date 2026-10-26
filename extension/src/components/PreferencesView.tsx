@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Check, ExternalLink, Save } from '../lib/icons';
 import { Preferences } from '../types';
-import { ROLES, SENIORITIES } from '../lib/format';
+import { EMPLOYMENT_LABELS, ROLES, SENIORITIES } from '../lib/format';
 
 const SITE = 'https://joblyextension.netlify.app';
 const HELP = [['Guides', '/guides'], ['FAQ', '/faq'], ['Support', '/support'], ['Privacy', '/privacy']] as const;
@@ -84,6 +84,25 @@ export const PreferencesView: React.FC<PreferencesViewProps> = ({ preferences, o
         <label className="label" htmlFor="kw-out">Keywords to leave out</label>
         <input id="kw-out" className="input" maxLength={500} value={prefs.excluded_keywords} onChange={(e) => edit({ excluded_keywords: e.target.value })} placeholder="e.g. contract, unpaid, sales" />
       </div>
+
+      <fieldset style={{ border: 0 }} className="stack">
+        <legend className="label">Dealbreakers</legend>
+        <div>
+          <span className="text-sm" id="job-types-label">Job types</span>
+          <div className="row wrap" role="group" aria-labelledby="job-types-label" style={{ marginTop: 6 }}>
+            {Object.entries(EMPLOYMENT_LABELS).map(([id, label]) => (
+              <button key={id} type="button" className="chip" aria-pressed={(prefs.employment_types ?? []).includes(id)} onClick={() => edit({ employment_types: toggle(prefs.employment_types ?? [], id) })}>{label}</button>
+            ))}
+          </div>
+          <p className="hint">None selected means any type. Postings that don't say count as full-time.</p>
+        </div>
+        <div>
+          <label className="label" htmlFor="min-salary">Lowest yearly salary</label>
+          <input id="min-salary" type="number" inputMode="numeric" min={0} step={5000} className="input" style={{ maxWidth: 220 }}
+            value={prefs.min_salary || ''} placeholder="e.g. 120000" onChange={(e) => edit({ min_salary: Math.max(0, Math.round(Number(e.target.value) || 0)) })} />
+          <p className="hint">Jobs that list less are hidden. Jobs without a salary, and hourly rates, still show.</p>
+        </div>
+      </fieldset>
 
       <label className="row card" style={{ padding: 12, justifyContent: 'space-between' }}>
         <span><span className="font-medium" style={{ display: 'block' }}>Desktop alerts</span><span className="text-xs muted">One notification when new jobs match</span></span>

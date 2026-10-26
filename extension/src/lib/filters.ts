@@ -8,13 +8,14 @@ export interface JobFilters {
   salaryOnly: boolean;
   freshnessDays: number;  // 0 = any
   remoteOnly: boolean;
+  jobType: string;        // 'all' | full_time | part_time | contract | internship
 }
 
-export const DEFAULT_FILTERS: JobFilters = { search: '', hub: 'all', exp: 'all', minBudget: 0, salaryOnly: false, freshnessDays: 0, remoteOnly: false };
+export const DEFAULT_FILTERS: JobFilters = { search: '', hub: 'all', exp: 'all', minBudget: 0, salaryOnly: false, freshnessDays: 0, remoteOnly: false, jobType: 'all' };
 
 /** Filters other than the search box (the search box is shown separately). */
 export function activeFilterCount(f: JobFilters): number {
-  return (f.hub !== 'all' ? 1 : 0) + (f.exp !== 'all' ? 1 : 0) + (f.minBudget > 0 ? 1 : 0) + (f.salaryOnly ? 1 : 0) + (f.freshnessDays > 0 ? 1 : 0) + (f.remoteOnly ? 1 : 0);
+  return (f.hub !== 'all' ? 1 : 0) + (f.exp !== 'all' ? 1 : 0) + (f.minBudget > 0 ? 1 : 0) + (f.salaryOnly ? 1 : 0) + (f.freshnessDays > 0 ? 1 : 0) + (f.remoteOnly ? 1 : 0) + (f.jobType !== 'all' ? 1 : 0);
 }
 
 const ALIASES: Record<string, string[]> = {
@@ -29,6 +30,7 @@ const ALIASES: Record<string, string[]> = {
 export function passesFilters(job: Job, f: JobFilters, mutedCompanyIds: number[]): boolean {
   if (mutedCompanyIds.includes(job.company_id)) return false;
   if (f.remoteOnly && job.work_mode !== 'remote') return false;
+  if (f.jobType !== 'all' && (job.employment_type || 'full_time') !== f.jobType) return false;
   if (f.hub !== 'all' && (job.geo_hub || 'global') !== f.hub) return false;
   if (f.exp !== 'all' && job.experience_tier !== f.exp) return false;
   if (f.salaryOnly && !job.salary_summary) return false;

@@ -58,6 +58,10 @@ async def main():
         # edge cases
         await add("Ancient Listing (must never show)", "frontend_engineering", 0, PLACES[0], now - timedelta(days=75))
         await add("Unknown Date Engineer", "fullstack_engineering", 1, PLACES[2], None, remote=True)
+        # internships (employment type set as a board would)
+        await add("Product Design Intern", "product_design", 4, PLACES[0], now - timedelta(days=1), seniority="intern", tier="0-2")
+        await add("Frontend Engineering Intern", "frontend_engineering", 8, PLACES[2], now - timedelta(days=2), remote=True, seniority="intern", tier="0-2")
+        await db.execute("UPDATE jobs SET employment_type = 'internship' WHERE title LIKE '% Intern'")
         await add("Broken Link Designer", "product_design", 2, PLACES[1], now - timedelta(days=2), url="javascript:alert(1)")
         await add("Extraordinarily Long Title " + "Wordsmith " * 18 + "Engineer", "frontend_engineering", 3, PLACES[4], now - timedelta(days=1))
         await db.commit()

@@ -3,7 +3,7 @@ import { RotateCcw, Search, SlidersHorizontal, X } from '../lib/icons';
 import { Job, Preferences } from '../types';
 import { JobCard } from './JobCard';
 import { EmptyState } from './EmptyState';
-import { ROLES, DEFAULT_ROLE_IDS, EXPERIENCE_LABELS, HUB_LABELS, timeAgo } from '../lib/format';
+import { ROLES, DEFAULT_ROLE_IDS, EXPERIENCE_LABELS, HUB_LABELS, timeAgo, EMPLOYMENT_LABELS } from '../lib/format';
 import { DEFAULT_FILTERS, JobFilters, activeFilterCount, chipCounts, filterJobs } from '../lib/filters';
 
 interface JobsFeedProps {
@@ -182,6 +182,13 @@ export const JobsFeed: React.FC<JobsFeedProps> = ({
                 <option value={30}>Past month</option>
               </select>
               <p className="hint">Jobs older than 2 months are never shown.</p>
+            </div>
+            <div>
+              <label className="label" htmlFor="f-type">Job type</label>
+              <select id="f-type" className="select" value={filters.jobType} onChange={(e) => set({ jobType: e.target.value })}>
+                <option value="all">Any type</option>
+                {Object.entries(EMPLOYMENT_LABELS).map(([id, label]) => <option key={id} value={id}>{label}</option>)}
+              </select>
             </div>
             <label className="row wide text-sm"><input type="checkbox" className="switch" role="switch" checked={filters.remoteOnly} onChange={(e) => set({ remoteOnly: e.target.checked })} /> Remote jobs only</label>
             <label className="row wide text-sm"><input type="checkbox" className="switch" role="switch" checked={filters.salaryOnly} onChange={(e) => set({ salaryOnly: e.target.checked })} /> Only jobs that list a salary</label>

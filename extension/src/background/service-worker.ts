@@ -3,6 +3,7 @@ import { AlertItem, Job } from '../types';
 import {
   jobKey, loadAlerts, loadPreferences, loadSeenKeys, prefsParam, readKey, storeAlerts, storeSeenKeys,
 } from '../lib/userData';
+import { FOLLOWED_KEY, MAX_FOLLOWED } from '../lib/follow';
 import { loadApps, loadInterviews, loadTasks, loadTrackerSettings, storeApps, storeInterviews, storeTasks } from '../lib/tracker';
 
 const ALARM_NAME = 'jobly-sync';
@@ -18,10 +19,20 @@ const REMINDER_MINUTES = 15;
 // Alerts are worked out here on the device: ask the server for fresh jobs that fit this user's preferences
 // (sent with the request, never stored there) and compare them with what was already seen.
 async function fetchRecentMatches(): Promise<Job[] | null> {
-  const query = new URLSearchParams({
+  return fetchJobs(new URLSearchParams({
     only_matching: 'true', freshness_days: String(RECENT_DAYS), limit: '50',
     prefs: prefsParam(await loadPreferences()),
-  });
+  }));
+}
+
+// New jobs at followed companies, whatever the preferences say: one request for all of them.
+async function fetchFollowedJobs(): Promise<Job[]> {
+  const ids = ((await readKey<number[]>(FOLLOWED_KEY)) ?? []).filter((n) => Number.isInteger(n)).slice(0, MAX_FOLLOWED);
+  if (!ids.length) return [];
+  return (await fetchJobs(new URLSearchParams({ company_ids: ids.join(','), freshness_days: String(RECENT_DAYS), limit: '50' }))) ?? [];
+}
+
+async function fetchJobs(query: URLSearchParams): Promise<Job[] | null> {
   for (const base of API_BASES) {
     const ctrl = new AbortController();
     const timer = setTimeout(() => ctrl.abort(), 20000);
@@ -88,8 +99,11 @@ async function mutedCompanyIds(): Promise<Set<number>> {
 // `silent` (or the very first run) records the current jobs as already seen without announcing them.
 async function checkNewMatchesAndNotify({ silent = false }: { silent?: boolean } = {}) {
   try {
-    const jobs = await fetchRecentMatches();
-    if (!jobs) return; // server unreachable: try again at the next alarm
+    const matches = await fetchRecentMatches();
+    if (!matches) return; // server unreachable: try again at the next alarm
+    const followedJobs = await fetchFollowedJobs();
+    const matchKeys = new Set(matches.map(jobKey));
+    const jobs = [...matches, ...followedJobs.filter((j) => !matchKeys.has(jobKey(j)))];
 
     const stored = await loadSeenKeys();
     const quiet = silent || !Array.isArray(stored);
@@ -105,7 +119,7 @@ async function checkNewMatchesAndNotify({ silent = false }: { silent?: boolean }
       const now = new Date().toISOString();
       const added: AlertItem[] = fresh.map((j) => ({
         id: jobKey(j), title: j.title, company_name: j.company_name, location: j.location,
-        application_url: j.application_url, sent_at: now, is_read: false,
+        application_url: j.application_url, sent_at: now, is_read: false, reason: matchKeys.has(jobKey(j)) ? 'match' : 'follow',
       }));
       alerts.unshift(...added);
       await storeAlerts(alerts);

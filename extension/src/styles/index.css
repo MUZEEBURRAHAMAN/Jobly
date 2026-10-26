@@ -298,6 +298,8 @@ a { color: inherit; }
 .topbar { display: flex; align-items: center; justify-content: space-between; gap: var(--space-2); padding: var(--space-3) var(--space-4); border-bottom: 1px solid var(--border); background: var(--background); }
 .brand-mark { display: block; flex: none; width: 32px; height: 32px; }
 .toolbar { position: sticky; top: 0; z-index: 10; padding: var(--space-3) var(--space-4); background: var(--background); border-bottom: 1px solid var(--border); display: flex; flex-direction: column; gap: var(--space-3); }
+/* With the filter panel open the toolbar can be taller than the popup, so it stops sticking and the list stays reachable. */
+.toolbar:has(.filters) { position: static; }
 .chips { display: flex; gap: var(--space-2); overflow-x: auto; scroll-snap-type: x proximity; padding-bottom: 2px; scrollbar-width: none; }
 .chips::-webkit-scrollbar { display: none; }
 .chips > * { scroll-snap-align: start; }

@@ -8,7 +8,7 @@ from typing import Any
 import httpx
 from ..db import get_db_connection, get_utc_now
 from ..matching import (
-    classify_role, detect_seniority, detect_work_mode,
+    classify_role, classify_employment, detect_seniority, detect_work_mode,
     detect_geo_hub, detect_experience_tier
 )
 from ..config import settings
@@ -154,6 +154,7 @@ async def upsert_job_record(
     work_mode = job.work_mode or detect_work_mode(job.location, job.title)
     geo_hub = detect_geo_hub(job.location, job.title)
     experience_tier = detect_experience_tier(seniority, job.title)
+    employment = classify_employment(job.title, job.raw_data)
     content_hash = calculate_content_hash(
         comp_name, job.title, job.location, job.application_url
     )
@@ -177,8 +178,8 @@ async def upsert_job_record(
         if existing["content_hash"] == content_hash:
             # FAST-PATH: Job content hasn't changed. Update last_seen_at with minimal I/O & memory.
             await db.execute(
-                "UPDATE jobs SET last_seen_at = ?, status = 'active' WHERE id = ?",
-                (now, existing["id"])
+                "UPDATE jobs SET last_seen_at = ?, status = 'active', employment_type = COALESCE(employment_type, ?) WHERE id = ?",
+                (now, employment, existing["id"])
             )
             return
 
@@ -211,7 +212,8 @@ async def upsert_job_record(
                 max_salary = COALESCE(?, max_salary),
                 geo_hub = ?,
                 experience_tier = ?,
-                posted_at = COALESCE(?, posted_at)
+                posted_at = COALESCE(?, posted_at),
+                employment_type = COALESCE(?, employment_type)
             WHERE id = ?
         """, (
             job.title,
@@ -230,6 +232,7 @@ async def upsert_job_record(
             geo_hub,
             experience_tier,
             posted_at,
+            employment,
             existing["id"]
         ))
         summary["updated_jobs"] += 1
@@ -252,8 +255,8 @@ async def upsert_job_record(
                 location, description, application_url, content_hash,
                 first_seen_at, last_seen_at, status, raw_json,
                 salary_summary, min_salary, max_salary,
-                geo_hub, experience_tier, posted_at
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'active', ?, ?, ?, ?, ?, ?, ?)
+                geo_hub, experience_tier, posted_at, employment_type
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'active', ?, ?, ?, ?, ?, ?, ?, ?)
         """, (
             comp_id,
             comp_name,
@@ -275,7 +278,8 @@ async def upsert_job_record(
             max_sal,
             geo_hub,
             experience_tier,
-            posted_at
+            posted_at,
+            employment
         ))
         summary["new_jobs"] += 1
 
@@ -480,11 +484,17 @@ async def sync_all_sources(company_id_filter: int | None = None, include_aggrega
 async def reclassify_roles(db) -> int:
     """Apply the current role rules to every active job. The stored role doubles as the category hint,
     which keeps this stable from one run to the next. Returns how many jobs changed role."""
-    cur = await db.execute("SELECT id, title, normalized_role FROM jobs WHERE status = 'active'")
-    changes = [(new, row["id"]) for row in await cur.fetchall()
+    cur = await db.execute("SELECT id, title, normalized_role, employment_type FROM jobs WHERE status = 'active'")
+    rows = await cur.fetchall()
+    changes = [(new, row["id"]) for row in rows
                if (new := classify_role(row["title"], row["normalized_role"])) != row["normalized_role"]]
+    # Jobs stored before employment types existed get one from their title (boards that say so set it on the next change).
+    kinds = [(kind, row["id"]) for row in rows if row["employment_type"] is None and (kind := classify_employment(row["title"]))]
     if changes:
         await db.executemany("UPDATE jobs SET normalized_role = ? WHERE id = ?", changes)
+    if kinds:
+        await db.executemany("UPDATE jobs SET employment_type = ? WHERE id = ?", kinds)
+    if changes or kinds:
         await db.commit()
         logger.info(f"[Ingestion] Re-classified {len(changes)} job roles")
     return len(changes)

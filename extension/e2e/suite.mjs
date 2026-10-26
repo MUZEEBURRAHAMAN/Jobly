@@ -290,4 +290,40 @@ await step('tracker: track, details, interviews, tasks, import/export, reminders
   await h.ctx.close();
 });
 
+await step('dealbreakers, job type filter, following companies', async () => {
+  const h = await launch(); const jobReqs = [];
+  h.ctx.on('request', (r) => { if (/\/api\/jobs\?/.test(r.url())) jobReqs.push(new URL(r.url())); });
+  const p = await open(h); await firstCard(p);
+  await p.getByRole('button', { name: /^Preferences/ }).click(); await sleep(500);
+  await p.getByRole('button', { name: 'Contract' }).click(); await p.getByLabel('Lowest yearly salary').fill('150000');
+  await p.getByRole('button', { name: 'Save preferences' }).click(); await p.getByText('Saved on this device.').waitFor({ timeout: 5000 });
+  const prefs = (await h.sw.evaluate(() => chrome.storage.local.get('userPreferences'))).userPreferences;
+  ok(prefs.min_salary === 150000 && prefs.employment_types.join() === 'contract', 'dealbreakers are stored on the device');
+  await p.getByRole('button', { name: /^Jobs/ }).click(); await sleep(1500);
+  const sent = JSON.parse(jobReqs.filter((u) => u.searchParams.get('prefs')).pop().searchParams.get('prefs'));
+  ok(sent.min_salary === 150000 && sent.employment_types[0] === 'contract', 'the job request carries the dealbreakers');
+  await p.getByRole('button', { name: /^All/ }).click(); await p.getByRole('button', { name: /Filters/ }).click();
+  ok(await p.locator('#f-type option').count() === 5, 'the filters offer a Job type');
+  await p.locator('#f-type').selectOption('internship'); await sleep(600);
+  const shown = await p.locator('article').count(); const interns = await p.locator('article .badge', { hasText: 'Internship' }).count();
+  ok(shown >= 1 && shown === interns, `Job type = Internship shows only internships (${shown})`);
+  await axe(p, 'job type filter'); await p.close();
+  // follow a company: its new jobs become alerts even when they don't match
+  const d = await open(h, 'options.html', { width: 1280, height: 860 }); await firstCard(d);
+  await d.getByRole('button', { name: /^Companies/ }).click(); await d.getByRole('button', { name: /^Follow / }).first().waitFor({ timeout: 10000 });
+  await d.getByRole('button', { name: /^Follow / }).first().click(); await sleep(400);
+  const followed = (await h.sw.evaluate(() => chrome.storage.local.get('followedCompanyIds'))).followedCompanyIds;
+  ok(followed?.length === 1, 'following a company is stored on the device');
+  await axe(d, 'companies with follow');
+  // follow a company that has jobs from the last 3 days, so the check has something to find
+  const recent = await json('/api/jobs?freshness_days=3&limit=1'); const recentCompany = recent.items[0].company_id;
+  await h.sw.evaluate((id) => chrome.storage.local.set({ followedCompanyIds: [id] }), recentCompany);
+  await h.sw.evaluate(() => chrome.storage.local.set({ alerts: [], seenAlertKeys: [], userPreferences: { roles: ['nonexistent_role'], seniorities: [], locations: [], remote_only: false, custom_keywords: '', excluded_keywords: '', min_salary: 0, employment_types: [], notify_enabled: false, sync_interval_mins: 30 } }));
+  await d.evaluate(() => new Promise((res) => chrome.runtime.sendMessage({ type: 'TRIGGER_BACKGROUND_CHECK' }, res))); await sleep(800);
+  const alerts = (await h.sw.evaluate(() => chrome.storage.local.get('alerts'))).alerts;
+  ok(alerts.length > 0 && alerts.every((a) => a.reason === 'follow'), `new jobs at a followed company become alerts even with no matching preferences (${alerts.length})`);
+  ok(jobReqs.some((u) => u.searchParams.get('company_ids') === String(recentCompany)), 'followed companies are asked for in one request');
+  await h.ctx.close();
+});
+
 t.done();
