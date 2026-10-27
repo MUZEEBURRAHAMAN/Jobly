@@ -6,6 +6,9 @@ import { TrackerStore } from '../lib/useTracker';
 import { appFromPageJob, PageJob, readJobInTab } from '../lib/pageJob';
 import { CopyButton } from './CopyButton';
 import { fitCheck } from '../lib/fit';
+import { AutofillPanel } from './AutofillPanel';
+import { TRACKER_KEYS } from '../lib/tracker';
+import { writeKey } from '../lib/userData';
 
 /**
  * The popup's Apply tab: save the job on the current page to the tracker, and copy profile answers into its form.
@@ -14,6 +17,7 @@ import { fitCheck } from '../lib/fit';
 export const ApplyKitView: React.FC<{ profiles: ProfilesStore; tracker: TrackerStore; openDashboard: (hash: string) => void; notify: (m: string, kind?: 'error' | 'info') => void }> = ({ profiles, tracker, openDashboard, notify }) => {
   const [page, setPage] = useState<PageJob | null | undefined>(undefined);
   const [saved, setSaved] = useState(false);
+  const [tabId, setTabId] = useState<number | null>(null);
 
   useEffect(() => {
     let alive = true;
@@ -21,6 +25,7 @@ export const ApplyKitView: React.FC<{ profiles: ProfilesStore; tracker: TrackerS
       try {
         const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
         if (!tab?.id || !/^https?:/.test(tab.url ?? '')) { if (alive) setPage(null); return; }
+        if (alive) setTabId(tab.id);
         const job = await readJobInTab(tab.id);
         if (alive) setPage(job);
       } catch { if (alive) setPage(null); }
@@ -53,6 +58,15 @@ export const ApplyKitView: React.FC<{ profiles: ProfilesStore; tracker: TrackerS
             : <button type="button" className="btn btn-brand btn-sm" style={{ alignSelf: 'flex-start' }} onClick={() => void save()}><Plus size={14} aria-hidden="true" /> Save to tracker</button>}
         </div>
       ) : <p className="text-sm">Open a job posting, then open Jobly to save it to your tracker.</p>}
+
+      {tabId !== null && page !== undefined && (
+        <AutofillPanel tabId={tabId} profile={profiles.active} openProfile={() => openDashboard('profile')} onFilled={() => {
+          // After filling, ask "Did you apply?" next time Jobly opens, like after clicking Apply on a job card.
+          if (!page || already) return;
+          const url = page.url.split('#')[0];
+          void writeKey(TRACKER_KEYS.pending, { at: Date.now(), job: { id: 0, company_id: 0, company_name: page.company, source_type: 'page', external_id: url, title: page.title, normalized_role: null, seniority: null, work_mode: null, location: page.location || null, description: null, application_url: url, first_seen_at: '', last_seen_at: '', status: 'active', is_saved: false, is_match: false } });
+        }} />
+      )}
 
       {fit && (
         <div className="card fit" style={{ padding: 12 }}>

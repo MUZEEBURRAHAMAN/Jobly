@@ -455,3 +455,10 @@ fieldset.profile-card > legend { padding: 0 var(--space-1); }
 .fit-list { list-style: none; display: flex; flex-direction: column; gap: 4px; margin-top: var(--space-2); }
 .fit-list li { color: var(--muted-foreground); }
 .fit-list .font-medium { color: var(--foreground); }
+
+.autofill { padding: var(--space-3); }
+.af-list { list-style: none; display: flex; flex-direction: column; gap: var(--space-2); max-height: 260px; overflow-y: auto; padding-right: 2px; }
+.af-row { display: flex; align-items: flex-start; gap: var(--space-2); }
+.af-row > input[type="checkbox"] { margin-top: 4px; width: 16px; height: 16px; accent-color: var(--brand); flex: none; }
+.af-row label { display: block; margin-bottom: 2px; }
+.af-empty { opacity: 0.75; }

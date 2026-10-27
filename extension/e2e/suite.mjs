@@ -404,4 +404,46 @@ await step('reading a job page and the fit check (in a real page)', async () => 
   await h.ctx.close();
 });
 
+await step('autofill: scan, propose, fill only approved fields (in a real page)', async () => {
+  const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+  const bundle = await esbuild({ entryPoints: [path.join(root, 'src/e2e-units.ts')], bundle: true, write: false, format: 'iife', globalName: 'units', platform: 'browser' });
+  const h = await launch(); const page = await h.ctx.newPage();
+  const form = `<html><body><form>
+    <label for="fn">First Name *</label><input id="fn" name="first_name" required>
+    <label for="ln">Last Name *</label><input id="ln" name="last_name" required>
+    <label for="em">Email</label><input id="em" type="email">
+    <div class="field"><div class="application-label">Phone</div><input name="phone" type="tel"></div>
+    <label>LinkedIn Profile <input name="urls[LinkedIn]"></label>
+    <label for="spon">Will you now or in the future require visa sponsorship?</label><select id="spon"><option value="">Select…</option><option value="1">Yes</option><option value="0">No</option></select>
+    <fieldset><legend>Are you legally authorized to work in the United States?</legend><label><input type="radio" name="auth" value="y"> Yes</label><label><input type="radio" name="auth" value="n"> No</label></fieldset>
+    <label for="cl">Why do you want to join us?</label><textarea id="cl"></textarea>
+    <label for="cv">Resume/CV</label><input id="cv" type="file">
+    <label><input type="checkbox" id="consent"> I agree to the privacy notice</label>
+    <label for="fav">Favourite colour</label><input id="fav">
+    <input type="hidden" name="token" value="x"><input type="password" id="pw">
+  </form></body></html>`;
+  await page.route('https://apply.example.test/**', (r) => r.fulfill({ contentType: 'text/html', body: form }));
+  await page.goto('https://apply.example.test/job'); await page.addScriptTag({ content: bundle.outputFiles[0].text });
+  await page.evaluate(() => { window.events = 0; document.getElementById('fn').addEventListener('input', () => window.events++); });
+  const scan = await page.evaluate(() => window.units.scanForm());
+  const labels = scan.fields.map((f) => f.label);
+  ok(labels.includes('First Name') && labels.includes('Phone') && labels.includes('LinkedIn Profile') && labels.some((l) => /legally authorized/.test(l)), `the scan finds questions by label, nearby text and legend (${scan.fields.length} fields)`);
+  ok(!scan.fields.some((f) => f.type === 'password' || f.type === 'hidden'), 'password and hidden fields are never touched');
+  const profile = await page.evaluate(() => ({ ...window.units.emptyProfile(), first_name: 'Ada', last_name: 'Lovelace', email: 'ada@example.com', phone: '+1 555 0100', linkedin: 'linkedin.com/in/ada', work_authorization: 'US citizen', needs_sponsorship: 'no', summary: 'I build design systems.' }));
+  const props = await page.evaluate(([f, p]) => window.units.proposeAnswers(f, p, true), [scan.fields, profile]);
+  const byLabel = Object.fromEntries(props.map((p) => [p.field.label, p]));
+  ok(byLabel['First Name'].value === 'Ada' && byLabel['Phone'].value === '+1 555 0100' && byLabel['LinkedIn Profile'].value === 'linkedin.com/in/ada', 'contact answers are proposed from the profile');
+  ok(byLabel['Will you now or in the future require visa sponsorship?'].value === 'No' && props.find((p) => /legally/.test(p.field.label)).value === 'Yes', 'yes/no questions get one of their own options');
+  ok(byLabel['Why do you want to join us?'].value === 'I build design systems.' && byLabel['Resume/CV'].answerId === 'resume', 'open questions get the summary as a starting point, the file field gets the resume');
+  ok(!byLabel['I agree to the privacy notice'].include && !byLabel['Favourite colour'].include, 'consent boxes and unknown questions are left for the user');
+  const items = props.filter((p) => p.include && p.value && p.field.label !== 'Phone').map((p) => ({ id: p.field.id, kind: p.field.kind, value: p.value }));
+  const res = await page.evaluate(([i]) => window.units.fillForm(i, { name: 'ada.pdf', type: 'application/pdf', data: 'data:application/pdf;base64,JVBERi0xLjQK' }), [items]);
+  const vals = await page.evaluate(() => ({ fn: document.getElementById('fn').value, phone: document.querySelector('[name=phone]').value, spon: document.getElementById('spon').selectedOptions[0].textContent, auth: document.querySelector('input[name=auth]:checked')?.value, cl: document.getElementById('cl').value, file: document.getElementById('cv').files[0]?.name, consent: document.getElementById('consent').checked, events: window.events }));
+  ok(res.filled === items.length && res.failed.length === 0, `filled ${res.filled} approved fields, none failed`);
+  ok(vals.fn === 'Ada' && vals.spon === 'No' && vals.auth === 'y' && vals.cl === 'I build design systems.' && vals.file === 'ada.pdf', 'text, select, radio, textarea and the resume file are filled');
+  ok(vals.phone === '' && vals.consent === false, 'an unchecked answer and the consent box stay untouched');
+  ok(vals.events >= 1, 'fields get input events, so sites built with React register the values');
+  await h.ctx.close();
+});
+
 t.done();
