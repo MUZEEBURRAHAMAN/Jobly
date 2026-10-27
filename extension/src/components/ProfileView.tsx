@@ -14,14 +14,14 @@ type Field = keyof Pick<Profile, 'first_name' | 'last_name' | 'email' | 'phone' 
 
 const CONTACT: [Field, string, string, string?][] = [
   ['first_name', 'First name', 'text'], ['last_name', 'Last name', 'text'], ['email', 'Email', 'email'], ['phone', 'Phone', 'tel'],
-  ['location', 'Location', 'text', 'City, country'], ['headline', 'Headline', 'text', 'Senior Product Designer'],
+  ['location', 'Location', 'text', 'e.g. Austin, TX'], ['headline', 'Headline', 'text', 'e.g. Senior Product Designer'],
 ];
 const LINKS: [Field, string, string, string?][] = [
-  ['linkedin', 'LinkedIn', 'url', 'linkedin.com/in/…'], ['github', 'GitHub', 'url', 'github.com/…'], ['portfolio', 'Portfolio', 'url'], ['website', 'Website', 'url'],
+  ['linkedin', 'LinkedIn', 'url', 'linkedin.com/in/yourname'], ['github', 'GitHub', 'url', 'github.com/yourname'], ['portfolio', 'Portfolio', 'url', 'yourportfolio.com'], ['website', 'Website', 'url', 'yoursite.com'],
 ];
 const WORK_FACTS: [Field, string, string, string?][] = [
-  ['years_experience', 'Years of experience', 'text', '6'], ['work_authorization', 'Work authorization', 'text', 'US citizen, EU work permit…'],
-  ['salary_expectation', 'Salary expectation', 'text', '$150,000'], ['notice_period', 'Notice period', 'text', '2 weeks'],
+  ['years_experience', 'Years of experience', 'text', 'e.g. 6'], ['work_authorization', 'Work authorization', 'text', 'e.g. US citizen, EU work permit'],
+  ['salary_expectation', 'Salary expectation', 'text', 'e.g. $150,000'], ['notice_period', 'Notice period', 'text', 'e.g. 2 weeks'],
 ];
 
 export const ProfileView: React.FC<{ store: ProfilesStore; notify: (m: string, kind?: 'error' | 'info') => void }> = ({ store, notify }) => {
@@ -100,10 +100,11 @@ export const ProfileView: React.FC<{ store: ProfilesStore; notify: (m: string, k
         </div>
       </div>
 
+      <div className="profile-grid">
       <div className="card profile-card">
         <div className="form-grid">
           <div className="wide"><label className="label" htmlFor="pf-label">Profile name</label>
-            <input id="pf-label" className="input" value={draft.label} maxLength={60} onChange={(e) => set({ label: e.target.value })} placeholder="Product design, Frontend…" />
+            <input id="pf-label" className="input" value={draft.label} maxLength={60} onChange={(e) => set({ label: e.target.value })} placeholder="e.g. Product design" />
             <p className="hint">Keep one profile per kind of role you apply for.</p></div>
         </div>
       </div>
@@ -127,12 +128,23 @@ export const ProfileView: React.FC<{ store: ProfilesStore; notify: (m: string, k
           <div><div className="row" style={{ justifyContent: 'space-between' }}><label className="label" htmlFor="pf-summary">Summary</label><CopyButton value={draft.summary} label="summary" /></div>
             <textarea id="pf-summary" className="textarea" rows={4} maxLength={3000} value={draft.summary} onChange={(e) => set({ summary: e.target.value })} placeholder="Two or three sentences about what you do and what you're looking for" /></div>
           <div><div className="row" style={{ justifyContent: 'space-between' }}><label className="label" htmlFor="pf-skills">Skills</label><CopyButton value={draft.skills} label="skills" /></div>
-            <input id="pf-skills" className="input" maxLength={1500} value={draft.skills} onChange={(e) => set({ skills: e.target.value })} placeholder="Figma, design systems, React, user research" />
+            <input id="pf-skills" className="input" maxLength={1500} value={draft.skills} onChange={(e) => set({ skills: e.target.value })} placeholder="e.g. Figma, design systems, React, user research" />
             <p className="hint">Separate with commas. Jobly also uses these for the fit score on job cards.</p></div>
         </div>
       </fieldset>
 
-      <fieldset className="card profile-card"><legend className="label">Experience</legend>
+      <fieldset className="card profile-card"><legend className="label">Resume file</legend>
+        {resume
+          ? <div className="row"><FileIcon size={16} aria-hidden="true" /><span className="grow text-sm">{resume.name} · {Math.round(resume.size / 1024)} KB</span><button type="button" className="btn btn-ghost btn-sm" onClick={() => void removeResume()}><Trash size={14} aria-hidden="true" /> Remove</button></div>
+          : <p className="text-sm">No file yet. Autofill attaches this file to application forms.</p>}
+        <label className="btn btn-outline btn-sm" style={{ alignSelf: 'flex-start', marginTop: 8 }}>
+          <FileIcon size={14} aria-hidden="true" /> {resume ? 'Replace file' : 'Choose a PDF or Word file'}
+          <input type="file" accept=".pdf,.doc,.docx,application/pdf" className="sr-only" onChange={(e) => { void pickResume(e.target.files?.[0]); e.target.value = ''; }} />
+        </label>
+        <p className="hint">Up to 1 MB. Stays on this device.</p>
+      </fieldset>
+
+      <fieldset className="card profile-card span-all"><legend className="label">Experience</legend>
         <div className="stack">
           {draft.work.map((w, i) => (
             <div key={w.id} className="sub-card">
@@ -140,7 +152,7 @@ export const ProfileView: React.FC<{ store: ProfilesStore; notify: (m: string, k
                 <div><label className="label" htmlFor={`w-title-${w.id}`}>Title</label><input id={`w-title-${w.id}`} className="input" value={w.title} onChange={(e) => setWork(w.id, { title: e.target.value })} /></div>
                 <div><label className="label" htmlFor={`w-co-${w.id}`}>Company</label><input id={`w-co-${w.id}`} className="input" value={w.company} onChange={(e) => setWork(w.id, { company: e.target.value })} /></div>
                 <div><label className="label" htmlFor={`w-start-${w.id}`}>Start</label><input id={`w-start-${w.id}`} type="month" className="input" value={w.start} onChange={(e) => setWork(w.id, { start: e.target.value })} /></div>
-                <div><label className="label" htmlFor={`w-end-${w.id}`}>End</label><input id={`w-end-${w.id}`} type="month" className="input" value={w.end} disabled={w.current} onChange={(e) => setWork(w.id, { end: e.target.value })} />
+                <div><label className="label" htmlFor={`w-end-${w.id}`}>End</label>{w.current ? <input id={`w-end-${w.id}`} className="input" value="Present" disabled /> : <input id={`w-end-${w.id}`} type="month" className="input" value={w.end} onChange={(e) => setWork(w.id, { end: e.target.value })} />}
                   <label className="row text-xs" style={{ marginTop: 6 }}><input type="checkbox" checked={w.current} onChange={(e) => setWork(w.id, { current: e.target.checked, end: e.target.checked ? '' : w.end })} /> I work here now</label></div>
                 <div className="wide"><label className="label" htmlFor={`w-loc-${w.id}`}>Location</label><input id={`w-loc-${w.id}`} className="input" value={w.location} onChange={(e) => setWork(w.id, { location: e.target.value })} /></div>
                 <div className="wide"><div className="row" style={{ justifyContent: 'space-between' }}><label className="label" htmlFor={`w-b-${w.id}`}>What you did (one point per line)</label><CopyButton value={w.bullets} label={`points for ${w.title || 'this role'}`} /></div>
@@ -158,13 +170,13 @@ export const ProfileView: React.FC<{ store: ProfilesStore; notify: (m: string, k
         </div>
       </fieldset>
 
-      <fieldset className="card profile-card"><legend className="label">Education</legend>
+      <fieldset className="card profile-card span-all"><legend className="label">Education</legend>
         <div className="stack">
           {draft.education.map((e) => (
             <div key={e.id} className="sub-card">
               <div className="form-grid">
                 <div className="wide"><label className="label" htmlFor={`e-s-${e.id}`}>School</label><input id={`e-s-${e.id}`} className="input" value={e.school} onChange={(ev) => setEdu(e.id, { school: ev.target.value })} /></div>
-                <div><label className="label" htmlFor={`e-d-${e.id}`}>Degree</label><input id={`e-d-${e.id}`} className="input" value={e.degree} onChange={(ev) => setEdu(e.id, { degree: ev.target.value })} placeholder="BSc, MA…" /></div>
+                <div><label className="label" htmlFor={`e-d-${e.id}`}>Degree</label><input id={`e-d-${e.id}`} className="input" value={e.degree} onChange={(ev) => setEdu(e.id, { degree: ev.target.value })} placeholder="e.g. BSc" /></div>
                 <div><label className="label" htmlFor={`e-f-${e.id}`}>Field of study</label><input id={`e-f-${e.id}`} className="input" value={e.field} onChange={(ev) => setEdu(e.id, { field: ev.target.value })} /></div>
                 <div><label className="label" htmlFor={`e-st-${e.id}`}>Start</label><input id={`e-st-${e.id}`} type="month" className="input" value={e.start} onChange={(ev) => setEdu(e.id, { start: ev.target.value })} /></div>
                 <div><label className="label" htmlFor={`e-en-${e.id}`}>End</label><input id={`e-en-${e.id}`} type="month" className="input" value={e.end} onChange={(ev) => setEdu(e.id, { end: ev.target.value })} /></div>
@@ -177,16 +189,8 @@ export const ProfileView: React.FC<{ store: ProfilesStore; notify: (m: string, k
         </div>
       </fieldset>
 
-      <fieldset className="card profile-card"><legend className="label">Resume file</legend>
-        {resume
-          ? <div className="row"><FileIcon size={16} aria-hidden="true" /><span className="grow text-sm">{resume.name} · {Math.round(resume.size / 1024)} KB</span><button type="button" className="btn btn-ghost btn-sm" onClick={() => void removeResume()}><Trash size={14} aria-hidden="true" /> Remove</button></div>
-          : <p className="text-sm">No file yet. Autofill attaches this file to application forms.</p>}
-        <label className="btn btn-outline btn-sm" style={{ alignSelf: 'flex-start', marginTop: 8 }}>
-          <FileIcon size={14} aria-hidden="true" /> {resume ? 'Replace file' : 'Choose a PDF or Word file'}
-          <input type="file" accept=".pdf,.doc,.docx,application/pdf" className="sr-only" onChange={(e) => { void pickResume(e.target.files?.[0]); e.target.value = ''; }} />
-        </label>
-        <p className="hint">Up to 1 MB. Stays on this device.</p>
-      </fieldset>
+
+      </div>
 
       <div className="save-bar">
         {confirmDelete

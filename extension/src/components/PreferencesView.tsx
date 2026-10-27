@@ -13,9 +13,11 @@ interface PreferencesViewProps {
   onSave: (prefs: Preferences) => Promise<void>;
   /** Re-open the first-run welcome tour. */
   onReplayWelcome?: () => void;
+  /** Dashboard: lay the groups out in two columns on wide screens. */
+  wide?: boolean;
 }
 
-export const PreferencesView: React.FC<PreferencesViewProps> = ({ preferences, onSave, onReplayWelcome }) => {
+export const PreferencesView: React.FC<PreferencesViewProps> = ({ preferences, onSave, onReplayWelcome, wide }) => {
   const [prefs, setPrefs] = useState<Preferences>(preferences);
   const [saving, setSaving] = useState(false);
   const [justSaved, setJustSaved] = useState(false);
@@ -40,7 +42,7 @@ export const PreferencesView: React.FC<PreferencesViewProps> = ({ preferences, o
   };
 
   return (
-    <form className="section" onSubmit={submit}>
+    <form className={`section${wide ? ' prefs-wide' : ''}`} onSubmit={submit}>
       <div>
         <h2>Preferences</h2>
         <p className="text-sm">Tell Jobly what you're looking for. "For you" in the jobs list uses these.</p>

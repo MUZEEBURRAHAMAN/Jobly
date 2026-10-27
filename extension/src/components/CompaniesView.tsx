@@ -25,13 +25,13 @@ const Row: React.FC<{ company: Company; muted: boolean; onToggle: () => void; fo
   const [failed, setFailed] = useState(false);
   const careers = safeHttpUrl(company.careers_url);
   return (
-    <li className="card row" style={{ padding: 12, gap: 12, opacity: muted ? 0.6 : 1 }}>
+    <li className="card row co-row" style={{ padding: 12, gap: 12, opacity: muted ? 0.6 : 1 }}>
       <div className="logo" aria-hidden="true">
         {!failed ? <img src={getCompanyLogoUrl(company.name, company.careers_url)} alt="" loading="lazy" onError={() => setFailed(true)} /> : <span className="logo-fallback">{company.name.slice(0, 1).toUpperCase()}</span>}
       </div>
       <div className="grow">
         <div className="font-medium truncate">{company.name}</div>
-        <div className="text-xs muted">{company.job_count} open role{company.job_count === 1 ? '' : 's'}{company.industry ? ` · ${company.industry}` : ''}</div>
+        <div className="text-xs muted truncate" title={company.industry ?? undefined}>{company.job_count} open role{company.job_count === 1 ? '' : 's'}{company.industry ? ` · ${company.industry}` : ''}</div>
       </div>
       {careers && (
         <a className="btn btn-ghost btn-icon btn-sm" href={careers} target="_blank" rel="noopener noreferrer" aria-label={`${company.name} careers page`} title="Careers page"><ExternalLink size={14} aria-hidden="true" /></a>
@@ -42,7 +42,7 @@ const Row: React.FC<{ company: Company; muted: boolean; onToggle: () => void; fo
       </button>
       <label className="row text-xs muted" style={{ gap: 6 }}>
         <input type="checkbox" className="switch" role="switch" checked={!muted} onChange={onToggle} aria-label={`Show jobs from ${company.name}`} />
-        <span>{muted ? 'Hidden' : 'Showing'}</span>
+        <span className="switch-label">{muted ? 'Hidden' : 'Showing'}</span>
       </label>
     </li>
   );

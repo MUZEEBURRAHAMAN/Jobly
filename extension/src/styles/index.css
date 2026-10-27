@@ -326,7 +326,7 @@ a { color: inherit; }
 .side .nav-link .nav-badge { margin-left: auto; }
 .content { flex: 1; min-width: 0; overflow-y: auto; }
 .content-inner { max-width: 1680px; margin: 0 auto; padding: var(--space-6); display: flex; flex-direction: column; gap: var(--space-4); }
-.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: var(--space-3); }
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(128px, 1fr)); gap: var(--space-3); }
 .stat { padding: var(--space-3) var(--space-4); }
 .stat .value { font-size: var(--text-2xl); line-height: var(--leading-2xl); font-weight: 600; letter-spacing: -0.02em; }
 
@@ -406,12 +406,13 @@ a { color: inherit; }
 .mini-item:hover { background: var(--hover); }
 .meter { height: 6px; border-radius: var(--radius-full); background: var(--muted); overflow: hidden; margin-top: var(--space-2); }
 .meter span { display: block; height: 100%; background: var(--brand); border-radius: inherit; }
-.board { display: grid; grid-template-columns: repeat(5, minmax(200px, 1fr)); gap: var(--space-3); overflow-x: auto; padding-bottom: var(--space-2); align-items: start; }
+.board { display: grid; grid-template-columns: repeat(5, minmax(176px, 1fr)); gap: var(--space-3); overflow-x: auto; padding-bottom: var(--space-2); align-items: start; }
 .board-col { background: var(--muted); border-radius: var(--radius-lg); padding: var(--space-2); display: flex; flex-direction: column; gap: var(--space-2); min-width: 0; }
 .board-head { display: flex; align-items: baseline; gap: var(--space-2); padding: var(--space-1) var(--space-2); font-size: var(--text-sm); }
 .board-list { list-style: none; display: flex; flex-direction: column; gap: var(--space-2); }
 .board-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--space-3); display: flex; flex-direction: column; gap: var(--space-2); }
 .board-card .select-sm { min-width: 0; width: 100%; }
+.board-card .badge { white-space: normal; height: auto; min-height: 22px; padding-block: 3px; line-height: 1.3; text-align: left; }
 .card-link { margin: -6px -6px 0 0; }
 .board-empty { padding: var(--space-3) var(--space-2); text-align: center; }
 .iv-card { padding: var(--space-4); }
@@ -462,3 +463,30 @@ fieldset.profile-card > legend { padding: 0 var(--space-1); }
 .af-row > input[type="checkbox"] { margin-top: 4px; width: 16px; height: 16px; accent-color: var(--brand); flex: none; }
 .af-row label { display: block; margin-bottom: 2px; }
 .af-empty { opacity: 0.75; }
+
+/* ---------- Dashboard layout: one width system ---------- */
+/* A section's own padding is for the popup; inside the dashboard the page already has its gutter. */
+.content-inner > .section { padding: 0; }
+/* Form pages use the full width with columns instead of a narrow strip. */
+.split { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--space-6); align-items: start; }
+.profile-grid { columns: 2 460px; column-gap: var(--space-4); }
+.profile-grid > * { break-inside: avoid; margin-bottom: var(--space-4); width: 100%; }
+.profile-grid .span-all { column-span: all; }
+.profile-grid .span-all .stack > .sub-card .form-grid { grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); }
+.profile-grid .span-all .stack > .sub-card .form-grid .wide { grid-column: 1 / -1; }
+.card-grid { list-style: none; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 440px), 1fr)); gap: var(--space-3); }
+.card-grid > li { height: 100%; }
+.finder-grid { grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) minmax(0, 0.8fr); }
+.finder-grid .wide { grid-column: auto; }
+.prefs-wide { display: block; columns: 2 460px; column-gap: var(--space-8); }
+.prefs-wide > * { break-inside: avoid; margin-bottom: var(--space-4); }
+.letter-actions { margin-top: var(--space-2); }
+.cols .co-row .switch-label { display: none; }
+.cols .co-row .grow { min-width: 0; }
+@media (max-width: 1100px) {
+  .split { grid-template-columns: 1fr; }
+  .finder-grid { grid-template-columns: 1fr 1fr; }
+  .finder-grid > :first-child { grid-column: 1 / -1; }
+}
+@media (max-width: 520px) { .finder-grid { grid-template-columns: 1fr; } }
+@media (max-width: 900px) { .board { grid-template-columns: repeat(5, 236px); } }

@@ -75,7 +75,7 @@ export const ContactsView: React.FC<{ tracker: TrackerStore; profile: Profile | 
       <div className="card" style={{ padding: 16 }}>
         <h3>Find people at a company</h3>
         {!hasHunterKey && <p className="banner" style={{ marginTop: 8 }}>Finding contacts uses your own Hunter account (it has a free plan). <button type="button" className="link" onClick={onOpenPreferences}>Add your Hunter API key</button></p>}
-        <div className="form-grid" style={{ marginTop: 12 }}>
+        <div className="form-grid finder-grid" style={{ marginTop: 12 }}>
           <div className="wide"><label className="label" htmlFor="ct-app">For application</label>
             <select id="ct-app" className="select" value={appKey} onChange={(e) => chooseApp(e.target.value)}>
               <option value="">None</option>
@@ -101,7 +101,7 @@ export const ContactsView: React.FC<{ tracker: TrackerStore; profile: Profile | 
       <div className="stack">
         <h3>Saved contacts</h3>
         {contacts.length === 0 ? <p className="text-sm">No contacts yet.</p> : (
-          <ul className="stack" style={{ listStyle: 'none' }}>{contacts.map((c) => {
+          <ul className="card-grid">{contacts.map((c) => {
             const a = c.app_key ? tracker.byKey.get(c.app_key) : undefined;
             return (
               <li key={c.id} className="task-row">

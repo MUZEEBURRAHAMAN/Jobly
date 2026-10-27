@@ -65,8 +65,12 @@ export const OptionsApp: React.FC = () => {
   const { muted, toggle: toggleMuted } = useMutedCompanies();
   const { notice, show: showNotice, clear: clearNotice } = useNotice();
   const { onboarded, complete: completeOnboarding, reset: resetOnboarding } = useOnboarded();
+  const onboardedRef = useRef(onboarded);
+  onboardedRef.current = onboarded;
   const jobsSeq = useRef(0);
   const tracker = useTrackerContext()!.store;
+  // Keep the open tab in the address, so reloading or bookmarking returns to it.
+  useEffect(() => { if (onboardedRef.current && window.location.hash.replace('#', '') !== tab) history.replaceState(null, '', tab === 'jobs' ? window.location.pathname : `#${tab}`); }, [tab]);
   const profiles = useProfiles();
   const [hasHunterKey, setHasHunterKey] = useState(false);
   useEffect(() => { const load = () => void readKey<string>(HUNTER_KEY).then((k) => setHasHunterKey(!!k)); load(); return onKeysChanged([HUNTER_KEY], load); }, []);
@@ -259,7 +263,7 @@ export const OptionsApp: React.FC = () => {
         </nav>
 
         <main id="main" className="content">
-          <div className={`content-inner${tab === 'preferences' || tab === 'tasks' || tab === 'profile' || tab === 'letters' ? ' narrow' : ''}`}>
+          <div className="content-inner">
             <ApplyPrompt onProblem={(m) => showNotice(m)} />
             {tab === 'jobs' && stats && (
               <div className="stats">
@@ -292,7 +296,7 @@ export const OptionsApp: React.FC = () => {
               {tab === 'letters' && <CoverLetterView profiles={profiles} tracker={tracker} savedJobs={savedJobs} notify={showNotice} onOpenProfile={() => setTab('profile')} />}
               {tab === 'contacts' && <ContactsView tracker={tracker} profile={profiles.active} notify={showNotice} onOpenPreferences={() => setTab('preferences')} hasHunterKey={hasHunterKey} />}
               {tab === 'alerts' && <AlertsView large alerts={alerts} newIds={newThisVisit} onMarkAllRead={markAlertsRead} />}
-              {tab === 'preferences' && preferences && <PreferencesView preferences={preferences} onSave={handleSavePreferences} onReplayWelcome={resetOnboarding} />}
+              {tab === 'preferences' && preferences && <PreferencesView wide preferences={preferences} onSave={handleSavePreferences} onReplayWelcome={resetOnboarding} />}
               {tab === 'preferences' && !preferences && <div className="section" aria-busy="true" aria-label="Loading your preferences">{[0, 1, 2, 3].map((i) => <div key={i} className="skeleton" style={{ height: i ? 56 : 28, width: i ? '100%' : '40%' }} />)}</div>}
             </ErrorBoundary>
           </div>

@@ -11,7 +11,7 @@ export const CopyButton: React.FC<{ value: string; label: string; text?: boolean
   };
   const Icon = state === 'copied' ? Check : Copy;
   return (
-    <button type="button" className={`btn btn-ghost btn-sm${text ? '' : ' btn-icon'}`} onClick={() => void copy()} disabled={!value}
+    <button type="button" className={`btn btn-sm${text ? ' btn-outline' : ' btn-ghost btn-icon'}`} onClick={() => void copy()} disabled={!value}
       aria-label={state === 'copied' ? `${label} copied` : `Copy ${label}`} title={state === 'failed' ? "Couldn't copy" : `Copy ${label}`}>
       <Icon size={14} aria-hidden="true" />{text && (state === 'copied' ? 'Copied' : 'Copy')}
     </button>

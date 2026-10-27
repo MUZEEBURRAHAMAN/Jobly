@@ -54,8 +54,8 @@ export const InterviewsView: React.FC<{ store: TrackerStore; onOpenTracker: () =
           actions={!store.apps.length ? <button type="button" className="btn" onClick={onOpenTracker}>Open the tracker</button> : undefined} />
       ) : (
         <>
-          {upcoming.length > 0 && <><h3>Upcoming</h3><ul className="stack" style={{ listStyle: 'none' }}>{upcoming.map(item)}</ul></>}
-          {past.length > 0 && <><h3>Past</h3><ul className="stack" style={{ listStyle: 'none' }}>{past.map(item)}</ul></>}
+          {upcoming.length > 0 && <><h3>Upcoming</h3><ul className="card-grid">{upcoming.map(item)}</ul></>}
+          {past.length > 0 && <><h3>Past</h3><ul className="card-grid">{past.map(item)}</ul></>}
         </>
       )}
       {editing && <InterviewDialog interview={editing.iv} apps={store.apps} onSave={store.saveInterview} onDelete={store.removeInterview} onClose={() => setEditing(null)} />}

@@ -49,6 +49,8 @@ export const TasksView: React.FC<{ store: TrackerStore; notify: (m: string, kind
     <div className="section">
       <div><h2>Tasks and goals</h2><p className="text-sm">Follow-ups, to-dos and a weekly target for applications.</p></div>
 
+      <div className="split">
+      <div className="stack">
       <div className="card goal">
         <div className="row" style={{ gap: 12 }}>
           <span className="goal-icon" aria-hidden="true"><Target size={20} /></span>
@@ -82,11 +84,13 @@ export const TasksView: React.FC<{ store: TrackerStore; notify: (m: string, kind
         </div>
       )}
 
+      </div>
+
       <div className="stack">
         <h3>To-dos</h3>
         <div className="task-add">
           <label className="sr-only" htmlFor="task-text">New task</label>
-          <input id="task-text" className="input" maxLength={300} placeholder="Send thank-you note, update portfolio…" value={text} onChange={(e) => setText(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') void add(); }} />
+          <input id="task-text" className="input" maxLength={300} placeholder="e.g. Send a thank-you note" value={text} onChange={(e) => setText(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') void add(); }} />
           <label className="sr-only" htmlFor="task-due">Due date</label>
           <input id="task-due" type="date" className="input" min={todayInput()} value={due} onChange={(e) => setDue(e.target.value)} />
           <label className="sr-only" htmlFor="task-app">Linked application</label>
@@ -100,6 +104,7 @@ export const TasksView: React.FC<{ store: TrackerStore; notify: (m: string, kind
         {done.length > 0 && <details><summary className="text-sm muted" style={{ cursor: 'pointer' }}>Done ({done.length})</summary><ul className="stack" style={{ listStyle: 'none', marginTop: 8 }}>{done.map(row)}</ul></details>}
         <p className="hint">Weeks start on Monday.</p>
       </div>
+    </div>
     </div>
   );
 };

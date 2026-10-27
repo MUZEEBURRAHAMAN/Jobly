@@ -98,6 +98,8 @@ export const CoverLetterView: React.FC<{ profiles: ProfilesStore; tracker: Track
     <div className="section">
       <div><h2>Cover letters</h2><p className="text-sm">Start from a template filled with your profile and the job, then make it yours.</p></div>
       {!profiles.active && <p className="banner">Fill in your profile so the letter can use your name, experience and skills. <button type="button" className="link" onClick={onOpenProfile}>Open profile</button></p>}
+      <div className="split">
+      <div className="stack">
       <div className="form-grid">
         <div className="wide">
           <label className="label" htmlFor="cl-target">Job</label>
@@ -115,6 +117,13 @@ export const CoverLetterView: React.FC<{ profiles: ProfilesStore; tracker: Track
           </select>
         </div>
       </div>
+      <div className="row wrap letter-actions">
+        <CopyButton value={text} label="cover letter" text />
+        <button type="button" className="btn btn-outline btn-sm" onClick={download}><Download size={14} aria-hidden="true" /> Word</button>
+        {tracked && <button type="button" className="btn btn-outline btn-sm" onClick={() => void saveToNotes()}><Save size={14} aria-hidden="true" /> Save to application notes</button>}
+        {edited && <button type="button" className="btn btn-ghost btn-sm" onClick={regenerate}>Start again from the template</button>}
+      </div>
+      </div>
       <div>
         <div className="row" style={{ justifyContent: 'space-between' }}>
           <label className="label" htmlFor="cl-text">Letter</label>
@@ -122,11 +131,6 @@ export const CoverLetterView: React.FC<{ profiles: ProfilesStore; tracker: Track
         </div>
         <textarea id="cl-text" className="textarea letter" rows={16} value={text} onChange={(e) => { setText(e.target.value); setEdited(true); }} />
       </div>
-      <div className="row wrap">
-        <CopyButton value={text} label="cover letter" text />
-        <button type="button" className="btn btn-outline btn-sm" onClick={download}><Download size={14} aria-hidden="true" /> Word</button>
-        {tracked && <button type="button" className="btn btn-outline btn-sm" onClick={() => void saveToNotes()}><Save size={14} aria-hidden="true" /> Save to application notes</button>}
-        {edited && <button type="button" className="btn btn-ghost btn-sm" onClick={regenerate}>Start again from the template</button>}
       </div>
     </div>
   );
