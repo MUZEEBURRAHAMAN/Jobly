@@ -1,0 +1,17 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "jobly-api-local",
+      "runtimeExecutable": "/bin/sh",
+      "runtimeArgs": ["-c", "cd \"/Users/muzeeburrahaman/Downloads/ai agents/JOB EXTENSION\" && DATABASE_PATH=/private/tmp/claude-501/-Users-muzeeburrahaman-Downloads-ai-agents-JOB-EXTENSION/e0e32caa-9c67-4805-b588-8781322dfff1/scratchpad/preview.db SNAPSHOT_REPO= AUTO_SYNC_INTERVAL_HOURS=999 exec .venv/bin/python -m uvicorn backend.app.main:app --host 127.0.0.1 --port 8000"],
+      "port": 8000
+    },
+    {
+      "name": "jobly-web",
+      "runtimeExecutable": "/bin/sh",
+      "runtimeArgs": ["-c", "cd \"/Users/muzeeburrahaman/Downloads/ai agents/JOB EXTENSION/web\" && PUBLIC_API_BASE=http://127.0.0.1:8000 exec npx astro dev --port 4321 --host 127.0.0.1"],
+      "port": 4321
+    }
+  ]
+}
