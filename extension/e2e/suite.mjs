@@ -20,7 +20,7 @@ await step('accessibility, both themes', async () => {
     for (const tab of ['Jobs', 'Apply', 'Companies', 'Saved', 'Preferences']) { await p.getByRole('button', { name: new RegExp('^' + tab) }).click(); await sleep(500); await axe(p, `popup/${tab}/${theme}`); }
     await p.getByRole('button', { name: /^Jobs/ }).click(); await p.getByRole('button', { name: /Filters/ }).click(); await axe(p, `popup/filters/${theme}`);
     const d = await open(h, 'options.html', { theme, width: 1280, height: 860 }); await firstCard(d);
-    for (const tab of ['Jobs', 'Companies', 'Saved', 'Tracker', 'Interviews', 'Tasks', 'Profile', 'Resume', 'Cover letters', 'Alerts', 'Preferences']) { await d.getByRole('button', { name: new RegExp('^' + tab) }).click(); await sleep(500); await axe(d, `dashboard/${tab}/${theme}`); }
+    for (const tab of ['Jobs', 'Companies', 'Saved', 'Tracker', 'Interviews', 'Tasks', 'Profile', 'Resume', 'Cover letters', 'Contacts', 'Alerts', 'Preferences']) { await d.getByRole('button', { name: new RegExp('^' + tab) }).click(); await sleep(500); await axe(d, `dashboard/${tab}/${theme}`); }
     await h.ctx.close();
   }
 });
@@ -443,6 +443,52 @@ await step('autofill: scan, propose, fill only approved fields (in a real page)'
   ok(vals.fn === 'Ada' && vals.spon === 'No' && vals.auth === 'y' && vals.cl === 'I build design systems.' && vals.file === 'ada.pdf', 'text, select, radio, textarea and the resume file are filled');
   ok(vals.phone === '' && vals.consent === false, 'an unchecked answer and the consent box stay untouched');
   ok(vals.events >= 1, 'fields get input events, so sites built with React register the values');
+  await h.ctx.close();
+});
+
+await step('contacts, outreach drafts, connections, calendar import state', async () => {
+  const h = await launch(); const store = async (k) => (await h.sw.evaluate((key) => chrome.storage.local.get(key), k))[k];
+  await h.sw.evaluate(() => chrome.storage.local.set({ applications: [{ key: 'manual:1', title: 'Staff Designer', company_name: 'Initech', location: null, application_url: 'https://careers.initech.com/jobs/1', source: 'manual', status: 'applied', notes: '', applied_at: new Date().toISOString(), follow_up_at: null, created_at: new Date().toISOString(), updated_at: new Date().toISOString() }],
+    profiles: [{ id: 'p1', label: 'Design', first_name: 'Ada', last_name: 'Lovelace', email: 'ada@example.com', phone: '', location: '', headline: 'Senior Product Designer', summary: '', linkedin: '', github: '', portfolio: '', website: '', work_authorization: '', needs_sponsorship: '', years_experience: '6', salary_expectation: '', notice_period: '', skills: '', work: [{ id: 'w1', company: 'Analytical Engines', title: 'Lead Designer', location: '', start: '2022-01', end: '', current: true, bullets: 'Led the checkout redesign' }], education: [], updated_at: new Date().toISOString() }], activeProfileId: 'p1' }));
+  const d = await open(h, 'options.html', { width: 1280, height: 900 }); await firstCard(d);
+  await d.getByRole('button', { name: /^Contacts/ }).click(); await d.getByText('Finding contacts uses your own Hunter account').waitFor({ timeout: 5000 });
+  ok(await d.getByRole('button', { name: 'Find contacts' }).isDisabled(), 'without a Hunter key, searching is off and the page says how to add one');
+  await d.getByLabel('For application').selectOption('manual:1'); ok((await d.getByLabel('Company domain').inputValue()) === 'initech.com', "the company's domain is taken from the application link");
+  await axe(d, 'contacts');
+  // a contact by hand, then an outreach draft
+  await d.getByRole('button', { name: 'Add a contact' }).click(); const dlg = d.getByRole('dialog'); await dlg.getByLabel('Name').fill('Grace Hopper'); await dlg.getByLabel('Position').fill('Head of Talent'); await dlg.getByLabel('Email').fill('grace@initech.com');
+  await d.getByRole('dialog').getByLabel('Application', { exact: true }).selectOption('manual:1'); await d.getByRole('button', { name: 'Save contact' }).click(); await sleep(400);
+  ok((await store('contacts'))?.[0]?.company === 'Initech', 'a contact is saved with its application');
+  await d.getByRole('button', { name: 'Draft message' }).click(); await d.getByRole('dialog').waitFor();
+  const msg = await d.getByLabel('Text', { exact: true }).inputValue();
+  ok(msg.startsWith('Hi Grace,') && msg.includes('Staff Designer role at Initech') && msg.includes('Ada Lovelace') && msg.includes('led the checkout redesign'), 'the outreach draft is filled from the contact, the job and the profile');
+  await d.getByLabel('Message', { exact: true }).selectOption('linkedin'); ok(await d.getByText(/\d+\/300 characters/).count() === 1, 'the LinkedIn note shows the 300-character limit');
+  await axe(d, 'outreach dialog');
+  await d.getByRole('button', { name: 'Mark as contacted' }).click(); await sleep(400); ok(!!(await store('contacts'))[0].contacted_at, 'marking as contacted is remembered');
+  // calendar import state in a build without an OAuth client
+  await d.getByRole('button', { name: /^Interviews/ }).click(); ok(await d.getByRole('button', { name: 'Import from Google Calendar' }).isDisabled(), 'calendar import is shown but off until it is set up');
+  // Hunter key in Preferences, never in a backup
+  await d.getByRole('button', { name: /^Preferences/ }).click(); await d.getByLabel(/Hunter API key/).fill('test-key-123'); await d.getByRole('button', { name: 'Save', exact: true }).click(); await sleep(300);
+  ok((await store('hunterApiKey')) === 'test-key-123', 'the Hunter key is stored on the device');
+  await d.getByRole('button', { name: /^Tracker/ }).click();
+  const [bk] = await Promise.all([d.waitForEvent('download'), d.getByRole('button', { name: 'Backup' }).click()]);
+  const backup = fs.readFileSync(await bk.path(), 'utf8'); ok(!backup.includes('test-key-123') && JSON.parse(backup).data.contacts?.length === 1, 'backups include contacts but never the API key');
+  // the Hunter search itself (in a real page, with the service mocked)
+  const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+  const bundle = await esbuild({ entryPoints: [path.join(root, 'src/e2e-units.ts')], bundle: true, write: false, format: 'iife', globalName: 'units', platform: 'browser' });
+  const page = await h.ctx.newPage(); const asked = [];
+  await page.route('https://api.hunter.io/**', (r) => { asked.push(new URL(r.request().url())); r.fulfill({ contentType: 'application/json', headers: { 'access-control-allow-origin': '*' }, body: JSON.stringify({ data: { emails: [
+    { first_name: 'Bob', last_name: 'Smith', position: 'Software Engineer', value: 'bob@initech.com', confidence: 90 },
+    { first_name: 'Ann', last_name: 'Lee', position: 'Technical Recruiter', value: 'ann@initech.com', confidence: 70, linkedin: 'https://linkedin.com/in/annlee' },
+    { first_name: 'No', last_name: 'Email', position: 'CEO' }] } }) }); });
+  await page.route('https://apply.example.test/**', (r) => r.fulfill({ contentType: 'text/html', body: '<html><body>ok</body></html>' }));
+  await page.goto('https://apply.example.test/'); await page.addInitScript(() => {});
+  await page.evaluate(() => { window.chrome = { permissions: { contains: async () => true, request: async () => true }, storage: { local: { get: async () => ({ hunterApiKey: 'k1' }) } } }; });
+  await page.addScriptTag({ content: bundle.outputFiles[0].text });
+  const found = await page.evaluate(() => window.units.findContacts('initech.com', 'hr'));
+  ok(found.length === 2 && found[0].name === 'Ann Lee', 'contacts without an email are dropped and recruiters come first');
+  ok(asked[0]?.searchParams.get('domain') === 'initech.com' && asked[0].searchParams.get('department') === 'hr' && asked[0].searchParams.get('api_key') === 'k1', 'the search goes straight to Hunter with the user\'s own key');
+  ok(await page.evaluate(() => window.units.companyDomain('https://boards.greenhouse.io/acme/jobs/1') === '' && window.units.companyDomain('https://jobs.acme.com/x') === 'acme.com'), 'hiring-system links are not mistaken for company domains');
   await h.ctx.close();
 });
 

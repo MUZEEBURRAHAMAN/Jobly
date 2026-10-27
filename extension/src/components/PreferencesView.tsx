@@ -3,6 +3,7 @@ import { Check, ExternalLink, Save } from '../lib/icons';
 import { Preferences } from '../types';
 import { EMPLOYMENT_LABELS, ROLES, SENIORITIES } from '../lib/format';
 import { SyncSetting } from './SyncSetting';
+import { ConnectionsSetting } from './ConnectionsSetting';
 
 const SITE = 'https://joblyextension.netlify.app';
 const HELP = [['Guides', '/guides'], ['FAQ', '/faq'], ['Support', '/support'], ['Privacy', '/privacy']] as const;
@@ -111,6 +112,7 @@ export const PreferencesView: React.FC<PreferencesViewProps> = ({ preferences, o
       </label>
 
       <SyncSetting />
+      <ConnectionsSetting />
 
       <div className="row">
         <button type="submit" className="btn grow" disabled={saving}><Save size={14} aria-hidden="true" /> {saving ? 'Saving…' : 'Save preferences'}</button>

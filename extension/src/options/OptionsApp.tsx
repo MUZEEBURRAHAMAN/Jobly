@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Bell, Bookmark, Briefcase, Building2, Calendar, FileText, Kanban, ListChecks, Mail, Moon, RefreshCw, SlidersHorizontal, Sun, User } from '../lib/icons';
+import { Bell, Bookmark, Briefcase, Building2, Calendar, FileText, Kanban, ListChecks, Mail, Moon, RefreshCw, SlidersHorizontal, Sun, User, Contacts } from '../lib/icons';
 import { api, ConnectionStatus } from '../lib/api';
 import { IS_DEV_BUILD, MAX_PAGE_SIZE } from '../lib/config';
 import { DEFAULT_FILTERS, JobFilters } from '../lib/filters';
@@ -27,12 +27,16 @@ import { ProfileView } from '../components/ProfileView';
 import { ResumeView } from '../components/ResumeView';
 import { CoverLetterView } from '../components/CoverLetterView';
 import { useProfiles } from '../lib/useProfiles';
+import { ContactsView } from '../components/ContactsView';
+import { CalendarImport } from '../components/CalendarImport';
+import { HUNTER_KEY } from '../lib/integrations';
+import { onKeysChanged, readKey } from '../lib/userData';
 import { useTrackerContext } from '../lib/trackerContext';
 import { dueLabel } from '../lib/dates';
 
-type Tab = 'jobs' | 'companies' | 'saved' | 'tracker' | 'interviews' | 'tasks' | 'profile' | 'resume' | 'letters' | 'alerts' | 'preferences';
+type Tab = 'jobs' | 'companies' | 'saved' | 'tracker' | 'interviews' | 'tasks' | 'profile' | 'resume' | 'letters' | 'contacts' | 'alerts' | 'preferences';
 const n = (v: number | undefined) => (v ?? 0).toLocaleString();
-const TABS: Tab[] = ['jobs', 'companies', 'saved', 'tracker', 'interviews', 'tasks', 'profile', 'resume', 'letters', 'alerts', 'preferences'];
+const TABS: Tab[] = ['jobs', 'companies', 'saved', 'tracker', 'interviews', 'tasks', 'profile', 'resume', 'letters', 'contacts', 'alerts', 'preferences'];
 const tabFromHash = (): Tab => { const h = window.location.hash.replace('#', ''); return (TABS as string[]).includes(h) ? (h as Tab) : 'jobs'; };
 
 export const OptionsApp: React.FC = () => {
@@ -64,6 +68,8 @@ export const OptionsApp: React.FC = () => {
   const jobsSeq = useRef(0);
   const tracker = useTrackerContext()!.store;
   const profiles = useProfiles();
+  const [hasHunterKey, setHasHunterKey] = useState(false);
+  useEffect(() => { const load = () => void readKey<string>(HUNTER_KEY).then((k) => setHasHunterKey(!!k)); load(); return onKeysChanged([HUNTER_KEY], load); }, []);
   // Follow-ups and tasks that are due today or overdue, for the Tasks badge.
   const dueNow = (iso: string | null) => !!iso && (dueLabel(iso).overdue || dueLabel(iso).text === 'today');
   const dueCount = tracker.tasks.filter((t) => !t.done && dueNow(t.due_at)).length
@@ -215,6 +221,7 @@ export const OptionsApp: React.FC = () => {
     { id: 'profile', label: 'Profile', icon: User },
     { id: 'resume', label: 'Resume', icon: FileText },
     { id: 'letters', label: 'Cover letters', icon: Mail },
+    { id: 'contacts', label: 'Contacts', icon: Contacts },
     { id: 'alerts', label: 'Alerts', icon: Bell, badge: unreadAlerts },
     { id: 'preferences', label: 'Preferences', icon: SlidersHorizontal },
   ];
@@ -278,11 +285,12 @@ export const OptionsApp: React.FC = () => {
               {tab === 'companies' && <CompaniesView large companies={companies} mutedCompanyIds={muted} onToggleMuted={toggleMuted} canManage={IS_DEV_BUILD} onAddCompany={handleAddCompany} offline={status === 'offline'} loading={status === 'connecting'} />}
               {tab === 'saved' && <SavedJobsView large savedJobs={savedJobs} onToggleSave={handleToggleSave} onBrowseJobs={() => setTab('jobs')} />}
               {tab === 'tracker' && <TrackerView store={tracker} savedJobs={savedJobs} notify={showNotice} onBrowseJobs={() => setTab('jobs')} />}
-              {tab === 'interviews' && <InterviewsView store={tracker} onOpenTracker={() => setTab('tracker')} />}
+              {tab === 'interviews' && <InterviewsView store={tracker} onOpenTracker={() => setTab('tracker')} calendarImport={<CalendarImport store={tracker} notify={showNotice} />} />}
               {tab === 'tasks' && <TasksView store={tracker} notify={showNotice} />}
               {tab === 'profile' && <ProfileView store={profiles} notify={showNotice} />}
               {tab === 'resume' && <ResumeView store={profiles} onOpenProfile={() => setTab('profile')} />}
               {tab === 'letters' && <CoverLetterView profiles={profiles} tracker={tracker} savedJobs={savedJobs} notify={showNotice} onOpenProfile={() => setTab('profile')} />}
+              {tab === 'contacts' && <ContactsView tracker={tracker} profile={profiles.active} notify={showNotice} onOpenPreferences={() => setTab('preferences')} hasHunterKey={hasHunterKey} />}
               {tab === 'alerts' && <AlertsView large alerts={alerts} newIds={newThisVisit} onMarkAllRead={markAlertsRead} />}
               {tab === 'preferences' && preferences && <PreferencesView preferences={preferences} onSave={handleSavePreferences} onReplayWelcome={resetOnboarding} />}
               {tab === 'preferences' && !preferences && <div className="section" aria-busy="true" aria-label="Loading your preferences">{[0, 1, 2, 3].map((i) => <div key={i} className="skeleton" style={{ height: i ? 56 : 28, width: i ? '100%' : '40%' }} />)}</div>}

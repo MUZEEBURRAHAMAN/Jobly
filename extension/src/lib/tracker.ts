@@ -55,6 +55,8 @@ export interface Interview {
   /** How the round went, 1-5 (null until rated). */
   rating: number | null;
   reminded?: boolean;
+  /** The calendar event it was imported from, so it is never imported twice. */
+  source_id?: string;
 }
 
 export interface Task {

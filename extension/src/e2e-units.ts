@@ -3,3 +3,4 @@ export { extractJobFromPage } from './lib/pageJob';
 export { fitCheck } from './lib/fit';
 export { emptyProfile } from './lib/profile';
 export { scanForm, fillForm, proposeAnswers } from './lib/autofill';
+export { findContacts, companyDomain } from './lib/integrations';

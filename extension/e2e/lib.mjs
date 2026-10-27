@@ -34,6 +34,10 @@ export async function launch({ onboarded = true, blockProd = true, colorScheme =
     ignoreDefaultArgs: ['--disable-extensions'],
     args: ['--headless=new', `--disable-extensions-except=${dist}`, `--load-extension=${dist}`],
   });
+  // Each run gets a throwaway profile; remove it when the browser closes so test runs don't fill the disk.
+  const closeBrowser = ctx.close.bind(ctx);
+  ctx.close = async (...args) => { try { await closeBrowser(...args); } finally { fs.rmSync(userDataDir, { recursive: true, force: true }); } };
+  process.once('exit', () => fs.rmSync(userDataDir, { recursive: true, force: true }));
   if (blockProd) await ctx.route(/^https:\/\/jobly-yd6l\.onrender\.com\//, (r) => r.abort('connectionrefused'));
   let [sw] = ctx.serviceWorkers();
   if (!sw) sw = await ctx.waitForEvent('serviceworker', { timeout: 20000 });
