@@ -1,12 +1,12 @@
 ---
 title: Security
 eyebrow: Security
-description: The permissions Jobly asks for, the one server it talks to, how data moves, and how to report a security problem.
-updated: 2026-10-18
+description: The permissions Jobly asks for, when it reads a page, the services it talks to, how data moves, and how to report a security problem.
+updated: 2026-10-27
 figure: vault
 ---
 
-> **The short version.** The extension asks for three permissions, talks to exactly one server, and can't see your tabs or the pages you visit. Everything personal stays in your browser.
+> **The short version.** Jobly talks to its own server for job listings. It reads the page you're on only when you click Save, Fit check or Autofill, and only that tab. Optional services (Google Calendar, Hunter) are asked for the first time you use them. Everything personal stays in your browser.
 
 ## Permissions
 
@@ -14,12 +14,16 @@ These are all the permissions in Jobly's manifest. Chrome shows them when you in
 
 | Permission | Why Jobly needs it | What it can't do |
 | --- | --- | --- |
-| `storage` | Keep your preferences, saved jobs and alerts in your browser | Read anything outside Jobly's own storage |
-| `notifications` | Show a desktop alert for a new match, only if you turn alerts on | Show anything without your setting |
-| `alarms` | Check for new jobs every 60 to 90 minutes | Run code on websites |
+| `storage` | Keep your preferences, saved jobs, tracker, profiles and contacts in your browser (and Chrome sync if you turn it on) | Read anything outside Jobly's own storage |
+| `notifications` | Show job alerts and your follow-up, task and interview reminders | Show anything you turned off |
+| `alarms` | Check for new jobs every 60 to 90 minutes and due reminders every 15 minutes | Run code on websites |
+| `activeTab` + `scripting` | Read or fill the tab you're on when you click Save, Fit check or Autofill | Touch any other tab, or any page you didn't click on |
+| `contextMenus` | Add "Save this job to Jobly" to the right-click menu | Do anything until you choose it |
+| `identity` (versions with calendar import) | Sign in to Google Calendar when you import interviews | Read any Google data without that sign-in |
 | `https://jobly-yd6l.onrender.com/*` | Fetch job listings from Jobly's server | Reach any other website |
+| Optional: `https://api.hunter.io/*` (and `https://www.googleapis.com/*` with calendar import) | Contact search and calendar import, asked for the first time you use them | Anything before you allow it |
 
-Jobly does **not** ask for `tabs`, `history`, `cookies`, `webRequest`, `scripting` or access to "all sites". It has no content scripts, so it never runs on the pages you browse.
+Jobly does **not** ask for `tabs`, `history`, `cookies`, `webRequest` or access to "all sites", and it has no content scripts that run on pages by themselves. Autofill never presses Submit and never touches password fields.
 
 ## How data moves
 
@@ -32,10 +36,10 @@ The server keeps no record of who asked for what. Identical requests are cached 
 
 ## Built-in protections
 
-- **Content Security Policy.** The extension only runs its own scripts and only connects to Jobly's server: `default-src 'self'; script-src 'self'; connect-src https://jobly-yd6l.onrender.com`.
+- **Content Security Policy.** The extension only runs its own scripts and only connects to Jobly's server and the optional services you turn on: `default-src 'self'; script-src 'self'; connect-src https://jobly-yd6l.onrender.com https://api.hunter.io` (plus Google's API addresses in versions with calendar import).
 - **Links that don't leak.** Apply links open the job's original page in a new tab with `noopener noreferrer`, so that site can't see or control the page you came from.
 - **Limits on the server.** Request rate limits, size limits on every input, a cap on how many heavy queries run at once, and a guard that stops the crawler from being pointed at private network addresses.
-- **No secrets in the extension.** There are no API keys or tokens in the extension to steal. Changing the list of companies needs an admin key that only the server holds.
+- **No secrets in the extension.** The extension ships with no API keys or tokens. If you add your own Hunter key, it stays in your browser and is left out of backups. Changing the list of companies needs an admin key that only the server holds.
 - **This website** uses a strict policy too: no inline scripts, no third-party scripts, self-hosted fonts.
 
 ## Logs

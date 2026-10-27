@@ -8,51 +8,42 @@ import FinalCta from '../components/landing/FinalCta.astro';
 type Group = { h: string; items: string[] };
 type Release = { v: string; tag: 'next' | 'upcoming'; title: string; lead: string; groups: Group[] };
 const releases: Release[] = [
-  { v: 'v0.2.0', tag: 'next', title: 'Application tracker', lead: 'Keep every application in one place.', groups: [
-    { h: 'Track applications', items: [
-      'A status on every saved job: Saved, Applied, Interview, Offer or Rejected.',
-      'Notes on each job, such as the recruiter’s name, salary talk and questions to ask.',
-      'A “Did you apply?” prompt after you click Apply, so the tracker fills itself.',
-      'A warning on job cards when you already applied to that company.',
+  { v: 'v1.1', tag: 'next', title: 'Wider autofill', lead: 'Fill more of each application without retyping.', groups: [
+    { h: 'Autofill', items: [
+      'Better handling of Workday’s multi-step forms and of custom questions.',
+      'Answers you type once remembered for the next form that asks the same question.',
     ] },
-    { h: 'Follow up', items: [
-      'Follow-up reminders, such as “check in after 7 days”.',
-      'A small dashboard: applications this week, interviews and your response rate.',
-    ] },
-    { h: 'Your data', items: ['Export and import your saved jobs and tracker as a file (JSON or CSV).'] },
+    { h: 'Tracker', items: ['Automatic status when a hiring system emails you, if you connect your inbox (optional).'] },
   ] },
-  { v: 'v0.3.0', tag: 'upcoming', title: 'Smarter matching', lead: 'Tell Jobly what you never want to see, and what to watch closely.', groups: [
-    { h: 'Dealbreakers', items: [
-      'Exclude keywords, set a salary floor, and hide work modes or companies you don’t want.',
+  { v: 'v1.2', tag: 'upcoming', title: 'Optional AI help', lead: 'For people who want it, with their own AI key, so Jobly stays free.', groups: [
+    { h: 'Writing', items: [
+      'Tailor a resume to a job, draft cover letters and answer application questions, using your own AI provider key.',
+      'Nothing is sent to an AI service unless you add a key and press the button.',
     ] },
-    { h: 'Alerts', items: [
-      'Follow a company: get an alert for any new role at an employer you pick.',
-      'A count of new matches on the toolbar icon.',
-    ] },
-  ] },
-  { v: 'v0.4.0', tag: 'upcoming', title: 'Apply faster, privately', lead: 'Less retyping between job pages and your applications.', groups: [
-    { h: 'Capture and reuse', items: [
-      'Save any job from any website with a right-click “Save to Jobly”. It reads the page title and address only when you click.',
-      'A copy kit: one-click copy of your name, links and a short intro to paste into forms.',
-      'Cover letter templates with fill-in fields such as the company and role. No AI.',
-    ] },
-    { h: 'Your devices', items: ['Sync saved jobs and your tracker across your computers through your Chrome account (small size limit).'] },
   ] },
 ];
 const later = [
-  { t: 'Resume keyword check', d: 'Paste your resume and see which keywords a job asks for that it lacks. It would run on your device, and depends on having each job’s description.' },
   { t: 'More companies and hiring systems', d: 'Adding career pages people ask for, and the systems companies use to publish them.' },
   { t: 'Clearer job cards', d: 'Showing salary and location details more consistently across sources.' },
   { t: 'More role families', d: 'Such as data, DevOps and mobile engineering.' },
   { t: 'Other browsers', d: 'Listing Jobly in the Edge and Firefox add-on stores.' },
 ];
 const wont = [
-  { t: 'AI-written resumes and cover letters', d: 'Every request costs money, and Jobly is free. Templates you fill in yourself are planned instead.' },
-  { t: 'Autofill on every site', d: 'It needs access to every page you visit. Jobly promises it can’t see your tabs, so it won’t.' },
+  { t: 'AI that Jobly pays for', d: 'Every AI request costs money, and Jobly is free. AI help, when it comes, will use your own key.' },
+  { t: 'Autofill that runs by itself', d: 'Jobly’s autofill works only on the tab you click on, shows every answer first, and never presses Submit. An agent that applies for you is not planned.' },
   { t: 'Accounts', d: 'Your data stays in your browser, so there is nothing to sign in to.' },
 ];
 const TAGS = { next: 'Next', upcoming: 'Upcoming' } as const;
 const changelog = [
+  { date: '2026-10-27', title: 'Jobly 1.0: from finding a job to the interview', items: [
+    'Application tracker: statuses, notes, follow-up reminders, a weekly goal, and a “Did you apply?” prompt after you open a job.',
+    'Interviews with prep checklists, ratings and a reminder an hour before; tasks with due dates; import from Google Calendar.',
+    'Resume profiles and a copy kit; a resume builder with four templates (PDF and Word); cover letter templates.',
+    'Save any job from its page, check your fit against the posting, and autofill application forms after reviewing every answer.',
+    'Dealbreakers (salary floor, job types), a Job type filter, and alerts for every new job at companies you follow.',
+    'Recruiter contacts with your own Hunter key, and outreach drafts for email and LinkedIn.',
+    'Import from a spreadsheet, export to CSV, full backup, and optional sync across your Chrome browsers.',
+  ] },
   { date: '2026-10-26', title: 'Jobly is on the Chrome Web Store', items: [
     'Jobly 0.1.0 is published, so it installs in one click from the Chrome Web Store.',
     'Every Add to Chrome button on this site now goes straight to the listing.',
@@ -117,7 +108,7 @@ const fmt = (d: string) => new Date(d + 'T12:00:00Z').toLocaleDateString('en-GB'
 
   <section class="container section rel-wrap" aria-labelledby="rel-title">
     <h2 class="sr-only" id="rel-title">Upcoming releases</h2>
-    <p class="now"><span class="now-tag">Now</span>Jobly v0.1.0 is live on the Chrome Web Store. Everything below comes after it.</p>
+    <p class="now"><span class="now-tag">Now</span>Jobly 1.0 is out: finding, tracking, profiles, resumes, cover letters, contacts and autofill with review. Everything below comes after it.</p>
     <ol class="rels">
       {releases.map((r) => (
         <li class="rel" data-reveal>

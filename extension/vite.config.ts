@@ -39,6 +39,11 @@ function googleOAuth(): Plugin {
       const file = resolve(outDir, 'manifest.json');
       const manifest = JSON.parse(readFileSync(file, 'utf8'));
       manifest.oauth2 = { client_id: id, scopes: ['https://www.googleapis.com/auth/calendar.readonly'] };
+      // Only a build with the client asks for what calendar import uses, so no version requests a permission it can't use.
+      manifest.permissions.push('identity');
+      manifest.optional_host_permissions = [...(manifest.optional_host_permissions ?? []), 'https://www.googleapis.com/*'];
+      manifest.content_security_policy.extension_pages = manifest.content_security_policy.extension_pages.replace(
+        /connect-src ([^;]*)/, (_m: string, list: string) => `connect-src ${list} https://www.googleapis.com https://oauth2.googleapis.com`);
       writeFileSync(file, JSON.stringify(manifest, null, 2) + '\n');
     },
   };

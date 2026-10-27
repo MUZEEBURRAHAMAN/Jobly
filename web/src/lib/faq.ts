@@ -7,7 +7,7 @@ export const FAQ_GROUPS: { id: string; title: string; items: Faq[] }[] = [
       { top: true, q: 'Is it really free?', a: 'Yes. Jobly is free, has no premium tier and shows no ads.' },
       { q: 'Do I need an account?', a: 'No. There is no sign-up, no login and no email. You pick your roles in the extension and that’s it.' },
       { top: true, q: 'Which browsers does it work in?', a: 'Chrome on desktop. Chromium browsers that install extensions from the Chrome Web Store, such as Edge and Brave, should work too, but we test on Chrome.' },
-      { q: 'Does Jobly apply to jobs for me?', a: 'No. Every Apply button opens the original listing, usually the employer’s own careers page and sometimes the remote job board it came from. You apply there yourself. Jobly never submits anything on your behalf.' },
+      { q: 'Does Jobly apply to jobs for me?', a: 'No. Jobly can fill an application form on the tab you’re on, from your profile, but it shows you every answer first and never presses Submit. You check the form and send it yourself.' },
     ],
   },
   {
@@ -24,7 +24,8 @@ export const FAQ_GROUPS: { id: string; title: string; items: Faq[] }[] = [
     id: 'alerts', title: 'Alerts and saved jobs', items: [
       { q: 'How do alerts work?', a: 'Every 60 to 90 minutes your browser asks Jobly’s server for jobs that match your preferences and compares them with what it has already seen. New ones show up as a badge on the toolbar icon and, if you turn it on, as a desktop notification.' },
       { q: 'I’m not getting desktop notifications.', a: 'Turn alerts on in Jobly’s Preferences, then check that Chrome is allowed to show notifications in your computer’s system settings. Focus or Do Not Disturb modes can also hide them.' },
-      { q: 'Are my saved jobs backed up?', a: 'No. Saved jobs live only in this browser, so they aren’t copied to other devices and are deleted if you uninstall Jobly.' },
+      { q: 'Are my saved jobs backed up?', a: 'They live in this browser. Turn on sync in Preferences to copy your preferences, tracker and profiles to Chrome on your other computers, or use Backup in the Tracker to save everything as a file.' },
+      { q: 'Does Jobly track my applications?', a: 'Yes. Mark any job as Applied, Interviewing, Offer or Rejected, add notes, follow-up reminders and interviews with prep checklists, and see your weekly progress. You can also import a spreadsheet of applications you kept elsewhere.' },
     ],
   },
   {
