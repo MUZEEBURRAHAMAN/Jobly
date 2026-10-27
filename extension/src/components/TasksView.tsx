@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Clock, Plus, Target, Trash } from '../lib/icons';
+import { Clock, ListChecks, Plus, Target, Trash } from '../lib/icons';
 import { newId, startOfWeek, Task, trackerStats } from '../lib/tracker';
 import { TrackerStore } from '../lib/useTracker';
 import { dueLabel, fromDateInput, todayInput } from '../lib/dates';
@@ -49,62 +49,72 @@ export const TasksView: React.FC<{ store: TrackerStore; notify: (m: string, kind
     <div className="section">
       <div><h2>Tasks and goals</h2><p className="text-sm">Follow-ups, to-dos and a weekly target for applications.</p></div>
 
-      <div className="split">
-      <div className="stack">
-      <div className="card goal">
-        <div className="row" style={{ gap: 12 }}>
-          <span className="goal-icon" aria-hidden="true"><Target size={20} /></span>
-          <div className="grow">
-            <div className="font-medium">{stats.appliedThisWeek} of {goal} applications this week</div>
-            <div className="text-sm muted">{stats.appliedThisWeek >= goal ? 'Goal reached. Nice work.' : `${goal - stats.appliedThisWeek} to go, ${daysLeft} day${daysLeft === 1 ? '' : 's'} left`}</div>
-          </div>
-          {goalDraft === null
-            ? <button type="button" className="btn btn-outline btn-sm" onClick={() => setGoalDraft(String(goal))}>Change goal</button>
-            : <div className="row"><label className="sr-only" htmlFor="goal-input">Weekly goal</label><input id="goal-input" type="number" min={1} max={200} className="input input-sm" style={{ width: 80 }} value={goalDraft} onChange={(e) => setGoalDraft(e.target.value)} /><button type="button" className="btn btn-sm" onClick={() => void saveGoal()}>Save</button></div>}
-        </div>
-        <div className="meter" role="img" aria-label={`${stats.appliedThisWeek} of ${goal}`}><span style={{ width: `${Math.min(100, (stats.appliedThisWeek / goal) * 100)}%` }} /></div>
-      </div>
-
-      <label className="option" style={{ cursor: 'pointer' }}>
-        <span className="grow"><span className="font-medium" style={{ display: 'block' }}>Reminders</span><span className="text-xs muted">Desktop reminders for follow-ups, tasks that are due and interviews an hour before they start</span></span>
-        <input type="checkbox" className="switch" role="switch" checked={store.settings.reminders} onChange={(e) => void store.saveSettings({ ...store.settings, reminders: e.target.checked })} />
-      </label>
-
-      {followUps.length > 0 && (
+      <div className="workspace">
         <div className="stack">
-          <h3>Follow-ups</h3>
-          <ul className="stack" style={{ listStyle: 'none' }}>
-            {followUps.map((a) => { const d = dueLabel(a.follow_up_at!); return (
-              <li key={a.key} className="task-row"><Clock size={16} aria-hidden="true" />
-                <span className="grow break">Follow up with <span className="font-medium">{a.company_name}</span> about {a.title}</span>
-                <span className={`badge ${d.overdue ? 'badge-warning' : 'badge-outline'}`}>{d.text}</span>
-                <button type="button" className="btn btn-ghost btn-sm" onClick={() => void store.updateApp(a.key, { follow_up_at: null })}>Done</button>
-              </li>); })}
-          </ul>
-        </div>
-      )}
+          {followUps.length > 0 && (
+            <section className="card panel" aria-labelledby="followups-title">
+              <div className="panel-head"><h3 id="followups-title">Follow-ups</h3><span className="text-xs muted">{followUps.length} to send</span></div>
+              <ul className="panel-list">
+                {followUps.map((a) => { const d = dueLabel(a.follow_up_at!); return (
+                  <li key={a.key} className="task-row"><Clock size={16} aria-hidden="true" />
+                    <span className="grow break text-sm">Follow up with <span className="font-medium">{a.company_name}</span> about {a.title}</span>
+                    <span className={`badge ${d.overdue ? 'badge-warning' : 'badge-outline'}`}>{d.text}</span>
+                    <button type="button" className="btn btn-ghost btn-sm" onClick={() => void store.updateApp(a.key, { follow_up_at: null })}>Done</button>
+                  </li>); })}
+              </ul>
+            </section>
+          )}
 
-      </div>
-
-      <div className="stack">
-        <h3>To-dos</h3>
-        <div className="task-add">
-          <label className="sr-only" htmlFor="task-text">New task</label>
-          <input id="task-text" className="input" maxLength={300} placeholder="e.g. Send a thank-you note" value={text} onChange={(e) => setText(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') void add(); }} />
-          <label className="sr-only" htmlFor="task-due">Due date</label>
-          <input id="task-due" type="date" className="input" min={todayInput()} value={due} onChange={(e) => setDue(e.target.value)} />
-          <label className="sr-only" htmlFor="task-app">Linked application</label>
-          <select id="task-app" className="select" value={appKey} onChange={(e) => setAppKey(e.target.value)}>
-            <option value="">No application</option>
-            {store.apps.map((a) => <option key={a.key} value={a.key}>{a.company_name} · {a.title}</option>)}
-          </select>
-          <button type="button" className="btn btn-sm" onClick={() => void add()}><Plus size={14} aria-hidden="true" /> Add task</button>
+          <section className="card panel" aria-labelledby="todos-title">
+            <div className="panel-head">
+              <h3 id="todos-title">To-dos</h3>
+              {open.length > 0 && <span className="text-xs muted">{open.length} open</span>}
+            </div>
+            <div className="task-add">
+              <label className="sr-only" htmlFor="task-text">New task</label>
+              <input id="task-text" className="input task-text" maxLength={300} placeholder="e.g. Send a thank-you note" value={text} onChange={(e) => setText(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') void add(); }} />
+              <label className="sr-only" htmlFor="task-due">Due date</label>
+              <input id="task-due" type="date" className="input" min={todayInput()} value={due} onChange={(e) => setDue(e.target.value)} />
+              <label className="sr-only" htmlFor="task-app">Linked application</label>
+              <select id="task-app" className="select" value={appKey} onChange={(e) => setAppKey(e.target.value)}>
+                <option value="">No application</option>
+                {store.apps.map((a) => <option key={a.key} value={a.key}>{a.company_name} · {a.title}</option>)}
+              </select>
+              <button type="button" className="btn" onClick={() => void add()}><Plus size={16} aria-hidden="true" /> Add task</button>
+            </div>
+            {open.length === 0
+              ? <div className="panel-empty"><span className="goal-icon" aria-hidden="true"><ListChecks size={20} /></span><p className="font-medium">No open tasks</p><p className="text-sm muted">Add the next step for an application, like a thank-you note or a portfolio update. Due tasks get a reminder.</p></div>
+              : <ul className="panel-list">{open.map(row)}</ul>}
+            {done.length > 0 && <details className="task-done"><summary className="text-sm muted">Done ({done.length})</summary><ul className="panel-list">{done.map(row)}</ul></details>}
+          </section>
         </div>
-        {open.length === 0 ? <p className="text-sm">No open tasks.</p> : <ul className="stack" style={{ listStyle: 'none' }}>{open.map(row)}</ul>}
-        {done.length > 0 && <details><summary className="text-sm muted" style={{ cursor: 'pointer' }}>Done ({done.length})</summary><ul className="stack" style={{ listStyle: 'none', marginTop: 8 }}>{done.map(row)}</ul></details>}
-        <p className="hint">Weeks start on Monday.</p>
+
+        <aside className="stack" aria-label="Weekly goal and reminders">
+          <section className="card panel goal" aria-labelledby="goal-title">
+            <div className="panel-head">
+              <div className="row" style={{ gap: 12 }}>
+                <span className="goal-icon" aria-hidden="true"><Target size={20} /></span>
+                <h3 id="goal-title">Weekly goal</h3>
+              </div>
+              {goalDraft === null
+                ? <button type="button" className="btn btn-outline btn-sm" onClick={() => setGoalDraft(String(goal))}>Change goal</button>
+                : <div className="row"><label className="sr-only" htmlFor="goal-input">Weekly goal</label><input id="goal-input" type="number" min={1} max={200} className="input input-sm" style={{ width: 72 }} value={goalDraft} onChange={(e) => setGoalDraft(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') void saveGoal(); }} /><button type="button" className="btn btn-sm" onClick={() => void saveGoal()}>Save</button></div>}
+            </div>
+            <div>
+              <div className="goal-number" aria-hidden="true"><span>{stats.appliedThisWeek}</span> <span className="muted">/ {goal}</span></div>
+              <p className="sr-only">{stats.appliedThisWeek} of {goal} applications this week</p>
+              <div className="meter" role="img" aria-label={`${stats.appliedThisWeek} of ${goal}`}><span style={{ width: `${Math.min(100, (stats.appliedThisWeek / goal) * 100)}%` }} /></div>
+              <p className="text-sm muted goal-note">{stats.appliedThisWeek >= goal ? 'Goal reached. Nice work.' : `${goal - stats.appliedThisWeek} to go, ${daysLeft} day${daysLeft === 1 ? '' : 's'} left`}</p>
+              <p className="hint">Applications this week. Weeks start on Monday.</p>
+            </div>
+          </section>
+
+          <label className="card panel reminder-card">
+            <span className="grow"><span className="font-medium" style={{ display: 'block' }}>Reminders</span><span className="text-xs muted">Desktop reminders for follow-ups, tasks that are due and interviews an hour before they start</span></span>
+            <input type="checkbox" className="switch" role="switch" checked={store.settings.reminders} onChange={(e) => void store.saveSettings({ ...store.settings, reminders: e.target.checked })} />
+          </label>
+        </aside>
       </div>
-    </div>
     </div>
   );
 };

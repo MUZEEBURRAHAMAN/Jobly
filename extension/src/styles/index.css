@@ -468,7 +468,6 @@ fieldset.profile-card > legend { padding: 0 var(--space-1); }
 /* A section's own padding is for the popup; inside the dashboard the page already has its gutter. */
 .content-inner > .section { padding: 0; }
 /* Form pages use the full width with columns instead of a narrow strip. */
-.split { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--space-6); align-items: start; }
 .profile-grid { columns: 2 460px; column-gap: var(--space-4); }
 .profile-grid > * { break-inside: avoid; margin-bottom: var(--space-4); width: 100%; }
 .profile-grid .span-all { column-span: all; }
@@ -480,13 +479,40 @@ fieldset.profile-card > legend { padding: 0 var(--space-1); }
 .finder-grid .wide { grid-column: auto; }
 .prefs-wide { display: block; columns: 2 460px; column-gap: var(--space-8); }
 .prefs-wide > * { break-inside: avoid; margin-bottom: var(--space-4); }
-.letter-actions { margin-top: var(--space-2); }
 .cols .co-row .switch-label { display: none; }
 .cols .co-row .grow { min-width: 0; }
 @media (max-width: 1100px) {
-  .split { grid-template-columns: 1fr; }
   .finder-grid { grid-template-columns: 1fr 1fr; }
   .finder-grid > :first-child { grid-column: 1 / -1; }
 }
 @media (max-width: 520px) { .finder-grid { grid-template-columns: 1fr; } }
 @media (max-width: 900px) { .board { grid-template-columns: repeat(5, 236px); } }
+
+/* ---------- Workspace: a main panel with a side panel (Tasks, Cover letters) ---------- */
+.workspace { display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: var(--space-6); align-items: start; }
+.workspace.aside-left { grid-template-columns: 380px minmax(0, 1fr); }
+@media (max-width: 1100px) { .workspace, .workspace.aside-left { grid-template-columns: minmax(0, 1fr); } }
+.panel { padding: var(--space-5); display: flex; flex-direction: column; gap: var(--space-4); }
+.panel-head { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); flex-wrap: wrap; min-height: 32px; }
+.panel-head h3, .panel-title { font-size: var(--text-base); line-height: var(--leading-base); font-weight: 600; margin: 0; }
+.panel-list { list-style: none; display: flex; flex-direction: column; }
+.panel-list .task-row { border: 0; border-radius: 0; background: none; padding: var(--space-3) 0; min-height: 52px; }
+.panel-list > .task-row + .task-row { border-top: 1px solid var(--border); }
+.panel-empty { display: flex; flex-direction: column; align-items: center; text-align: center; gap: var(--space-1); padding: var(--space-8) var(--space-4); border: 1px dashed var(--border); border-radius: var(--radius); }
+.panel-empty .goal-icon { margin-bottom: var(--space-2); }
+.panel-empty .text-sm { max-width: 400px; }
+.panel.flush { padding: 0; gap: 0; overflow: hidden; }
+.panel.flush > .panel-head { padding: var(--space-5) var(--space-5) var(--space-4); border-bottom: 1px solid var(--border); }
+.panel.flush > .panel-foot { padding: var(--space-3) var(--space-5); border-top: 1px solid var(--border); background: var(--muted); }
+.panel .letter { border: 0; border-radius: 0; background: transparent; box-shadow: none; min-height: 540px; padding: var(--space-5); display: block; width: 100%; }
+.panel .letter:focus-visible { outline-offset: -2px; }
+.task-add { grid-template-columns: minmax(0, 1fr) 160px 200px auto; }
+@media (max-width: 1500px) { .task-add { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto; } .task-add .task-text { grid-column: 1 / -1; } }
+@media (max-width: 560px) { .task-add { grid-template-columns: minmax(0, 1fr); } }
+.task-done summary { cursor: pointer; padding: var(--space-1) 0; }
+.task-done .panel-list { margin-top: var(--space-2); }
+.goal { gap: var(--space-3); }
+.goal-number { font-size: var(--text-2xl); line-height: var(--leading-2xl); font-weight: 600; letter-spacing: -0.02em; }
+.goal-number .muted { font-size: var(--text-base); font-weight: 500; letter-spacing: 0; }
+.goal-note { margin-top: var(--space-2); }
+.reminder-card { flex-direction: row; align-items: center; cursor: pointer; }

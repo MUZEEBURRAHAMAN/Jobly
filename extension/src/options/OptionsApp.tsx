@@ -70,6 +70,7 @@ export const OptionsApp: React.FC = () => {
   const jobsSeq = useRef(0);
   const tracker = useTrackerContext()!.store;
   // Keep the open tab in the address, so reloading or bookmarking returns to it.
+  useEffect(() => { const onHash = () => setTab(tabFromHash()); window.addEventListener('hashchange', onHash); return () => window.removeEventListener('hashchange', onHash); }, []);
   useEffect(() => { if (onboardedRef.current && window.location.hash.replace('#', '') !== tab) history.replaceState(null, '', tab === 'jobs' ? window.location.pathname : `#${tab}`); }, [tab]);
   const profiles = useProfiles();
   const [hasHunterKey, setHasHunterKey] = useState(false);

@@ -92,45 +92,59 @@ export const CoverLetterView: React.FC<{ profiles: ProfilesStore; tracker: Track
     const a = Object.assign(document.createElement('a'), { href: url, download: `cover-letter-${fileSafe(company || 'company')}.doc` });
     document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 1000);
   };
-  const missing = (text.match(/\[[a-z ]+\]/g) ?? []).length;
+  const gaps = text.match(/\[[a-z ]+\]/g) ?? [];
+  const missing = gaps.length;
+  const profileGaps = gaps.some((g) => g !== '[role]' && g !== '[company]');
 
   return (
     <div className="section">
       <div><h2>Cover letters</h2><p className="text-sm">Start from a template filled with your profile and the job, then make it yours.</p></div>
       {!profiles.active && <p className="banner">Fill in your profile so the letter can use your name, experience and skills. <button type="button" className="link" onClick={onOpenProfile}>Open profile</button></p>}
-      <div className="split">
-      <div className="stack">
-      <div className="form-grid">
-        <div className="wide">
-          <label className="label" htmlFor="cl-target">Job</label>
-          <select id="cl-target" className="select" value={target} onChange={(e) => { setTarget(e.target.value); setEdited(false); }}>
-            <option value="">Type the role and company below</option>
-            {targets.map((t) => <option key={t.key} value={t.key}>{t.role} · {t.company}</option>)}
-          </select>
-        </div>
-        <div><label className="label" htmlFor="cl-role">Role</label><input id="cl-role" className="input" value={role} onChange={(e) => { setRole(e.target.value); setEdited(false); }} /></div>
-        <div><label className="label" htmlFor="cl-company">Company</label><input id="cl-company" className="input" value={company} onChange={(e) => { setCompany(e.target.value); setEdited(false); }} /></div>
-        <div className="wide">
-          <label className="label" htmlFor="cl-template">Template</label>
-          <select id="cl-template" className="select" value={template} onChange={(e) => { setTemplate(e.target.value); setEdited(false); }}>
-            {TEMPLATES.map((t) => <option key={t.id} value={t.id}>{t.label}</option>)}
-          </select>
-        </div>
-      </div>
-      <div className="row wrap letter-actions">
-        <CopyButton value={text} label="cover letter" text />
-        <button type="button" className="btn btn-outline btn-sm" onClick={download}><Download size={14} aria-hidden="true" /> Word</button>
-        {tracked && <button type="button" className="btn btn-outline btn-sm" onClick={() => void saveToNotes()}><Save size={14} aria-hidden="true" /> Save to application notes</button>}
-        {edited && <button type="button" className="btn btn-ghost btn-sm" onClick={regenerate}>Start again from the template</button>}
-      </div>
-      </div>
-      <div>
-        <div className="row" style={{ justifyContent: 'space-between' }}>
-          <label className="label" htmlFor="cl-text">Letter</label>
-          {missing > 0 && <span className="text-xs" style={{ color: 'var(--warning)' }}>{missing} gap{missing === 1 ? '' : 's'} to fill in [brackets]</span>}
-        </div>
-        <textarea id="cl-text" className="textarea letter" rows={16} value={text} onChange={(e) => { setText(e.target.value); setEdited(true); }} />
-      </div>
+      <div className="workspace aside-left">
+        <section className="card panel" aria-labelledby="cl-details-title">
+          <div className="panel-head"><h3 id="cl-details-title">Details</h3></div>
+          <div className="stack">
+            <div>
+              <label className="label" htmlFor="cl-target">Job</label>
+              <select id="cl-target" className="select" value={target} onChange={(e) => { setTarget(e.target.value); setEdited(false); }}>
+                <option value="">Type the role and company below</option>
+                {targets.map((t) => <option key={t.key} value={t.key}>{t.role} · {t.company}</option>)}
+              </select>
+              <p className="hint">Pick a job from your tracker or saved jobs, or type it below.</p>
+            </div>
+            <div><label className="label" htmlFor="cl-role">Role</label><input id="cl-role" className="input" placeholder="e.g. Senior Product Designer" value={role} onChange={(e) => { setRole(e.target.value); setEdited(false); }} /></div>
+            <div><label className="label" htmlFor="cl-company">Company</label><input id="cl-company" className="input" placeholder="e.g. Acme" value={company} onChange={(e) => { setCompany(e.target.value); setEdited(false); }} /></div>
+            <div>
+              <label className="label" htmlFor="cl-template">Template</label>
+              <select id="cl-template" className="select" value={template} onChange={(e) => { setTemplate(e.target.value); setEdited(false); }}>
+                {TEMPLATES.map((t) => <option key={t.id} value={t.id}>{t.label}</option>)}
+              </select>
+            </div>
+          </div>
+        </section>
+
+        <section className="card panel flush">
+          <div className="panel-head">
+            <div className="row" style={{ gap: 10 }}>
+              <label className="panel-title" htmlFor="cl-text">Letter</label>
+              {missing > 0 && <span className="badge badge-warning">{missing} gap{missing === 1 ? '' : 's'} to fill</span>}
+            </div>
+            <div className="row wrap" style={{ gap: 8 }}>
+              {edited && <button type="button" className="btn btn-ghost btn-sm" onClick={regenerate}>Start again</button>}
+              {tracked && <button type="button" className="btn btn-outline btn-sm" onClick={() => void saveToNotes()}><Save size={14} aria-hidden="true" /> Save to notes</button>}
+              <button type="button" className="btn btn-outline btn-sm" onClick={download}><Download size={14} aria-hidden="true" /> Word</button>
+              <CopyButton value={text} label="cover letter" text />
+            </div>
+          </div>
+          <textarea id="cl-text" className="textarea letter" rows={18} value={text} onChange={(e) => { setText(e.target.value); setEdited(true); }} />
+          {missing > 0 && (
+            <p className="panel-foot text-xs muted">
+              {profileGaps
+                ? <>Words in [brackets] are empty profile fields or job details. Replace them here, or <button type="button" className="link" onClick={onOpenProfile}>fill in your profile</button> once and every letter uses it.</>
+                : 'Pick a job or type the role and company to fill in [role] and [company].'}
+            </p>
+          )}
+        </section>
       </div>
     </div>
   );
