@@ -143,7 +143,7 @@ const AppCard: React.FC<{ app: Application; interviews: Interview[]; onOpen?: ()
         {app.applied_at && <span className="badge badge-outline">Applied {formatDate(app.applied_at)}</span>}
         {due && app.status !== 'rejected' && app.status !== 'withdrawn' && <span className={`badge ${due.overdue ? 'badge-warning' : 'badge-outline'}`}><Clock size={12} aria-hidden="true" /> Follow up {due.text}</span>}
         {next && <span className="badge badge-brand">Interview {formatDate(next.at)}</span>}
-        {app.source !== 'jobly' && <span className="badge badge-outline">{app.source === 'import' ? 'Imported' : 'Added by hand'}</span>}
+        {app.source !== 'jobly' && <span className="badge badge-outline">{app.source === 'import' ? 'Imported' : app.source === 'page' ? 'Saved from a page' : 'Added by hand'}</span>}
       </div>
       <div className="row" style={{ gap: 6 }}>
         <select className="select select-sm grow" value={app.status} aria-label={`Status of ${app.title} at ${app.company_name}`} onChange={(e) => onMove(e.target.value as AppStatus)}>

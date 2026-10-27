@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Bookmark, Briefcase, Building2, SlidersHorizontal } from '../lib/icons';
+import { Bookmark, Briefcase, Building2, SlidersHorizontal, Wand } from '../lib/icons';
 import { api, ConnectionStatus } from '../lib/api';
 import { IS_DEV_BUILD } from '../lib/config';
 import { DEFAULT_FILTERS, JobFilters } from '../lib/filters';
@@ -17,8 +17,11 @@ import { PreferencesView } from '../components/PreferencesView';
 import { Notice, useNotice } from '../components/Notice';
 import { Welcome } from '../components/Welcome';
 import { ApplyPrompt } from '../components/ApplyPrompt';
+import { ApplyKitView } from '../components/ApplyKitView';
+import { useProfiles } from '../lib/useProfiles';
+import { useTrackerContext } from '../lib/trackerContext';
 
-type Tab = 'jobs' | 'companies' | 'saved' | 'preferences';
+type Tab = 'jobs' | 'apply' | 'companies' | 'saved' | 'preferences';
 
 export const PopupApp: React.FC = () => {
   const [theme, setTheme] = useState<Theme>(getInitialTheme());
@@ -43,6 +46,8 @@ export const PopupApp: React.FC = () => {
   const { notice, show: showNotice, clear: clearNotice } = useNotice();
   const { onboarded, complete: completeOnboarding, reset: resetOnboarding } = useOnboarded();
   const jobsSeq = useRef(0); // only the newest request may update the list
+  const profiles = useProfiles();
+  const tracker = useTrackerContext()!.store;
 
   useEffect(() => {
     applyTheme(theme);
@@ -184,6 +189,7 @@ export const PopupApp: React.FC = () => {
 
   const tabs: { id: Tab; label: string; icon: React.ElementType; badge?: number }[] = [
     { id: 'jobs', label: 'Jobs', icon: Briefcase },
+    { id: 'apply', label: 'Apply', icon: Wand },
     { id: 'companies', label: 'Companies', icon: Building2 },
     { id: 'saved', label: 'Saved', icon: Bookmark, badge: savedJobs.length },
     { id: 'preferences', label: 'Preferences', icon: SlidersHorizontal },
@@ -219,6 +225,8 @@ export const PopupApp: React.FC = () => {
             displayLimit={displayLimit} onDisplayLimitChange={setDisplayLimit}
           />
         )}
+        {tab === 'apply' && <ApplyKitView profiles={profiles} tracker={tracker} notify={showNotice}
+          openDashboard={(hash) => { try { void chrome.tabs.create({ url: chrome.runtime.getURL(`options.html#${hash}`) }); } catch { window.open(`/options.html#${hash}`, '_blank'); } }} />}
         {tab === 'companies' && <CompaniesView companies={companies} mutedCompanyIds={muted} onToggleMuted={toggleMuted} canManage={IS_DEV_BUILD} onAddCompany={handleAddCompany} offline={status === 'offline'} loading={status === 'connecting'} />}
         {tab === 'saved' && <SavedJobsView savedJobs={savedJobs} onToggleSave={handleToggleSave} onBrowseJobs={() => setTab('jobs')} />}
         {tab === 'preferences' && preferences && <PreferencesView preferences={preferences} onSave={handleSavePreferences} onReplayWelcome={resetOnboarding} />}

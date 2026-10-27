@@ -1,6 +1,9 @@
 // End-to-end suite: real Chromium + the built extension + a backend on a fixture database.
 import { launch, open, makeRunner, LOCAL, JSON_HEADERS, sleep, json, API } from './lib.mjs';
 import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import { build as esbuild } from 'esbuild';
 
 const t = makeRunner('e2e suite');
 const { ok, step, axe } = t;
@@ -14,10 +17,10 @@ await step('accessibility, both themes', async () => {
   for (const theme of ['light', 'dark']) {
     const h = await launch({ colorScheme: theme });
     const p = await open(h, 'popup.html', { theme }); await firstCard(p);
-    for (const tab of ['Jobs', 'Companies', 'Saved', 'Preferences']) { await p.getByRole('button', { name: new RegExp('^' + tab) }).click(); await sleep(500); await axe(p, `popup/${tab}/${theme}`); }
+    for (const tab of ['Jobs', 'Apply', 'Companies', 'Saved', 'Preferences']) { await p.getByRole('button', { name: new RegExp('^' + tab) }).click(); await sleep(500); await axe(p, `popup/${tab}/${theme}`); }
     await p.getByRole('button', { name: /^Jobs/ }).click(); await p.getByRole('button', { name: /Filters/ }).click(); await axe(p, `popup/filters/${theme}`);
     const d = await open(h, 'options.html', { theme, width: 1280, height: 860 }); await firstCard(d);
-    for (const tab of ['Jobs', 'Companies', 'Saved', 'Tracker', 'Interviews', 'Tasks', 'Alerts', 'Preferences']) { await d.getByRole('button', { name: new RegExp('^' + tab) }).click(); await sleep(500); await axe(d, `dashboard/${tab}/${theme}`); }
+    for (const tab of ['Jobs', 'Companies', 'Saved', 'Tracker', 'Interviews', 'Tasks', 'Profile', 'Resume', 'Cover letters', 'Alerts', 'Preferences']) { await d.getByRole('button', { name: new RegExp('^' + tab) }).click(); await sleep(500); await axe(d, `dashboard/${tab}/${theme}`); }
     await h.ctx.close();
   }
 });
@@ -323,6 +326,81 @@ await step('dealbreakers, job type filter, following companies', async () => {
   const alerts = (await h.sw.evaluate(() => chrome.storage.local.get('alerts'))).alerts;
   ok(alerts.length > 0 && alerts.every((a) => a.reason === 'follow'), `new jobs at a followed company become alerts even with no matching preferences (${alerts.length})`);
   ok(jobReqs.some((u) => u.searchParams.get('company_ids') === String(recentCompany)), 'followed companies are asked for in one request');
+  await h.ctx.close();
+});
+
+await step('profile, copy kit, resume, cover letter, backup, sync', async () => {
+  const h = await launch(); const store = async (k, area = 'local') => (await h.sw.evaluate(([key, a]) => chrome.storage[a].get(key), [k, area]))[k];
+  const d = await open(h, 'options.html', { width: 1280, height: 900 }); await firstCard(d);
+  await d.getByRole('button', { name: /^Profile/ }).click(); await d.getByRole('button', { name: 'Create profile' }).click(); await sleep(400);
+  await d.getByLabel('First name', { exact: true }).fill('Ada'); await d.getByLabel('Last name', { exact: true }).fill('Lovelace'); await d.getByLabel('Email', { exact: true }).fill('ada@example.com');
+  await d.getByLabel('Headline', { exact: true }).fill('Senior Product Designer'); await d.getByLabel('Years of experience', { exact: true }).fill('6');
+  await d.getByLabel('Skills', { exact: true }).fill('Figma, Design systems, React, User research');
+  await d.getByRole('button', { name: 'Add a role' }).click(); await d.getByLabel('Title', { exact: true }).fill('Lead Designer'); await d.getByLabel('Company', { exact: true }).fill('Analytical Engines');
+  await d.getByLabel(/What you did/).fill('Led the redesign of checkout, lifting conversion 12%\nBuilt the design system');
+  await d.getByRole('button', { name: 'Save profile' }).click(); await sleep(500);
+  const prof = (await store('profiles'))?.[0];
+  ok(prof?.first_name === 'Ada' && prof.work[0].company === 'Analytical Engines' && prof.work[0].current === true, 'the profile is saved on the device with its experience');
+  await axe(d, 'profile filled');
+  // resume
+  await d.getByRole('button', { name: /^Resume/ }).click(); await d.locator('.resume h1').waitFor({ timeout: 5000 });
+  ok((await d.locator('.resume h1').innerText()) === 'Ada Lovelace' && await d.locator('.resume li', { hasText: 'Built the design system' }).count() === 1, 'the resume preview is built from the profile');
+  await d.getByText('Classic', { exact: true }).click(); await sleep(300); ok((await store('resumeTemplate')) === 'classic', 'the chosen template is remembered');
+  ok(await d.evaluate(() => getComputedStyle(document.querySelector('.resume')).fontFamily.includes('Georgia')), 'the Classic template applies its own styles (constructed stylesheet, no inline <style>)');
+  const [doc] = await Promise.all([d.waitForEvent('download'), d.getByRole('button', { name: 'Word' }).click()]);
+  const docText = fs.readFileSync(await doc.path(), 'utf8'); ok(docText.includes('Ada Lovelace') && docText.includes('Experience') && doc.suggestedFilename() === 'Ada-Lovelace.doc', 'Word export holds the resume');
+  await axe(d, 'resume');
+  // cover letter
+  await d.getByRole('button', { name: /^Cover letters/ }).click(); await d.getByLabel('Role', { exact: true }).fill('Staff Designer'); await d.getByLabel('Company', { exact: true }).fill('Initech'); await sleep(300);
+  const letter = await d.getByLabel('Letter', { exact: true }).inputValue();
+  ok(letter.includes('Dear Initech hiring team') && letter.includes('Staff Designer') && letter.includes('Ada Lovelace') && letter.includes('led the redesign of checkout'), 'the cover letter fills in the job and the profile');
+  await axe(d, 'cover letters');
+  // backup carries profiles
+  await d.getByRole('button', { name: /^Tracker/ }).click();
+  const [bk] = await Promise.all([d.waitForEvent('download'), d.getByRole('button', { name: 'Backup' }).click()]);
+  ok(JSON.parse(fs.readFileSync(await bk.path(), 'utf8')).data.profiles?.[0]?.first_name === 'Ada', 'the backup includes profiles');
+  // copy kit in the popup
+  const p = await open(h); await firstCard(p); await p.getByRole('button', { name: /^Apply/ }).click();
+  await p.locator('.kit-row', { hasText: 'ada@example.com' }).waitFor({ timeout: 5000 }); ok(true, 'the popup copy kit lists the profile answers');
+  await p.getByText('Open a job posting, then open Jobly').waitFor({ timeout: 5000 }); ok(true, 'on a non-job page the Apply tab explains how to save a job');
+  await axe(p, 'apply kit'); await p.close();
+  // sync across Chrome browsers (opt-in)
+  await d.getByRole('button', { name: /^Preferences/ }).click(); await d.getByRole('switch', { name: /Sync across your Chrome browsers/ }).click(); await sleep(1500);
+  const meta = await store('jobly_meta', 'sync'); ok(meta?.chunks >= 1, `turning sync on writes a snapshot to Chrome sync (${meta?.chunks} chunk)`);
+  const snapshot = JSON.parse((await h.sw.evaluate(async (n) => { const k = Array.from({ length: n }, (_, i) => `jobly_${i}`); const r = await chrome.storage.sync.get(k); return k.map((x) => r[x]).join(''); }, meta.chunks)));
+  ok(snapshot.profiles?.[0]?.first_name === 'Ada' && !('savedJobs' in snapshot), 'the snapshot holds the synced data only');
+  snapshot.tasks = [{ id: 'remote-task', text: 'Made on my laptop', due_at: null, done: false, app_key: null, created_at: new Date().toISOString() }];
+  const json = JSON.stringify(snapshot);
+  await h.sw.evaluate(async ([js]) => { const parts = {}; for (let i = 0; i * 7000 < js.length; i++) parts[`jobly_${i}`] = js.slice(i * 7000, (i + 1) * 7000); await chrome.storage.sync.set({ ...parts, jobly_meta: { chunks: Object.keys(parts).length, updatedAt: Date.now() + 60000, device: 'other-device', trimmed: false } }); }, [json]);
+  await sleep(1500);
+  ok((await store('tasks'))?.[0]?.text === 'Made on my laptop', 'a newer snapshot from another browser is applied');
+  await h.ctx.close();
+});
+
+await step('reading a job page and the fit check (in a real page)', async () => {
+  const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+  const bundle = await esbuild({ entryPoints: [path.join(root, 'src/e2e-units.ts')], bundle: true, write: false, format: 'iife', globalName: 'units', platform: 'browser' })
+    .catch(() => null);
+  ok(!!bundle, 'the page-reading code bundles on its own');
+  if (!bundle) return;
+  const h = await launch(); const page = await h.ctx.newPage();
+  const posting = { '@context': 'https://schema.org', '@type': 'JobPosting', title: 'Senior Product Designer', datePosted: '2026-10-20', employmentType: 'FULL_TIME',
+    hiringOrganization: { '@type': 'Organization', name: 'Quill Systems' }, jobLocation: { '@type': 'Place', address: { addressLocality: 'Austin', addressRegion: 'TX', addressCountry: 'US' } },
+    baseSalary: { currency: 'USD', value: { minValue: 150000, maxValue: 190000, unitText: 'YEAR' } },
+    description: '<p>We want 5+ years of product design. You know <b>Figma</b> and design systems, and you have run user research. Bonus: TypeScript, Storybook, accessibility.</p><img src=x onerror="window.pwned=1">' };
+  await page.route('https://jobs.example.test/**', (r) => r.fulfill({ contentType: 'text/html', body: `<html><head><title>Senior Product Designer - Quill</title><script type="application/ld+json">${JSON.stringify({ '@graph': [posting] })}</script></head><body><main>Apply now</main></body></html>` }));
+  await page.goto('https://jobs.example.test/123'); await page.addScriptTag({ content: bundle.outputFiles[0].text });
+  const job = await page.evaluate(() => window.units.extractJobFromPage());
+  ok(job.found && job.title === 'Senior Product Designer' && job.company === 'Quill Systems' && job.location === 'Austin, TX, US' && job.datePosted === '2026-10-20' && /150000 – 190000 USD per year/.test(job.salary), 'a schema.org JobPosting is read (title, company, place, date, salary)');
+  ok(job.description.includes('5+ years') && !job.description.includes('<p>'), 'the description arrives as plain text');
+  ok(await page.evaluate(() => !window.pwned), "reading the page never runs the page's markup");
+  const fit = await page.evaluate((d) => window.units.fitCheck({ ...window.units.emptyProfile(), skills: 'Figma, Design systems, User research, Python', years_experience: '6' }, d), job.description);
+  ok(fit.level === 'strong' && fit.found.length === 3 && fit.missing.join() === 'Python' && fit.yearsAsked === 5, `fit check: ${fit.level}, ${fit.found.length} skills found, asks ${fit.yearsAsked} years`);
+  ok(fit.suggestions.includes('TypeScript') && fit.suggestions.includes('Storybook') && !fit.suggestions.includes('Figma'), 'it suggests skills the posting asks for that the profile lacks');
+  await page.route('https://plain.example.test/**', (r) => r.fulfill({ contentType: 'text/html', body: '<html><head><title>Frontend Engineer at Paperplane</title></head><body><h1>Frontend Engineer</h1></body></html>' }));
+  await page.goto('https://plain.example.test/job'); await page.addScriptTag({ content: bundle.outputFiles[0].text });
+  const plain = await page.evaluate(() => window.units.extractJobFromPage());
+  ok(!plain.found && plain.title === 'Frontend Engineer' && plain.company === 'Paperplane', 'a page without structured data falls back to its heading and title');
   await h.ctx.close();
 });
 

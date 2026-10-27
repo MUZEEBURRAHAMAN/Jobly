@@ -1,12 +1,13 @@
 import { Application, AppStatus, STATUSES, sanitizeApp, TRACKER_KEYS } from './tracker';
 import { readKey, writeKey, STORAGE_KEYS } from './userData';
+import { cleanProfile, MAX_PROFILES, Profile } from './profile';
 
 /**
  * Export and import. A JSON backup holds everything Jobly keeps on this device; a CSV holds the tracker only and is
  * what spreadsheets, Notion and Google Sheets export, so applications kept elsewhere can be brought in.
  */
 
-const BACKUP_KEYS = [STORAGE_KEYS.preferences, STORAGE_KEYS.saved, TRACKER_KEYS.apps, TRACKER_KEYS.interviews, TRACKER_KEYS.tasks, TRACKER_KEYS.settings, 'mutedCompanyIds', 'followedCompanyIds', 'profile'];
+const BACKUP_KEYS = [STORAGE_KEYS.preferences, STORAGE_KEYS.saved, TRACKER_KEYS.apps, TRACKER_KEYS.interviews, TRACKER_KEYS.tasks, TRACKER_KEYS.settings, 'mutedCompanyIds', 'followedCompanyIds', 'profiles', 'activeProfileId', 'resumeFile', 'resumeTemplate'];
 const MAX_FILE_BYTES = 5_000_000;
 
 function download(name: string, type: string, body: string) {
@@ -129,6 +130,8 @@ export async function importFile(file: File): Promise<ImportResult> {
         if (k === 'savedJobs') value = arr.filter((j) => ok(j, ['title', 'company_name']));
         if (k === 'mutedCompanyIds' || k === 'followedCompanyIds') value = arr.filter((n) => typeof n === 'number');
       }
+      if (k === 'profiles') value = (Array.isArray(value) ? value : []).slice(0, MAX_PROFILES).map((x) => cleanProfile(x as Partial<Profile>));
+      if (k === 'resumeFile' && (typeof value !== 'object' || value === null || Array.isArray(value))) continue;
       if (!(await writeKey(k, value))) throw new Error("Couldn't restore the backup. Your browser storage may be full.");
       restored++;
     }

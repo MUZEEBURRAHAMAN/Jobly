@@ -4,7 +4,9 @@ import {
   jobKey, loadAlerts, loadPreferences, loadSeenKeys, prefsParam, readKey, storeAlerts, storeSeenKeys,
 } from '../lib/userData';
 import { FOLLOWED_KEY, MAX_FOLLOWED } from '../lib/follow';
-import { loadApps, loadInterviews, loadTasks, loadTrackerSettings, storeApps, storeInterviews, storeTasks } from '../lib/tracker';
+import { loadApps, loadInterviews, loadTasks, loadTrackerSettings, MAX_APPS, sanitizeApp, storeApps, storeInterviews, storeTasks } from '../lib/tracker';
+import { appFromPageJob, readJobInTab } from '../lib/pageJob';
+import { pullSnapshot, pushSnapshot, SYNC_SETTING, SYNC_STATE, syncEnabled, SYNCED_LOCAL_KEYS, syncState } from '../lib/sync';
 
 const ALARM_NAME = 'jobly-sync';
 const RECENT_DAYS = 3; // only jobs posted this recently are worth an alert
@@ -78,6 +80,49 @@ chrome.runtime.onInstalled.addListener(async (details) => {
 });
 
 chrome.runtime.onStartup.addListener(() => { void ensureAlarm(); });
+
+// Chrome sync (opt-in): a local change is pushed a few seconds later; another device's newer snapshot is pulled in.
+let ignoreLocalUntil = 0;
+let pushTimer: ReturnType<typeof setTimeout> | undefined;
+async function pullQuietly() {
+  ignoreLocalUntil = Date.now() + 4000; // the pull's own writes are not local changes
+  const applied = await pullSnapshot().catch(() => false);
+  if (!applied) ignoreLocalUntil = 0;
+  return applied;
+}
+chrome.storage.onChanged.addListener(async (changes, area) => {
+  if (area === 'sync' && 'jobly_meta' in changes) { if (await syncEnabled()) await pullQuietly(); return; }
+  if (area !== 'local') return;
+  if (SYNC_SETTING in changes && changes[SYNC_SETTING].newValue === true) { if (!(await pullQuietly())) await pushSnapshot(); return; }
+  if (!Object.keys(changes).some((k) => SYNCED_LOCAL_KEYS.includes(k)) || Date.now() < ignoreLocalUntil || !(await syncEnabled())) return;
+  const state = await syncState();
+  await chrome.storage.local.set({ [SYNC_STATE]: { ...state, changedAt: Date.now() } });
+  clearTimeout(pushTimer);
+  pushTimer = setTimeout(() => void pushSnapshot(), 5000);
+});
+void (async () => { if (await syncEnabled()) await pullQuietly(); })();
+
+// Right-click any job posting: "Save this job to Jobly". Chrome lets the extension read only that tab, only on that click.
+const SAVE_MENU = 'jobly-save-page';
+function ensureMenu() {
+  chrome.contextMenus.removeAll(() => {
+    chrome.contextMenus.create({ id: SAVE_MENU, title: 'Save this job to Jobly', contexts: ['page'], documentUrlPatterns: ['https://*/*', 'http://*/*'] }, () => void chrome.runtime.lastError);
+  });
+}
+ensureMenu();
+
+chrome.contextMenus.onClicked.addListener(async (info, tab) => {
+  if (info.menuItemId !== SAVE_MENU || !tab?.id) return;
+  const job = await readJobInTab(tab.id);
+  const draft = job ? appFromPageJob(job) : { key: tab.url, title: tab.title, company_name: tab.url ? new URL(tab.url).hostname.replace(/^www\./, '') : '', application_url: tab.url, status: 'saved' as const, source: 'page' as const };
+  const app = sanitizeApp(draft);
+  if (!app) return;
+  const apps = await loadApps();
+  const existing = apps.find((a) => a.key === app.key);
+  if (!existing && apps.length >= MAX_APPS) { await remind('saved', 'Your tracker is full', `Remove some of the ${MAX_APPS} applications to save more.`); return; }
+  if (!existing) await storeApps([app, ...apps]);
+  await remind('saved', existing ? 'Already in your Jobly tracker' : 'Saved to your Jobly tracker', `${app.title} · ${app.company_name}`);
+});
 
 chrome.alarms.onAlarm.addListener(async (alarm) => {
   if (alarm.name === ALARM_NAME || alarm.name === 'hiring-radar-sync') {
@@ -210,7 +255,7 @@ async function remind(id: string, title: string, message: string) {
 // Notification Click Handler: reminders open the page they are about; job alerts open Alerts.
 chrome.notifications.onClicked.addListener(async (notificationId) => {
   await chrome.notifications.clear(notificationId);
-  const page = notificationId.startsWith('rem-iv') ? 'interviews' : notificationId.startsWith('rem-') ? 'tasks' : 'alerts';
+  const page = notificationId.startsWith('rem-iv') ? 'interviews' : notificationId.startsWith('rem-') ? 'tasks' : notificationId.startsWith('saved') ? 'tracker' : 'alerts';
   await chrome.tabs.create({ url: chrome.runtime.getURL(`options.html#${page}`) });
 });
 

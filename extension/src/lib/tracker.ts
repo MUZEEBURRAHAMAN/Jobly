@@ -30,7 +30,7 @@ export interface Application {
   application_url: string;
   salary_summary?: string | null;
   posted_at?: string | null;
-  source: 'jobly' | 'manual' | 'import';
+  source: 'jobly' | 'manual' | 'import' | 'page';
   status: AppStatus;
   notes: string;
   applied_at: string | null;
@@ -100,7 +100,7 @@ export function sanitizeApp(a: Partial<Application> & { title?: unknown; company
   return {
     key: clip(a.key, 600) || `manual:${newId()}`, title, company_name: company, location: a.location ? clip(a.location, 160) : null,
     application_url: safeHttpUrl(String(a.application_url ?? '')) ?? '', salary_summary: a.salary_summary ? clip(a.salary_summary, 80) : null,
-    posted_at: iso(a.posted_at), source: a.source === 'jobly' || a.source === 'import' ? a.source : 'manual', status, notes: clip(a.notes, 4000),
+    posted_at: iso(a.posted_at), source: a.source === 'jobly' || a.source === 'import' || a.source === 'page' ? a.source : 'manual', status, notes: clip(a.notes, 4000),
     applied_at: iso(a.applied_at), follow_up_at: iso(a.follow_up_at), follow_up_notified: !!a.follow_up_notified,
     created_at: iso(a.created_at) ?? t, updated_at: iso(a.updated_at) ?? t,
   };

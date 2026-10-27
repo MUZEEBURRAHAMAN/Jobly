@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Bell, Bookmark, Briefcase, Building2, Calendar, Kanban, ListChecks, Moon, RefreshCw, SlidersHorizontal, Sun } from '../lib/icons';
+import { Bell, Bookmark, Briefcase, Building2, Calendar, FileText, Kanban, ListChecks, Mail, Moon, RefreshCw, SlidersHorizontal, Sun, User } from '../lib/icons';
 import { api, ConnectionStatus } from '../lib/api';
 import { IS_DEV_BUILD, MAX_PAGE_SIZE } from '../lib/config';
 import { DEFAULT_FILTERS, JobFilters } from '../lib/filters';
@@ -23,12 +23,16 @@ import { TrackerView } from '../components/TrackerView';
 import { InterviewsView } from '../components/InterviewsView';
 import { TasksView } from '../components/TasksView';
 import { ApplyPrompt } from '../components/ApplyPrompt';
+import { ProfileView } from '../components/ProfileView';
+import { ResumeView } from '../components/ResumeView';
+import { CoverLetterView } from '../components/CoverLetterView';
+import { useProfiles } from '../lib/useProfiles';
 import { useTrackerContext } from '../lib/trackerContext';
 import { dueLabel } from '../lib/dates';
 
-type Tab = 'jobs' | 'companies' | 'saved' | 'tracker' | 'interviews' | 'tasks' | 'alerts' | 'preferences';
+type Tab = 'jobs' | 'companies' | 'saved' | 'tracker' | 'interviews' | 'tasks' | 'profile' | 'resume' | 'letters' | 'alerts' | 'preferences';
 const n = (v: number | undefined) => (v ?? 0).toLocaleString();
-const TABS: Tab[] = ['jobs', 'companies', 'saved', 'tracker', 'interviews', 'tasks', 'alerts', 'preferences'];
+const TABS: Tab[] = ['jobs', 'companies', 'saved', 'tracker', 'interviews', 'tasks', 'profile', 'resume', 'letters', 'alerts', 'preferences'];
 const tabFromHash = (): Tab => { const h = window.location.hash.replace('#', ''); return (TABS as string[]).includes(h) ? (h as Tab) : 'jobs'; };
 
 export const OptionsApp: React.FC = () => {
@@ -59,6 +63,7 @@ export const OptionsApp: React.FC = () => {
   const { onboarded, complete: completeOnboarding, reset: resetOnboarding } = useOnboarded();
   const jobsSeq = useRef(0);
   const tracker = useTrackerContext()!.store;
+  const profiles = useProfiles();
   // Follow-ups and tasks that are due today or overdue, for the Tasks badge.
   const dueNow = (iso: string | null) => !!iso && (dueLabel(iso).overdue || dueLabel(iso).text === 'today');
   const dueCount = tracker.tasks.filter((t) => !t.done && dueNow(t.due_at)).length
@@ -207,6 +212,9 @@ export const OptionsApp: React.FC = () => {
     { id: 'tracker', label: 'Tracker', icon: Kanban, badge: tracker.apps.length },
     { id: 'interviews', label: 'Interviews', icon: Calendar, badge: upcomingInterviews },
     { id: 'tasks', label: 'Tasks', icon: ListChecks, badge: dueCount },
+    { id: 'profile', label: 'Profile', icon: User },
+    { id: 'resume', label: 'Resume', icon: FileText },
+    { id: 'letters', label: 'Cover letters', icon: Mail },
     { id: 'alerts', label: 'Alerts', icon: Bell, badge: unreadAlerts },
     { id: 'preferences', label: 'Preferences', icon: SlidersHorizontal },
   ];
@@ -244,7 +252,7 @@ export const OptionsApp: React.FC = () => {
         </nav>
 
         <main id="main" className="content">
-          <div className={`content-inner${tab === 'preferences' || tab === 'tasks' ? ' narrow' : ''}`}>
+          <div className={`content-inner${tab === 'preferences' || tab === 'tasks' || tab === 'profile' || tab === 'letters' ? ' narrow' : ''}`}>
             <ApplyPrompt onProblem={(m) => showNotice(m)} />
             {tab === 'jobs' && stats && (
               <div className="stats">
@@ -272,6 +280,9 @@ export const OptionsApp: React.FC = () => {
               {tab === 'tracker' && <TrackerView store={tracker} savedJobs={savedJobs} notify={showNotice} onBrowseJobs={() => setTab('jobs')} />}
               {tab === 'interviews' && <InterviewsView store={tracker} onOpenTracker={() => setTab('tracker')} />}
               {tab === 'tasks' && <TasksView store={tracker} notify={showNotice} />}
+              {tab === 'profile' && <ProfileView store={profiles} notify={showNotice} />}
+              {tab === 'resume' && <ResumeView store={profiles} onOpenProfile={() => setTab('profile')} />}
+              {tab === 'letters' && <CoverLetterView profiles={profiles} tracker={tracker} savedJobs={savedJobs} notify={showNotice} onOpenProfile={() => setTab('profile')} />}
               {tab === 'alerts' && <AlertsView large alerts={alerts} newIds={newThisVisit} onMarkAllRead={markAlertsRead} />}
               {tab === 'preferences' && preferences && <PreferencesView preferences={preferences} onSave={handleSavePreferences} onReplayWelcome={resetOnboarding} />}
               {tab === 'preferences' && !preferences && <div className="section" aria-busy="true" aria-label="Loading your preferences">{[0, 1, 2, 3].map((i) => <div key={i} className="skeleton" style={{ height: i ? 56 : 28, width: i ? '100%' : '40%' }} />)}</div>}

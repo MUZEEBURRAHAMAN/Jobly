@@ -22,7 +22,7 @@ export const Notice: React.FC<{ notice: NoticeState | null; onClose: () => void 
   return (
     <div className={`notice ${notice.kind === 'info' ? 'info' : ''}`} role={notice.kind === 'error' ? 'alert' : 'status'}>
       <span className="grow">{notice.message}</span>
-      <button type="button" className="btn btn-outline btn-sm" onClick={onClose} aria-label="Dismiss message">OK</button>
+      <button type="button" className="btn btn-outline btn-sm" onClick={onClose} aria-label="OK, dismiss this message">OK</button>
     </div>
   );
 };

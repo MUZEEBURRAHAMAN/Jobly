@@ -6,7 +6,8 @@ import {
   RefreshIcon, Moon02Icon, Building06Icon, Briefcase01Icon, SparklesIcon, Share08Icon, FloppyDiskIcon, ArrowTurnBackwardIcon,
   Add01Icon, Location01Icon, Flag02Icon, CheckmarkCircle02Icon, BookmarkCheck02Icon, Notification03Icon, ArrowRight01Icon,
   ArrowLeft01Icon, ChromeIcon, KanbanIcon, Calendar03Icon, CheckListIcon, Download04Icon, Upload04Icon, Delete02Icon, StarIcon,
-  Clock01Icon, PencilEdit02Icon, Target02Icon, Link01Icon,
+  Clock01Icon, PencilEdit02Icon, Target02Icon, Link01Icon, Copy01Icon, UserAccountIcon, FileEditIcon, Mail01Icon, File02Icon, MagicWand01Icon,
+  ContactBookIcon,
 } from '@hugeicons/core-free-icons';
 
 type Node = readonly [string, Readonly<Record<string, string | number>>];
@@ -68,4 +69,11 @@ export const Clock = make(n(Clock01Icon), 'Clock');
 export const Pencil = make(n(PencilEdit02Icon), 'Pencil');
 export const Target = make(n(Target02Icon), 'Target');
 export const LinkIcon = make(n(Link01Icon), 'LinkIcon');
+export const Copy = make(n(Copy01Icon), 'Copy');
+export const User = make(n(UserAccountIcon), 'User');
+export const FileText = make(n(FileEditIcon), 'FileText');
+export const Mail = make(n(Mail01Icon), 'Mail');
+export const File = make(n(File02Icon), 'File');
+export const Wand = make(n(MagicWand01Icon), 'Wand');
+export const Contacts = make(n(ContactBookIcon), 'Contacts');
 export type IconComponent = ReturnType<typeof make>;

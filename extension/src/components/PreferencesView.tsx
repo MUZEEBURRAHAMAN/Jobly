@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Check, ExternalLink, Save } from '../lib/icons';
 import { Preferences } from '../types';
 import { EMPLOYMENT_LABELS, ROLES, SENIORITIES } from '../lib/format';
+import { SyncSetting } from './SyncSetting';
 
 const SITE = 'https://joblyextension.netlify.app';
 const HELP = [['Guides', '/guides'], ['FAQ', '/faq'], ['Support', '/support'], ['Privacy', '/privacy']] as const;
@@ -108,6 +109,8 @@ export const PreferencesView: React.FC<PreferencesViewProps> = ({ preferences, o
         <span><span className="font-medium" style={{ display: 'block' }}>Desktop alerts</span><span className="text-xs muted">One notification when new jobs match</span></span>
         <input type="checkbox" className="switch" role="switch" checked={prefs.notify_enabled} onChange={(e) => edit({ notify_enabled: e.target.checked })} />
       </label>
+
+      <SyncSetting />
 
       <div className="row">
         <button type="submit" className="btn grow" disabled={saving}><Save size={14} aria-hidden="true" /> {saving ? 'Saving…' : 'Save preferences'}</button>
