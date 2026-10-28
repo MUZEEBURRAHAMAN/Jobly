@@ -1,0 +1,46 @@
+name: Discover companies
+
+# Tests the candidate employers in scripts/candidates/ against the job boards (scripts/discover_boards.py) and
+# commits the boards that answer with jobs to backend/app/data/companies.json. The next crawl picks them up.
+on:
+  workflow_dispatch:
+    inputs:
+      limit:
+        description: "Test at most this many new names (0 = all)"
+        default: "0"
+      retry:
+        description: "Also retry names that found nothing before"
+        type: boolean
+        default: false
+  schedule:
+    - cron: "41 3 * * 1"            # Mondays: try names added to the candidate lists since
+
+permissions:
+  contents: write
+
+concurrency:
+  group: discover-companies
+  cancel-in-progress: false
+
+jobs:
+  discover:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: backend/requirements.txt
+      - run: pip install -r backend/requirements.txt
+      - name: Discover
+        run: python scripts/discover_boards.py --limit "${{ inputs.limit || 0 }}" ${{ inputs.retry && '--retry' || '' }}
+      - name: Commit new companies
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add backend/app/data/companies.json scripts/candidates/tried.txt scripts/candidates/results.jsonl
+          if git diff --cached --quiet; then echo "nothing new"; exit 0; fi
+          git commit -m "Discover companies: new job boards from scripts/candidates"
+          git push

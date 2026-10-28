@@ -1,0 +1,65 @@
+name: Crawl and publish jobs
+
+# Every 4 hours: crawl every company's job board, then publish
+#   1. the static job data (backend/app/static_export.py) to the Cloudflare Pages project that the extension,
+#      website and Studio read from (needs the CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID repository secrets), and
+#   2. the database snapshot the Render API restores on boot (release "snapshot").
+# Each run starts from the previous snapshot, so first-seen dates carry over. Unlimited minutes need a public repo.
+on:
+  schedule:
+    - cron: "17 */4 * * *"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write                  # create/update the "snapshot" release
+
+concurrency:
+  group: jobs-data
+  cancel-in-progress: false
+
+jobs:
+  crawl:
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    env:
+      DATABASE_PATH: ${{ github.workspace }}/.data/jobly.db
+      SNAPSHOT_REPO: ${{ github.repository }}
+      SNAPSHOT_TOKEN: ${{ github.token }}
+      CRAWL_PROFILE: full
+      CRAWL_CONCURRENCY: "16"
+      PAGES_PROJECT: ${{ vars.JOBS_DATA_PROJECT || 'jobly-data' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: backend/requirements.txt
+      - run: pip install -r backend/requirements.txt
+
+      - name: Crawl
+        run: python -m backend.app.snapshot build jobly.db.gz
+
+      - name: Export static job data
+        run: |
+          python -m backend.app.static_export site
+          du -sh site
+          find site -type f | wc -l
+
+      - name: Publish to Cloudflare Pages
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          if [ -z "$CLOUDFLARE_API_TOKEN" ] || [ -z "$CLOUDFLARE_ACCOUNT_ID" ]; then
+            echo "::warning::CLOUDFLARE_API_TOKEN / CLOUDFLARE_ACCOUNT_ID secrets are not set; skipping the static data deploy"
+            exit 0
+          fi
+          npx -y wrangler@4 pages deploy site --project-name "$PAGES_PROJECT" --branch main --commit-dirty=true
+
+      - name: Publish snapshot
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release view snapshot >/dev/null 2>&1 || gh release create snapshot --title "Job snapshot" --notes "Automated database snapshot used to warm-start the server. Replaced on every run." --latest=false
+          gh release upload snapshot jobly.db.gz --clobber

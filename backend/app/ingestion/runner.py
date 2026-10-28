@@ -311,9 +311,16 @@ async def fetch_company_jobs(
         elif source_type == "personio":
             jobs = await fetch_personio_jobs(source_id, name, client)
         elif source_type == "workday":
-            jobs = await fetch_workday_jobs(source_id, name, client)
+            if settings.CRAWL_PROFILE == "full":
+                # The scheduled full crawl lists every role: page through the whole board instead of tech searches
+                jobs = await fetch_workday_jobs(source_id, name, client, max_pages=settings.WORKDAY_MAX_PAGES, queries=("",), only_roles=False)
+            else:
+                jobs = await fetch_workday_jobs(source_id, name, client)
         elif source_type == "amazon":
-            jobs = await fetch_amazon_jobs(source_id, name, client)
+            if settings.CRAWL_PROFILE == "full":
+                jobs = await fetch_amazon_jobs("all", name, client, max_pages=100)
+            else:
+                jobs = await fetch_amazon_jobs(source_id, name, client)
         elif source_type == "custom":
             jobs = await fetch_custom_portal_jobs(careers_url or source_id, name, client)
         else:
@@ -324,8 +331,9 @@ async def fetch_company_jobs(
         return company, [], str(e)
 
 
-BATCH_SIZE = 10
-SEMAPHORE_LIMIT = 5
+# Boards read at once, and companies per database commit (settings.CRAWL_CONCURRENCY: 5 on the free server).
+SEMAPHORE_LIMIT = max(1, settings.CRAWL_CONCURRENCY)
+BATCH_SIZE = max(10, 2 * SEMAPHORE_LIMIT)
 
 
 async def sync_all_sources(company_id_filter: int | None = None, include_aggregators: bool = True) -> dict[str, Any]:
@@ -372,7 +380,7 @@ async def sync_all_sources(company_id_filter: int | None = None, include_aggrega
         companies = [dict(row) for row in await cursor.fetchall()]
         summary["companies_checked"] = len(companies)
 
-        limits = httpx.Limits(max_keepalive_connections=5, max_connections=10)
+        limits = httpx.Limits(max_keepalive_connections=SEMAPHORE_LIMIT, max_connections=2 * SEMAPHORE_LIMIT)
         async with httpx.AsyncClient(timeout=25.0, limits=limits) as client:
             sem = asyncio.Semaphore(SEMAPHORE_LIMIT)
 
@@ -519,7 +527,7 @@ async def sync_board_sources() -> dict[str, Any]:
             row["name"].strip().lower(): row["id"] for row in await cursor.fetchall()
         }
 
-        limits = httpx.Limits(max_keepalive_connections=5, max_connections=10)
+        limits = httpx.Limits(max_keepalive_connections=SEMAPHORE_LIMIT, max_connections=2 * SEMAPHORE_LIMIT)
         async with httpx.AsyncClient(timeout=25.0, limits=limits) as client:
             # 2. WWR
             try:

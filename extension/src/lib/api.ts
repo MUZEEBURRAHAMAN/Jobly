@@ -1,6 +1,28 @@
 import { Job, JobsResponse, Company, Preferences, RadarStats } from '../types';
-import { API_BASES, MAX_PAGE_SIZE, WAKE_TIMEOUTS_MS } from './config';
+import { JobData, type DataJob, type JobQuery } from '../../../shared/jobdata';
+import { API_BASES, DATA_BASE, MAX_PAGE_SIZE, WAKE_TIMEOUTS_MS } from './config';
 import { loadPreferences, prefsParam, storePreferences } from './userData';
+
+// Static files time out sooner than the API: they are on a CDN, so a slow answer means they are unreachable.
+const timedFetch: typeof fetch = (input, init) => fetch(input, { ...init, signal: init?.signal ?? AbortSignal.timeout(15000) });
+export const jobData = new JobData(DATA_BASE, timedFetch);
+
+/** A static-data job in the shape the API returns (the list never carries descriptions). */
+export function toJob(j: DataJob, generatedAt: string): Job {
+  return {
+    ...j, external_id: '', description: null, last_seen_at: generatedAt, status: 'active', is_saved: false,
+  };
+}
+
+/** The extension's filters as a static-data query. */
+export function toQuery(params: import('../types').JobFilterParams, prefs: Preferences): JobQuery {
+  return {
+    role: params.role, location: params.location, seniority: params.seniority, company_id: params.company_id,
+    search: params.search?.slice(0, 100), work_mode: params.work_mode, geo_hub: params.geo_hub, experience_tier: params.experience_tier,
+    min_budget: params.min_budget, has_salary: params.has_salary, freshness_days: params.freshness_days,
+    only_matching: params.only_matching, prefs, limit: params.limit, offset: params.offset,
+  };
+}
 
 export type ConnectionStatus = 'connecting' | 'online' | 'offline';
 
@@ -24,6 +46,14 @@ class ApiClient {
   // ----------------------------------------------------------------- connectivity
   /** One pass over all base URLs with a per-request timeout. */
   async checkHealth(timeoutMs = 4000): Promise<boolean> {
+    try {
+      jobData.refresh();
+      await jobData.meta(AbortSignal.timeout(Math.max(timeoutMs, 6000)));
+      this.isOnline = true;
+      return true;
+    } catch {
+      // the static data is unreachable: see whether the API answers
+    }
     for (const url of API_BASES) {
       const controller = new AbortController();
       const timer = setTimeout(() => controller.abort(), timeoutMs);
@@ -132,6 +162,16 @@ class ApiClient {
   // ----------------------------------------------------------------- jobs
   async getJobs(params: import('../types').JobFilterParams): Promise<JobsResponse> {
     const limit = Math.min(Math.max(params.limit ?? 30, 1), MAX_PAGE_SIZE);
+    try {
+      const page = await jobData.query(toQuery({ ...params, limit }, await loadPreferences()));
+      const items = page.items.map((j) => toJob(j, page.generated_at));
+      if (!params.search && !params.offset) { this.writeCache('cachedJobs', items); this.writeCache('cachedJobsAt', Date.now()); }
+      this.isOnline = true;
+      this.lastFailure = null;
+      return { items, total: page.total, limit, offset: page.offset };
+    } catch {
+      // the static data is unreachable: ask the API
+    }
     const query = new URLSearchParams();
     if (params.role) query.set('role', params.role);
     if (params.location) query.set('location', params.location);
@@ -170,6 +210,13 @@ class ApiClient {
 
   // ----------------------------------------------------------------- companies
   async getCompanies(): Promise<Company[]> {
+    try {
+      const data = await jobData.companies<Company[]>();
+      this.writeCache('cachedCompanies', data);
+      return data;
+    } catch {
+      // fall back to the API
+    }
     const res = await this.safeFetch('/api/companies');
     if (res) {
       try {
@@ -219,6 +266,16 @@ class ApiClient {
 
   // ----------------------------------------------------------------- stats / reports
   async getStats(): Promise<RadarStats> {
+    try {
+      const prefs = await loadPreferences();
+      const [stats, matched] = await Promise.all([
+        jobData.stats<RadarStats>(),
+        jobData.query({ only_matching: true, prefs, limit: 1 }).then((p) => p.total),
+      ]);
+      return { ...stats, matched_jobs: matched, is_syncing: false };
+    } catch {
+      // fall back to the API
+    }
     const res = await this.safeFetch(`/api/stats?${new URLSearchParams({ prefs: prefsParam(await loadPreferences()) })}`);
     if (res) {
       try {
@@ -231,6 +288,14 @@ class ApiClient {
   }
 
   async triggerSync(): Promise<{ status: string; ok: boolean }> {
+    // The job data is re-published every few hours by the scheduled crawl: "refresh" picks up the newest copy.
+    try {
+      jobData.refresh();
+      await jobData.meta();
+      return { status: 'refreshed', ok: true };
+    } catch {
+      // the static data is unreachable: ask the API to crawl
+    }
     const res = await this.safeFetch('/api/sync', { method: 'POST' });
     if (!res) return { status: 'failed', ok: false };
     try {

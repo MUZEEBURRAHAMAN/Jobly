@@ -1,0 +1,253 @@
+# Big employers on Workday: Name|tenant|site hint|industry. Discovery tries the tenant on wd1/wd3/wd5/wd12/wd103/wd501
+# with the hint and common site names, and keeps the first board that answers with jobs.
+Walmart|walmart|WalmartExternal|Retail
+Amazon Web Services Partners|aws|External|Cloud
+Bank of America|ghr|Lateral-US|Banking
+Wells Fargo|wf|WellsFargoJobs|Banking
+JPMorgan Chase|jpmc|JPMC|Banking
+Morgan Stanley|ms|External|Financial Services
+Fidelity Investments|fmr|FidelityCareers|Financial Services
+Charles Schwab|schwab|Schwab|Financial Services
+Northern Trust|northerntrust|northerntrust|Financial Services
+PNC|pnc|External|Banking
+Citizens Bank|citizens|Citizens_Careers|Banking
+KeyBank|keybank|External_Career_Site|Banking
+Regions|regions|Regions_Careers|Banking
+Fifth Third Bank|fifththird|53careers|Banking
+Huntington Bank|huntington|HNBcareers|Banking
+M&T Bank|mtb|MTB|Banking
+American Express|aexp|AmericanExpress|Financial Services
+Discover|discover|Discover|Financial Services
+Synchrony|synchronyfinancial|Synchrony_Careers|Financial Services
+Ally|ally|Ally_Careers|Financial Services
+Prudential|pru|Careers|Insurance
+MetLife|metlife|External|Insurance
+Travelers|travelers|External|Insurance
+Liberty Mutual|libertymutual|LMI|Insurance
+Nationwide|nationwide|Nationwide_Career|Insurance
+Allstate|allstate|allstate_careers|Insurance
+Progressive|progressive|Progressive|Insurance
+Aflac|aflac|External|Insurance
+Principal Financial|principal|Principal|Insurance
+Lincoln Financial|lfg|LNC|Insurance
+Humana|humana|Humana_External_Career_Site|Healthcare
+Elevance Health|elevancehealth|ANT|Healthcare
+Cigna|cigna|cignacareers|Healthcare
+Centene|centene|Centene_External|Healthcare
+Molina Healthcare|molinahealthcare|Molina|Healthcare
+UnitedHealth Group|uhg|External|Healthcare
+Kaiser Permanente|kp|KP_External|Healthcare
+HCA Healthcare|hcahealthcare|HCA_Healthcare_Careers|Healthcare
+CommonSpirit Health|commonspirit|CommonSpirit|Healthcare
+Providence|providence|Providence|Healthcare
+Ascension|ascension|Ascension|Healthcare
+Tenet Healthcare|tenethealth|Tenet|Healthcare
+Mayo Clinic|mayoclinic|Mayo_Clinic_Careers|Healthcare
+Cleveland Clinic|clevelandclinic|ClevelandClinicCareers|Healthcare
+Pfizer|pfizer|PfizerCareers|Pharmaceuticals
+Merck|msd|SearchJobs|Pharmaceuticals
+Bristol Myers Squibb|bms|BMS|Pharmaceuticals
+AbbVie|abbvie|External|Pharmaceuticals
+Amgen|amgen|Careers|Biotechnology
+Gilead Sciences|gilead|gileadcareers|Biotechnology
+Regeneron|regeneron|Careers|Biotechnology
+Vertex Pharmaceuticals|vrtx|Vertex_Careers|Biotechnology
+Biogen|biibhr|external|Biotechnology
+Moderna|modernatx|M_tx|Biotechnology
+Eli Lilly|lilly|LLY|Pharmaceuticals
+Johnson & Johnson|jj|JJ|Healthcare
+Medtronic|medtronic|MedtronicCareers|Medical Devices
+Boston Scientific|bostonscientific|BSCI|Medical Devices
+Stryker|stryker|StrykerCareers|Medical Devices
+Abbott|abbott|abbottcareers|Medical Devices
+Becton Dickinson|bdx|EXTERNAL_CAREER_SITE_USA|Medical Devices
+Baxter|baxter|baxter|Medical Devices
+Thermo Fisher Scientific|thermofisher|ThermoFisherCareers|Life Sciences
+Danaher|danaher|DanaherJobs|Life Sciences
+Agilent|agilent|Agilent_Careers|Life Sciences
+Illumina|illumina|illumina-careers|Life Sciences
+Edwards Lifesciences|edwards|EdwardsCareers|Medical Devices
+Intuitive Surgical|intuitive|Intuitive|Medical Devices
+GE HealthCare|gehc|GEHC_ExternalSite|Medical Devices
+Dexcom|dexcom|Dexcom|Medical Devices
+ResMed|resmed|ResMed_External_Careers|Medical Devices
+Cardinal Health|cardinalhealth|EXT|Healthcare
+McKesson|mckesson|External_Careers|Healthcare
+Walgreens|walgreens|External|Retail
+Kroger|kroger|External|Retail
+Albertsons|albertsons|albertsonscompanies|Retail
+Costco|costco|Costco|Retail
+Best Buy|bestbuy|BestBuy|Retail
+Macy's|macys|Macys|Retail
+Nordstrom|nordstrom|nordstrom_careers|Retail
+Gap|gapinc|GAPINC|Retail
+Ulta Beauty|ulta|Ulta|Retail
+Dollar General|dollargeneral|External|Retail
+Dollar Tree|dollartree|Dollar_Tree|Retail
+TJX|tjx|TJX_EXTERNAL|Retail
+Ross Stores|ross|Ross_External|Retail
+Kohl's|kohls|kohlscareers|Retail
+Williams-Sonoma|williamssonoma|wsi_careers|Retail
+Chewy|chewy|chewycareers|E-commerce
+Wayfair|wayfair|wayfair|E-commerce
+Nike|nike|nke|Consumer Goods
+Lululemon|lululemon|lululemon|Consumer Goods
+Under Armour|underarmour|UAEXTERNAL|Consumer Goods
+VF Corporation|vfc|vfc_careers|Consumer Goods
+PepsiCo|pepsico|Pepsico|Consumer Goods
+Coca-Cola|coke|coca-cola-careers|Consumer Goods
+Kraft Heinz|heinz|KraftHeinz_Careers|Consumer Goods
+General Mills|generalmills|General_Mills_Careers|Consumer Goods
+Kellanova|kellanova|Kellanova|Consumer Goods
+Mondelez|mdlz|External|Consumer Goods
+Colgate-Palmolive|colgate|Colgate|Consumer Goods
+Kimberly-Clark|kimberlyclark|GLOBAL|Consumer Goods
+Estée Lauder|elcompanies|ELC_Careers|Consumer Goods
+Hershey|hershey|Hershey|Consumer Goods
+Starbucks|starbucks|starbucks|Restaurants
+McDonald's|mcdonalds|External|Restaurants
+Chipotle|chipotle|chipotle|Restaurants
+Yum! Brands|yumbrands|Yum_Careers|Restaurants
+Marriott|marriott|marriott|Hospitality
+Hilton|hilton|Hilton|Hospitality
+Hyatt|hyatt|Hyatt|Hospitality
+Disney|disney|disneycareer|Media & Entertainment
+Warner Bros. Discovery|warnerbros|global|Media & Entertainment
+Paramount|paramount|ParamountPictures|Media & Entertainment
+Comcast|comcast|Comcast_Careers|Telecommunications
+Charter Communications|spectrum|Spectrum|Telecommunications
+Verizon|verizon|verizon-careers|Telecommunications
+T-Mobile|tmobile|External|Telecommunications
+AT&T|att|ATTGeneral|Telecommunications
+Lumen|lumen|External|Telecommunications
+Dell Technologies|dell|External|Technology
+Hewlett Packard Enterprise|hpe|Jobsathpe|Technology
+IBM|ibm|External|Technology
+Red Hat|redhat|jobs|Technology
+VMware|vmware|VMware|Technology
+Qualcomm|qualcomm|External|Semiconductors
+AMD|amd|AMD|Semiconductors
+Texas Instruments|ti|TI_Careers|Semiconductors
+Applied Materials|amat|External|Semiconductors
+Lam Research|lamresearch|LAM|Semiconductors
+KLA|kla|Search|Semiconductors
+Marvell|marvell|MarvellCareers|Semiconductors
+Western Digital|wdc|WD_Careers|Technology
+Seagate|seagatecareers|Seagate|Technology
+NetApp|netapp|NetApp|Technology
+Juniper Networks|juniper|JuniperCareers|Technology
+Arista Networks|arista|Arista|Technology
+Palo Alto Networks|paloaltonetworks|External|Cybersecurity
+Fortinet|fortinet|Fortinet_Careers|Cybersecurity
+CrowdStrike|crowdstrike|crowdstrikecareers|Cybersecurity
+Zscaler|zscaler|Zscaler_Careers|Cybersecurity
+Okta|okta|Okta|Cybersecurity
+Splunk|splunk|Splunk_Careers|Software
+Intuit|intuit|Intuit|Software
+Snowflake|snowflake|Snowflake|Software
+Box|box|Box|Software
+Dropbox|dropbox|Dropbox|Software
+Twilio|twilio|Twilio|Software
+DocuSign|docusign|DocuSign|Software
+Electronic Arts|ea|EA_Careers|Gaming
+Activision Blizzard|activision|External|Gaming
+Take-Two Interactive|taketwo|External|Gaming
+Accenture Federal Services|accenturefederal|AFS|Consulting
+Deloitte US|deloitte|Deloitte_US|Consulting
+EY|ey|EY|Consulting
+KPMG US|kpmg|KPMG_Careers|Consulting
+Booz Allen Hamilton|bah|BAH_Jobs|Consulting
+CACI|caci|External|Defense
+SAIC|saic|SAIC|Defense
+General Dynamics|gdit|External_Career_Site|Defense
+Northrop Grumman|ngc|Northrop_Grumman_External_Site|Defense
+Lockheed Martin|lmco|LMCareers|Defense
+RTX|globalhr|REC_RTX_Ext_Gateway|Defense
+L3Harris|l3harris|External|Defense
+Honeywell|honeywell|Honeywell|Industrial
+Caterpillar|cat|CaterpillarCareers|Industrial
+Deere & Company|johndeere|DeereJobs|Industrial
+Cummins|cummins|cummins|Industrial
+Eaton|eaton|eaton|Industrial
+Emerson|emerson|External_Careers|Industrial
+Rockwell Automation|rockwellautomation|External_Rockwell_Automation|Industrial
+Johnson Controls|jci|JCI|Industrial
+Carrier|carrier|careers|Industrial
+Trane Technologies|tranetechnologies|External|Industrial
+Otis|otis|REC_Ext_Gateway|Industrial
+Parker Hannifin|parker|ParkerCareers|Industrial
+Illinois Tool Works|itw|ITW|Industrial
+Dover|dovercorporation|External|Industrial
+Siemens Energy|siemensenergy|External|Energy
+Schneider Electric|se|External|Industrial
+ABB|abb|External|Industrial
+GM|generalmotors|Careers_GM|Automotive
+Ford|ford|FordCareers|Automotive
+Stellantis|stellantis|External|Automotive
+Tesla|tesla|Tesla|Automotive
+Rivian|rivian|Careers|Automotive
+Toyota North America|toyota|TMNA|Automotive
+Honda America|honda|Honda|Automotive
+Chevron|chevron|jobs|Energy
+ExxonMobil|exxonmobil|ExxonMobil|Energy
+ConocoPhillips|conocophillips|External|Energy
+Shell|shell|ShellCareers|Energy
+BP|bp|bpCareers|Energy
+Baker Hughes|bakerhughes|BakerHughes|Energy
+Halliburton|halliburton|External|Energy
+SLB|slb|SLB|Energy
+NextEra Energy|nexteraenergy|NextEra|Energy
+Duke Energy|duke|search|Energy
+Southern Company|southernco|External|Energy
+Dominion Energy|dominionenergy|External|Energy
+Exelon|exelon|Exelon|Energy
+PG&E|pge|PGE|Energy
+Edison International|edison|Careers|Energy
+UPS|ups|UPS|Logistics
+FedEx|fedex|FXE-US_External|Logistics
+DHL|dhl|DHL|Logistics
+XPO|xpo|XPO|Logistics
+C.H. Robinson|chrobinson|CHR|Logistics
+Union Pacific|up|UP|Logistics
+Delta Air Lines|delta|External|Airlines
+United Airlines|united|United|Airlines
+American Airlines|aa|Americans|Airlines
+Southwest Airlines|swa|External|Airlines
+Alaska Airlines|alaskaair|AlaskaAirlinesExternal|Airlines
+Uber|uber|Uber|Technology
+Expedia Group|expedia|search|Travel
+Booking Holdings|bookingholdings|External|Travel
+Ralph Lauren|ralphlauren|External|Consumer Goods
+Tapestry|tapestry|Tapestry|Consumer Goods
+Sephora|sephora|Sephora|Retail
+Accenture India|accenture|AccentureCareers|Consulting
+Infosys BPM|infosys|Infosys|IT Services
+Unilever|unilever|External|Consumer Goods
+Novartis|novartis|Novartis_Careers|Pharmaceuticals
+AstraZeneca|astrazeneca|Careers|Pharmaceuticals
+GSK|gsk|GSKCareers|Pharmaceuticals
+Sanofi|sanofi|SanofiCareers|Pharmaceuticals
+Bayer|bayer|Bayer|Pharmaceuticals
+Roche|roche|roche-ext|Pharmaceuticals
+Takeda|takeda|External|Pharmaceuticals
+Novo Nordisk|novonordisk|NovoNordisk|Pharmaceuticals
+HSBC|hsbc|External|Banking
+Barclays|barclays|External_Career_Site_Barclays|Banking
+Standard Chartered|scb|Standard_Chartered|Banking
+Lloyds Banking Group|lbg|Lloyds_Banking_Group|Banking
+NatWest|natwest|NatWest|Banking
+Santander|santander|SantanderCareers|Banking
+ING|ing|ING|Banking
+Deutsche Bank|db|DBWebsite|Banking
+UBS|ubs|UBS|Banking
+BNP Paribas|bnpparibas|External|Banking
+Scotiabank|scotiabank|External|Banking
+RBC|rbc|RBC|Banking
+CIBC|cibc|search|Banking
+Sun Life|sunlife|Experienced-Jobs|Insurance
+Telstra|telstra|Telstra|Telecommunications
+Commonwealth Bank|cba|CBA|Banking
+ANZ|anz|ANZ|Banking
+Westpac|westpac|Westpac|Banking
+Woolworths Group|woolworths|Woolworths|Retail
+Coles|coles|Coles|Retail

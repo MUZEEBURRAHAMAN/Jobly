@@ -25,6 +25,10 @@ export interface Job {
   experience_tier?: string | null;
   /** full_time, part_time, contract or internship; null when the posting doesn't say. */
   employment_type?: string | null;
+  /** The job's category: one of the five tech roles, or a broad family such as "sales" (static job data only). */
+  category?: string;
+  /** Y Combinator batch of the employer, e.g. "W21". */
+  yc_batch?: string | null;
 }
 
 export interface JobsResponse {

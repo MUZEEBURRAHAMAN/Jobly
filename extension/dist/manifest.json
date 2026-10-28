@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Jobly — Find jobs. Apply smarter",
   "short_name": "Jobly",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "minimum_chrome_version": "116",
   "description": "Fresh tech jobs with real posting dates, plus a job tracker, resume builder and autofill you review. Free, no account.",
   "homepage_url": "https://joblyextension.netlify.app",
@@ -15,7 +15,8 @@
     "contextMenus"
   ],
   "host_permissions": [
-    "https://jobly-yd6l.onrender.com/*"
+    "https://jobly-yd6l.onrender.com/*",
+    "https://jobly-data.pages.dev/*"
   ],
   "optional_host_permissions": [
     "https://api.hunter.io/*"
@@ -35,6 +36,6 @@
     "128": "icons/icon-128.png"
   },
   "content_security_policy": {
-    "extension_pages": "default-src 'self'; img-src 'self' https://t2.gstatic.com data:; connect-src https://jobly-yd6l.onrender.com https://api.hunter.io; script-src 'self'"
+    "extension_pages": "default-src 'self'; img-src 'self' https://t2.gstatic.com data:; connect-src https://jobly-data.pages.dev https://jobly-yd6l.onrender.com https://api.hunter.io; script-src 'self'"
   }
 }

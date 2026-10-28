@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Icon } from '../components/Icon';
 import { Busy, Empty, Field, Text } from '../components/ui';
-import { ROLES, ageLabel, jobAsPostingText, searchJobs, type JobQuery, type JoblyJob } from '../lib/jobs';
+import { ROLES, ageLabel, jobAsPostingText, searchJobs, withDescription, type JobQuery, type JoblyJob } from '../lib/jobs';
 import { startFromPosting } from './NewApplication';
 
 const DEFAULT: JobQuery = { role: 'tech', search: '', location: '', days: 14, remote: false, yc: false };
@@ -37,13 +37,17 @@ export function FindJobs() {
   return (
     <div className="stack" style={{ gap: 20 }}>
       <div className="page-head">
-        <div><h1>Find jobs</h1><p>Fresh tech jobs from company career pages, with the date each was really posted. From Jobly’s job index.</p></div>
+        <div><h1>Find jobs</h1><p>Fresh jobs from company career pages, with the date each was really posted. From Jobly’s job index.</p></div>
       </div>
       <form className="card" onSubmit={(e) => { e.preventDefault(); load(q); }}>
         <div className="grid-4" style={{ alignItems: 'end' }}>
           <Field label="Role">
             <select className="select" value={q.role} onChange={(e) => setQ({ ...q, role: e.target.value })}>
-              {ROLES.map((r) => <option key={r.id} value={r.id}>{r.label}</option>)}
+              {['Tech', 'More roles'].map((g) => (
+                <optgroup key={g} label={g}>
+                  {ROLES.filter((r) => r.group === g).map((r) => <option key={r.id} value={r.id}>{r.label}</option>)}
+                </optgroup>
+              ))}
             </select>
           </Field>
           <Field label="Keywords"><Text value={q.search} onChange={(v) => setQ({ ...q, search: v })} placeholder="e.g. React, Figma" /></Field>
@@ -90,9 +94,14 @@ export function FindJobs() {
                   </div>
                 </div>
                 <div className="row">
-                  {j.description && <button className="btn sm ghost" onClick={() => setOpen(open === j.id ? null : j.id)} aria-expanded={open === j.id}>{open === j.id ? 'Hide' : 'Details'}</button>}
+                  <button className="btn sm ghost" aria-expanded={open === j.id} onClick={async () => {
+                    if (open === j.id) { setOpen(null); return; }
+                    const full = await withDescription(j);
+                    setItems((list) => list.map((x) => (x.id === j.id ? full : x)));
+                    setOpen(j.id);
+                  }}>{open === j.id ? 'Hide' : 'Details'}</button>
                   <a className="btn sm" href={j.application_url} target="_blank" rel="noopener noreferrer"><Icon name="external" />Open</a>
-                  <button className="btn sm primary" onClick={() => startFromPosting(jobAsPostingText(j), j.application_url)}><Icon name="sparkle" />Tailor for this</button>
+                  <button className="btn sm primary" onClick={async () => { const full = await withDescription(j); startFromPosting(jobAsPostingText(full), j.application_url); }}><Icon name="sparkle" />Tailor for this</button>
                 </div>
               </div>
               {open === j.id && <div className="posting-text">{jobAsPostingText(j)}</div>}
@@ -103,7 +112,7 @@ export function FindJobs() {
           )}
         </div>
       )}
-      <p className="small muted">Searches go to Jobly’s job server with only your search words and filters. Nothing from your profile is sent.</p>
+      <p className="small muted">Jobs are read from Jobly’s public job files and filtered in your browser. Nothing from your profile is sent.</p>
     </div>
   );
 }

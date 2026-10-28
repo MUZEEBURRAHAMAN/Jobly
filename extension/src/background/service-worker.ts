@@ -1,4 +1,6 @@
 import { API_BASES } from '../lib/config';
+import { jobData, toJob } from '../lib/api';
+import type { JobQuery } from '../../../shared/jobdata';
 import { AlertItem, Job } from '../types';
 import {
   jobKey, loadAlerts, loadPreferences, loadSeenKeys, prefsParam, readKey, storeAlerts, storeSeenKeys,
@@ -18,28 +20,36 @@ const REMINDER_ALARM = 'jobly-reminders';
 const REMINDER_MINUTES = 15;
 
 // The background check is not user-facing, so it can afford to wait for a sleeping free-tier server.
-// Alerts are worked out here on the device: ask the server for fresh jobs that fit this user's preferences
-// (sent with the request, never stored there) and compare them with what was already seen.
+// Alerts are worked out here on the device: read fresh jobs that fit this user's preferences from Jobly's static job
+// data (the preferences never leave the device; the API, the fallback, gets them with the request and doesn't store
+// them) and compare them with what was already seen.
 async function fetchRecentMatches(): Promise<Job[] | null> {
-  return fetchJobs(new URLSearchParams({
-    only_matching: 'true', freshness_days: String(RECENT_DAYS), limit: '50',
-    prefs: prefsParam(await loadPreferences()),
-  }));
+  const prefs = await loadPreferences();
+  return fetchJobs({ only_matching: true, freshness_days: RECENT_DAYS, limit: 50, prefs },
+    new URLSearchParams({ only_matching: 'true', freshness_days: String(RECENT_DAYS), limit: '50', prefs: prefsParam(prefs) }));
 }
 
 // New jobs at followed companies, whatever the preferences say: one request for all of them.
 async function fetchFollowedJobs(): Promise<Job[]> {
   const ids = ((await readKey<number[]>(FOLLOWED_KEY)) ?? []).filter((n) => Number.isInteger(n)).slice(0, MAX_FOLLOWED);
   if (!ids.length) return [];
-  return (await fetchJobs(new URLSearchParams({ company_ids: ids.join(','), freshness_days: String(RECENT_DAYS), limit: '50' }))) ?? [];
+  return (await fetchJobs({ company_ids: ids, freshness_days: RECENT_DAYS, limit: 50 },
+    new URLSearchParams({ company_ids: ids.join(','), freshness_days: String(RECENT_DAYS), limit: '50' }))) ?? [];
 }
 
-async function fetchJobs(query: URLSearchParams): Promise<Job[] | null> {
+async function fetchJobs(query: JobQuery, apiQuery: URLSearchParams): Promise<Job[] | null> {
+  try {
+    jobData.refresh();
+    const page = await jobData.query(query);
+    return page.items.map((j) => toJob(j, page.generated_at));
+  } catch {
+    /* the static data is unreachable: ask the API */
+  }
   for (const base of API_BASES) {
     const ctrl = new AbortController();
     const timer = setTimeout(() => ctrl.abort(), 20000);
     try {
-      const res = await fetch(`${base}/api/jobs?${query}`, { signal: ctrl.signal });
+      const res = await fetch(`${base}/api/jobs?${apiQuery}`, { signal: ctrl.signal });
       if (res.ok) {
         const data = await res.json();
         return Array.isArray(data?.items) ? data.items : null;

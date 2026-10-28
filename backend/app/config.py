@@ -21,6 +21,10 @@ class Settings(BaseSettings):
     # "full" (the scheduled snapshot job on GitHub Actions, which costs the server nothing): read everything. The server restores
     # that snapshot whenever it starts, so heavy sources stay fresh without the server crawling them.
     CRAWL_PROFILE: str = "light"
+    # Job boards read at once. 5 suits the 512 MB server; the scheduled crawl on GitHub Actions runs with more.
+    CRAWL_CONCURRENCY: int = 5
+    # Full crawl only: pages of 20 read per Workday employer (60 pages = the newest 1,200 jobs of a big employer).
+    WORKDAY_MAX_PAGES: int = 60
 
     # Jobs posted longer ago than this are never stored or shown (stale/ghost listings; keeps the DB small).
     MAX_JOB_AGE_DAYS: int = 60

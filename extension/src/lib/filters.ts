@@ -1,4 +1,5 @@
 import { Job } from '../types';
+import { CATEGORY_IDS } from './format';
 
 export interface JobFilters {
   search: string;
@@ -44,9 +45,10 @@ export function passesFilters(job: Job, f: JobFilters, mutedCompanyIds: number[]
   return true;
 }
 
-/** Role chip: 'all_matching' (your preferences), a role id, or 'all'. */
+/** Role chip: 'all_matching' (your preferences), a role id, a broad category from "More roles", or 'all'. */
 export function passesRole(job: Job, roleFilter: string, targetRoles: string[]): boolean {
   if (roleFilter === 'all') return true;
+  if (CATEGORY_IDS.includes(roleFilter)) return job.category === roleFilter;
   if (roleFilter === 'all_matching') return job.is_match || (!!job.normalized_role && targetRoles.includes(job.normalized_role));
   return (job.normalized_role || '') === roleFilter;
 }

@@ -110,6 +110,28 @@ Add it to `backend/app/data/companies.json` (or, in a dev build, use the **Compa
 
 ---
 
+## Job data (static files, no server needed)
+
+The extension, the website and Jobly Studio read jobs from static JSON files on Cloudflare Pages
+(`https://jobly-data.pages.dev/v1/`), and filter, match and sort them in the browser (`shared/jobdata.ts`, with the API's
+exact rules). The Render API is only a fallback while those files are unreachable, and it still handles writes (reports).
+
+- **Every role, tech highlighted.** Each job has a category (`backend/app/categories.py`): one of the five tech roles, or a broad
+  family (engineering, data, sales, marketing, people, finance, operations, ...). The extension lists the others under "More roles".
+- **"Crawl and publish jobs" workflow** (`.github/workflows/jobs-data.yml`, every 4 hours): restores the last snapshot, crawls every
+  board with the full profile (all roles, Workday and Amazon included), runs `python -m backend.app.static_export site`, deploys
+  `site/` to the `jobly-data` Pages project, and republishes the snapshot release for the API.
+- **"Discover companies" workflow** (`.github/workflows/discover-companies.yml`): tests the employers listed in `scripts/candidates/`
+  against Greenhouse, Lever, Ashby, Workable, SmartRecruiters, Recruitee and Workday (`scripts/discover_boards.py`) and commits the
+  boards that answer with jobs to `backend/app/data/companies.json`.
+- **Layout:** `meta.json` (columns, age buckets, categories, file sizes), `jobs/<category>/<age bucket>.json` (rows, newest first),
+  `desc/<id % 2048>.json` (descriptions), `companies.json`, `stats.json`, `geo.json`. A query reads only its categories and the
+  newest buckets it needs: tech roles posted in the last week are about 0.7 MB compressed at 200,000 jobs.
+
+**One-time setup:** make the repository public (unlimited Actions minutes; a private repo's 2,000 free minutes a month aren't enough),
+then add the repository secrets `CLOUDFLARE_API_TOKEN` (permission: Account → Cloudflare Pages → Edit) and `CLOUDFLARE_ACCOUNT_ID`.
+Run "Discover companies" once, then "Crawl and publish jobs".
+
 ## Jobly Studio
 
 `studio/` is a separate web app: tailored resumes and cover letters from one profile, with a fact check that keeps drafts to what the profile says, and an application tracker. It runs entirely in the browser (no server, no account) and deploys as a static site. See [studio/README.md](studio/README.md).

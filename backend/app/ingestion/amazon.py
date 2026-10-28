@@ -20,12 +20,13 @@ async def fetch_amazon_jobs(
     'software-development' or 'default'
     """
     jobs: list[NormalizedJob] = []
-    category = source_identifier if source_identifier and source_identifier != "default" else "software-development"
+    # "all" (the full crawl) reads every category, newest first; otherwise one category, software by default
+    category = None if source_identifier == "all" else (source_identifier if source_identifier and source_identifier != "default" else "software-development")
 
     for page in range(max_pages):
         offset = page * page_size
         params = {
-            "category[]": category,
+            **({"category[]": category} if category else {}),
             "result_limit": page_size,
             "offset": offset,
             "sort": "recent"

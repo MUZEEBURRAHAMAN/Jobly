@@ -246,6 +246,10 @@ a { color: inherit; }
 .chip:hover { background: var(--hover); color: var(--foreground); }
 .chip[aria-pressed="true"] { background: var(--foreground); color: var(--background); border-color: var(--foreground); }
 .chip .count { font-size: var(--text-xs); opacity: 0.8; }
+/* "More roles": a dropdown dressed as a chip; filled like a pressed chip while one of its roles is picked */
+.chip-select { appearance: none; padding-right: var(--space-3); font-family: inherit; }
+.chip-select.active { background: var(--foreground); color: var(--background); border-color: var(--foreground); }
+.chip-select option { color: var(--foreground); background: var(--background); }
 
 /* Selectable card (preferences) */
 .option {

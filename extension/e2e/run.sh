@@ -14,6 +14,8 @@ export EXT_DIST="$WORK/build/dev" EXT_PROD="$WORK/build/prod"
 npx vite build --mode development --outDir "$EXT_DIST" --emptyOutDir >/dev/null
 npx vite build --outDir "$EXT_PROD" --emptyOutDir >/dev/null
 "$PY" e2e/fixture.py
+export STATIC_DIR="$WORK/static"
+( cd "$ROOT" && "$PY" -m backend.app.static_export "$STATIC_DIR" >/dev/null )
 if lsof -i :8000 -sTCP:LISTEN >/dev/null 2>&1; then echo "Port 8000 is busy: stop whatever is using it first" >&2; exit 1; fi
 ( cd "$ROOT" && exec "$PY" -m uvicorn backend.app.main:app --host 127.0.0.1 --port 8000 --log-level warning ) & SERVER=$!   # exec: SERVER is the python process itself
 for _ in $(seq 1 30); do curl -sf http://127.0.0.1:8000/health >/dev/null && break; sleep 1; done

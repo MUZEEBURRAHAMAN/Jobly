@@ -3,7 +3,7 @@ import { RotateCcw, Search, SlidersHorizontal, X } from '../lib/icons';
 import { Job, Preferences } from '../types';
 import { JobCard } from './JobCard';
 import { EmptyState } from './EmptyState';
-import { ROLES, DEFAULT_ROLE_IDS, EXPERIENCE_LABELS, HUB_LABELS, timeAgo, EMPLOYMENT_LABELS } from '../lib/format';
+import { ROLES, DEFAULT_ROLE_IDS, EXPERIENCE_LABELS, HUB_LABELS, timeAgo, EMPLOYMENT_LABELS, CATEGORIES, CATEGORY_IDS } from '../lib/format';
 import { DEFAULT_FILTERS, JobFilters, activeFilterCount, chipCounts, filterJobs } from '../lib/filters';
 
 interface JobsFeedProps {
@@ -203,6 +203,11 @@ export const JobsFeed: React.FC<JobsFeedProps> = ({
               {counts[c.id] !== undefined && jobs.length > 0 && <span className="count">{counts[c.id]}{hasMore ? '+' : ''}</span>}
             </button>
           ))}
+          <select className={`chip chip-select${CATEGORY_IDS.includes(roleFilter) ? ' active' : ''}`} aria-label="More roles"
+            value={CATEGORY_IDS.includes(roleFilter) ? roleFilter : ''} onChange={(e) => onRoleFilterChange(e.target.value || 'all')}>
+            <option value="">More roles…</option>
+            {CATEGORIES.map((c) => <option key={c.id} value={c.id}>{c.label}</option>)}
+          </select>
         </div>
       </div>
 

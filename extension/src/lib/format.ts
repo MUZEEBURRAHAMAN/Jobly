@@ -21,6 +21,23 @@ export const ROLES = [
   { id: 'fullstack_engineering', label: 'Fullstack engineering', hint: 'Fullstack, software engineer, cloud', short: 'Fullstack' },
 ] as const;
 
+/** Every other kind of job, for "More roles" (ids match backend/app/categories.py). */
+export const CATEGORIES = [
+  { id: 'engineering', label: 'Engineering' },
+  { id: 'data', label: 'Data & analytics' },
+  { id: 'design', label: 'Design & creative' },
+  { id: 'marketing', label: 'Marketing' },
+  { id: 'sales', label: 'Sales & business development' },
+  { id: 'customer', label: 'Customer success & support' },
+  { id: 'people', label: 'People & recruiting' },
+  { id: 'finance', label: 'Finance & accounting' },
+  { id: 'legal', label: 'Legal & compliance' },
+  { id: 'operations', label: 'Operations' },
+  { id: 'healthcare', label: 'Healthcare & science' },
+  { id: 'other', label: 'Other' },
+] as const;
+export const CATEGORY_IDS: string[] = CATEGORIES.map((c) => c.id);
+
 export const SENIORITIES = [
   { id: 'intern', label: 'Intern' },
   { id: 'junior', label: 'Junior · 0–2 yrs' },

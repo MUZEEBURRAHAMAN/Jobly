@@ -193,6 +193,23 @@ await step('dashboard layout fills the window', async () => {
   await h.ctx.close();
 });
 
+await step('static job data: the popup reads jobly-data, with the API down', async () => {
+  const h = await launch({ dist: process.env.EXT_PROD, staticData: true });   // blockProd: the API is unreachable
+  const reqs = []; const errors = []; const p = await h.ctx.newPage(); p.on('request', (r) => reqs.push(r.url())); p.on('console', (m) => { if (m.type() === 'error') errors.push(m.text()); });
+  await p.setViewportSize({ width: 400, height: 590 }); await p.goto(`chrome-extension://${h.id}/popup.html`); await firstCard(p); await sleep(800);
+  ok(await cards(p) > 0, 'jobs render from the static data');
+  ok(reqs.some((u) => u.endsWith('/v1/meta.json')) && reqs.some((u) => /\/v1\/jobs\/[a-z_]+\/\w+\.json$/.test(u)), 'it read meta.json and job files');
+  ok(!/offline|can.t reach/i.test(await text(p)), 'no offline message');
+  ok(!errors.some((e) => /Content Security Policy/.test(e)), 'no CSP violations reading the data');
+  const shown = await count(p);
+  const apiTotal = (await json('/api/jobs?limit=1')).total;
+  ok(shown > 0 && shown <= apiTotal, `the count (${shown}) is within what the API holds (${apiTotal})`);
+  await p.getByLabel('More roles').selectOption('sales'); await p.getByText('Enterprise Account Executive').waitFor({ timeout: 15000 });
+  ok(await cards(p) === 1, '"More roles" → Sales lists the one sales job');
+  await axe(p, 'jobs with "More roles" picked');
+  await h.ctx.close();
+});
+
 await step('production build: https only, no localhost, no CSP errors', async () => {
   const h = await launch({ blockProd: false, dist: process.env.EXT_PROD });
   await h.ctx.route(/^https:\/\/jobly-yd6l\.onrender\.com\//, async (route) => {
@@ -207,7 +224,7 @@ await step('production build: https only, no localhost, no CSP errors', async ()
   ok(await cards(p) > 0, 'production build renders jobs over https');
   ok(!reqs.some((u) => /127\.0\.0\.1|localhost|getcatchly/.test(u)), 'no requests to localhost or getcatchly');
   ok(!errors.some((e) => /Content Security Policy/.test(e)), 'no CSP violations');
-  const manifest = await h.sw.evaluate(() => chrome.runtime.getManifest()); ok(manifest.host_permissions.every((x) => x.startsWith('https://')) && manifest.host_permissions.length === 1, `host permissions: ${manifest.host_permissions.join(', ')}`);
+  const manifest = await h.sw.evaluate(() => chrome.runtime.getManifest()); ok(manifest.host_permissions.every((x) => x.startsWith('https://')) && manifest.host_permissions.length === 2 && manifest.host_permissions.includes('https://jobly-data.pages.dev/*'), `host permissions: ${manifest.host_permissions.join(', ')}`);
   await h.ctx.close();
 });
 

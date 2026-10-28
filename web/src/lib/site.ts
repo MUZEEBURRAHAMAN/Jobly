@@ -6,6 +6,8 @@ export const SITE = {
   // The Chrome Web Store listing (live since 2026-10-26). Empty = the buttons fall back to /how-it-works#install.
   storeUrl: 'https://chromewebstore.google.com/detail/phdobnnjceecemndkgeclghkjcfjfgfl',
   api: (import.meta.env.PUBLIC_API_BASE as string | undefined) || 'https://jobly-yd6l.onrender.com',
+  // Jobly's job data as static files (shared/jobdata.ts): read first, the API is the fallback
+  data: (import.meta.env.PUBLIC_DATA_BASE as string | undefined) || 'https://jobly-data.pages.dev/v1',
   github: 'https://github.com/MUZEEBURRAHAMAN/Jobly',
 };
 

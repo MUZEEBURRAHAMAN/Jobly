@@ -1,6 +1,9 @@
-// Fresh jobs from Jobly's own server, with the date each one was really posted.
-// The server must list this site in SITE_ORIGINS (CORS) for these requests to work.
+// Fresh jobs from Jobly's job data, with the date each one was really posted: the static files on Cloudflare Pages
+// (shared/jobdata.ts) first, Jobly's API as the fallback. The API must list this site in SITE_ORIGINS (CORS).
+import { DATA_BASE, JobData, type DataJob } from '../../../shared/jobdata';
+
 const API = (import.meta.env.VITE_JOBLY_API as string | undefined) ?? 'https://jobly-yd6l.onrender.com';
+const jobData = new JobData((import.meta.env.VITE_JOBLY_DATA as string | undefined) ?? DATA_BASE);
 
 export interface JoblyJob {
   id: number;
@@ -19,17 +22,39 @@ export interface JoblyJob {
 }
 
 export const ROLES = [
-  { id: 'tech', label: 'All tech roles' },
-  { id: 'frontend_engineering', label: 'Frontend' },
-  { id: 'fullstack_engineering', label: 'Fullstack' },
-  { id: 'product_design', label: 'Product design' },
-  { id: 'product_management', label: 'Product management' },
-  { id: 'ai_ml', label: 'AI / ML' },
+  { id: 'tech', label: 'All tech roles', group: 'Tech' },
+  { id: 'frontend_engineering', label: 'Frontend', group: 'Tech' },
+  { id: 'fullstack_engineering', label: 'Fullstack', group: 'Tech' },
+  { id: 'product_design', label: 'Product design', group: 'Tech' },
+  { id: 'product_management', label: 'Product management', group: 'Tech' },
+  { id: 'ai_ml', label: 'AI / ML', group: 'Tech' },
+  { id: 'all', label: 'Every role', group: 'More roles' },
+  { id: 'engineering', label: 'Engineering', group: 'More roles' },
+  { id: 'data', label: 'Data & analytics', group: 'More roles' },
+  { id: 'design', label: 'Design & creative', group: 'More roles' },
+  { id: 'marketing', label: 'Marketing', group: 'More roles' },
+  { id: 'sales', label: 'Sales', group: 'More roles' },
+  { id: 'customer', label: 'Customer success', group: 'More roles' },
+  { id: 'people', label: 'People & recruiting', group: 'More roles' },
+  { id: 'finance', label: 'Finance', group: 'More roles' },
+  { id: 'legal', label: 'Legal', group: 'More roles' },
+  { id: 'operations', label: 'Operations', group: 'More roles' },
+  { id: 'healthcare', label: 'Healthcare & science', group: 'More roles' },
 ];
 
 export interface JobQuery { role: string; search: string; location: string; days: number; remote: boolean; yc: boolean }
 
 export async function searchJobs(q: JobQuery, offset = 0, signal?: AbortSignal): Promise<{ items: JoblyJob[]; total: number }> {
+  try {
+    const page = await jobData.query({
+      role: q.role || 'tech', search: q.search.trim().slice(0, 100), location: q.location.trim(), freshness_days: q.days,
+      work_mode: q.remote ? 'remote' : undefined, yc: q.yc, limit: 30, offset,
+    }, signal);
+    return { items: page.items.map(fromData), total: page.total };
+  } catch (e) {
+    if ((e as Error).name === 'AbortError') throw e;
+    // the static data is unreachable: ask the API
+  }
   const p = new URLSearchParams({ role: q.role || 'tech', limit: '30', offset: String(offset), freshness_days: String(q.days) });
   if (q.search.trim()) p.set('search', q.search.trim().slice(0, 100));
   if (q.location.trim()) p.set('location', q.location.trim().slice(0, 100));
@@ -46,6 +71,14 @@ export async function searchJobs(q: JobQuery, offset = 0, signal?: AbortSignal):
   if (!res.ok) throw new Error(`Jobly’s job server returned an error (${res.status}).`);
   const data = await res.json();
   return { items: data.items ?? [], total: data.total ?? 0 };
+}
+
+const fromData = (j: DataJob): JoblyJob => ({ ...j, description: null });
+
+/** The job's description from the static data, when the list didn't carry it. */
+export async function withDescription(j: JoblyJob): Promise<JoblyJob> {
+  if (j.description) return j;
+  try { return { ...j, description: await jobData.description(j.id) }; } catch { return j; }
 }
 
 /** The posting as text Studio can analyse: what the server knows about the job. */
