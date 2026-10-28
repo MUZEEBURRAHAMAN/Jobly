@@ -27,7 +27,7 @@ logger = logging.getLogger(__name__)
 
 # What happened to the warm start at boot, for /health: which setting is missing shows up here without revealing any secret.
 restore_status: dict[str, object] = {"result": "not attempted"}
-MAX_DB_BYTES = 500_000_000
+MAX_DB_BYTES = 1_500_000_000   # about 200k jobs with descriptions is ~500 MB
 REQUIRED_TABLES = {"companies", "jobs", "preferences", "notifications", "reports"}
 
 
@@ -151,6 +151,8 @@ async def _build(out: Path) -> int:
     from .ingestion.runner import sync_all_sources
     from .seed import seed_companies_if_missing
 
+    # Start from the last published snapshot when there is one, so first-seen dates carry over between runs
+    await restore_snapshot_if_needed()
     await init_db()
     await seed_companies_if_missing()
     summary = await sync_all_sources()

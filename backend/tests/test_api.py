@@ -47,6 +47,39 @@ class TestBasics(APITestCase):
 
 
 class TestJobsList(APITestCase):
+    async def test_salary_floor_and_employment_type_dealbreakers(self):
+        from backend.app.db import get_db_connection
+        async with get_db_connection() as db:
+            await db.execute("UPDATE jobs SET max_salary = 90000, min_salary = 70000 WHERE external_id = 'ext-4'")
+            await db.execute("UPDATE jobs SET max_salary = 200000, min_salary = 150000 WHERE external_id = 'ext-6'")
+            await db.execute("UPDATE jobs SET employment_type = 'contract' WHERE external_id = 'ext-hourly'")
+            await db.commit()
+        try:
+            prefs = json.dumps({"roles": [], "seniorities": [], "min_salary": 120000})
+            items = (await self.client.get("/api/jobs", params={"only_matching": "true", "limit": 200, "prefs": prefs})).json()["items"]
+            ids = {j["external_id"] for j in items}
+            self.assertNotIn("ext-4", ids)            # lists less than the floor
+            self.assertIn("ext-6", ids)               # meets it
+            self.assertIn("ext-8", ids)               # no salary listed: still shown
+            self.assertIn("ext-hourly", ids)          # hourly rates aren't compared with a yearly floor
+            prefs = json.dumps({"roles": [], "seniorities": [], "employment_types": ["contract"]})
+            items = (await self.client.get("/api/jobs", params={"only_matching": "true", "limit": 200, "prefs": prefs})).json()["items"]
+            self.assertEqual({j["external_id"] for j in items}, {"ext-hourly"})
+            self.assertTrue(all(j["is_match"] for j in items))   # the badge agrees with the SQL filter
+            only = (await self.client.get("/api/jobs?employment_type=contract&limit=50")).json()["items"]
+            self.assertEqual([j["employment_type"] for j in only], ["contract"])
+        finally:
+            async with get_db_connection() as db:
+                await db.execute("UPDATE jobs SET max_salary = NULL, min_salary = NULL WHERE external_id IN ('ext-4', 'ext-6')")
+                await db.execute("UPDATE jobs SET employment_type = NULL")
+                await db.commit()
+
+    async def test_company_ids_returns_only_those_employers(self):
+        data = (await self.client.get("/api/jobs?company_ids=2&limit=200")).json()
+        self.assertGreater(data["total"], 0)
+        self.assertEqual({j["company_name"] for j in data["items"]}, {"Globex"})
+        self.assertEqual((await self.client.get("/api/jobs?company_ids=2;DROP")).status_code, 422)
+
     async def test_role_tech_means_any_classified_job(self):
         everyone = (await self.client.get("/api/jobs?limit=200")).json()["items"]
         tech = (await self.client.get("/api/jobs?role=tech&limit=200")).json()["items"]

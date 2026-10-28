@@ -25,8 +25,32 @@ function localDevBackend(): Plugin {
   };
 }
 
+// Google Calendar import needs an OAuth client made for this extension's ID. Set JOBLY_GOOGLE_CLIENT_ID when building
+// and it is added to the manifest; without it the extension builds and works, with calendar import shown as not set up.
+function googleOAuth(): Plugin {
+  let outDir = 'dist';
+  return {
+    name: 'jobly-google-oauth',
+    apply: 'build',
+    configResolved(config) { outDir = config.build.outDir; },
+    closeBundle() {
+      const id = process.env.JOBLY_GOOGLE_CLIENT_ID?.trim();
+      if (!id) return;
+      const file = resolve(outDir, 'manifest.json');
+      const manifest = JSON.parse(readFileSync(file, 'utf8'));
+      manifest.oauth2 = { client_id: id, scopes: ['https://www.googleapis.com/auth/calendar.readonly'] };
+      // Only a build with the client asks for what calendar import uses, so no version requests a permission it can't use.
+      manifest.permissions.push('identity');
+      manifest.optional_host_permissions = [...(manifest.optional_host_permissions ?? []), 'https://www.googleapis.com/*'];
+      manifest.content_security_policy.extension_pages = manifest.content_security_policy.extension_pages.replace(
+        /connect-src ([^;]*)/, (_m: string, list: string) => `connect-src ${list} https://www.googleapis.com https://oauth2.googleapis.com`);
+      writeFileSync(file, JSON.stringify(manifest, null, 2) + '\n');
+    },
+  };
+}
+
 export default defineConfig(({ mode }) => ({
-  plugins: [react(), ...(mode === 'development' ? [localDevBackend()] : [])],
+  plugins: [react(), googleOAuth(), ...(mode === 'development' ? [localDevBackend()] : [])],
   build: {
     outDir: mode === 'development' ? 'dist-dev' : 'dist',
     emptyOutDir: true,

@@ -9,6 +9,7 @@ import { fileURLToPath } from 'node:url';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const web = path.resolve(here, '..');
+const LOGO = 'data:image/png;base64,' + fs.readFileSync(path.join(web, 'public', 'img', 'logo-wordmark-136.png')).toString('base64');
 const require = createRequire(path.resolve(web, '../extension/package.json'));
 const { chromium } = require('playwright');
 const { chromiumPath } = await import(path.resolve(web, '../extension/e2e/lib.mjs'));
@@ -31,14 +32,14 @@ body { width: 1200px; height: 630px; font-family: Switzer, sans-serif; backgroun
 .b2 { position: absolute; width: 520px; height: 420px; right: 160px; bottom: -260px; border-radius: 50%; background: #ffe3cf; filter: blur(80px); }
 .b3 { position: absolute; width: 360px; height: 320px; right: -60px; bottom: -120px; border-radius: 50%; background: #e8e4ff; filter: blur(70px); opacity: .8; }
 .logo { position: relative; display: flex; align-items: center; gap: 14px; font-weight: 700; font-size: 34px; letter-spacing: -0.02em; color: #0a0a0a; }
-.mark { width: 48px; height: 48px; border-radius: 13px; background: #b83a0a; color: #fff; display: grid; place-items: center; font-size: 26px; font-weight: 700; }
+.logo img { height: 64px; width: auto; display: block; }
 .eyebrow { position: relative; margin-top: auto; display: flex; align-items: center; gap: 10px; color: #b83a0a; font-size: 28px; font-weight: 500; }
 .eyebrow::before { content: ''; width: 10px; height: 10px; border-radius: 50%; background: currentColor; }
 h1 { position: relative; margin-top: 18px; font-size: ${p.title.length > 48 ? 62 : 74}px; line-height: 1.04; letter-spacing: -0.045em; font-weight: 500; color: #0a0a0a; max-width: 960px; text-wrap: balance; }
 .foot { position: relative; margin-top: 36px; display: flex; justify-content: space-between; align-items: center; font-size: 24px; color: #525252; }
 .pill { padding: 10px 20px; border-radius: 999px; background: #0a0a0a; color: #fff; font-weight: 500; font-size: 22px; }
 </style></head><body><div class="card"><span class="b1"></span><span class="b2"></span><span class="b3"></span>
-<div class="logo"><span class="mark">J</span>Jobly</div>
+<div class="logo"><img src="${LOGO}" alt="Jobly"></div>
 <p class="eyebrow">${esc(p.eyebrow)}</p><h1>${esc(p.title)}</h1>
 <div class="foot"><span>joblyextension.netlify.app</span><span class="pill">Free · No account</span></div></div></body></html>`;
 

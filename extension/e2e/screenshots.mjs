@@ -14,7 +14,7 @@ fs.mkdirSync(STORE, { recursive: true }); fs.mkdirSync(WEB, { recursive: true })
 const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'jobly-shots-'));
 const SWITZER = { 400: 'Regular', 500: 'Medium', 600: 'Semibold', 700: 'Bold' };
 const fontUrl = (w) => pathToFileURL(path.join(root, 'web', 'public', 'fonts', 'switzer', `Switzer-${SWITZER[w]}.woff2`)).href;
-const iconUrl = pathToFileURL(path.join(root, 'extension', 'public', 'icons', 'icon-128.png')).href;
+const wordmarkUrl = pathToFileURL(path.join(root, 'store-assets', 'jobly_logo_wordmark.png')).href;
 const b64 = (f) => 'data:image/png;base64,' + fs.readFileSync(f).toString('base64');
 
 const h = await launch();
@@ -53,14 +53,14 @@ const composite = async (name, title, text, imgs) => {
 await composite('screenshot-5-popup.png', 'Quick look from your toolbar', 'Open the popup for matched jobs in light or dark, without leaving your tab.', [popLight, popDark]);
 await composite('screenshot-6-calm-empty-states.png', 'Calm when there is nothing to show', 'Clear explanations and a way forward in every empty or offline state.', [popEmpty]);
 const tile = `<!doctype html><style>@font-face{font-family:A;font-weight:700;src:url(${fontUrl(700)})}@font-face{font-family:A;font-weight:500;src:url(${fontUrl(500)})}*{margin:0;box-sizing:border-box}
-body{width:440px;height:280px;background:linear-gradient(135deg,#b83a0a,#e8602a);color:#fff;font-family:A,system-ui,sans-serif;display:flex;flex-direction:column;justify-content:center;padding:0 36px;gap:14px}
-.r{display:flex;align-items:center;gap:14px}.r img{width:56px;height:56px;border-radius:14px}.r b{font-size:44px;letter-spacing:-.03em}p{font-size:23px;font-weight:500;line-height:1.25}small{opacity:.9;font-size:15px}</style>
-<div class="r"><img src="${iconUrl}"><b>Jobly</b></div><p>Find jobs.<br>Apply smarter.</p><small>Fresh jobs from hundreds of companies</small>`;
+body{width:440px;height:280px;background:#fff1e8;color:#18181b;font-family:A,system-ui,sans-serif;display:flex;flex-direction:column;justify-content:center;padding:0 36px;gap:16px}
+img{height:88px;width:auto;align-self:flex-start}p{font-size:25px;font-weight:700;line-height:1.2;letter-spacing:-.02em}small{color:#52525b;font-size:15px;font-weight:500}</style>
+<img src="${wordmarkUrl}"><p>Find jobs.<br>Apply smarter.</p><small>Real posting dates. Free, no account.</small>`;
 const tf = path.join(tmp, 'tile.html'); fs.writeFileSync(tf, tile); await page.setViewportSize({ width: 440, height: 280 }); await page.goto(pathToFileURL(tf).href); await sleep(500);
 await shot(page, path.join(STORE, 'promo-small-440x280.png'));
 await h.ctx.close();
 
-// Web Store wants 24-bit PNGs without alpha: flatten everything we wrote
+// Web Store wants 24-bit PNGs without alpha: flatten the screenshots and promo tile we wrote (never the logo masters beside them)
 const py = process.env.PYTHON || path.join(root, '.venv', 'bin', 'python');
 // website hero showcase: four views of the dashboard at 1440x900, retina, light and dark (converted to WebP below)
 const hi = await launch({ scale: 2 }); await hi.ctx.route(/t2\.gstatic\.com/, (r) => r.abort());
@@ -85,7 +85,7 @@ for (const theme of ['light', 'dark']) {
 }
 await hi.ctx.close();
 
-execFileSync(py, ['-c', `import glob,sys\nfrom PIL import Image\nfor f in glob.glob(r"${STORE}/*.png"):\n    Image.open(f).convert("RGB").save(f, optimize=True)`]);
+execFileSync(py, ['-c', `import glob,sys\nfrom PIL import Image\nfor f in glob.glob(r"${STORE}/screenshot-*.png") + glob.glob(r"${STORE}/promo-*.png"):\n    Image.open(f).convert("RGB").save(f, optimize=True)`]);
 execFileSync(py, ['-c', `import glob,os\nfrom PIL import Image\nfor f in glob.glob(r"${WEB}/dashboard-*.png"):\n    im = Image.open(f).convert("RGB")\n    im.save(f[:-4] + ".webp", quality=82, method=6)\n    [im.resize((n, round(im.height * n / im.width)), Image.LANCZOS).save(f[:-4] + "-%d.webp" % n, quality=82, method=6) for n in (720, 1080)]\n    os.remove(f)`]);
 console.log('done');
 process.exit(0);

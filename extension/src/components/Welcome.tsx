@@ -15,7 +15,7 @@ interface WelcomeProps {
 const FIGURES = [Exploded, Sieve, Padlock]; // decorative only: never a focusable figure (Riffle is), the wrapper is aria-hidden
 const DEFAULTS: Preferences = {
   roles: DEFAULT_ROLE_IDS, seniorities: ['intern', 'junior', 'mid', 'senior', 'lead'], locations: [],
-  remote_only: false, custom_keywords: '', excluded_keywords: '', notify_enabled: true, sync_interval_mins: 30,
+  remote_only: false, custom_keywords: '', excluded_keywords: '', min_salary: 0, employment_types: [], notify_enabled: true, sync_interval_mins: 30,
 };
 
 export const Welcome: React.FC<WelcomeProps> = ({ initial, onFinish, onSkip, compact }) => {

@@ -25,6 +25,8 @@ export const DEFAULT_PREFERENCES: Preferences = {
   remote_only: false,
   custom_keywords: '',
   excluded_keywords: '',
+  min_salary: 0,
+  employment_types: [],
   notify_enabled: true,
   sync_interval_mins: 30,
 };
@@ -82,6 +84,7 @@ export function prefsParam(p: Preferences): string {
   return JSON.stringify({
     roles: p.roles, seniorities: p.seniorities, locations: p.locations, remote_only: p.remote_only,
     custom_keywords: p.custom_keywords, excluded_keywords: p.excluded_keywords,
+    min_salary: p.min_salary || 0, employment_types: p.employment_types ?? [],
   });
 }
 

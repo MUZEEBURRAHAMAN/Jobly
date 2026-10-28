@@ -13,3 +13,8 @@ export const MAX_PAGE_SIZE = 200;
 
 // Per-attempt timeouts while waiting for a sleeping free-tier backend to wake (~40s total).
 export const WAKE_TIMEOUTS_MS = [6000, 12000, 22000];
+
+// Jobly's job data as static files on Cloudflare Pages (published by the "Crawl and publish jobs" workflow).
+// Reads come from here; the API above is the fallback while the data is unreachable, and handles writes.
+// Development builds (and the browser tests) look for it on the local server, which has none, so they use the local API.
+export const DATA_BASE = IS_DEV_BUILD ? 'http://127.0.0.1:8000/static-data/v1' : 'https://jobly-data.pages.dev/v1';

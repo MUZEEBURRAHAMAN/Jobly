@@ -6,8 +6,19 @@ import { SITE } from './site';
 type Stats = { total_jobs: number; is_syncing: boolean };
 let ready: Promise<boolean> | undefined;
 
+/** A file of the static job data at build time, or null when it can't be read. */
+export async function staticData<T>(file: string): Promise<T | null> {
+  try {
+    const res = await fetch(`${SITE.data}/${file}`, { signal: AbortSignal.timeout(30000) });
+    return res.ok ? ((await res.json()) as T) : null;
+  } catch {
+    return null;
+  }
+}
+
 export function serverReady(maxWaitMs = 4 * 60 * 1000): Promise<boolean> {
   ready ??= (async () => {
+    if (await staticData('meta.json')) return true;   // static data is always complete: no crawl to wait for
     const until = Date.now() + maxWaitMs;
     while (Date.now() < until) {
       try {

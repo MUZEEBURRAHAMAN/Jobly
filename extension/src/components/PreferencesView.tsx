@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { Check, ExternalLink, Save } from '../lib/icons';
 import { Preferences } from '../types';
-import { ROLES, SENIORITIES } from '../lib/format';
+import { EMPLOYMENT_LABELS, ROLES, SENIORITIES } from '../lib/format';
+import { SyncSetting } from './SyncSetting';
+import { ConnectionsSetting } from './ConnectionsSetting';
 
 const SITE = 'https://joblyextension.netlify.app';
 const HELP = [['Guides', '/guides'], ['FAQ', '/faq'], ['Support', '/support'], ['Privacy', '/privacy']] as const;
@@ -11,9 +13,11 @@ interface PreferencesViewProps {
   onSave: (prefs: Preferences) => Promise<void>;
   /** Re-open the first-run welcome tour. */
   onReplayWelcome?: () => void;
+  /** Dashboard: lay the groups out in two columns on wide screens. */
+  wide?: boolean;
 }
 
-export const PreferencesView: React.FC<PreferencesViewProps> = ({ preferences, onSave, onReplayWelcome }) => {
+export const PreferencesView: React.FC<PreferencesViewProps> = ({ preferences, onSave, onReplayWelcome, wide }) => {
   const [prefs, setPrefs] = useState<Preferences>(preferences);
   const [saving, setSaving] = useState(false);
   const [justSaved, setJustSaved] = useState(false);
@@ -38,7 +42,7 @@ export const PreferencesView: React.FC<PreferencesViewProps> = ({ preferences, o
   };
 
   return (
-    <form className="section" onSubmit={submit}>
+    <form className={`section${wide ? ' prefs-wide' : ''}`} onSubmit={submit}>
       <div>
         <h2>Preferences</h2>
         <p className="text-sm">Tell Jobly what you're looking for. "For you" in the jobs list uses these.</p>
@@ -85,10 +89,32 @@ export const PreferencesView: React.FC<PreferencesViewProps> = ({ preferences, o
         <input id="kw-out" className="input" maxLength={500} value={prefs.excluded_keywords} onChange={(e) => edit({ excluded_keywords: e.target.value })} placeholder="e.g. contract, unpaid, sales" />
       </div>
 
+      <fieldset style={{ border: 0 }} className="stack">
+        <legend className="label">Dealbreakers</legend>
+        <div>
+          <span className="text-sm" id="job-types-label">Job types</span>
+          <div className="row wrap" role="group" aria-labelledby="job-types-label" style={{ marginTop: 6 }}>
+            {Object.entries(EMPLOYMENT_LABELS).map(([id, label]) => (
+              <button key={id} type="button" className="chip" aria-pressed={(prefs.employment_types ?? []).includes(id)} onClick={() => edit({ employment_types: toggle(prefs.employment_types ?? [], id) })}>{label}</button>
+            ))}
+          </div>
+          <p className="hint">None selected means any type. Postings that don't say count as full-time.</p>
+        </div>
+        <div>
+          <label className="label" htmlFor="min-salary">Lowest yearly salary</label>
+          <input id="min-salary" type="number" inputMode="numeric" min={0} step={5000} className="input" style={{ maxWidth: 220 }}
+            value={prefs.min_salary || ''} placeholder="e.g. 120000" onChange={(e) => edit({ min_salary: Math.max(0, Math.round(Number(e.target.value) || 0)) })} />
+          <p className="hint">Jobs that list less are hidden. Jobs without a salary, and hourly rates, still show.</p>
+        </div>
+      </fieldset>
+
       <label className="row card" style={{ padding: 12, justifyContent: 'space-between' }}>
         <span><span className="font-medium" style={{ display: 'block' }}>Desktop alerts</span><span className="text-xs muted">One notification when new jobs match</span></span>
         <input type="checkbox" className="switch" role="switch" checked={prefs.notify_enabled} onChange={(e) => edit({ notify_enabled: e.target.checked })} />
       </label>
+
+      <SyncSetting />
+      <ConnectionsSetting />
 
       <div className="row">
         <button type="submit" className="btn grow" disabled={saving}><Save size={14} aria-hidden="true" /> {saving ? 'Saving…' : 'Save preferences'}</button>

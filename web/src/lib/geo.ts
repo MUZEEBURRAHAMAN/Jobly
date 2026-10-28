@@ -1,7 +1,7 @@
 // Where Jobly's jobs are: the shape of /api/geo, and a build-time copy so the map section has real numbers
 // without JavaScript. The browser refreshes them live (scripts/job-map.ts).
 import { SITE } from './site';
-import { serverReady } from './server';
+import { serverReady, staticData } from './server';
 
 export type GeoPlace = { name: string; kind: 'hub' | 'country'; country: string; lat: number; lng: number; jobs: number; employers: number; roles: Record<string, number> };
 export type GeoCountry = { country: string; jobs: number; employers: number; roles: Record<string, number> };
@@ -14,9 +14,10 @@ export const ROLE_LABELS: Record<string, string> = {
 let cached: Promise<Geo | null> | undefined;
 /** Fetched once per build (several pages show the map). Null when the server doesn't answer: the browser then fills it in. */
 export function geoAtBuild(): Promise<Geo | null> {
-  cached ??= serverReady()
-    .then(() => fetch(`${SITE.api}/api/geo`, { signal: AbortSignal.timeout(60000) }))
-    .then((r) => (r.ok ? (r.json() as Promise<Geo>) : null))
+  cached ??= staticData<Geo>('geo.json')
+    .then((g) => g ?? serverReady()
+      .then(() => fetch(`${SITE.api}/api/geo`, { signal: AbortSignal.timeout(60000) }))
+      .then((r) => (r.ok ? (r.json() as Promise<Geo>) : null)))
     .then((g) => (g && g.total > 0 ? g : null))
     .catch(() => null);
   return cached;

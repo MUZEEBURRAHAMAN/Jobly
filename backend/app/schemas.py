@@ -32,6 +32,7 @@ class JobOut(BaseModel):
     max_salary: float | None = None
     geo_hub: str | None = None
     experience_tier: str | None = None
+    employment_type: str | None = None
     yc_batch: str | None = None   # Y Combinator batch of the employer, e.g. "W21"
 
     @field_validator("application_url", mode="before")
@@ -106,6 +107,9 @@ class PreferencesSchema(BaseModel):
     remote_only: bool = False
     custom_keywords: str = Field(default="", max_length=500)
     excluded_keywords: str = Field(default="", max_length=500)
+    # Dealbreakers: a yearly salary floor (jobs that list less are left out) and the employment types wanted
+    min_salary: int = Field(default=0, ge=0, le=10_000_000)
+    employment_types: Annotated[list[Token], Field(max_length=6)] = []
     notify_enabled: bool = True
     sync_interval_mins: int = Field(default=30, ge=5, le=1440)
 

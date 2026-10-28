@@ -53,7 +53,7 @@ class TestReclassify(unittest.IsolatedAsyncioTestCase):
     async def test_fixes_stored_roles_and_is_stable(self):
         async with aiosqlite.connect(":memory:") as db:
             db.row_factory = aiosqlite.Row
-            await db.execute("CREATE TABLE jobs (id INTEGER PRIMARY KEY, title TEXT, normalized_role TEXT, status TEXT)")
+            await db.execute("CREATE TABLE jobs (id INTEGER PRIMARY KEY, title TEXT, normalized_role TEXT, status TEXT, employment_type TEXT)")
             await db.executemany("INSERT INTO jobs (title, normalized_role, status) VALUES (?, ?, ?)", [
                 ("Enterprise Account Director", "product_design", "active"),
                 ("Staff Software Engineer, Android Design System", "product_design", "active"),
@@ -75,3 +75,17 @@ class TestReclassify(unittest.IsolatedAsyncioTestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestEmploymentType(unittest.TestCase):
+    def test_board_field_wins_then_title(self):
+        from backend.app.matching import classify_employment as c
+        self.assertEqual(c("Senior Engineer", {"employmentType": "FullTime"}), "full_time")
+        self.assertEqual(c("Senior Engineer", {"employmentType": "Intern"}), "internship")
+        self.assertEqual(c("Designer", {"commitment": "Part-time"}), "part_time")
+        self.assertEqual(c("Designer", {"commitment": "Contract (6 months)"}), "contract")
+        self.assertEqual(c("Software Engineering Intern"), "internship")
+        self.assertEqual(c("Freelance Illustrator"), "contract")
+        self.assertEqual(c("Part time UX Writer"), "part_time")
+        self.assertIsNone(c("Product Manager"))
+        self.assertIsNone(c("Internal Tools Engineer"))   # "internal" is not an internship

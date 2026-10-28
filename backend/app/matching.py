@@ -198,6 +198,36 @@ def detect_work_mode(location: str | None, title: str) -> str:
         return "hybrid"
     return "on-site"
 
+EMPLOYMENT_TYPES = ("full_time", "part_time", "contract", "internship")
+_ASHBY_EMPLOYMENT = {"fulltime": "full_time", "parttime": "part_time", "intern": "internship", "contract": "contract", "temporary": "contract"}
+
+
+def classify_employment(title: str | None, raw: dict[str, Any] | None = None) -> str | None:
+    """full_time, part_time, contract or internship, from the board's own field when it has one, else the title.
+    None means the posting doesn't say (filters treat that as full time, which almost all such postings are)."""
+    raw = raw or {}
+    board = str(raw.get("employmentType") or raw.get("commitment") or raw.get("employment_type") or "").lower().replace("-", "").replace(" ", "")
+    if board:
+        if board in _ASHBY_EMPLOYMENT:
+            return _ASHBY_EMPLOYMENT[board]
+        if "intern" in board:
+            return "internship"
+        if "part" in board:
+            return "part_time"
+        if any(w in board for w in ("contract", "freelance", "temporary", "temp")):
+            return "contract"
+        if "full" in board:
+            return "full_time"
+    t = (title or "").lower()
+    if re.search(r"\bintern(ship)?s?\b|\bco-?op\b|\bwerkstudent", t):
+        return "internship"
+    if re.search(r"\b(contract|contractor|freelance|freelancer|temporary|temp)\b", t):
+        return "contract"
+    if re.search(r"\bpart[- ]time\b", t):
+        return "part_time"
+    return None
+
+
 def matches_preferences(job: dict[str, Any], preferences: dict[str, Any]) -> bool:
     pref_roles = preferences.get("roles", [])
     if pref_roles:
@@ -227,6 +257,16 @@ def matches_preferences(job: dict[str, Any], preferences: dict[str, Any]) -> boo
         full_text = f"{job.get('title', '')} {job.get('location', '')}".lower()
         if not any(k in full_text for k in kws):
             return False
+
+    floor = int(preferences.get("min_salary") or 0)
+    if floor:
+        top = job.get("max_salary")
+        if top is not None and top >= 1000 and top < floor:   # unknown and hourly (< 1000) salaries still match
+            return False
+
+    kinds = preferences.get("employment_types") or []
+    if kinds and (job.get("employment_type") or "full_time") not in kinds:
+        return False
 
     excluded_kw = preferences.get("excluded_keywords", "").strip()
     if excluded_kw:

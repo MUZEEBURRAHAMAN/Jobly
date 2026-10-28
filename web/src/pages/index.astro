@@ -15,11 +15,11 @@ import { SITE } from '../lib/site';
 
 const guides = (await getGuides()).filter((g) => g.data.featured).slice(0, 3);
 const jsonLd = [
-  { '@context': 'https://schema.org', '@type': 'Organization', name: 'Jobly', url: SITE.url, logo: `${SITE.url}/img/icon-128.png`, email: SITE.email },
+  { '@context': 'https://schema.org', '@type': 'Organization', name: 'Jobly', url: SITE.url, logo: `${SITE.url}/img/icon-512.png`, email: SITE.email },
   { '@context': 'https://schema.org', '@type': 'WebSite', name: 'Jobly', url: SITE.url },
   { '@context': 'https://schema.org', '@type': 'SoftwareApplication', name: 'Jobly', applicationCategory: 'BrowserApplication', operatingSystem: 'Chrome',
     description: 'A free Chrome extension that lists tech jobs from company career pages with their real posting date, hides jobs older than 60 days, and alerts you to new matches. No account.',
-    url: SITE.url, offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' } },
+    url: SITE.url, installUrl: SITE.storeUrl || undefined, downloadUrl: SITE.storeUrl || undefined, offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' } },
 ];
 ---
 <Base description="Jobly is a free Chrome extension that lists tech jobs from company career pages with their real posting date, hides anything older than 60 days and alerts you to new ones. No account.">

@@ -49,6 +49,6 @@ Our own extension, so take this with a pinch of salt. Jobly reads the career pag
 
 ## Check the permissions
 
-Before installing any extension, open its Chrome Web Store page and read what it can access. Autofill tools need to read the pages you apply on. A finder doesn't need to read your pages at all: Jobly, for example, can't see your tabs or browsing history. See [Jobly's permissions](/security#permissions).
+Before installing any extension, open its Chrome Web Store page and read what it can access. Autofill tools need to read the pages you apply on. Look for tools that read only the page you ask them to: Jobly, for example, reads a tab only when you click Save or Autofill, and never your browsing history. See [Jobly's permissions](/security#permissions).
 
 Sources: [Simplify Copilot](https://simplify.jobs/copilot), [HiringCafe review (Scoutify)](https://scoutify.com/blog/hiringcafe-review), [Teal review (Scoutify)](https://scoutify.com/blog/teal-review), [Huntr job tracker](https://huntr.co/product/job-tracker).

@@ -27,14 +27,33 @@ export function chromiumPath() {
   throw new Error('No Chromium found. Run `npx playwright install chromium` or set CHROMIUM_PATH.');
 }
 
-export async function launch({ onboarded = true, blockProd = true, colorScheme = 'light', dist = BUILD, scale = 1 } = {}) {
+export const STATIC = process.env.STATIC_DIR || '';   // the fixture database as static job data (set by run.sh)
+
+/** Answer requests for Jobly's static job data from a local export. */
+export async function serveStatic(ctx, dir = STATIC) {
+  await ctx.route(/^https:\/\/jobly-data\.pages\.dev\//, async (route) => {
+    const file = path.join(dir, new URL(route.request().url()).pathname);
+    if (!file.startsWith(dir) || !fs.existsSync(file)) return route.fulfill({ status: 404, headers: { 'access-control-allow-origin': '*' }, body: 'not found' });
+    await route.fulfill({ status: 200, headers: JSON_HEADERS, body: fs.readFileSync(file) });
+  });
+}
+
+export async function launch({ onboarded = true, blockProd = true, colorScheme = 'light', dist = BUILD, scale = 1, staticData = false } = {}) {
   const userDataDir = fs.mkdtempSync(path.join(os.tmpdir(), 'jobly-e2e-'));
   const ctx = await chromium.launchPersistentContext(userDataDir, {
     executablePath: chromiumPath(), headless: false, colorScheme, viewport: { width: 1280, height: 800 }, deviceScaleFactor: scale,
     ignoreDefaultArgs: ['--disable-extensions'],
     args: ['--headless=new', `--disable-extensions-except=${dist}`, `--load-extension=${dist}`],
   });
+  // Each run gets a throwaway profile; remove it when the browser closes so test runs don't fill the disk.
+  const closeBrowser = ctx.close.bind(ctx);
+  ctx.close = async (...args) => { try { await closeBrowser(...args); } finally { fs.rmSync(userDataDir, { recursive: true, force: true }); } };
+  process.once('exit', () => fs.rmSync(userDataDir, { recursive: true, force: true }));
   if (blockProd) await ctx.route(/^https:\/\/jobly-yd6l\.onrender\.com\//, (r) => r.abort('connectionrefused'));
+  // Development builds read their (absent) static data from the local server and fall back to its API.
+  // Production builds read jobly-data.pages.dev: tests either serve the fixture as static data or block it.
+  if (staticData) await serveStatic(ctx);
+  else if (dist !== BUILD) await ctx.route(/^https:\/\/jobly-data\.pages\.dev\//, (r) => r.abort('connectionrefused'));
   let [sw] = ctx.serviceWorkers();
   if (!sw) sw = await ctx.waitForEvent('serviceworker', { timeout: 20000 });
   const id = sw.url().split('/')[2];

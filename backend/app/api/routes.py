@@ -16,7 +16,7 @@ from ..schemas import (
     JobOut, JobsResponse, CompanyOut, CompanyCreate,
     PreferencesSchema, StatsOut, GeoOut, GeoPlace, GeoCountry
 )
-from ..matching import matches_preferences
+from ..matching import EMPLOYMENT_TYPES, matches_preferences
 from ..geo import HUBS, country_point, place_of_job
 from ..ingestion.runner import sync_all_sources
 from ..ingestion.runner import age_cutoff_iso
@@ -95,6 +95,14 @@ def pref_conditions(prefs: dict[str, Any], skip_roles: bool = False) -> tuple[li
     if keywords:
         conds.append("(" + " OR ".join(f"{text_expr} LIKE ? ESCAPE '\\'" for _ in keywords) + ")")
         params.extend(_like(k) for k in keywords)
+    floor = int(prefs.get("min_salary") or 0)
+    if floor:   # unknown and hourly (< 1000) salaries still match
+        conds.append("(max_salary IS NULL OR max_salary < 1000 OR max_salary >= ?)")
+        params.append(floor)
+    kinds = [k for k in (prefs.get("employment_types") or []) if k in EMPLOYMENT_TYPES]
+    if kinds:
+        conds.append(f"COALESCE(employment_type, 'full_time') IN ({','.join('?' for _ in kinds)})")
+        params.extend(kinds)
     excluded = _csv(prefs.get("excluded_keywords", ""))
     if excluded:
         conds.append("NOT (" + " OR ".join(f"{text_expr} LIKE ? ESCAPE '\\'" for _ in excluded) + ")")
@@ -117,6 +125,8 @@ async def list_jobs(
     freshness_days: int | None = Query(default=None, ge=0, le=3650),
     only_matching: bool = False,
     yc: bool = False,   # only employers in Y Combinator's public directory
+    employment_type: str | None = Query(default=None, max_length=32),
+    company_ids: str | None = Query(default=None, max_length=600, pattern=r"^\d+(,\d+)*$"),   # followed companies (max 50)
     limit: int = Query(default=30, ge=1, le=200),
     offset: int = Query(default=0, ge=0, le=1_000_000),
     prefs_dict: dict[str, Any] = Depends(prefs_param),
@@ -134,6 +144,13 @@ async def list_jobs(
         elif role:
             conditions.append("normalized_role = ?")
             params.append(role)
+        if employment_type:
+            conditions.append("COALESCE(employment_type, 'full_time') = ?")
+            params.append(employment_type)
+        if company_ids:
+            ids = list(dict.fromkeys(int(i) for i in company_ids.split(',')))[:50]
+            conditions.append(f"company_id IN ({','.join('?' for _ in ids)})")
+            params.extend(ids)
         if yc:
             conditions.append("company_id IN (SELECT id FROM companies WHERE yc_batch IS NOT NULL)")
         if only_matching and prefs_dict:
@@ -213,7 +230,7 @@ async def list_jobs(
                    title, normalized_role, seniority, work_mode, location,
                    application_url, first_seen_at, last_seen_at, posted_at,
                    status, salary_summary, min_salary, max_salary,
-                   geo_hub, experience_tier,
+                   geo_hub, experience_tier, employment_type,
                    (SELECT yc_batch FROM companies WHERE companies.id = jobs.company_id) AS yc_batch
             FROM jobs
             {where_clause}
@@ -253,6 +270,7 @@ async def list_jobs(
                     max_salary=job_dict.get("max_salary"),
                     geo_hub=job_dict.get("geo_hub"),
                     experience_tier=job_dict.get("experience_tier"),
+                    employment_type=job_dict.get("employment_type"),
                     yc_batch=job_dict.get("yc_batch"),
                 )
             )
@@ -284,7 +302,13 @@ async def get_job(job_id: int):
             last_seen_at=job_dict["last_seen_at"],
             posted_at=job_dict.get("posted_at"),
             status=job_dict["status"],
-            is_match=False
+            is_match=False,
+            salary_summary=job_dict.get("salary_summary"),
+            min_salary=job_dict.get("min_salary"),
+            max_salary=job_dict.get("max_salary"),
+            geo_hub=job_dict.get("geo_hub"),
+            experience_tier=job_dict.get("experience_tier"),
+            employment_type=job_dict.get("employment_type"),
         )
 
 # S-3 FIX: Report endpoint — persists user reports to the reports table

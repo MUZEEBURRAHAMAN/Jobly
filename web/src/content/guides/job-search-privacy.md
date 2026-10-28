@@ -39,7 +39,7 @@ Job tools collect very different amounts of data. Before you install an extensio
 
 ## How Jobly handles it
 
-Jobly needs no account and stores your preferences, saved jobs and alerts only in your browser. It can't see your tabs or browsing history, and it talks to one server, which doesn't keep your searches. [Read the privacy policy](/privacy) or [see the permissions](/security).
+Jobly needs no account and stores your preferences, saved jobs, tracker and profiles only in your browser. It reads a page only when you click to save, check or autofill it, has no access to your browsing history, and its server doesn't keep your searches. [Read the privacy policy](/privacy) or [see the permissions](/security).
 
 ## Common questions
 

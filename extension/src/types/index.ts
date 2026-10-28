@@ -23,6 +23,12 @@ export interface Job {
   max_salary?: number | null;
   geo_hub?: string | null;
   experience_tier?: string | null;
+  /** full_time, part_time, contract or internship; null when the posting doesn't say. */
+  employment_type?: string | null;
+  /** The job's category: one of the five tech roles, or a broad family such as "sales" (static job data only). */
+  category?: string;
+  /** Y Combinator batch of the employer, e.g. "W21". */
+  yc_batch?: string | null;
 }
 
 export interface JobsResponse {
@@ -77,6 +83,9 @@ export interface Preferences {
   remote_only: boolean;
   custom_keywords: string;
   excluded_keywords: string;
+  /** Dealbreakers: a yearly salary floor (0 = none) and the employment types wanted (empty = any). */
+  min_salary: number;
+  employment_types: string[];
   notify_enabled: boolean;
   sync_interval_mins: number;
 }
@@ -92,6 +101,8 @@ export interface AlertItem {
   /** When Jobly noticed it (ISO). */
   sent_at: string;
   is_read: boolean;
+  /** Why it was announced: it matches the preferences, or it is at a followed company. */
+  reason?: 'match' | 'follow';
 }
 
 export interface RadarStats {

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { ExternalLink, Plus, Search, X } from '../lib/icons';
+import { Bell, ExternalLink, Plus, Search, X } from '../lib/icons';
+import { useFollowedCompanies } from '../lib/followedCompanies';
 import { Company } from '../types';
 import { getCompanyLogoUrl } from '../lib/companyLogos';
 import { safeHttpUrl } from '../lib/url';
@@ -20,24 +21,28 @@ interface CompaniesViewProps {
   loading?: boolean;
 }
 
-const Row: React.FC<{ company: Company; muted: boolean; onToggle: () => void }> = ({ company, muted, onToggle }) => {
+const Row: React.FC<{ company: Company; muted: boolean; onToggle: () => void; following: boolean; onFollow: () => void; large?: boolean }> = ({ company, muted, onToggle, following, onFollow, large }) => {
   const [failed, setFailed] = useState(false);
   const careers = safeHttpUrl(company.careers_url);
   return (
-    <li className="card row" style={{ padding: 12, gap: 12, opacity: muted ? 0.6 : 1 }}>
+    <li className="card row co-row" style={{ padding: 12, gap: 12, opacity: muted ? 0.6 : 1 }}>
       <div className="logo" aria-hidden="true">
         {!failed ? <img src={getCompanyLogoUrl(company.name, company.careers_url)} alt="" loading="lazy" onError={() => setFailed(true)} /> : <span className="logo-fallback">{company.name.slice(0, 1).toUpperCase()}</span>}
       </div>
       <div className="grow">
         <div className="font-medium truncate">{company.name}</div>
-        <div className="text-xs muted">{company.job_count} open role{company.job_count === 1 ? '' : 's'}{company.industry ? ` · ${company.industry}` : ''}</div>
+        <div className="text-xs muted truncate" title={company.industry ?? undefined}>{company.job_count} open role{company.job_count === 1 ? '' : 's'}{company.industry ? ` · ${company.industry}` : ''}</div>
       </div>
       {careers && (
         <a className="btn btn-ghost btn-icon btn-sm" href={careers} target="_blank" rel="noopener noreferrer" aria-label={`${company.name} careers page`} title="Careers page"><ExternalLink size={14} aria-hidden="true" /></a>
       )}
+      <button type="button" className={`btn btn-sm ${following ? 'btn-toggled' : 'btn-outline'}${large ? '' : ' btn-icon'}`} aria-pressed={following} onClick={onFollow}
+        aria-label={`${following ? 'Following' : 'Follow'} ${company.name}`} title={following ? 'Following: alerts for every new job here' : 'Follow: get an alert for every new job here'}>
+        <Bell size={14} duo={following} aria-hidden="true" />{large && (following ? 'Following' : 'Follow')}
+      </button>
       <label className="row text-xs muted" style={{ gap: 6 }}>
         <input type="checkbox" className="switch" role="switch" checked={!muted} onChange={onToggle} aria-label={`Show jobs from ${company.name}`} />
-        <span>{muted ? 'Hidden' : 'Showing'}</span>
+        <span className="switch-label">{muted ? 'Hidden' : 'Showing'}</span>
       </label>
     </li>
   );
@@ -50,10 +55,13 @@ export const CompaniesView: React.FC<CompaniesViewProps> = ({ companies, mutedCo
   const [form, setForm] = useState({ name: '', source_type: 'greenhouse', source_identifier: '', industry: '', careers_url: '' });
   const [adding, setAdding] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { followed, toggle: toggleFollow } = useFollowedCompanies();
+  const [onlyFollowing, setOnlyFollowing] = useState(false);
+  const follow = async (id: number) => { const problem = await toggleFollow(id); if (problem) setError(problem); };
 
   useEffect(() => setVisible(PAGE), [query]);
   const q = query.trim().toLowerCase();
-  const list = companies.filter((c) => !q || c.name.toLowerCase().includes(q) || (c.industry || '').toLowerCase().includes(q));
+  const list = companies.filter((c) => (!onlyFollowing || followed.includes(c.id)) && (!q || c.name.toLowerCase().includes(q) || (c.industry || '').toLowerCase().includes(q)));
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -101,6 +109,11 @@ export const CompaniesView: React.FC<CompaniesViewProps> = ({ companies, mutedCo
         <Search size={16} aria-hidden="true" />
         <input className="input" type="search" value={query} onChange={(e) => setQuery(e.target.value)} placeholder={`Search ${companies.length} companies…`} aria-label="Search companies" />
       </div>
+      <div className="row wrap">
+        <button type="button" className="chip" aria-pressed={onlyFollowing} onClick={() => setOnlyFollowing((v) => !v)}>Following <span className="count">{followed.length}</span></button>
+        <span className="text-xs muted">Follow a company to get an alert for every new job there.</span>
+      </div>
+      {error && !showAdd && <p role="alert" className="text-sm" style={{ color: 'var(--warning)' }}>{error}</p>}
 
       {companies.length === 0 && loading ? (
         <ul className="stack" style={{ listStyle: 'none', gap: 8 }} aria-busy="true" aria-label="Loading companies">
@@ -114,7 +127,7 @@ export const CompaniesView: React.FC<CompaniesViewProps> = ({ companies, mutedCo
       ) : (
         <>
           <ul className={large ? 'cols' : 'stack'} style={{ listStyle: 'none', gap: 8 }}>
-            {list.slice(0, visible).map((c) => <Row key={c.id} company={c} muted={mutedCompanyIds.includes(c.id)} onToggle={() => onToggleMuted(c.id)} />)}
+            {list.slice(0, visible).map((c) => <Row key={c.id} company={c} muted={mutedCompanyIds.includes(c.id)} onToggle={() => onToggleMuted(c.id)} following={followed.includes(c.id)} onFollow={() => void follow(c.id)} large={large} />)}
           </ul>
           {list.length > visible && <button type="button" className="btn btn-outline" onClick={() => setVisible(visible + PAGE)}>Show more ({list.length - visible} left)</button>}
         </>

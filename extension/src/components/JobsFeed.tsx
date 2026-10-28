@@ -3,7 +3,7 @@ import { RotateCcw, Search, SlidersHorizontal, X } from '../lib/icons';
 import { Job, Preferences } from '../types';
 import { JobCard } from './JobCard';
 import { EmptyState } from './EmptyState';
-import { ROLES, DEFAULT_ROLE_IDS, EXPERIENCE_LABELS, HUB_LABELS, timeAgo } from '../lib/format';
+import { ROLES, DEFAULT_ROLE_IDS, EXPERIENCE_LABELS, HUB_LABELS, timeAgo, EMPLOYMENT_LABELS, CATEGORIES, CATEGORY_IDS } from '../lib/format';
 import { DEFAULT_FILTERS, JobFilters, activeFilterCount, chipCounts, filterJobs } from '../lib/filters';
 
 interface JobsFeedProps {
@@ -183,6 +183,13 @@ export const JobsFeed: React.FC<JobsFeedProps> = ({
               </select>
               <p className="hint">Jobs older than 2 months are never shown.</p>
             </div>
+            <div>
+              <label className="label" htmlFor="f-type">Job type</label>
+              <select id="f-type" className="select" value={filters.jobType} onChange={(e) => set({ jobType: e.target.value })}>
+                <option value="all">Any type</option>
+                {Object.entries(EMPLOYMENT_LABELS).map(([id, label]) => <option key={id} value={id}>{label}</option>)}
+              </select>
+            </div>
             <label className="row wide text-sm"><input type="checkbox" className="switch" role="switch" checked={filters.remoteOnly} onChange={(e) => set({ remoteOnly: e.target.checked })} /> Remote jobs only</label>
             <label className="row wide text-sm"><input type="checkbox" className="switch" role="switch" checked={filters.salaryOnly} onChange={(e) => set({ salaryOnly: e.target.checked })} /> Only jobs that list a salary</label>
             {filterCount > 0 && <button type="button" className="btn btn-ghost btn-sm wide" onClick={resetFilters}><RotateCcw size={14} aria-hidden="true" /> Reset filters</button>}
@@ -196,6 +203,11 @@ export const JobsFeed: React.FC<JobsFeedProps> = ({
               {counts[c.id] !== undefined && jobs.length > 0 && <span className="count">{counts[c.id]}{hasMore ? '+' : ''}</span>}
             </button>
           ))}
+          <select className={`chip chip-select${CATEGORY_IDS.includes(roleFilter) ? ' active' : ''}`} aria-label="More roles"
+            value={CATEGORY_IDS.includes(roleFilter) ? roleFilter : ''} onChange={(e) => onRoleFilterChange(e.target.value || 'all')}>
+            <option value="">More roles…</option>
+            {CATEGORIES.map((c) => <option key={c.id} value={c.id}>{c.label}</option>)}
+          </select>
         </div>
       </div>
 

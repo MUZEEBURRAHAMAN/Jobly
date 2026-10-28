@@ -21,6 +21,23 @@ export const ROLES = [
   { id: 'fullstack_engineering', label: 'Fullstack engineering', hint: 'Fullstack, software engineer, cloud', short: 'Fullstack' },
 ] as const;
 
+/** Every other kind of job, for "More roles" (ids match backend/app/categories.py). */
+export const CATEGORIES = [
+  { id: 'engineering', label: 'Engineering' },
+  { id: 'data', label: 'Data & analytics' },
+  { id: 'design', label: 'Design & creative' },
+  { id: 'marketing', label: 'Marketing' },
+  { id: 'sales', label: 'Sales & business development' },
+  { id: 'customer', label: 'Customer success & support' },
+  { id: 'people', label: 'People & recruiting' },
+  { id: 'finance', label: 'Finance & accounting' },
+  { id: 'legal', label: 'Legal & compliance' },
+  { id: 'operations', label: 'Operations' },
+  { id: 'healthcare', label: 'Healthcare & science' },
+  { id: 'other', label: 'Other' },
+] as const;
+export const CATEGORY_IDS: string[] = CATEGORIES.map((c) => c.id);
+
 export const SENIORITIES = [
   { id: 'intern', label: 'Intern' },
   { id: 'junior', label: 'Junior · 0–2 yrs' },
@@ -36,3 +53,5 @@ export const DEFAULT_ROLE_IDS: string[] = ROLES.map((r) => r.id);
 
 /** Remote job boards whose listings Jobly passes on: the card says where the job was found (their terms ask for that). */
 export const BOARD_NAMES: Record<string, string> = { weworkremotely: 'We Work Remotely', himalayas: 'Himalayas', arbeitnow: 'Arbeitnow' };
+
+export const EMPLOYMENT_LABELS: Record<string, string> = { full_time: 'Full-time', part_time: 'Part-time', contract: 'Contract', internship: 'Internship' };
