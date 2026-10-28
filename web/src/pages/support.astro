@@ -8,8 +8,8 @@ const topics = ['A question', 'Something is broken', 'An idea or a missing compa
 const fixes = [
   { q: 'Jobs take a while to load', a: 'Jobly’s server sleeps when nobody is using it. The first request can take up to a minute while it wakes up; after that it’s quick.' },
   { q: 'No desktop alerts', a: 'Turn alerts on in Jobly’s Preferences, then check that Chrome is allowed to show notifications in your computer’s settings.' },
-  { q: 'Too few matches', a: 'Add more roles or experience levels, remove an exclude keyword, or turn off Remote only. Jobly covers tech roles only.' },
-  { q: 'A job is gone when I click Apply', a: 'The employer may have just closed it. Jobly removes closed jobs at the next refresh, within about two hours.' },
+  { q: 'Too few matches', a: 'Add more roles or experience levels, remove an exclude keyword, or turn off Remote only. Under Preferences, “More development, IT and design roles” adds areas like backend, DevOps or QA.' },
+  { q: 'A job is gone when I click Apply', a: 'The employer may have just closed it. Jobly removes closed jobs at the next refresh, within about four hours.' },
 ];
 ---
 <Base title="Support" description="Questions, bugs, ideas or a wrong listing: write to the Jobly team. A person reads every message and replies within two working days.">
@@ -18,9 +18,7 @@ const fixes = [
 
   <section class="container support">
     <div class="form-card">
-      <form name="support" method="POST" action="/thanks" data-netlify="true" netlify-honeypot="bot-field" data-form="support-done" data-email={SITE.email}>
-        <input type="hidden" name="form-name" value="support" />
-        <p class="hp"><label>Leave this empty <input name="bot-field" tabindex="-1" autocomplete="off" /></label></p>
+      <form name="support" method="POST" action={`mailto:${SITE.email}?subject=Jobly%20support`} enctype="text/plain" data-form="support-done" data-email={SITE.email} data-subject="Jobly support">
         <div class="row">
           <div class="field"><label for="s-name">Name <span class="opt">(optional)</span></label><input class="input" id="s-name" name="name" autocomplete="name" maxlength="80" /></div>
           <div class="field"><label for="s-email">Email</label><input class="input" id="s-email" name="email" type="email" required autocomplete="email" maxlength="120" aria-describedby="s-email-hint" /><span class="hint" id="s-email-hint">Only used to reply to you.</span></div>
@@ -33,15 +31,15 @@ const fixes = [
           <span class="hint" id="s-message-hint">For a bug, say what you did and what happened. For a listing, paste its link.</span>
         </div>
         <div class="submit">
-          <button class="btn btn-ink btn-lg" type="submit"><Icon name="send" size={17} />Send message</button>
+          <button class="btn btn-ink btn-lg" type="submit"><Icon name="send" size={17} />Write the email</button>
           <p class="form-status" data-form-status role="status" aria-live="polite"></p>
         </div>
-        <p class="small">By sending, you agree that we keep your message until we’ve dealt with it (at most 12 months). See the <a href="/privacy#forms-you-can-send-us">privacy policy</a>.</p>
+        <p class="small">This opens your email app with the message filled in; press Send there. We keep your message until we’ve dealt with it (at most 12 months). See the <a href="/privacy#forms-you-can-send-us">privacy policy</a>.</p>
       </form>
       <div class="done" id="support-done" hidden tabindex="-1">
         <span class="done-icon"><Icon name="check" size={22} /></span>
-        <h2>Message sent</h2>
-        <p>Thanks for writing. We’ll reply to the email you gave within two working days.</p>
+        <h2>Almost there</h2>
+        <p>Your email app should now be open with your message. Press Send there, and we’ll reply within two working days. Nothing opened? Write to <a href={`mailto:${SITE.email}`}>{SITE.email}</a>.</p>
         <a class="btn btn-outline btn-sm" href="/guides">Browse the guides meanwhile</a>
       </div>
     </div>

@@ -3,38 +3,61 @@ import Base from '../layouts/Base.astro';
 import PageHero from '../components/page/PageHero.astro';
 import SectionHead from '../components/SectionHead.astro';
 import FinalCta from '../components/landing/FinalCta.astro';
+import { SITE } from '../lib/site';
 
 // Releases, newest plan first. "Later" items are ideas, not promises, and nothing here has a date.
 type Group = { h: string; items: string[] };
 type Release = { v: string; tag: 'next' | 'upcoming'; title: string; lead: string; groups: Group[] };
 const releases: Release[] = [
-  { v: 'v1.1', tag: 'next', title: 'Wider autofill', lead: 'Fill more of each application without retyping.', groups: [
+  { v: 'v1.1', tag: 'next', title: 'Every role, with design and IT sorted by area', lead: 'Built and tested; waiting for Chrome Web Store review.', groups: [
+    { h: 'Jobs', items: [
+      'Every job from the career pages Jobly reads, not only five tech roles: sales, marketing, finance, operations and more under More roles.',
+      'A Design & IT list, and its own list for each area: backend, mobile, DevOps and cloud, QA, cybersecurity, IT and support, enterprise apps, data and creative design.',
+      'Every design level, from intern to VP and chief design officer, plus UX research, UX writing, content, service and DesignOps roles.',
+    ] },
+    { h: 'Speed and privacy', items: [
+      'Jobs load from fast public files and are filtered in your browser, so your preferences never leave it.',
+      'Pick development, IT and design areas in Preferences, and alerts cover them too.',
+    ] },
+  ] },
+  { v: 'v1.2', tag: 'upcoming', title: 'Wider autofill', lead: 'Fill more of each application without retyping.', groups: [
     { h: 'Autofill', items: [
       'Better handling of Workday’s multi-step forms and of custom questions.',
       'Answers you type once remembered for the next form that asks the same question.',
     ] },
     { h: 'Tracker', items: ['Automatic status when a hiring system emails you, if you connect your inbox (optional).'] },
   ] },
-  { v: 'v1.2', tag: 'upcoming', title: 'Optional AI help', lead: 'For people who want it, with their own AI key, so Jobly stays free.', groups: [
+  { v: 'v1.3', tag: 'upcoming', title: 'Jobly Studio in the extension', lead: 'The tailored resume and cover letter from Jobly Studio, one click from any job.', groups: [
     { h: 'Writing', items: [
-      'Tailor a resume to a job, draft cover letters and answer application questions, using your own AI provider key.',
-      'Nothing is sent to an AI service unless you add a key and press the button.',
+      'Send a job from the extension to Jobly Studio, which writes a tailored resume and cover letter from your profile.',
+      'Uses your own AI key or your Claude plan, so Jobly stays free. Nothing goes to an AI service unless you set it up.',
     ] },
   ] },
 ];
 const later = [
-  { t: 'More companies and hiring systems', d: 'Adding career pages people ask for, and the systems companies use to publish them.' },
-  { t: 'Clearer job cards', d: 'Showing salary and location details more consistently across sources.' },
-  { t: 'More role families', d: 'Such as data, DevOps and mobile engineering.' },
+  { t: 'More companies every week', d: 'Jobly now tests new employers weekly and adds the ones with live job boards. Suggest one through the support page.' },
+  { t: 'More hiring systems', d: 'Reading iCIMS, SuccessFactors and Taleo, which many large employers use.' },
+  { t: 'Pages for every area', d: 'Guides for backend, DevOps, data and security job searches, like the ones for design and frontend.' },
   { t: 'Other browsers', d: 'Listing Jobly in the Edge and Firefox add-on stores.' },
 ];
 const wont = [
-  { t: 'AI that Jobly pays for', d: 'Every AI request costs money, and Jobly is free. AI help, when it comes, will use your own key.' },
+  { t: 'AI that Jobly pays for', d: 'Every AI request costs money, and Jobly is free. Jobly Studio’s AI help uses your own key or your Claude plan.' },
   { t: 'Autofill that runs by itself', d: 'Jobly’s autofill works only on the tab you click on, shows every answer first, and never presses Submit. An agent that applies for you is not planned.' },
   { t: 'Accounts', d: 'Your data stays in your browser, so there is nothing to sign in to.' },
 ];
 const TAGS = { next: 'Next', upcoming: 'Upcoming' } as const;
 const changelog = [
+  { date: '2026-10-28', title: 'Every role, 1,600+ employers and 77,000+ jobs', items: [
+    'Jobly now lists every job from the career pages it reads, with design, development and IT sorted into their own lists.',
+    'About 700 new employers, including large companies on Workday and SmartRecruiters, for 1,600+ in all and 77,000+ open jobs posted in the last 60 days.',
+    'New job pages on this site for each area: backend, mobile, DevOps and cloud, QA, cybersecurity, IT, enterprise apps, data and creative design, plus one Design & IT list.',
+    'Jobs are published as fast public files every four hours, so lists load in under a second and your browser does the filtering.',
+    'Every design level is recognised, from intern to VP and chief design officer.',
+  ] },
+  { date: '2026-10-28', title: 'Jobly Studio', items: [
+    'A free web app for a tailored resume and cover letter for every job, written only from facts in your profile, with a check that removes anything it can’t trace back.',
+    'Board and table of applications, a dashboard, PDF downloads in four themes, and Find jobs from Jobly’s job list. Everything stays in your browser.',
+  ] },
   { date: '2026-10-27', title: 'Jobly 1.0: from finding a job to the interview', items: [
     'Application tracker: statuses, notes, follow-up reminders, a weekly goal, and a “Did you apply?” prompt after you open a job.',
     'Interviews with prep checklists, ratings and a reminder an hour before; tasks with due dates; import from Google Calendar.',
@@ -108,7 +131,7 @@ const fmt = (d: string) => new Date(d + 'T12:00:00Z').toLocaleDateString('en-GB'
 
   <section class="container section rel-wrap" aria-labelledby="rel-title">
     <h2 class="sr-only" id="rel-title">Upcoming releases</h2>
-    <p class="now"><span class="now-tag">Now</span>Jobly 1.0 is out: finding, tracking, profiles, resumes, cover letters, contacts and autofill with review. Everything below comes after it.</p>
+    <p class="now"><span class="now-tag">Now</span>Jobly 1.0 is out, Jobly now lists 77,000+ jobs from 1,600+ employers, and <a href={SITE.studio}>Jobly Studio</a> writes tailored resumes and cover letters. Everything below comes next.</p>
     <ol class="rels">
       {releases.map((r) => (
         <li class="rel" data-reveal>
@@ -164,6 +187,7 @@ const fmt = (d: string) => new Date(d + 'T12:00:00Z').toLocaleDateString('en-GB'
 <style>
   .rels { list-style: none; padding: 0; display: grid; }
   .now { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 28px; color: var(--muted); }
+  .now a { color: var(--fg); text-decoration: underline; text-underline-offset: 3px; }
   .now-tag { font-size: 0.75rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; padding: 4px 10px; border-radius: 999px; border: 1px solid var(--border); background: var(--card); color: var(--success); }
   .rel { display: grid; grid-template-columns: 200px minmax(0, 1fr); gap: 32px; padding-block: 32px; border-top: 1px solid var(--border-strong); }
   .rel:last-child { border-bottom: 1px solid var(--border-strong); }

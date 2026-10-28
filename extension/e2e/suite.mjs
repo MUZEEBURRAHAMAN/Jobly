@@ -47,7 +47,7 @@ await step('jobs: search, categories, date posted, 2-month rule', async () => {
   await p.getByLabel('Search jobs').fill('Unknown Date'); await p.getByText('Unknown Date Engineer').first().waitFor({ timeout: 10000 }); ok(true, 'a job with an unknown date is still listed');
   await p.getByLabel('Search jobs').fill(''); await p.locator('article').first().waitFor();
   ok(await p.getByLabel('Search jobs').inputValue() === '', 'search cleared');
-  await p.getByRole('button', { name: /^Design/ }).click(); await sleep(1200); ok(await p.getByRole('button', { name: /^Design/ }).getAttribute('aria-pressed') === 'true', 'category chip toggles');
+  await p.getByRole('button', { name: /^Design(?! &)/ }).click(); await sleep(1200); ok(await p.getByRole('button', { name: /^Design(?! &)/ }).getAttribute('aria-pressed') === 'true', 'category chip toggles');
   await p.getByRole('button', { name: /^All/ }).click(); await sleep(1200);
   const all = await count(p); ok(/last 2 months/.test(await text(p)), 'list says it only covers the last 2 months');
   await p.getByRole('button', { name: /Filters/ }).click();
@@ -207,6 +207,11 @@ await step('static job data: the popup reads jobly-data, with the API down', asy
   await p.getByLabel('More roles').selectOption('sales'); await p.getByText('Enterprise Account Executive').waitFor({ timeout: 15000 });
   ok(await cards(p) === 1, '"More roles" → Sales lists the one sales job');
   await axe(p, 'jobs with "More roles" picked');
+  await p.getByLabel('More roles').selectOption('backend'); await p.getByText('Senior Java Developer').waitFor({ timeout: 15000 });
+  ok(await cards(p) === 1, '"More roles" → Backend development lists the Java developer');
+  await p.getByRole('button', { name: /^Design & IT/ }).click(); await p.getByText('Senior Java Developer').waitFor({ timeout: 15000 }); await sleep(500);
+  const body = await text(p);
+  ok(!/Enterprise Account Executive|Technical Recruiter/.test(body) && await cards(p) > 1, '"Design & IT" lists design, development and IT jobs, not sales or recruiting');
   await h.ctx.close();
 });
 

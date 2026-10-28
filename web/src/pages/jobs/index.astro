@@ -5,12 +5,19 @@ import Figure from '../../components/Figure.astro';
 import Icon from '../../components/Icon.astro';
 import JobMap from '../../components/landing/JobMap.astro';
 import FinalCta from '../../components/landing/FinalCta.astro';
-import { ROLES } from '../../lib/roles';
+import { AREAS, DESIGN_IT, ROLES } from '../../lib/roles';
 ---
-<Base title="Jobs by role" description="Browse the newest tech jobs from company career pages by role: product design, frontend, product management, AI and ML, and fullstack. Live, every two hours.">
-  <PageHero crumbs={[{ label: 'Jobs' }]} eyebrow="Jobs" title="The newest tech jobs, by role." figure="basket" intensity={0.7}
-    lead="Pick a role to see what went up on company career pages most recently, live from Jobly’s server. For alerts on new ones, add the extension." />
+<Base title="Jobs by role" description="Browse the newest design, development and IT jobs from company career pages by role: product design, frontend, backend, mobile, DevOps, data, security, IT and more. Updated every four hours.">
+  <PageHero crumbs={[{ label: 'Jobs' }]} eyebrow="Jobs" title="Every design, development and IT job, by role." figure="basket" intensity={0.7}
+    lead="Pick a role to see what went up on company career pages most recently. Jobly lists every role, and sorts design, development and IT jobs into their own lists, at every level from intern to VP. For alerts on new ones, add the extension." />
+  <section class="container all-in-one">
+    <a class="yc" href={`/jobs/${DESIGN_IT.slug}`} data-reveal data-role-counts>
+      <span class="yc-text"><strong>All design, development &amp; IT</strong><span>Every design, development and IT job in one list. <span data-count-role={DESIGN_IT.id}>…</span> posted this week.</span></span>
+      <span class="go">See the jobs <Icon name="arrow-right" size={15} class="arrow" /></span>
+    </a>
+  </section>
   <section class="container roles" data-role-counts>
+    <h2 class="group-title">Core tech roles</h2>
     <ul class="grid" data-stagger>
       {ROLES.map((r) => (
         <li data-reveal>
@@ -25,9 +32,23 @@ import { ROLES } from '../../lib/roles';
       ))}
     </ul>
   </section>
+  <section class="container roles areas-wrap" data-role-counts>
+    <h2 class="group-title">More development, IT and design</h2>
+    <ul class="areas" data-stagger>
+      {AREAS.map((r) => (
+        <li data-reveal>
+          <a class="area" href={`/jobs/${r.slug}`}>
+            <span class="name">{r.name}</span>
+            <span class="count"><span data-count-role={r.id}>…</span> posted this week</span>
+            <span class="titles">{r.titles.slice(0, 4).join(' · ')}</span>
+          </a>
+        </li>
+      ))}
+    </ul>
+  </section>
   <section class="container yc-wrap">
     <a class="yc" href="/jobs/yc" data-reveal>
-      <span class="yc-text"><strong>Y Combinator startups</strong><span>Open roles at companies from Y Combinator’s public directory, all five roles in one list.</span></span>
+      <span class="yc-text"><strong>Y Combinator startups</strong><span>Open design, development and IT roles at companies from Y Combinator’s public directory, in one list.</span></span>
       <span class="go">See the jobs <Icon name="arrow-right" size={15} class="arrow" /></span>
     </a>
   </section>
@@ -45,7 +66,17 @@ import { ROLES } from '../../lib/roles';
   .yc-text strong { font-size: 1.375rem; font-weight: 500; letter-spacing: -0.025em; }
   .yc-text span { color: var(--muted); }
   .yc .go { display: inline-flex; align-items: center; gap: 6px; font-weight: 500; }
-  .roles { padding-block: clamp(40px, 5vw, 64px) var(--section-y); }
+  .roles { padding-block: clamp(24px, 3vw, 40px) clamp(32px, 4vw, 48px); }
+  .all-in-one { padding-top: clamp(40px, 5vw, 64px); }
+  .group-title { font-size: 1.5rem; font-weight: 500; letter-spacing: -0.025em; margin-bottom: 20px; }
+  .areas-wrap { padding-bottom: var(--section-y); }
+  .areas { list-style: none; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px; }
+  .area { height: 100%; display: flex; flex-direction: column; gap: 4px; padding: 18px 20px; border-radius: 18px; background: var(--card); border: 1px solid var(--border);
+    transition: border-color var(--dur) ease, box-shadow var(--dur) ease; }
+  .area:hover { border-color: var(--border-strong); box-shadow: var(--shadow-md); }
+  .area .name { padding: 0; font-size: 1.125rem; }
+  .area .count, .area .titles { padding: 0; }
+  .yc-text [data-count-role] { color: var(--brand); font-weight: 600; }
   .grid { list-style: none; padding: 0; display: grid; grid-template-columns: repeat(6, 1fr); gap: 16px; }
   .grid li { grid-column: span 2; }
   .grid li:nth-child(4) { grid-column: 2 / span 2; }

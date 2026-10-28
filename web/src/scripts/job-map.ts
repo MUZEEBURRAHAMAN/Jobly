@@ -76,7 +76,7 @@ function init(root: HTMLElement) {
     draw();
     // A map wider than its frame (phones) must be reachable by keyboard too, (it starts at the left edge, over the Americas)
     const wide = scroller.scrollWidth > scroller.clientWidth + 2;
-    if (wide && !scroller.hasAttribute('tabindex')) { scroller.tabIndex = 0; scroller.setAttribute('role', 'region'); scroller.setAttribute('aria-label', 'Map of tech jobs by place, scrolls sideways') ; }
+    if (wide && !scroller.hasAttribute('tabindex')) { scroller.tabIndex = 0; scroller.setAttribute('role', 'region'); scroller.setAttribute('aria-label', 'Map of core tech jobs by place, scrolls sideways') ; }
     if (!wide && scroller.hasAttribute('tabindex')) { scroller.removeAttribute('tabindex'); scroller.removeAttribute('role'); scroller.removeAttribute('aria-label'); }
   };
 
@@ -264,7 +264,7 @@ function init(root: HTMLElement) {
     list.replaceChildren(...geo.by_country.slice(0, 10).map((c) => {
       const li = document.createElement('li'), b = document.createElement('button');
       b.type = 'button'; b.className = 'c-row'; b.dataset.country = c.country;
-      b.textContent = `${c.country}, ${formatNumber(c.jobs)} tech jobs at ${c.employers} employers`;
+      b.textContent = `${c.country}, ${formatNumber(c.jobs)} core tech jobs at ${c.employers} employers`;
       li.append(b);
       return li;
     }));

@@ -1,5 +1,5 @@
 ---
-// "Where the jobs are": a dotted world map. Each cluster is a hiring hub, sized by its open tech jobs; hover or tap
+// "Where the jobs are": a dotted world map. Each cluster is a hiring hub, sized by its open core tech jobs; hover or tap
 // one (or pick a country below) for its numbers. The headline, the stats and the country list are real text, so the
 // section reads fine without the canvas. Numbers: build-time copy of /api/geo, refreshed live by scripts/job-map.ts.
 import { geoAtBuild } from '../../lib/geo';
@@ -21,7 +21,7 @@ const hubs = geo?.places.filter((p) => p.kind === 'hub').length ?? 0;
       <header class="head" data-stagger>
         <span class="eyebrow" data-reveal>Coverage</span>
         <h2 class="title" id="map-title" data-reveal>
-          {title ?? <><span class="big" data-geo="total">{geo ? fmt(geo.total) : '2,000+'}</span> tech jobs open in <span class="big" data-geo="countries">{geo?.countries ?? '30+'}</span> countries</>}
+          {title ?? <><span class="big" data-geo="total">{geo ? fmt(geo.total) : '2,000+'}</span> core tech jobs open in <span class="big" data-geo="countries">{geo?.countries ?? '30+'}</span> countries</>}
         </h2>
         <p class="lead" data-reveal>{lead}</p>
       </header>
@@ -41,7 +41,7 @@ const hubs = geo?.places.filter((p) => p.kind === 'hub').length ?? 0;
       </div>
 
       <dl class="stats" data-stagger>
-        <div class="stat" data-reveal><dt>tech jobs open</dt><dd data-geo="total2">{geo ? fmt(geo.total) : '2,000+'}</dd></div>
+        <div class="stat" data-reveal><dt>core tech jobs open</dt><dd data-geo="total2">{geo ? fmt(geo.total) : '2,000+'}</dd></div>
         <div class="stat" data-reveal><dt>employers hiring</dt><dd data-geo="employers">{geo ? fmt(geo.employers) : '190+'}</dd></div>
         <div class="stat" data-reveal><dt>countries</dt><dd data-geo="countries2">{geo?.countries ?? '30+'}</dd></div>
         <div class="stat" data-reveal><dt>hiring hubs on the map</dt><dd data-geo="hubs">{hubs || '40+'}</dd></div>
@@ -52,7 +52,7 @@ const hubs = geo?.places.filter((p) => p.kind === 'hub').length ?? 0;
         <h3>Where most jobs are</h3>
         <ol data-list>
           {top.map((c) => (
-            <li><button type="button" class="c-row" data-country={c.country}>{c.country}, {fmt(c.jobs)} tech jobs at {c.employers} employers</button></li>
+            <li><button type="button" class="c-row" data-country={c.country}>{c.country}, {fmt(c.jobs)} core tech jobs at {c.employers} employers</button></li>
           ))}
         </ol>
       </div>

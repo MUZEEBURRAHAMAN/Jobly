@@ -23,8 +23,9 @@ class Settings(BaseSettings):
     CRAWL_PROFILE: str = "light"
     # Job boards read at once. 5 suits the 512 MB server; the scheduled crawl on GitHub Actions runs with more.
     CRAWL_CONCURRENCY: int = 5
-    # Full crawl only: pages of 20 read per Workday employer (60 pages = the newest 1,200 jobs of a big employer).
-    WORKDAY_MAX_PAGES: int = 60
+    # Full crawl only: pages of 20 read per Workday employer (125 pages = up to 2,500 jobs of a big employer; at 60, many
+    # big employers stopped at the cap). About 0.7 s a page, so the largest employers take under two minutes each.
+    WORKDAY_MAX_PAGES: int = 125
 
     # Jobs posted longer ago than this are never stored or shown (stale/ghost listings; keeps the DB small).
     MAX_JOB_AGE_DAYS: int = 60
@@ -34,7 +35,7 @@ class Settings(BaseSettings):
     # Comma-separated Chrome extension IDs allowed by CORS. Empty = any extension (dev only; set after publishing).
     EXTENSION_IDS: str = ""
     # The public website may read job counts (hero search, freshness chart, companies list). Comma-separated origins.
-    SITE_ORIGINS: str = "https://joblyextension.netlify.app"
+    SITE_ORIGINS: str = "https://jobly-88t.pages.dev,https://jobly-studio.pages.dev,https://joblyextension.netlify.app"
     # Interactive API docs are off in production.
     ENABLE_DOCS: bool = False
     # Free-tier persistence: restore the newest snapshot from a GitHub release when the database is empty.

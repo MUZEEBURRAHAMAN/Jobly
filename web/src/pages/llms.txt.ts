@@ -9,7 +9,7 @@ export const GET: APIRoute = async () => {
   const body = [
     '# Jobly',
     '',
-    '> Jobly is a free Chrome extension that lists tech jobs (product design, frontend, product management, AI/ML and fullstack) from the career pages of hundreds of companies and three remote job boards, with each job’s real posting date. It hides jobs older than 60 days, shows no promoted listings, alerts you to new matches, and needs no account. Preferences, saved jobs and alerts stay in the browser.',
+    '> Jobly is a free Chrome extension that lists jobs from the career pages of 1,600+ companies, with design, development and IT sorted by area (product design, frontend, fullstack, backend, mobile, DevOps, data, QA, security, IT and more), and three remote job boards, with each job’s real posting date. It hides jobs older than 60 days, shows no promoted listings, alerts you to new matches, and needs no account. Preferences, saved jobs and alerts stay in the browser.',
     '',
     ...sections.flatMap((s) => [`## ${s}`, '', ...pages.filter((p) => p.section === s).map((p) => `- [${p.eyebrow}: ${p.title}](${new URL(p.path, SITE.url).href}): ${p.summary}`), '']),
     '## Contact',

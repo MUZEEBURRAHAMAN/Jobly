@@ -2,11 +2,11 @@
 title: Privacy policy
 eyebrow: Privacy
 description: What Jobly keeps on your device, what it sends to its server, and what it never collects. No account, no analytics, no tracking.
-updated: 2026-10-27
+updated: 2026-10-28
 figure: padlock
 ---
 
-> **The short version.** Jobly has no accounts and no analytics. Your preferences, saved jobs, tracker, profiles and contacts stay in your browser. To show you jobs, the extension asks Jobly's server for them. It reads a web page only when you click to save that job, check your fit or autofill its form. Optional connections (Chrome sync, Google Calendar, Hunter) are off until you turn them on, and talk to those services directly, never through Jobly's server. We don't build a profile of you, and we don't sell or share data.
+> **The short version.** Jobly has no accounts and no analytics. Your preferences, saved jobs, tracker, profiles and contacts stay in your browser. To show you jobs, the extension downloads Jobly's public job files and filters them in your browser. It reads a web page only when you click to save that job, check your fit or autofill its form. Optional connections (Chrome sync, Google Calendar, Hunter) are off until you turn them on, and talk to those services directly, never through Jobly's server. We don't build a profile of you, and we don't sell or share data.
 
 ## What Jobly is
 
@@ -64,12 +64,12 @@ Each is off until you turn it on, and each talks to that service straight from y
 
 ## Forms you can send us
 
-Two forms on this site send us a message. Both are optional and both are handled by Netlify Forms, which stores the submission and forwards it to us by email.
+Two forms on this site help you write to us. Both are optional. Neither sends anything by itself: they open your own email app with the message filled in, and you send it like any other email.
 
 - **Support form:** your email address and your message, plus your name if you give it. We use them only to reply.
 - **Uninstall feedback:** after you uninstall the extension, Chrome opens a short page asking why. The reason you pick and any note you type are sent. It asks for no email and the page has no identifier linking it to you.
 
-Netlify also records the IP address of whoever submits a form. It uses it against spam, we can't switch it off, and it is stored with the message.
+Because the message is an ordinary email, we see the address you send it from and whatever your email provider adds. Nothing goes through this website's servers.
 
 We delete form messages once we have dealt with them, and at the latest after 12 months. Deleting is done by hand, so if you'd like your message removed sooner, write to us and we will.
 
@@ -85,14 +85,14 @@ We delete form messages once we have dealt with them, and at the latest after 12
 | Service | Why | What it can see |
 | --- | --- | --- |
 | Render (hosting) and Cloudflare (network) | Runs Jobly's server | Short-lived technical logs such as IP address, time and the address requested (which can include your search words) |
-| Netlify | Hosts this website and its forms | Technical logs including IP address, and what you type into a form together with the IP address it came from |
+| Cloudflare Pages | Hosts this website, Jobly Studio and Jobly's public job files | Short-lived technical logs such as IP address, time and the address requested |
 | Google favicon service (t2.gstatic.com) | Shows company logos in the extension | The company domains your browser asks logos for, and your IP address |
 | Chrome Web Store and your Google account | Installing and updating the extension, Chrome sync if you turn it on, Google Calendar if you connect it | Covered by Google's own policies |
 | Hunter (only if you add your own key) | Finding contacts at a company | The company domain you search and your API key |
 
 ## Where your data goes
 
-Jobly's server (Render, with Cloudflare in front) and this website (Netlify) run in the United States, so requests from other countries cross borders. Netlify says it relies on the EU-U.S. Data Privacy Framework and the European Commission's standard contractual clauses for such transfers. Almost nothing that identifies you is stored: your preferences stay in your browser, and the only things we keep are messages you choose to send us.
+Jobly's server (Render, with Cloudflare in front) run in the United States, and this website and the job files are served from Cloudflare's network, so requests from other countries can cross borders. Cloudflare says it relies on the EU-U.S. Data Privacy Framework and the European Commission's standard contractual clauses for such transfers. Almost nothing that identifies you is stored: your preferences stay in your browser, and the only things we keep are messages you choose to send us.
 
 ## Your rights
 

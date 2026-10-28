@@ -19,9 +19,23 @@ ROLE_TAXONOMY = {
             r"\bui\s+designer\b",
             r"\bweb\s+designer\b",
             r"\b(?:ux|user)\s+research(?:er)?\b",
+            # Design leadership and the rest of the product design family
+            r"\b(?:head|director|vp|vice\s+president)\s+of\s+(?:product\s+|ux\s+|user\s+experience\s+)?design\b",
+            r"\b(?:product\s+|ux\s+)?design\s+(?:manager|director|lead|leader)\b",
+            r"\bchief\s+design\s+officer\b",
+            r"\bux\s+(?:lead|manager|director|architect|strategist|engineer)\b",
+            r"\bux\s+writ(?:er|ing)\b",
+            r"\bcontent\s+design(?:er)?\b",
+            r"\bservice\s+design(?:er)?\b",
+            r"\bdesign\s*ops\b",
+            r"\bdesign\s+(?:operations|program\s+manager)\b",
         ],
         "exclude": [
             r"\bfashion\s+design\b",
+            r"\bconstruction\b",
+            r"\barchitectur(?:e|al)\b",
+            r"\bcivil\b",
+            r"\blandscape\b",
             r"\binterior\s+design\b",
             r"\binstructional\s+design\b",
             r"\bhardware\b",
@@ -54,7 +68,8 @@ ROLE_TAXONOMY = {
             r"\bdesign\s+engineer\s*[\(\-]?\s*(?:web|ui|frontend|product|brand)\b",
             r"\bclient\s+(?:platform\s+)?engineer\b",
             r"\bjavascript\b",
-            r"\btypescript\b"
+            r"\btypescript\b",
+            r"\b(?:angular(?:js)?|vue(?:\.js|js)?|svelte|next\.js|nextjs)\s+(?:engineer|developer|dev)\b"
         ],
         "exclude": [
             r"\bbackend\s+(?:engineer|developer)\b",
@@ -71,7 +86,8 @@ ROLE_TAXONOMY = {
             r"\bactuator\b",
             # "Full-stack (React / TypeScript)" is a fullstack job that happens to name frontend tools.
             r"\bfull\s*[-]?\s*stack\b",
-            r"\bfullstack\b"
+            r"\bfullstack\b",
+            r"\breact\s+native\b"
         ]
     },
     "product_management": {
@@ -182,9 +198,9 @@ def detect_seniority(title: str) -> str:
     title_lower = title.lower()
     if re.search(r"\b(?:intern|internship|co-op)\b", title_lower):
         return "intern"
-    if re.search(r"\b(?:junior|jr\.?|associate|entry\s*level|new\s*grad)\b", title_lower):
+    if re.search(r"\b(?:junior|jr\.?|associate|entry\s*level|new\s*grad|graduate|trainee|apprentice)\b", title_lower):
         return "junior"
-    if re.search(r"\b(?:staff|principal|lead|founding|head\s+of|director|architect|manager)\b", title_lower):
+    if re.search(r"\b(?:staff|principal|lead|founding|head\s+of|director|architect|manager|vp|svp|evp|vice\s+president|chief|cto|cdo|cpo|cio|ciso)\b", title_lower):
         return "lead"
     if re.search(r"\b(?:senior|sr\.?|iii|experienced)\b", title_lower):
         return "senior"

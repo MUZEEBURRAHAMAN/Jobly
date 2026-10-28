@@ -46,7 +46,7 @@ The server keeps no record of who asked for what. Identical requests are cached 
 
 Jobly's own server keeps no access log. It logs only errors and crawl results, never your search words or preferences.
 
-The hosting providers (Render, Cloudflare and Netlify) keep short-lived technical logs such as IP address, time and the address requested, like any website. Because a search request carries your search words in its address, those can appear in the provider's logs for a short time.
+The hosting providers (Render and Cloudflare) keep short-lived technical logs such as IP address, time and the address requested, like any website. Because a search request carries your search words in its address, those can appear in the provider's logs for a short time.
 
 ## Report a security problem
 

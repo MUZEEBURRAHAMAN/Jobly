@@ -4,4 +4,4 @@ Disallow: /thanks
 Disallow: /uninstall
 Disallow: /og-pages.json
 
-Sitemap: https://joblyextension.netlify.app/sitemap.xml
+Sitemap: https://jobly-88t.pages.dev/sitemap.xml

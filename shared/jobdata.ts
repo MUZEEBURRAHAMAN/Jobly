@@ -6,6 +6,8 @@
 export const DATA_BASE = 'https://jobly-data.pages.dev/v1';
 
 export const TECH_ROLES = ['product_design', 'frontend_engineering', 'fullstack_engineering', 'product_management', 'ai_ml'];
+/** "Design & IT" (role: "design_it"): every design, development and IT category (backend/app/categories.py DESIGN_AND_IT). */
+export const DESIGN_AND_IT = [...TECH_ROLES, 'design', 'backend', 'mobile', 'devops', 'qa', 'security', 'it', 'enterprise', 'data', 'engineering'];
 
 export interface Category { id: string; label: string; tech: boolean; jobs: number }
 
@@ -59,7 +61,8 @@ export interface Prefs {
 }
 
 export interface JobQuery {
-  /** "tech" (the five tech roles), "all", a tech role or a category id. Empty = all. */
+  /** "tech" (the five tech roles), "design_it" (every design, development and IT category), "all", a tech role or a
+   * category id. Empty = all. */
   role?: string;
   /** Several categories or roles at once (ignored when `role` is set). */
   roles?: string[];
@@ -103,9 +106,9 @@ const EMPLOYMENT = ['full_time', 'part_time', 'contract', 'internship'];
 const csv = (s?: string) => (s ?? '').split(',').map((t) => t.trim().toLowerCase()).filter(Boolean);
 const lower = (s: string | null | undefined) => (s ?? '').toLowerCase();
 
-/** matching.matches_preferences, line for line. */
+/** matching.matches_preferences, line for line; a chosen role also matches the job's category ("backend", "devops"...). */
 export function matchesPreferences(job: DataJob, prefs: Prefs, skipRoles = false): boolean {
-  if (!skipRoles && prefs.roles?.length && !prefs.roles.includes(job.normalized_role ?? '')) return false;
+  if (!skipRoles && prefs.roles?.length && !prefs.roles.includes(job.normalized_role ?? '') && !prefs.roles.includes(job.category)) return false;
   if (prefs.seniorities?.length && !prefs.seniorities.includes(job.seniority || 'mid')) return false;
   if (prefs.remote_only && job.work_mode !== 'remote') return false;
   if (prefs.locations?.length) {
@@ -132,7 +135,7 @@ function searchMatches(job: DataJob, tokens: string[]): boolean {
 /** Categories a query reads. */
 export function categoriesFor(meta: Meta, q: JobQuery): string[] {
   const all = meta.categories.map((c) => c.id);
-  const pick = (r: string) => (r === 'tech' ? TECH_ROLES : r === 'all' || !r ? all : [r]);
+  const pick = (r: string) => (r === 'tech' ? TECH_ROLES : r === 'design_it' ? DESIGN_AND_IT : r === 'all' || !r ? all : [r]);
   if (q.role) return pick(q.role).filter((c) => all.includes(c));
   if (q.roles?.length) return [...new Set(q.roles.flatMap(pick))].filter((c) => all.includes(c));
   // "Only matching" with chosen roles needs only those roles' files

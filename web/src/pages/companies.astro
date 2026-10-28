@@ -27,7 +27,7 @@ const filters = [
   { id: 'board', label: 'Via job boards' },
 ];
 ---
-<Base title="Companies" description="Every company career page and job board Jobly reads, with how many open tech jobs each has right now. Updated every two hours.">
+<Base title="Companies" description="Every company career page and job board Jobly reads, with how many open jobs each has right now. Updated every four hours.">
   <PageHero crumbs={[{ label: 'Companies' }]} eyebrow="Companies" title="Every company Jobly reads." figure="cabinet" intensity={0.7}
     lead="Jobly reads company career pages directly, plus three remote job boards. Here is the full list, with how many open jobs each has right now." />
 
@@ -65,13 +65,13 @@ const filters = [
       ))}
     </ul>
     <div class="empty" data-empty hidden>
-      <p><strong>No company matches that search.</strong> Jobly reads tech companies only. Missing one you like?</p>
+      <p><strong>No company matches that search.</strong> Missing one you like?</p>
       <a class="btn btn-outline btn-sm" href="/support">Suggest a company</a>
     </div>
     <p class="foot small">Logos and names belong to their owners. Jobly isn’t affiliated with these companies. <a href="/how-dates-work">How Jobly reads each source</a></p>
   </section>
 
-  <FinalCta title="Their newest jobs, in one place." lead="Jobly checks every one of these pages every two hours and tells you when a new job matches." />
+  <FinalCta title="Their newest jobs, in one place." lead="Jobly checks every one of these pages every four hours and tells you when a new job matches." />
   <script>import '../scripts/companies';</script>
 </Base>
 

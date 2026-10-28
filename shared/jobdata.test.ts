@@ -87,6 +87,21 @@ describe('JobData.query', () => {
   });
 });
 
+describe('groups', () => {
+  it('"design_it" reads every design, development and IT category the data has, and nothing else', async () => {
+    const log: string[] = [];
+    const data = new JobData('https://data.test/v1', fakeFetch(log));
+    const page = await data.query({ role: 'design_it', limit: 10 });
+    expect(page.items.map((j) => j.id)).toEqual([2, 1, 3]);
+    expect(log.some((l) => l.startsWith('jobs/sales'))).toBe(false);
+  });
+  it('a preferred category matches jobs in it', async () => {
+    const data = new JobData('https://data.test/v1', fakeFetch([]));
+    const page = await data.query({ only_matching: true, prefs: { roles: ['sales'] } });
+    expect(page.items.map((j) => j.id)).toEqual([4, 5]);
+  });
+});
+
 describe('matchesPreferences', () => {
   const job = { title: 'Senior Designer', location: 'Berlin', normalized_role: 'product_design', seniority: null, work_mode: 'on-site',
     max_salary: 50_000, employment_type: null } as unknown as DataJob;

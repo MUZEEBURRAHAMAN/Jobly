@@ -3,7 +3,7 @@ import { RotateCcw, Search, SlidersHorizontal, X } from '../lib/icons';
 import { Job, Preferences } from '../types';
 import { JobCard } from './JobCard';
 import { EmptyState } from './EmptyState';
-import { ROLES, DEFAULT_ROLE_IDS, EXPERIENCE_LABELS, HUB_LABELS, timeAgo, EMPLOYMENT_LABELS, CATEGORIES, CATEGORY_IDS } from '../lib/format';
+import { ROLES, DEFAULT_ROLE_IDS, EXPERIENCE_LABELS, HUB_LABELS, timeAgo, EMPLOYMENT_LABELS, CATEGORIES, CATEGORY_IDS, CATEGORY_GROUPS } from '../lib/format';
 import { DEFAULT_FILTERS, JobFilters, activeFilterCount, chipCounts, filterJobs } from '../lib/filters';
 
 interface JobsFeedProps {
@@ -51,7 +51,7 @@ export const JobsFeed: React.FC<JobsFeedProps> = ({
   const mutedHidden = useMemo(() => (mutedCompanyIds.length ? jobs.filter((j) => mutedCompanyIds.includes(j.company_id)).length : 0), [jobs, mutedCompanyIds]);
   const visible = useMemo(() => filterJobs(jobs, filters, roleFilter, targetRoles, mutedCompanyIds), [jobs, filters, roleFilter, targetRoles, mutedCompanyIds]);
 
-  const chips = [{ id: 'all_matching', label: 'For you' }, ...ROLES.map((r) => ({ id: r.id, label: r.short })), { id: 'all', label: 'All' }];
+  const chips = [{ id: 'all_matching', label: 'For you' }, ...ROLES.map((r) => ({ id: r.id, label: r.short })), { id: 'design_it', label: 'Design & IT' }, { id: 'all', label: 'All' }];
   const resetFilters = () => onFiltersChange({ ...DEFAULT_FILTERS, search: filters.search });
 
   const renderBody = () => {
@@ -206,7 +206,11 @@ export const JobsFeed: React.FC<JobsFeedProps> = ({
           <select className={`chip chip-select${CATEGORY_IDS.includes(roleFilter) ? ' active' : ''}`} aria-label="More roles"
             value={CATEGORY_IDS.includes(roleFilter) ? roleFilter : ''} onChange={(e) => onRoleFilterChange(e.target.value || 'all')}>
             <option value="">More roles…</option>
-            {CATEGORIES.map((c) => <option key={c.id} value={c.id}>{c.label}</option>)}
+            {CATEGORY_GROUPS.map((g) => (
+              <optgroup key={g} label={g}>
+                {CATEGORIES.filter((c) => c.group === g).map((c) => <option key={c.id} value={c.id}>{c.label}</option>)}
+              </optgroup>
+            ))}
           </select>
         </div>
       </div>

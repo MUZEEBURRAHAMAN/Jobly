@@ -32,7 +32,7 @@ You can't always tell from the outside, but a few checks catch most of them.
 Jobly can't read minds, but it removes the two most common kinds of ghost job automatically:
 
 - It **hides anything posted more than 60 days ago**, using the date from the employer's own system.
-- It **removes jobs the employer no longer lists**, at the next refresh, within about two hours.
+- It **removes jobs the employer no longer lists**, at the next refresh, within about four hours.
 
 Every card shows how old the posting is, so you can decide for yourself. [Read how dates work](/how-dates-work).
 

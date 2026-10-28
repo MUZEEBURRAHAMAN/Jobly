@@ -16,7 +16,7 @@ const rows: { label: string; jobly: Cell; linkedin: Cell; indeed: Cell; pages: C
   { label: 'No paid or promoted listings', jobly: ['yes', 'None'], linkedin: ['no', '“Promoted” jobs'], indeed: ['no', '“Sponsored” jobs'], pages: ['yes', 'None'] },
   { label: 'Job alerts without an account', jobly: ['yes', 'No sign-up'], linkedin: ['no', 'Account needed'], indeed: ['no', 'Account needed'], pages: ['no', 'No alerts'] },
   { label: 'Apply on the employer’s own site', jobly: ['yes', 'Nearly always; some via a job board'], linkedin: ['part', 'Easy Apply or employer site'], indeed: ['part', 'Indeed Apply or employer site'], pages: ['yes', 'Always'] },
-  { label: 'Jobs in every industry', jobly: ['no', 'Tech roles only'], linkedin: ['yes', 'Millions of jobs'], indeed: ['yes', 'Millions of jobs'], pages: ['part', 'One company at a time'] },
+  { label: 'Jobs in every industry', jobly: ['part', 'Every role; design, dev & IT sorted by area'], linkedin: ['yes', 'Millions of jobs'], indeed: ['yes', 'Millions of jobs'], pages: ['part', 'One company at a time'] },
   { label: 'Free for job seekers', jobly: ['yes', 'Free'], linkedin: ['yes', 'Free; Premium is paid'], indeed: ['yes', 'Free'], pages: ['yes', 'Free'] },
 ];
 const ICON: Record<Mark, string> = { yes: 'check', no: 'x', part: 'minus' };
@@ -30,7 +30,7 @@ const sources = [
 ---
 <section class="section container compare" id="compare" aria-labelledby="compare-title">
   <SectionHead eyebrow="Jobly vs others" id="compare-title" title="Fewer jobs. Fresher jobs." center
-    lead="LinkedIn and Indeed list far more jobs than Jobly. Jobly does one thing: recent tech jobs straight from the source, without an account." />
+    lead="LinkedIn and Indeed list far more jobs than Jobly. Jobly does one thing: recent jobs straight from the source, with design, development and IT sorted by area, without an account." />
 
   <fieldset class="picker">
     <legend class="sr-only">Compare Jobly with</legend>

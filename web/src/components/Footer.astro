@@ -3,7 +3,7 @@ import Icon from './Icon.astro';
 import { SITE, installHref } from '../lib/site';
 
 const cols = [
-  { title: 'Product', links: [['Features', '/#features'], ['How it works', '/how-it-works'], ['Jobs by role', '/jobs'], ['YC startup jobs', '/jobs/yc'], ['How dates work', '/how-dates-work']] },
+  { title: 'Product', links: [['Features', '/#features'], ['How it works', '/how-it-works'], ['Jobs by role', '/jobs'], ['Design & IT jobs', '/jobs/design-it'], ['YC startup jobs', '/jobs/yc'], ['Jobly Studio', SITE.studio], ['How dates work', '/how-dates-work']] },
   { title: 'Resources', links: [['Guides', '/guides'], ['Alternatives', '/alternatives'], ['Companies', '/companies'], ['Roadmap', '/roadmap'], ['FAQ', '/faq']] },
   { title: 'Company', links: [['Support', '/support'], ['Privacy', '/privacy'], ['Security', '/security'], ['Terms', '/terms']] },
 ];
@@ -25,7 +25,7 @@ const cols = [
     </div>
     <div class="container"><div class="bottom">
       <span>© {new Date().getFullYear()} Jobly. Not affiliated with the employers or job boards it lists.</span>
-      <span class="status" data-status="unknown"><span class="s-dot" aria-hidden="true"></span><span data-updated>Jobs update every 2 hours</span></span>
+      <span class="status" data-status="unknown"><span class="s-dot" aria-hidden="true"></span><span data-updated>Jobs update every 4 hours</span></span>
       <a class="mail" href={`mailto:${SITE.email}`}><Icon name="mail" size={14} />{SITE.email}</a>
     </div></div>
     <div class="container wm-wrap" aria-hidden="true"><div class="wordmark">Jobly</div></div>

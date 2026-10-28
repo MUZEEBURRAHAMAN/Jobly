@@ -1,27 +1,19 @@
-// Netlify Forms without leaving the page: post the form in the background and show the result in place.
-// Without JavaScript the form still posts normally and Netlify shows /thanks.
+// Feedback forms open the visitor's email app with the message filled in (the site is static: there is no form server).
+// Without JavaScript the form's own mailto: action does the same, less neatly.
+const LABELS: Record<string, string> = { name: 'Name', email: 'Reply to', topic: 'Topic', message: 'Message', reason: 'Reason', note: 'Note' };
+
 for (const form of document.querySelectorAll<HTMLFormElement>('form[data-form]')) {
   const status = form.querySelector<HTMLElement>('[data-form-status]');
-  const button = form.querySelector<HTMLButtonElement>('button[type="submit"]');
   const done = document.getElementById(form.dataset.form!);
-  const say = (state: 'ok' | 'error' | 'busy', text: string) => { if (status) { status.dataset.state = state; status.textContent = text; } };
 
-  form.addEventListener('submit', async (e) => {
+  form.addEventListener('submit', (e) => {
     e.preventDefault();
     if (!form.reportValidity()) return;
-    const body = new URLSearchParams();
-    new FormData(form).forEach((v, k) => body.append(k, String(v)));
-    if (button) button.disabled = true;
-    say('busy', 'Sending…');
-    try {
-      const res = await fetch('/', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body });
-      if (!res.ok) throw new Error(String(res.status));
-      form.reset();
-      if (done) { form.hidden = true; done.hidden = false; done.focus(); } else say('ok', 'Sent. Thank you!');
-    } catch {
-      say('error', `That didn't go through. Please try again, or email ${form.dataset.email}.`);
-    } finally {
-      if (button) button.disabled = false;
-    }
+    const lines: string[] = [];
+    new FormData(form).forEach((v, k) => { const text = String(v).trim(); if (text) lines.push(k === 'message' || k === 'note' ? `\n${text}` : `${LABELS[k] ?? k}: ${text}`); });
+    const href = `mailto:${form.dataset.email}?subject=${encodeURIComponent(form.dataset.subject ?? 'Jobly')}&body=${encodeURIComponent(lines.join('\n'))}`;
+    window.location.href = href;
+    if (done) { form.hidden = true; done.hidden = false; done.focus(); }
+    else if (status) { status.dataset.state = 'ok'; status.textContent = 'Your email app should now be open. Press Send there.'; }
   });
 }

@@ -5,7 +5,7 @@
   "version": "1.1.0",
   "minimum_chrome_version": "116",
   "description": "Fresh tech jobs with real posting dates, plus a job tracker, resume builder and autofill you review. Free, no account.",
-  "homepage_url": "https://joblyextension.netlify.app",
+  "homepage_url": "https://jobly-88t.pages.dev",
   "permissions": [
     "storage",
     "notifications",

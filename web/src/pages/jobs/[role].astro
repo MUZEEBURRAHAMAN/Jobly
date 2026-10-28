@@ -4,20 +4,20 @@ import PageHero from '../../components/page/PageHero.astro';
 import SectionHead from '../../components/SectionHead.astro';
 import GuideCard from '../../components/page/GuideCard.astro';
 import FinalCta from '../../components/landing/FinalCta.astro';
-import { ROLES, type Role } from '../../lib/roles';
+import { ALL_ROLES, DESIGN_IT, type Role } from '../../lib/roles';
 import { getGuides } from '../../lib/guides';
 
 export function getStaticPaths() {
-  return ROLES.map((role) => ({ params: { role: role.slug }, props: { role } }));
+  return [...ALL_ROLES, DESIGN_IT].map((role) => ({ params: { role: role.slug }, props: { role } }));
 }
 interface Props { role: Role }
 const { role } = Astro.props;
 const guide = role.guide ? (await getGuides()).find((g) => g.id === role.guide) : undefined;
-const others = ROLES.filter((r) => r.slug !== role.slug);
+const others = [DESIGN_IT, ...ALL_ROLES].filter((r) => r.slug !== role.slug);
 const ranges = [{ d: 1, l: 'Past 24 hours' }, { d: 7, l: 'Past week' }, { d: 14, l: 'Past 2 weeks' }, { d: 30, l: 'Past month' }];
 const title = `Latest ${role.name.toLowerCase()} jobs`;
 ---
-<Base title={title} description={`The newest ${role.plural} from company career pages, updated every two hours, each with its real posting date. No promoted listings, no account.`}>
+<Base title={title} description={`The newest ${role.plural} from company career pages, updated every four hours, each with its real posting date. No promoted listings, no account.`}>
   <PageHero crumbs={[{ label: 'Jobs', href: '/jobs' }, { label: role.name }]} eyebrow={`${role.name} jobs`} title={`${role.name} jobs, straight from the source.`} lead={role.lead} figure={role.figure} intensity={0.7}>
     <p class="live"><span class="dot" aria-hidden="true"></span><span data-week>…</span>&nbsp;posted in the last 7 days</p>
   </PageHero>
@@ -44,10 +44,10 @@ const title = `Latest ${role.name.toLowerCase()} jobs`;
     <div class="panel panel-pad">
       <div class="container about">
         <div>
-          <SectionHead eyebrow="What’s included" id="titles-title" title={`Every title Jobly counts as ${role.name.toLowerCase()}`}
-            lead="Employers name the same job in many ways. Jobly reads the title and groups these together, so one preference covers them all." />
+          <SectionHead eyebrow="What’s included" id="titles-title" title={role.id === 'design_it' ? 'Every area in this list' : `Every title Jobly counts as ${role.name.toLowerCase()}`}
+            lead={role.id === 'design_it' ? 'Each area also has its own page. Jobly sorts every job by its title, at every level from intern to VP.' : 'Employers name the same job in many ways. Jobly reads the title and groups these together, at every level from intern to VP.'} />
           <ul class="titles">{role.titles.map((t) => <li>{t}</li>)}</ul>
-          <p class="others">Other roles: {others.map((o, i) => <>{i > 0 && ' · '}<a href={`/jobs/${o.slug}`}>{o.name}</a></>)}</p>
+          <p class="others">Other lists: {others.map((o, i) => <>{i > 0 && ' · '}<a href={`/jobs/${o.slug}`}>{o.name}</a></>)}</p>
         </div>
         {guide && <div class="guide"><p class="g-label">Guide</p><GuideCard guide={guide} /></div>}
       </div>

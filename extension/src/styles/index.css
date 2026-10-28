@@ -251,6 +251,9 @@ a { color: inherit; }
 .chip-select.active { background: var(--foreground); color: var(--background); border-color: var(--foreground); }
 .chip-select option { color: var(--foreground); background: var(--background); }
 
+/* Preferences: the extra development, IT and design roles fold away until wanted */
+.more-roles summary { cursor: pointer; padding: var(--space-2) 0; color: var(--foreground); }
+
 /* Selectable card (preferences) */
 .option {
   display: flex; align-items: center; gap: var(--space-3); width: 100%; text-align: left;

@@ -1,5 +1,5 @@
 import { Job } from '../types';
-import { CATEGORY_IDS } from './format';
+import { CATEGORY_IDS, DESIGN_IT_IDS } from './format';
 
 export interface JobFilters {
   search: string;
@@ -48,8 +48,9 @@ export function passesFilters(job: Job, f: JobFilters, mutedCompanyIds: number[]
 /** Role chip: 'all_matching' (your preferences), a role id, a broad category from "More roles", or 'all'. */
 export function passesRole(job: Job, roleFilter: string, targetRoles: string[]): boolean {
   if (roleFilter === 'all') return true;
+  if (roleFilter === 'design_it') return DESIGN_IT_IDS.includes(job.category ?? job.normalized_role ?? '');
   if (CATEGORY_IDS.includes(roleFilter)) return job.category === roleFilter;
-  if (roleFilter === 'all_matching') return job.is_match || (!!job.normalized_role && targetRoles.includes(job.normalized_role));
+  if (roleFilter === 'all_matching') return job.is_match || (!!job.normalized_role && targetRoles.includes(job.normalized_role)) || (!!job.category && targetRoles.includes(job.category));
   return (job.normalized_role || '') === roleFilter;
 }
 
@@ -59,12 +60,13 @@ export function filterJobs(jobs: Job[], f: JobFilters, roleFilter: string, targe
 
 /** Count per chip, honouring every other filter, so each chip shows what you'd get if you picked it. */
 export function chipCounts(jobs: Job[], f: JobFilters, targetRoles: string[], muted: number[], roleIds: string[]): Record<string, number> {
-  const counts: Record<string, number> = { all_matching: 0, all: 0 };
+  const counts: Record<string, number> = { all_matching: 0, design_it: 0, all: 0 };
   roleIds.forEach((id) => { counts[id] = 0; });
   for (const job of jobs) {
     if (!passesFilters(job, f, muted)) continue;
     counts.all++;
     if (passesRole(job, 'all_matching', targetRoles)) counts.all_matching++;
+    if (passesRole(job, 'design_it', targetRoles)) counts.design_it++;
     if (job.normalized_role && counts[job.normalized_role] !== undefined) counts[job.normalized_role]++;
   }
   return counts;

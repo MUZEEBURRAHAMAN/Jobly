@@ -70,7 +70,7 @@ class TestExport(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(meta["columns"], list(COLUMNS))
         self.assertEqual(meta["files"]["product_design"]["3"]["jobs"], 1)
         self.assertEqual(meta["files"]["sales"]["3"]["jobs"], 1)
-        self.assertEqual(meta["files"]["engineering"]["u"]["jobs"], 1)
+        self.assertEqual(meta["files"]["backend"]["u"]["jobs"], 1)
         cats = {c["id"]: c["jobs"] for c in meta["categories"]}
         self.assertEqual((cats["product_design"], cats["sales"], cats["other"]), (1, 1, 0))
 
@@ -85,6 +85,8 @@ class TestExport(unittest.IsolatedAsyncioTestCase):
 
         stats = json.loads((v1 / "stats.json").read_text())
         self.assertEqual(stats["total_jobs"], 3)
+        # Design & IT: the designer (recent) and the backend engineer (no date); not the account executive
+        self.assertEqual((stats["design_it_jobs"], stats["design_it_week"], stats["jobs_week"]), (2, 1, 2))
         self.assertEqual(json.loads((v1 / "companies.json").read_text())[0]["job_count"], 4)  # API counts all active
         self.assertIn("Access-Control-Allow-Origin: *", (out / "_headers").read_text())
 

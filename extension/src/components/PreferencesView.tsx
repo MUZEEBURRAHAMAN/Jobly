@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { Check, ExternalLink, Save } from '../lib/icons';
 import { Preferences } from '../types';
-import { EMPLOYMENT_LABELS, ROLES, SENIORITIES } from '../lib/format';
+import { CATEGORIES, EMPLOYMENT_LABELS, ROLES, SENIORITIES } from '../lib/format';
 import { SyncSetting } from './SyncSetting';
 import { ConnectionsSetting } from './ConnectionsSetting';
 
-const SITE = 'https://joblyextension.netlify.app';
+const SITE = 'https://jobly-88t.pages.dev';
 const HELP = [['Guides', '/guides'], ['FAQ', '/faq'], ['Support', '/support'], ['Privacy', '/privacy']] as const;
 
 interface PreferencesViewProps {
@@ -62,6 +62,23 @@ export const PreferencesView: React.FC<PreferencesViewProps> = ({ preferences, o
             </button>
           );
         })}
+        <details className="more-roles" open={prefs.roles.some((r) => CATEGORIES.some((c) => c.id === r && c.group !== 'Business & other'))}>
+          <summary className="text-sm font-medium">More development, IT and design roles</summary>
+          <div className="stack" style={{ marginTop: 8 }}>
+            {CATEGORIES.filter((c) => c.group !== 'Business & other').map((c) => {
+              const checked = prefs.roles.includes(c.id);
+              return (
+                <button key={c.id} type="button" role="checkbox" aria-checked={checked} className="option" onClick={() => edit({ roles: toggle(prefs.roles, c.id) })}>
+                  <span className="tick" aria-hidden="true"><Check size={14} /></span>
+                  <span>
+                    <span className="font-medium" style={{ display: 'block' }}>{c.label}</span>
+                    <span className="text-xs muted">{c.hint}</span>
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </details>
         {prefs.roles.length === 0 && <p className="hint" role="status">No roles selected: "For you" will show every role.</p>}
       </fieldset>
 
