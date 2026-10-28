@@ -23,3 +23,6 @@ extension/dist-dev/
 
 # Store upload package (rebuilt from extension/dist)
 store-assets/*.zip
+
+# Playwright test output
+test-results/
