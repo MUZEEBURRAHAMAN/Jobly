@@ -5,7 +5,7 @@ import { CATEGORIES, EMPLOYMENT_LABELS, ROLES, SENIORITIES } from '../lib/format
 import { SyncSetting } from './SyncSetting';
 import { ConnectionsSetting } from './ConnectionsSetting';
 
-const SITE = 'https://joblyextension.netlify.app';
+const SITE = 'https://jobly-88t.pages.dev';
 const HELP = [['Guides', '/guides'], ['FAQ', '/faq'], ['Support', '/support'], ['Privacy', '/privacy']] as const;
 
 interface PreferencesViewProps {

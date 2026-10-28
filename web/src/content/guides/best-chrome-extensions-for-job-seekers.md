@@ -15,9 +15,9 @@ A job search has three slow parts: **finding** good jobs, **filling in** applica
 
 ### Jobly
 
-Our own extension, so take this with a pinch of salt. Jobly reads the career pages of hundreds of companies around the world, plus three remote job boards and lists tech jobs (product design, frontend, product management, AI/ML and fullstack) with their real posting date. It hides anything older than 60 days and alerts you to new matches. It's free, needs no account, and keeps your preferences in your browser.
+Our own extension, so take this with a pinch of salt. Jobly reads the career pages of 1,600+ companies around the world, plus three remote job boards, and lists every job with its real posting date, with design, development and IT sorted by area (product design, frontend, fullstack, backend, mobile, DevOps, data, QA, security, IT and more). It hides anything older than 60 days and alerts you to new matches. It's free, needs no account, and keeps your preferences in your browser.
 
-**Good for:** seeing new tech jobs from the source early. **Not for:** jobs outside tech, or applying for you.
+**Good for:** seeing new design, development and IT jobs from the source early. **Not for:** small local employers without an online careers page, or applying for you.
 
 ### HiringCafe (a website, not an extension)
 

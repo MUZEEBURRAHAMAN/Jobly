@@ -35,7 +35,7 @@ class Settings(BaseSettings):
     # Comma-separated Chrome extension IDs allowed by CORS. Empty = any extension (dev only; set after publishing).
     EXTENSION_IDS: str = ""
     # The public website may read job counts (hero search, freshness chart, companies list). Comma-separated origins.
-    SITE_ORIGINS: str = "https://joblyextension.netlify.app"
+    SITE_ORIGINS: str = "https://jobly-88t.pages.dev,https://jobly-studio.pages.dev,https://joblyextension.netlify.app"
     # Interactive API docs are off in production.
     ENABLE_DOCS: bool = False
     # Free-tier persistence: restore the newest snapshot from a GitHub release when the database is empty.

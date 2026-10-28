@@ -41,7 +41,7 @@ h1 { position: relative; margin-top: 18px; font-size: ${p.title.length > 48 ? 62
 </style></head><body><div class="card"><span class="b1"></span><span class="b2"></span><span class="b3"></span>
 <div class="logo"><img src="${LOGO}" alt="Jobly"></div>
 <p class="eyebrow">${esc(p.eyebrow)}</p><h1>${esc(p.title)}</h1>
-<div class="foot"><span>joblyextension.netlify.app</span><span class="pill">Free · No account</span></div></div></body></html>`;
+<div class="foot"><span>jobly-88t.pages.dev</span><span class="pill">Free · No account</span></div></div></body></html>`;
 
 const browser = await chromium.launch({ executablePath: chromiumPath(), args: ['--headless=new', '--allow-file-access-from-files'] });
 const page = await browser.newPage({ viewport: { width: 1200, height: 630 } });

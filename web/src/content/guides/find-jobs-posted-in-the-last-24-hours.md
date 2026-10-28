@@ -45,7 +45,7 @@ These pages list jobs the moment they're published, with no promoted listings in
 Checking is the slow part, so hand it off:
 
 1. **Set alerts on the big sites** with narrow searches: one role, one location or remote, and only a few keywords. Broad alerts bury the good jobs.
-2. **Use Jobly for tech roles.** Pick your roles once and Jobly checks every 60 to 90 minutes, then shows a desktop alert when a new match appears. It needs no account.
+2. **Use Jobly for design, development and IT roles.** Pick your roles once and Jobly checks every 60 to 90 minutes, then shows a desktop alert when a new match appears. It needs no account.
 3. **Set a daily time.** Morning works well, because many jobs are published during the employer's working day. Ten focused minutes beats an hour of scrolling.
 
 ## Apply quickly, but not carelessly

@@ -17,13 +17,11 @@ const reasons = [
 ---
 <Base title="Jobly was removed" description="Jobly has been removed from Chrome. Tell us in one click why you uninstalled it; it helps us make Jobly better." noindex>
   <PageHero crumbs={[{ label: 'Uninstalled' }]} eyebrow="Uninstalled" title="Jobly was removed." figure="drawer" intensity={0.7}
-    lead="Your preferences, saved jobs and alerts were deleted from this browser along with the extension. Would you tell us why you left? It takes ten seconds and asks for nothing about you." />
+    lead="Your preferences, saved jobs and alerts were deleted from this browser along with the extension. Would you tell us why you left? It takes ten seconds." />
 
   <section class="container leave">
     <div class="card">
-      <form name="uninstall" method="POST" action="/thanks" data-netlify="true" netlify-honeypot="bot-field" data-form="uninstall-done" data-email={SITE.email}>
-        <input type="hidden" name="form-name" value="uninstall" />
-        <p class="hp"><label>Leave this empty <input name="bot-field" tabindex="-1" autocomplete="off" /></label></p>
+      <form name="uninstall" method="POST" action={`mailto:${SITE.email}?subject=Why%20I%20uninstalled%20Jobly`} enctype="text/plain" data-form="uninstall-done" data-email={SITE.email} data-subject="Why I uninstalled Jobly">
         <fieldset class="field">
           <legend>Why did you uninstall Jobly?</legend>
           <div class="reasons">
@@ -37,15 +35,15 @@ const reasons = [
           <textarea class="input" id="u-note" name="note" maxlength="1000" placeholder="What would have made Jobly worth keeping?"></textarea>
         </div>
         <div class="submit">
-          <button class="btn btn-ink btn-lg" type="submit"><Icon name="send" size={17} />Send feedback</button>
+          <button class="btn btn-ink btn-lg" type="submit"><Icon name="send" size={17} />Write the email</button>
           <p class="form-status" data-form-status role="status" aria-live="polite"></p>
         </div>
-        <p class="small">No email, no identifier: we can’t tell who sent this. <a href="/privacy#forms-you-can-send-us">Privacy</a></p>
+        <p class="small">This opens your email app with your answer filled in; press Send there. We’ll see the address you send from, and use it only to reply if you asked something. <a href="/privacy#forms-you-can-send-us">Privacy</a></p>
       </form>
       <div class="done" id="uninstall-done" hidden tabindex="-1">
         <span class="done-icon"><Icon name="heart" size={22} /></span>
         <h2>Thank you</h2>
-        <p>We read every answer. Good luck with your search.</p>
+        <p>Your email app should now be open with your answer: press Send there. We read every one. Good luck with your search.</p>
       </div>
     </div>
 

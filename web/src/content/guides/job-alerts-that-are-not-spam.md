@@ -39,7 +39,7 @@ Jobly was built so alerts stay useful:
 ## A simple routine
 
 1. Two or three narrow alerts on the big sites.
-2. Jobly for tech roles from company career pages.
+2. Jobly for design, development and IT roles (or any role) from company career pages.
 3. Once a day, open your alerts, apply to the best two or three, and save the rest for later.
 
 Fewer, better alerts mean you actually read them.
@@ -52,7 +52,7 @@ Usually three to five in total. If you stop opening them, you have too many or t
 
 ### Why didn't Jobly alert me about a job I saw elsewhere?
 
-Jobly only covers tech roles from the career pages and job boards it reads, and only jobs that match your preferences. Check the [list of companies](/companies) and your role and keyword settings.
+Jobly only covers the career pages and job boards it reads, and only jobs that match your preferences. Check the [list of companies](/companies) and your role and keyword settings.
 
 ### Can I get Jobly alerts on my phone?
 

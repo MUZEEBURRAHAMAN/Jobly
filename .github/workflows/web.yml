@@ -1,0 +1,65 @@
+name: Deploy website and Studio
+
+# Builds the Astro website (web/) and Jobly Studio (studio/) and publishes both to Cloudflare Pages
+# (needs the CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID repository secrets).
+# Runs on every push to main that touches them, and after each crawl so the numbers baked into the pages
+# (job counts, companies, the job map) stay current.
+on:
+  push:
+    branches: [main]
+    paths:
+      - "web/**"
+      - "studio/**"
+      - "shared/**"
+      - ".github/workflows/web.yml"
+  workflow_run:
+    workflows: ["Crawl and publish jobs"]
+    types: [completed]
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+concurrency:
+  group: web-deploy
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      WEB_PROJECT: ${{ vars.WEB_PROJECT || 'jobly' }}
+      STUDIO_PROJECT: ${{ vars.STUDIO_PROJECT || 'jobly-studio' }}
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: |
+            web/package-lock.json
+            studio/package-lock.json
+
+      - name: Build website
+        working-directory: web
+        run: |
+          npm ci
+          npm run build
+
+      - name: Build Studio
+        working-directory: studio
+        run: |
+          npm ci
+          npm run build
+
+      - name: Publish to Cloudflare Pages
+        run: |
+          if [ -z "$CLOUDFLARE_API_TOKEN" ] || [ -z "$CLOUDFLARE_ACCOUNT_ID" ]; then
+            echo "::warning::CLOUDFLARE_API_TOKEN / CLOUDFLARE_ACCOUNT_ID secrets are not set; skipping the deploy"
+            exit 0
+          fi
+          npx -y wrangler@4 pages deploy web/dist --project-name "$WEB_PROJECT" --branch main --commit-dirty=true
+          npx -y wrangler@4 pages deploy studio/dist --project-name "$STUDIO_PROJECT" --branch main --commit-dirty=true

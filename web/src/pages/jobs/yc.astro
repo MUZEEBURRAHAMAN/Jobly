@@ -25,7 +25,7 @@ const ranges = [{ d: 7, l: 'Past week' }, { d: 14, l: 'Past 2 weeks' }, { d: 30,
     </div>
     <fieldset class="roles">
       <legend class="sr-only">Role</legend>
-      <label><input type="radio" name="role" value="tech" checked /><span>All five roles</span></label>
+      <label><input type="radio" name="role" value="design_it" checked /><span>All design &amp; IT</span></label>
       {ROLES.map((r) => <label><input type="radio" name="role" value={r.id} /><span>{r.name}</span></label>)}
     </fieldset>
     <p class="status small" data-status role="status" aria-live="polite">Loading the latest jobs…</p>

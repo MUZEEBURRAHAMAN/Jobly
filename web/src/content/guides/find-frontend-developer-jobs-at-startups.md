@@ -15,7 +15,7 @@ Startups are a good place for frontend developers: you ship to real users quickl
 - **Startup job boards.** Boards run by investors and accelerators list roles at the companies they back.
 - **Founders and engineers on social media.** Early hires are often announced in a post before a formal listing exists.
 
-Jobly reads hundreds of these careers pages, including many startups, and shows new frontend jobs within a few hours of going up.
+Jobly reads 1,600+ of these careers pages, including many startups, and shows new frontend jobs within a few hours of going up.
 
 ## Search for the right titles
 

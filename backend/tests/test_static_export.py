@@ -85,6 +85,8 @@ class TestExport(unittest.IsolatedAsyncioTestCase):
 
         stats = json.loads((v1 / "stats.json").read_text())
         self.assertEqual(stats["total_jobs"], 3)
+        # Design & IT: the designer (recent) and the backend engineer (no date); not the account executive
+        self.assertEqual((stats["design_it_jobs"], stats["design_it_week"], stats["jobs_week"]), (2, 1, 2))
         self.assertEqual(json.loads((v1 / "companies.json").read_text())[0]["job_count"], 4)  # API counts all active
         self.assertIn("Access-Control-Allow-Origin: *", (out / "_headers").read_text())
 

@@ -74,7 +74,7 @@ async function ensureAlarm() {
 void ensureAlarm();
 
 // After an uninstall Chrome opens a short, optional feedback page. It carries no identifier.
-void chrome.runtime.setUninstallURL('https://joblyextension.netlify.app/uninstall');
+void chrome.runtime.setUninstallURL('https://jobly-88t.pages.dev/uninstall');
 
 chrome.runtime.onInstalled.addListener(async (details) => {
   await chrome.action.setBadgeBackgroundColor({ color: '#06b6d4' });

@@ -1,13 +1,15 @@
 // One place for links and facts used across the site.
 export const SITE = {
   name: 'Jobly',
-  url: 'https://joblyextension.netlify.app',
+  url: 'https://jobly-88t.pages.dev',
   email: 'rahamanmuzeeb1108@gmail.com',
   // The Chrome Web Store listing (live since 2026-10-26). Empty = the buttons fall back to /how-it-works#install.
   storeUrl: 'https://chromewebstore.google.com/detail/phdobnnjceecemndkgeclghkjcfjfgfl',
   api: (import.meta.env.PUBLIC_API_BASE as string | undefined) || 'https://jobly-yd6l.onrender.com',
   // Jobly's job data as static files (shared/jobdata.ts): read first, the API is the fallback
   data: (import.meta.env.PUBLIC_DATA_BASE as string | undefined) || 'https://jobly-data.pages.dev/v1',
+  // Jobly Studio: résumés and cover letters tailored to a posting, in the browser
+  studio: 'https://jobly-studio.pages.dev',
   github: 'https://github.com/MUZEEBURRAHAMAN/Jobly',
 };
 
@@ -22,7 +24,7 @@ export const MENUS: { id: string; label: string; items: MenuItem[]; preview: { t
     items: [
       { label: 'Jobs feed', text: 'The freshest matches first, each with its posting date.', href: '/#features', icon: 'briefcase' },
       { label: 'Alerts', text: 'A notification when a new match appears.', href: '/#features', icon: 'bell' },
-      { label: 'Saved jobs', text: 'A shortlist that stays on your device.', href: '/#features', icon: 'bookmark' },
+      { label: 'Jobly Studio', text: 'Resumes and cover letters tailored to a job, free.', href: 'https://jobly-studio.pages.dev', icon: 'sparkles' },
       { label: 'Filters', text: 'Date posted, experience, salary, location, remote.', href: '/#features', icon: 'sliders-horizontal' },
       { label: 'How it works', text: 'From career page to your toolbar.', href: '/how-it-works', icon: 'layers' },
       { label: 'How dates work', text: 'Where dates come from and the 60-day rule.', href: '/how-dates-work', icon: 'calendar-clock' },

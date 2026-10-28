@@ -21,12 +21,12 @@ import json
 import re
 import sqlite3
 import sys
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from html import unescape
 from pathlib import Path
 from typing import Any
 
-from .categories import CATEGORIES, classify_category
+from .categories import CATEGORIES, DESIGN_AND_IT, classify_category
 from .config import settings
 
 VERSION = 1
@@ -139,6 +139,21 @@ async def export(db_path: Path, out: Path, now: datetime | None = None) -> dict[
         _write(root / "desc" / f"{shard}.json", docs)
 
     stats, geo, companies = await _api_documents()
+    # The website quotes design, development and IT counts too ("Design & IT": the tech roles and every dev/IT area)
+    design_it = set(DESIGN_AND_IT)
+    day, week = (now - timedelta(days=1)).isoformat(), (now - timedelta(days=7)).isoformat()
+    counts = {"design_it_jobs": 0, "design_it_today": 0, "design_it_week": 0, "jobs_week": 0}
+    pi = COLUMNS.index("posted_at")
+    for (cat, _bucket), cat_rows in files.items():
+        for row in cat_rows:
+            p = row[pi] or ""
+            in_week = p >= week
+            counts["jobs_week"] += in_week
+            if cat in design_it:
+                counts["design_it_jobs"] += 1
+                counts["design_it_today"] += p >= day
+                counts["design_it_week"] += in_week
+    stats = {**stats, **counts}
     _write(root / "stats.json", stats)
     _write(root / "geo.json", geo)
     _write(root / "companies.json", companies)

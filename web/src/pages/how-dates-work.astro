@@ -9,11 +9,11 @@ import { SOURCES } from '../lib/sources';
 const rules = [
   { icon: 'calendar', title: 'The employer’s own date', text: 'Jobly reads the posting date from the system the employer published the job in, not the day Jobly happened to find it.' },
   { icon: 'filter-x', title: 'Nothing older than 60 days', text: 'Jobs posted more than 60 days ago are never stored, and jobs that pass the limit are removed at the next refresh.' },
-  { icon: 'x', title: 'Closed jobs go away', text: 'When an employer takes a job down, Jobly stops showing it at the next refresh, within about two hours.' },
+  { icon: 'x', title: 'Closed jobs go away', text: 'When an employer takes a job down, Jobly stops showing it at the next refresh, within about four hours.' },
 ];
 const life = [
   { when: 'Day 0', title: 'Posted', text: 'The employer publishes the job on its careers page or a job board.' },
-  { when: 'Within 2 hours', title: 'Found', text: 'Jobly’s server reads every source every two hours and stores the job with its real date.' },
+  { when: 'Within 4 hours', title: 'Found', text: 'Jobly reads every source every four hours and stores the job with its real date.' },
   { when: 'Within 60–90 min', title: 'You’re told', text: 'Your browser checks for new matches and shows an alert if the job fits your preferences.' },
   { when: 'Day 60', title: 'Retired', text: 'The job drops out of Jobly, even if the employer still lists it.' },
 ];
