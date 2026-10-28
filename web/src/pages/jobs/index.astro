@@ -5,9 +5,9 @@ import Figure from '../../components/Figure.astro';
 import Icon from '../../components/Icon.astro';
 import JobMap from '../../components/landing/JobMap.astro';
 import FinalCta from '../../components/landing/FinalCta.astro';
-import { AREAS, DESIGN_IT, ROLES } from '../../lib/roles';
+import { AREAS, DESIGN_IT, EVERY, OTHERS, ROLES } from '../../lib/roles';
 ---
-<Base title="Jobs by role" description="Browse the newest design, development and IT jobs from company career pages by role: product design, frontend, backend, mobile, DevOps, data, security, IT and more. Updated every four hours.">
+<Base title="Jobs by role" description="Browse the newest jobs from company career pages by role: product design, frontend, backend, mobile, DevOps, data, security, IT, plus marketing, sales, finance and every other role. Updated every four hours.">
   <PageHero crumbs={[{ label: 'Jobs' }]} eyebrow="Jobs" title="Every design, development and IT job, by role." figure="basket" intensity={0.7}
     lead="Pick a role to see what went up on company career pages most recently. Jobly lists every role, and sorts design, development and IT jobs into their own lists, at every level from intern to VP. For alerts on new ones, add the extension." />
   <section class="container all-in-one">
@@ -32,19 +32,29 @@ import { AREAS, DESIGN_IT, ROLES } from '../../lib/roles';
       ))}
     </ul>
   </section>
-  <section class="container roles areas-wrap" data-role-counts>
-    <h2 class="group-title">More development, IT and design</h2>
-    <ul class="areas" data-stagger>
-      {AREAS.map((r) => (
-        <li data-reveal>
-          <a class="area" href={`/jobs/${r.slug}`}>
-            <span class="name">{r.name}</span>
-            <span class="count"><span data-count-role={r.id}>…</span> posted this week</span>
-            <span class="titles">{r.titles.slice(0, 4).join(' · ')}</span>
-          </a>
-        </li>
-      ))}
-    </ul>
+  {[{ title: 'More development, IT and design', roles: AREAS }, { title: 'Every other role', roles: OTHERS }].map((g) => (
+    <section class="container roles" data-role-counts>
+      <h2 class="group-title">{g.title}</h2>
+      <ul class="grid-auto" data-stagger>
+        {g.roles.map((r) => (
+          <li data-reveal>
+            <a class="card" href={`/jobs/${r.slug}`}>
+              <span class="art"><Figure name={r.figure} intensity={0.55} /></span>
+              <span class="name">{r.name}</span>
+              <span class="count"><span data-count-role={r.id}>…</span> posted this week</span>
+              <span class="titles">{r.titles.slice(0, 4).join(' · ')}</span>
+              <span class="go">See the jobs <Icon name="arrow-right" size={15} class="arrow" /></span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </section>
+  ))}
+  <section class="container every-wrap" data-role-counts>
+    <a class="yc" href={`/jobs/${EVERY.slug}`} data-reveal>
+      <span class="yc-text"><strong>Every job, in one list</strong><span>All roles from every employer and job board Jobly reads, up to two months old. <span data-count-role={EVERY.id}>…</span> posted this week.</span></span>
+      <span class="go">See the jobs <Icon name="arrow-right" size={15} class="arrow" /></span>
+    </a>
   </section>
   <section class="container yc-wrap">
     <a class="yc" href="/jobs/yc" data-reveal>
@@ -69,13 +79,9 @@ import { AREAS, DESIGN_IT, ROLES } from '../../lib/roles';
   .roles { padding-block: clamp(24px, 3vw, 40px) clamp(32px, 4vw, 48px); }
   .all-in-one { padding-top: clamp(40px, 5vw, 64px); }
   .group-title { font-size: 1.5rem; font-weight: 500; letter-spacing: -0.025em; margin-bottom: 20px; }
-  .areas-wrap { padding-bottom: var(--section-y); }
-  .areas { list-style: none; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px; }
-  .area { height: 100%; display: flex; flex-direction: column; gap: 4px; padding: 18px 20px; border-radius: 18px; background: var(--card); border: 1px solid var(--border);
-    transition: border-color var(--dur) ease, box-shadow var(--dur) ease; }
-  .area:hover { border-color: var(--border-strong); box-shadow: var(--shadow-md); }
-  .area .name { padding: 0; font-size: 1.125rem; }
-  .area .count, .area .titles { padding: 0; }
+  @media (min-width: 961px) { .grid-auto li:last-child:nth-child(3n+1) { grid-column: 2; } }
+  .every-wrap { padding-block: 0 16px; }
+  .grid-auto { list-style: none; padding: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
   .yc-text [data-count-role] { color: var(--brand); font-weight: 600; }
   .grid { list-style: none; padding: 0; display: grid; grid-template-columns: repeat(6, 1fr); gap: 16px; }
   .grid li { grid-column: span 2; }
@@ -94,6 +100,6 @@ import { AREAS, DESIGN_IT, ROLES } from '../../lib/roles';
   .go { margin-top: auto; padding-top: 10px; display: inline-flex; align-items: center; gap: 6px; font-weight: 500; }
   .card :global(.arrow) { transition: transform var(--dur) var(--ease-out); }
   .card:hover :global(.arrow) { transform: translateX(3px); }
-  @media (max-width: 960px) { .grid { grid-template-columns: 1fr 1fr; } .grid li, .grid li:nth-child(4) { grid-column: auto; } }
-  @media (max-width: 600px) { .grid { grid-template-columns: 1fr; } }
+  @media (max-width: 960px) { .grid, .grid-auto { grid-template-columns: 1fr 1fr; } .grid li, .grid li:nth-child(4) { grid-column: auto; } }
+  @media (max-width: 600px) { .grid, .grid-auto { grid-template-columns: 1fr; } }
 </style>
