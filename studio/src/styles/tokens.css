@@ -1,0 +1,68 @@
+/* ---------- Tokens: light (default) — the Jobly design system, shared with the extension ---------- */
+/* ---------- Tokens: light (default) ---------- */
+:root {
+  color-scheme: light;
+
+  --background: #ffffff;
+  --foreground: #0a0a0a;
+  --card: #ffffff;
+  --card-foreground: #0a0a0a;
+  --muted: #f4f4f5;
+  --muted-foreground: #52525b;      /* 7.7:1 on white, 6.9:1 on --muted */
+  --border: #e4e4e7;
+  --input: #d4d4d8;
+  --primary: #18181b;
+  --primary-foreground: #fafafa;
+  --secondary: #f4f4f5;
+  --secondary-foreground: #18181b;
+  --hover: #f4f4f5;
+
+  --brand: #b83a0a;                 /* 5.8:1 on white, 5.2:1 on --brand-soft */
+  --brand-foreground: #ffffff;
+  --brand-soft: #fff1e8;
+  --success: #166534;
+  --success-soft: #e8f6ee;
+  --warning: #92400e;
+  --warning-soft: #fef3c7;
+  --destructive: #b91c1c;
+  --destructive-soft: #fee8e8;
+  --ring: #b83a0a;
+
+  --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.06);
+  --shadow-md: 0 8px 24px rgb(0 0 0 / 0.12);
+
+}
+
+/* ---------- Tokens: dark ---------- */
+[data-theme="dark"] {
+  color-scheme: dark;
+
+  --background: #0a0a0a;
+  --foreground: #fafafa;
+  --card: #111113;
+  --card-foreground: #fafafa;
+  --muted: #1c1c1f;
+  --muted-foreground: #a1a1aa;      /* 7.9:1 on background, 6.8:1 on --muted */
+  --border: #27272a;
+  --input: #3f3f46;
+  --primary: #fafafa;
+  --primary-foreground: #18181b;
+  --secondary: #1c1c1f;
+  --secondary-foreground: #fafafa;
+  --hover: #1c1c1f;
+
+  --brand: #fb923c;                 /* 8.6:1 on background */
+  --brand-foreground: #1a0f08;
+  --brand-soft: #2a1608;
+  --success: #4ade80;
+  --success-soft: #0f2a1b;
+  --warning: #fbbf24;
+  --warning-soft: #2b2108;
+  --destructive: #f87171;
+  --destructive-soft: #2d1212;
+  --ring: #fb923c;
+
+  --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.5);
+  --shadow-md: 0 8px 24px rgb(0 0 0 / 0.55);
+
+}

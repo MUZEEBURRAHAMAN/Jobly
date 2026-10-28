@@ -1,0 +1,10 @@
+{
+  "name": "Jobly Studio",
+  "short_name": "Studio",
+  "description": "Tailored resumes and cover letters from your own profile, and every application tracked.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#b83a0a",
+  "icons": [{ "src": "/icon-128.png", "sizes": "128x128", "type": "image/png" }, { "src": "/apple-touch-icon.png", "sizes": "180x180", "type": "image/png" }]
+}

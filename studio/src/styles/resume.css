@@ -1,0 +1,70 @@
+/* Resume and letter pages. Sized in real units so the screen preview and the printed PDF match. */
+.page {
+  --accent: #b83a0a;
+  width: 210mm; min-height: 297mm; padding: 16mm 17mm; margin: 0 auto;
+  background: #fff; color: #18181b; box-shadow: 0 2px 16px rgb(0 0 0 / 0.12);
+  font-family: 'Switzer', ui-sans-serif, system-ui, sans-serif; font-size: 10pt; line-height: 1.42;
+}
+.page.letter-size { width: 8.5in; min-height: 11in; }
+.page * { color: inherit; }
+.page h1 { font-size: 22pt; font-weight: 700; letter-spacing: -0.02em; margin: 0; }
+.page .r-headline { font-size: 11.5pt; color: var(--accent); font-weight: 600; margin-top: 2pt; }
+.page .r-contact { display: flex; flex-wrap: wrap; gap: 2pt 10pt; margin-top: 6pt; font-size: 9pt; color: #52525b; }
+.page .r-contact a { color: #52525b; text-decoration: none; }
+.page section { margin-top: 12pt; break-inside: auto; }
+.page h2 { font-size: 9pt; text-transform: uppercase; letter-spacing: 0.1em; font-weight: 700; color: var(--accent); margin: 0 0 5pt; padding-bottom: 3pt; border-bottom: 0.75pt solid #e4e4e7; }
+.page .r-entry { margin-top: 7pt; break-inside: avoid; }
+.page .r-entry:first-of-type { margin-top: 0; }
+.page .r-entry-head { display: flex; justify-content: space-between; gap: 10pt; align-items: baseline; }
+.page .r-entry-head b { font-weight: 600; font-size: 10.5pt; }
+.page .r-entry-head span { font-size: 9pt; color: #52525b; white-space: nowrap; }
+.page .r-sub { font-size: 9.5pt; color: #3f3f46; }
+.page ul { margin: 3pt 0 0; padding-left: 13pt; }
+.page li { margin: 1.5pt 0; }
+.page li::marker { color: var(--accent); }
+.page .r-skills { display: flex; flex-wrap: wrap; gap: 3pt 6pt; }
+.page .r-skills span { padding: 1pt 6pt; border-radius: 3pt; background: #f4f4f5; font-size: 9pt; }
+.page .r-skill-group { margin-top: 2pt; }
+.page .r-skill-group b { font-weight: 600; }
+.page p { margin: 0; }
+
+/* Classic: centred header, black rules */
+.page.t-classic { --accent: #18181b; }
+.page.t-classic header { text-align: center; }
+.page.t-classic .r-contact { justify-content: center; }
+.page.t-classic h2 { letter-spacing: 0.14em; border-bottom-color: #18181b; }
+.page.t-classic .r-headline { color: #3f3f46; }
+
+/* Modern: accent bar, accent headings (default) */
+.page.t-modern header { border-left: 4pt solid var(--accent); padding-left: 10pt; }
+
+/* Compact: tighter spacing so a long career fits a page */
+.page.t-compact { font-size: 9.2pt; line-height: 1.35; padding: 12mm 14mm; }
+.page.t-compact h1 { font-size: 18pt; }
+.page.t-compact section { margin-top: 9pt; }
+.page.t-compact .r-entry { margin-top: 5pt; }
+.page.t-compact header { display: flex; justify-content: space-between; align-items: flex-end; gap: 12pt; }
+.page.t-compact .r-contact { justify-content: flex-end; text-align: right; max-width: 55%; }
+
+/* Serif: traditional, for law, finance, academia */
+.page.t-serif { font-family: 'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, serif; font-size: 10.5pt; }
+.page.t-serif h1 { font-weight: 600; letter-spacing: 0; }
+.page.t-serif h2 { text-transform: none; letter-spacing: 0; font-size: 12pt; font-weight: 600; font-style: italic; }
+
+/* Letter */
+.page .l-head { margin-bottom: 18pt; }
+.page .l-head h1 { font-size: 16pt; }
+.page .l-date { margin: 0 0 14pt; color: #52525b; }
+.page .l-to { margin-bottom: 14pt; }
+.page .l-body p { margin: 0 0 9pt; }
+.page .l-sign { margin-top: 16pt; }
+.page .flag { background: #fef3c7; border-radius: 2pt; }
+
+#print-root { display: none; }
+@media print {
+  body { background: #fff !important; }
+  body > *:not(#print-root) { display: none !important; }
+  #print-root { display: block; }
+  #print-root .page { box-shadow: none; margin: 0; width: auto; min-height: 0; }
+  #print-root .page .flag { background: none; }
+}

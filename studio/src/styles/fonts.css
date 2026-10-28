@@ -1,0 +1,6 @@
+/* Switzer by Jérémie Hornus / Indian Type Foundry, ITF Free Font License 2.0 (embedding in applications is permitted;
+   official WOFF2 files, unmodified; license in assets/fonts/switzer). Bundled, so nothing loads from a font CDN. */
+@font-face { font-family: 'Switzer'; font-style: normal; font-display: swap; font-weight: 400; src: url('../assets/fonts/Switzer-Regular.woff2') format('woff2'); }
+@font-face { font-family: 'Switzer'; font-style: normal; font-display: swap; font-weight: 500; src: url('../assets/fonts/Switzer-Medium.woff2') format('woff2'); }
+@font-face { font-family: 'Switzer'; font-style: normal; font-display: swap; font-weight: 600; src: url('../assets/fonts/Switzer-Semibold.woff2') format('woff2'); }
+@font-face { font-family: 'Switzer'; font-style: normal; font-display: swap; font-weight: 700; src: url('../assets/fonts/Switzer-Bold.woff2') format('woff2'); }

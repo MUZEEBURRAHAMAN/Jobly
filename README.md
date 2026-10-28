@@ -73,6 +73,7 @@ cd extension && npx tsc --noEmit             # type-check
 | `DATABASE_PATH` | `./hiring_radar.db` | SQLite file. Render's free tier has no persistent disk: the server re-seeds and re-crawls on every restart |
 | `ADMIN_TOKEN` | *(unset)* | Enables company create/toggle and `?wait_for_completion=true` via the `X-Admin-Token` header. Unset = disabled |
 | `EXTENSION_IDS` | *(any extension)* | Comma-separated Chrome extension IDs allowed by CORS. **Set this after publishing** |
+| `SITE_ORIGINS` | `https://joblyextension.netlify.app` | Comma-separated web origins allowed by CORS: the website and Jobly Studio (for example `https://jobly-studio.pages.dev`) |
 | `ENABLE_DOCS` | `false` | Serves `/docs` when `true` |
 | `AUTO_SYNC_INTERVAL_HOURS` | `2` | Background crawl interval |
 | `SNAPSHOT_REPO` / `SNAPSHOT_TAG` / `SNAPSHOT_ASSET` | `MUZEEBURRAHAMAN/Jobly` / `snapshot` / `jobly.db.gz` | Where an empty server restores a database snapshot from (set `SNAPSHOT_REPO=` empty to disable) |
@@ -108,6 +109,10 @@ Employers are listed in `backend/app/data/companies.json`; find and add them wit
 Add it to `backend/app/data/companies.json` (or, in a dev build, use the **Companies → Add** form with `ADMIN_TOKEN` set). The server picks up new entries on its next start.
 
 ---
+
+## Jobly Studio
+
+`studio/` is a separate web app: tailored resumes and cover letters from one profile, with a fact check that keeps drafts to what the profile says, and an application tracker. It runs entirely in the browser (no server, no account) and deploys as a static site. See [studio/README.md](studio/README.md).
 
 ## Directory Structure
 
