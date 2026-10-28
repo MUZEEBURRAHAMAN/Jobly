@@ -4,7 +4,7 @@ import { Busy, Empty, Field, Text } from '../components/ui';
 import { ROLES, ageLabel, jobAsPostingText, searchJobs, withDescription, type JobQuery, type JoblyJob } from '../lib/jobs';
 import { startFromPosting } from './NewApplication';
 
-const DEFAULT: JobQuery = { role: 'tech', search: '', location: '', days: 14, remote: false, yc: false };
+const DEFAULT: JobQuery = { role: 'design_it', search: '', location: '', days: 14, remote: false, yc: false };
 
 export function FindJobs() {
   const [q, setQ] = useState<JobQuery>(DEFAULT);
@@ -43,7 +43,7 @@ export function FindJobs() {
         <div className="grid-4" style={{ alignItems: 'end' }}>
           <Field label="Role">
             <select className="select" value={q.role} onChange={(e) => setQ({ ...q, role: e.target.value })}>
-              {['Tech', 'More roles'].map((g) => (
+              {['Design & IT', 'More roles'].map((g) => (
                 <optgroup key={g} label={g}>
                   {ROLES.filter((r) => r.group === g).map((r) => <option key={r.id} value={r.id}>{r.label}</option>)}
                 </optgroup>

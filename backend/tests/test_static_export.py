@@ -70,7 +70,7 @@ class TestExport(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(meta["columns"], list(COLUMNS))
         self.assertEqual(meta["files"]["product_design"]["3"]["jobs"], 1)
         self.assertEqual(meta["files"]["sales"]["3"]["jobs"], 1)
-        self.assertEqual(meta["files"]["engineering"]["u"]["jobs"], 1)
+        self.assertEqual(meta["files"]["backend"]["u"]["jobs"], 1)
         cats = {c["id"]: c["jobs"] for c in meta["categories"]}
         self.assertEqual((cats["product_design"], cats["sales"], cats["other"]), (1, 1, 0))
 

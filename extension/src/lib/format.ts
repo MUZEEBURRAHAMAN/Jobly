@@ -21,22 +21,32 @@ export const ROLES = [
   { id: 'fullstack_engineering', label: 'Fullstack engineering', hint: 'Fullstack, software engineer, cloud', short: 'Fullstack' },
 ] as const;
 
-/** Every other kind of job, for "More roles" (ids match backend/app/categories.py). */
+/** Every other kind of job, for "More roles" and Preferences (ids match backend/app/categories.py), by group. */
 export const CATEGORIES = [
-  { id: 'engineering', label: 'Engineering' },
-  { id: 'data', label: 'Data & analytics' },
-  { id: 'design', label: 'Design & creative' },
-  { id: 'marketing', label: 'Marketing' },
-  { id: 'sales', label: 'Sales & business development' },
-  { id: 'customer', label: 'Customer success & support' },
-  { id: 'people', label: 'People & recruiting' },
-  { id: 'finance', label: 'Finance & accounting' },
-  { id: 'legal', label: 'Legal & compliance' },
-  { id: 'operations', label: 'Operations' },
-  { id: 'healthcare', label: 'Healthcare & science' },
-  { id: 'other', label: 'Other' },
+  { id: 'backend', label: 'Backend development', hint: 'Java, Python, Go, Node, .NET', group: 'Development & IT' },
+  { id: 'mobile', label: 'Mobile development', hint: 'iOS, Android, Flutter, React Native', group: 'Development & IT' },
+  { id: 'devops', label: 'DevOps, cloud & SRE', hint: 'Platform, infrastructure, AWS, Kubernetes', group: 'Development & IT' },
+  { id: 'qa', label: 'QA & testing', hint: 'Test automation, SDET, quality engineering', group: 'Development & IT' },
+  { id: 'security', label: 'Cybersecurity', hint: 'Security engineering, SOC, pen testing', group: 'Development & IT' },
+  { id: 'it', label: 'IT, support & networks', hint: 'IT support, sysadmin, networks, databases', group: 'Development & IT' },
+  { id: 'enterprise', label: 'ERP, CRM & enterprise apps', hint: 'Salesforce, SAP, ServiceNow, Oracle', group: 'Development & IT' },
+  { id: 'data', label: 'Data & analytics', hint: 'Data engineering, analytics, BI', group: 'Development & IT' },
+  { id: 'engineering', label: 'Other engineering', hint: 'Embedded, firmware, game, architects', group: 'Development & IT' },
+  { id: 'design', label: 'Graphic, brand & creative design', hint: 'Graphic, motion, illustration, art direction', group: 'Design' },
+  { id: 'marketing', label: 'Marketing', hint: '', group: 'Business & other' },
+  { id: 'sales', label: 'Sales & business development', hint: '', group: 'Business & other' },
+  { id: 'customer', label: 'Customer success & support', hint: '', group: 'Business & other' },
+  { id: 'people', label: 'People & recruiting', hint: '', group: 'Business & other' },
+  { id: 'finance', label: 'Finance & accounting', hint: '', group: 'Business & other' },
+  { id: 'legal', label: 'Legal & compliance', hint: '', group: 'Business & other' },
+  { id: 'operations', label: 'Operations', hint: '', group: 'Business & other' },
+  { id: 'healthcare', label: 'Healthcare & science', hint: '', group: 'Business & other' },
+  { id: 'other', label: 'Other', hint: '', group: 'Business & other' },
 ] as const;
 export const CATEGORY_IDS: string[] = CATEGORIES.map((c) => c.id);
+export const CATEGORY_GROUPS = ['Development & IT', 'Design', 'Business & other'] as const;
+/** The "Design & IT" chip: the five tech roles and every development, IT and design category. */
+export const DESIGN_IT_IDS: string[] = [...ROLES.map((r) => r.id as string), ...CATEGORIES.filter((c) => c.group !== 'Business & other').map((c) => c.id)];
 
 export const SENIORITIES = [
   { id: 'intern', label: 'Intern' },

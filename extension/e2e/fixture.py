@@ -65,6 +65,7 @@ async def main():
         # jobs outside the five tech roles (listed under "More roles")
         await add("Enterprise Account Executive", None, 5, PLACES[0], now - timedelta(days=1))
         await add("Technical Recruiter", None, 6, PLACES[2], now - timedelta(days=3), remote=True)
+        await add("Senior Java Developer", None, 7, PLACES[1], now - timedelta(days=2))
         await add("Broken Link Designer", "product_design", 2, PLACES[1], now - timedelta(days=2), url="javascript:alert(1)")
         await add("Extraordinarily Long Title " + "Wordsmith " * 18 + "Engineer", "frontend_engineering", 3, PLACES[4], now - timedelta(days=1))
         await db.commit()
