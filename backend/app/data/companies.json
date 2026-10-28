@@ -6847,5 +6847,5541 @@
     "industry": null,
     "region": "yc",
     "yc_batch": "X26"
+  },
+  {
+    "name": "Anthropic",
+    "slug": "anthropic",
+    "careers_url": "https://boards.greenhouse.io/anthropic",
+    "source_type": "greenhouse",
+    "source_identifier": "anthropic",
+    "industry": "Artificial Intelligence"
+  },
+  {
+    "name": "Tenstorrent",
+    "slug": "tenstorrent",
+    "careers_url": "https://boards.greenhouse.io/tenstorrent",
+    "source_type": "greenhouse",
+    "source_identifier": "tenstorrent",
+    "industry": "Artificial Intelligence"
+  },
+  {
+    "name": "Arize AI",
+    "slug": "arize-ai",
+    "careers_url": "https://boards.greenhouse.io/arizeai",
+    "source_type": "greenhouse",
+    "source_identifier": "arizeai",
+    "industry": "Artificial Intelligence"
+  },
+  {
+    "name": "Galileo",
+    "slug": "galileo",
+    "careers_url": "https://boards.greenhouse.io/galileo",
+    "source_type": "greenhouse",
+    "source_identifier": "galileo",
+    "industry": "Artificial Intelligence"
+  },
+  {
+    "name": "Invisible Technologies",
+    "slug": "invisible-technologies",
+    "careers_url": "https://jobs.smartrecruiters.com/Invisibletechnologies",
+    "source_type": "smartrecruiters",
+    "source_identifier": "Invisibletechnologies",
+    "industry": "Artificial Intelligence"
+  },
+  {
+    "name": "Turing",
+    "slug": "turing",
+    "careers_url": "https://boards.greenhouse.io/turing",
+    "source_type": "greenhouse",
+    "source_identifier": "turing",
+    "industry": "Artificial Intelligence"
+  },
+  {
+    "name": "Suki",
+    "slug": "suki",
+    "careers_url": "https://boards.greenhouse.io/suki",
+    "source_type": "greenhouse",
+    "source_identifier": "suki",
+    "industry": "Artificial Intelligence"
+  },
+  {
+    "name": "Nabla",
+    "slug": "nabla",
+    "careers_url": "https://jobs.ashbyhq.com/nabla",
+    "source_type": "ashby",
+    "source_identifier": "nabla",
+    "industry": "Artificial Intelligence"
+  },
+  {
+    "name": "Luma AI",
+    "slug": "luma-ai",
+    "careers_url": "https://jobs.ashbyhq.com/lumaai",
+    "source_type": "ashby",
+    "source_identifier": "lumaai",
+    "industry": "Artificial Intelligence"
+  },
+  {
+    "name": "Ideogram",
+    "slug": "ideogram",
+    "careers_url": "https://jobs.ashbyhq.com/ideogram",
+    "source_type": "ashby",
+    "source_identifier": "ideogram",
+    "industry": "Artificial Intelligence"
+  },
+  {
+    "name": "Black Forest Labs",
+    "slug": "black-forest-labs",
+    "careers_url": "https://jobs.ashbyhq.com/black-forest-labs",
+    "source_type": "ashby",
+    "source_identifier": "black-forest-labs",
+    "industry": "Artificial Intelligence"
+  },
+  {
+    "name": "Magic",
+    "slug": "magic",
+    "careers_url": "https://jobs.ashbyhq.com/magic",
+    "source_type": "ashby",
+    "source_identifier": "magic",
+    "industry": "Artificial Intelligence"
+  },
+  {
+    "name": "Factory",
+    "slug": "factory",
+    "careers_url": "https://jobs.ashbyhq.com/factory",
+    "source_type": "ashby",
+    "source_identifier": "factory",
+    "industry": "Artificial Intelligence"
+  },
+  {
+    "name": "Ironclad",
+    "slug": "ironclad",
+    "careers_url": "https://jobs.ashbyhq.com/ironcladhq",
+    "source_type": "ashby",
+    "source_identifier": "ironcladhq",
+    "industry": "Artificial Intelligence"
+  },
+  {
+    "name": "Rogo",
+    "slug": "rogo",
+    "careers_url": "https://jobs.ashbyhq.com/rogo",
+    "source_type": "ashby",
+    "source_identifier": "rogo",
+    "industry": "Artificial Intelligence"
+  },
+  {
+    "name": "AlphaSense",
+    "slug": "alphasense",
+    "careers_url": "https://boards.greenhouse.io/alphasense",
+    "source_type": "greenhouse",
+    "source_identifier": "alphasense",
+    "industry": "Artificial Intelligence"
+  },
+  {
+    "name": "Gong",
+    "slug": "gong",
+    "careers_url": "https://jobs.smartrecruiters.com/Gong",
+    "source_type": "smartrecruiters",
+    "source_identifier": "Gong",
+    "industry": "Artificial Intelligence"
+  },
+  {
+    "name": "Salesloft",
+    "slug": "salesloft",
+    "careers_url": "https://boards.greenhouse.io/salesloft",
+    "source_type": "greenhouse",
+    "source_identifier": "salesloft",
+    "industry": "Artificial Intelligence"
+  },
+  {
+    "name": "Apollo.io",
+    "slug": "apollo-io",
+    "careers_url": "https://boards.greenhouse.io/apolloio",
+    "source_type": "greenhouse",
+    "source_identifier": "apolloio",
+    "industry": "Artificial Intelligence"
+  },
+  {
+    "name": "Unify",
+    "slug": "unify",
+    "careers_url": "https://jobs.ashbyhq.com/unify",
+    "source_type": "ashby",
+    "source_identifier": "unify",
+    "industry": "Artificial Intelligence"
+  },
+  {
+    "name": "Observe.AI",
+    "slug": "observe-ai",
+    "careers_url": "https://boards.greenhouse.io/observeai",
+    "source_type": "greenhouse",
+    "source_identifier": "observeai",
+    "industry": "Artificial Intelligence"
+  },
+  {
+    "name": "Sarvam AI",
+    "slug": "sarvam-ai",
+    "careers_url": "https://jobs.ashbyhq.com/sarvam",
+    "source_type": "ashby",
+    "source_identifier": "sarvam",
+    "industry": "Artificial Intelligence"
+  },
+  {
+    "name": "Aleph Alpha",
+    "slug": "aleph-alpha",
+    "careers_url": "https://jobs.ashbyhq.com/alephalpha",
+    "source_type": "ashby",
+    "source_identifier": "alephalpha",
+    "industry": "Artificial Intelligence"
+  },
+  {
+    "name": "DeepL",
+    "slug": "deepl",
+    "careers_url": "https://jobs.ashbyhq.com/deepl",
+    "source_type": "ashby",
+    "source_identifier": "deepl",
+    "industry": "Artificial Intelligence"
+  },
+  {
+    "name": "Wayve",
+    "slug": "wayve",
+    "careers_url": "https://jobs.ashbyhq.com/wayve",
+    "source_type": "ashby",
+    "source_identifier": "wayve",
+    "industry": "Artificial Intelligence"
+  },
+  {
+    "name": "PhysicsX",
+    "slug": "physicsx",
+    "careers_url": "https://boards.greenhouse.io/physicsx",
+    "source_type": "greenhouse",
+    "source_identifier": "physicsx",
+    "industry": "Artificial Intelligence"
+  },
+  {
+    "name": "Photoroom",
+    "slug": "photoroom",
+    "careers_url": "https://jobs.ashbyhq.com/photoroom",
+    "source_type": "ashby",
+    "source_identifier": "photoroom",
+    "industry": "Artificial Intelligence"
+  },
+  {
+    "name": "Dust",
+    "slug": "dust",
+    "careers_url": "https://jobs.ashbyhq.com/dust",
+    "source_type": "ashby",
+    "source_identifier": "dust",
+    "industry": "Artificial Intelligence"
+  },
+  {
+    "name": "Owkin",
+    "slug": "owkin",
+    "careers_url": "https://jobs.ashbyhq.com/owkin",
+    "source_type": "ashby",
+    "source_identifier": "owkin",
+    "industry": "Artificial Intelligence"
+  },
+  {
+    "name": "Shift Technology",
+    "slug": "shift-technology",
+    "careers_url": "https://boards.greenhouse.io/shifttechnology",
+    "source_type": "greenhouse",
+    "source_identifier": "shifttechnology",
+    "industry": "Artificial Intelligence"
+  },
+  {
+    "name": "Contentsquare",
+    "slug": "contentsquare",
+    "careers_url": "https://jobs.lever.co/contentsquare",
+    "source_type": "lever",
+    "source_identifier": "contentsquare",
+    "industry": "Artificial Intelligence"
+  },
+  {
+    "name": "Cohere Health",
+    "slug": "cohere-health",
+    "careers_url": "https://boards.greenhouse.io/coherehealth",
+    "source_type": "greenhouse",
+    "source_identifier": "coherehealth",
+    "industry": "Artificial Intelligence"
+  },
+  {
+    "name": "PathAI",
+    "slug": "pathai",
+    "careers_url": "https://boards.greenhouse.io/pathai",
+    "source_type": "greenhouse",
+    "source_identifier": "pathai",
+    "industry": "Artificial Intelligence"
+  },
+  {
+    "name": "Xaira Therapeutics",
+    "slug": "xaira-therapeutics",
+    "careers_url": "https://boards.greenhouse.io/xairatherapeutics",
+    "source_type": "greenhouse",
+    "source_identifier": "xairatherapeutics",
+    "industry": "Artificial Intelligence"
+  },
+  {
+    "name": "Generate Biomedicines",
+    "slug": "generate-biomedicines",
+    "careers_url": "https://boards.greenhouse.io/generatebiomedicines",
+    "source_type": "greenhouse",
+    "source_identifier": "generatebiomedicines",
+    "industry": "Artificial Intelligence"
+  },
+  {
+    "name": "Inceptive",
+    "slug": "inceptive",
+    "careers_url": "https://boards.greenhouse.io/inceptive",
+    "source_type": "greenhouse",
+    "source_identifier": "inceptive",
+    "industry": "Artificial Intelligence"
+  },
+  {
+    "name": "Physical Intelligence",
+    "slug": "physical-intelligence",
+    "careers_url": "https://jobs.ashbyhq.com/physicalintelligence",
+    "source_type": "ashby",
+    "source_identifier": "physicalintelligence",
+    "industry": "Artificial Intelligence"
+  },
+  {
+    "name": "Figure",
+    "slug": "figure",
+    "careers_url": "https://boards.greenhouse.io/figure",
+    "source_type": "greenhouse",
+    "source_identifier": "figure",
+    "industry": "Artificial Intelligence"
+  },
+  {
+    "name": "Figure AI",
+    "slug": "figure-ai",
+    "careers_url": "https://boards.greenhouse.io/figureai",
+    "source_type": "greenhouse",
+    "source_identifier": "figureai",
+    "industry": "Artificial Intelligence"
+  },
+  {
+    "name": "1X",
+    "slug": "1x",
+    "careers_url": "https://jobs.ashbyhq.com/1x",
+    "source_type": "ashby",
+    "source_identifier": "1x",
+    "industry": "Artificial Intelligence"
+  },
+  {
+    "name": "Apptronik",
+    "slug": "apptronik",
+    "careers_url": "https://boards.greenhouse.io/apptronik",
+    "source_type": "greenhouse",
+    "source_identifier": "apptronik",
+    "industry": "Artificial Intelligence"
+  },
+  {
+    "name": "Agility Robotics",
+    "slug": "agility-robotics",
+    "careers_url": "https://boards.greenhouse.io/agilityrobotics",
+    "source_type": "greenhouse",
+    "source_identifier": "agilityrobotics",
+    "industry": "Artificial Intelligence"
+  },
+  {
+    "name": "Dexterity",
+    "slug": "dexterity",
+    "careers_url": "https://jobs.lever.co/dexterity",
+    "source_type": "lever",
+    "source_identifier": "dexterity",
+    "industry": "Artificial Intelligence"
+  },
+  {
+    "name": "Sanctuary AI",
+    "slug": "sanctuary-ai",
+    "careers_url": "https://jobs.ashbyhq.com/sanctuary",
+    "source_type": "ashby",
+    "source_identifier": "sanctuary",
+    "industry": "Artificial Intelligence"
+  },
+  {
+    "name": "Field AI",
+    "slug": "field-ai",
+    "careers_url": "https://jobs.lever.co/field-ai",
+    "source_type": "lever",
+    "source_identifier": "field-ai",
+    "industry": "Artificial Intelligence"
+  },
+  {
+    "name": "Motional",
+    "slug": "motional",
+    "careers_url": "https://boards.greenhouse.io/motional",
+    "source_type": "greenhouse",
+    "source_identifier": "motional",
+    "industry": "Artificial Intelligence"
+  },
+  {
+    "name": "Saronic",
+    "slug": "saronic",
+    "careers_url": "https://jobs.ashbyhq.com/saronic",
+    "source_type": "ashby",
+    "source_identifier": "saronic",
+    "industry": "Artificial Intelligence"
+  },
+  {
+    "name": "Epirus",
+    "slug": "epirus",
+    "careers_url": "https://boards.greenhouse.io/epirus",
+    "source_type": "greenhouse",
+    "source_identifier": "epirus",
+    "industry": "Artificial Intelligence"
+  },
+  {
+    "name": "Chaos Industries",
+    "slug": "chaos-industries",
+    "careers_url": "https://boards.greenhouse.io/chaosindustries",
+    "source_type": "greenhouse",
+    "source_identifier": "chaosindustries",
+    "industry": "Artificial Intelligence"
+  },
+  {
+    "name": "Skydio",
+    "slug": "skydio",
+    "careers_url": "https://jobs.ashbyhq.com/skydio",
+    "source_type": "ashby",
+    "source_identifier": "skydio",
+    "industry": "Artificial Intelligence"
+  },
+  {
+    "name": "Wing",
+    "slug": "wing",
+    "careers_url": "https://boards.greenhouse.io/wing",
+    "source_type": "greenhouse",
+    "source_identifier": "wing",
+    "industry": "Artificial Intelligence"
+  },
+  {
+    "name": "Hermeus",
+    "slug": "hermeus",
+    "careers_url": "https://jobs.lever.co/hermeus",
+    "source_type": "lever",
+    "source_identifier": "hermeus",
+    "industry": "Artificial Intelligence"
+  },
+  {
+    "name": "Rocket Lab",
+    "slug": "rocket-lab",
+    "careers_url": "https://boards.greenhouse.io/rocketlab",
+    "source_type": "greenhouse",
+    "source_identifier": "rocketlab",
+    "industry": "Artificial Intelligence"
+  },
+  {
+    "name": "Varda Space",
+    "slug": "varda-space",
+    "careers_url": "https://boards.greenhouse.io/vardaspace",
+    "source_type": "greenhouse",
+    "source_identifier": "vardaspace",
+    "industry": "Artificial Intelligence"
+  },
+  {
+    "name": "Vast",
+    "slug": "vast",
+    "careers_url": "https://boards.greenhouse.io/vast",
+    "source_type": "greenhouse",
+    "source_identifier": "vast",
+    "industry": "Artificial Intelligence"
+  },
+  {
+    "name": "Muon Space",
+    "slug": "muon-space",
+    "careers_url": "https://boards.greenhouse.io/muonspace",
+    "source_type": "greenhouse",
+    "source_identifier": "muonspace",
+    "industry": "Artificial Intelligence"
+  },
+  {
+    "name": "Hadrian Automation",
+    "slug": "hadrian-automation",
+    "careers_url": "https://jobs.ashbyhq.com/hadrian-automation",
+    "source_type": "ashby",
+    "source_identifier": "hadrian-automation",
+    "industry": "Artificial Intelligence"
+  },
+  {
+    "name": "SingleStore",
+    "slug": "singlestore",
+    "careers_url": "https://boards.greenhouse.io/singlestore",
+    "source_type": "greenhouse",
+    "source_identifier": "singlestore",
+    "industry": "Developer Tools & Infrastructure"
+  },
+  {
+    "name": "Materialize",
+    "slug": "materialize",
+    "careers_url": "https://jobs.ashbyhq.com/materialize",
+    "source_type": "ashby",
+    "source_identifier": "materialize",
+    "industry": "Developer Tools & Infrastructure"
+  },
+  {
+    "name": "StarTree",
+    "slug": "startree",
+    "careers_url": "https://boards.greenhouse.io/startree",
+    "source_type": "greenhouse",
+    "source_identifier": "startree",
+    "industry": "Developer Tools & Infrastructure"
+  },
+  {
+    "name": "Imply",
+    "slug": "imply",
+    "careers_url": "https://boards.greenhouse.io/imply",
+    "source_type": "greenhouse",
+    "source_identifier": "imply",
+    "industry": "Developer Tools & Infrastructure"
+  },
+  {
+    "name": "Airbyte",
+    "slug": "airbyte",
+    "careers_url": "https://jobs.ashbyhq.com/airbyte",
+    "source_type": "ashby",
+    "source_identifier": "airbyte",
+    "industry": "Developer Tools & Infrastructure"
+  },
+  {
+    "name": "FullStory",
+    "slug": "fullstory",
+    "careers_url": "https://jobs.ashbyhq.com/fullstory",
+    "source_type": "ashby",
+    "source_identifier": "fullstory",
+    "industry": "Developer Tools & Infrastructure"
+  },
+  {
+    "name": "LogRocket",
+    "slug": "logrocket",
+    "careers_url": "https://jobs.lever.co/logrocket",
+    "source_type": "lever",
+    "source_identifier": "logrocket",
+    "industry": "Developer Tools & Infrastructure"
+  },
+  {
+    "name": "Cribl",
+    "slug": "cribl",
+    "careers_url": "https://boards.greenhouse.io/cribl",
+    "source_type": "greenhouse",
+    "source_identifier": "cribl",
+    "industry": "Developer Tools & Infrastructure"
+  },
+  {
+    "name": "incident.io",
+    "slug": "incident-io",
+    "careers_url": "https://jobs.ashbyhq.com/incident",
+    "source_type": "ashby",
+    "source_identifier": "incident",
+    "industry": "Developer Tools & Infrastructure"
+  },
+  {
+    "name": "Vultr",
+    "slug": "vultr",
+    "careers_url": "https://jobs.ashbyhq.com/vultr",
+    "source_type": "ashby",
+    "source_identifier": "vultr",
+    "industry": "Developer Tools & Infrastructure"
+  },
+  {
+    "name": "Scaleway",
+    "slug": "scaleway",
+    "careers_url": "https://jobs.lever.co/scaleway",
+    "source_type": "lever",
+    "source_identifier": "scaleway",
+    "industry": "Developer Tools & Infrastructure"
+  },
+  {
+    "name": "Prisma",
+    "slug": "prisma",
+    "careers_url": "https://prisma.recruitee.com",
+    "source_type": "recruitee",
+    "source_identifier": "prisma",
+    "industry": "Developer Tools & Infrastructure"
+  },
+  {
+    "name": "Apollo GraphQL",
+    "slug": "apollo-graphql",
+    "careers_url": "https://jobs.ashbyhq.com/apollo-graphql",
+    "source_type": "ashby",
+    "source_identifier": "apollo-graphql",
+    "industry": "Developer Tools & Infrastructure"
+  },
+  {
+    "name": "Kong",
+    "slug": "kong",
+    "careers_url": "https://jobs.ashbyhq.com/kong",
+    "source_type": "ashby",
+    "source_identifier": "kong",
+    "industry": "Developer Tools & Infrastructure"
+  },
+  {
+    "name": "Speakeasy",
+    "slug": "speakeasy",
+    "careers_url": "https://jobs.ashbyhq.com/speakeasy",
+    "source_type": "ashby",
+    "source_identifier": "speakeasy",
+    "industry": "Developer Tools & Infrastructure"
+  },
+  {
+    "name": "Docker",
+    "slug": "docker",
+    "careers_url": "https://jobs.ashbyhq.com/docker",
+    "source_type": "ashby",
+    "source_identifier": "docker",
+    "industry": "Developer Tools & Infrastructure"
+  },
+  {
+    "name": "Buildkite",
+    "slug": "buildkite",
+    "careers_url": "https://boards.greenhouse.io/buildkite",
+    "source_type": "greenhouse",
+    "source_identifier": "buildkite",
+    "industry": "Developer Tools & Infrastructure"
+  },
+  {
+    "name": "Snyk",
+    "slug": "snyk",
+    "careers_url": "https://jobs.ashbyhq.com/snyk",
+    "source_type": "ashby",
+    "source_identifier": "snyk",
+    "industry": "Developer Tools & Infrastructure"
+  },
+  {
+    "name": "Semgrep",
+    "slug": "semgrep",
+    "careers_url": "https://jobs.ashbyhq.com/semgrep",
+    "source_type": "ashby",
+    "source_identifier": "semgrep",
+    "industry": "Developer Tools & Infrastructure"
+  },
+  {
+    "name": "Socket",
+    "slug": "socket",
+    "careers_url": "https://jobs.ashbyhq.com/socket",
+    "source_type": "ashby",
+    "source_identifier": "socket",
+    "industry": "Developer Tools & Infrastructure"
+  },
+  {
+    "name": "Sysdig",
+    "slug": "sysdig",
+    "careers_url": "https://jobs.lever.co/sysdig",
+    "source_type": "lever",
+    "source_identifier": "sysdig",
+    "industry": "Developer Tools & Infrastructure"
+  },
+  {
+    "name": "NetBird",
+    "slug": "netbird",
+    "careers_url": "https://jobs.ashbyhq.com/netbird",
+    "source_type": "ashby",
+    "source_identifier": "netbird",
+    "industry": "Developer Tools & Infrastructure"
+  },
+  {
+    "name": "1Password",
+    "slug": "1password",
+    "careers_url": "https://jobs.ashbyhq.com/1password",
+    "source_type": "ashby",
+    "source_identifier": "1password",
+    "industry": "Developer Tools & Infrastructure"
+  },
+  {
+    "name": "WorkOS",
+    "slug": "workos",
+    "careers_url": "https://jobs.ashbyhq.com/workos",
+    "source_type": "ashby",
+    "source_identifier": "workos",
+    "industry": "Developer Tools & Infrastructure"
+  },
+  {
+    "name": "Descope",
+    "slug": "descope",
+    "careers_url": "https://boards.greenhouse.io/descope",
+    "source_type": "greenhouse",
+    "source_identifier": "descope",
+    "industry": "Developer Tools & Infrastructure"
+  },
+  {
+    "name": "Trigger.dev",
+    "slug": "trigger-dev",
+    "careers_url": "https://jobs.ashbyhq.com/triggerdev",
+    "source_type": "ashby",
+    "source_identifier": "triggerdev",
+    "industry": "Developer Tools & Infrastructure"
+  },
+  {
+    "name": "n8n",
+    "slug": "n8n",
+    "careers_url": "https://jobs.ashbyhq.com/n8n",
+    "source_type": "ashby",
+    "source_identifier": "n8n",
+    "industry": "Developer Tools & Infrastructure"
+  },
+  {
+    "name": "Workato",
+    "slug": "workato",
+    "careers_url": "https://boards.greenhouse.io/workato",
+    "source_type": "greenhouse",
+    "source_identifier": "workato",
+    "industry": "Developer Tools & Infrastructure"
+  },
+  {
+    "name": "Celigo",
+    "slug": "celigo",
+    "careers_url": "https://boards.greenhouse.io/celigo",
+    "source_type": "greenhouse",
+    "source_identifier": "celigo",
+    "industry": "Developer Tools & Infrastructure"
+  },
+  {
+    "name": "SnapLogic",
+    "slug": "snaplogic",
+    "careers_url": "https://jobs.lever.co/snaplogic",
+    "source_type": "lever",
+    "source_identifier": "snaplogic",
+    "industry": "Developer Tools & Infrastructure"
+  },
+  {
+    "name": "Wrike",
+    "slug": "wrike",
+    "careers_url": "https://boards.greenhouse.io/wrike",
+    "source_type": "greenhouse",
+    "source_identifier": "wrike",
+    "industry": "Developer Tools & Infrastructure"
+  },
+  {
+    "name": "Gamma",
+    "slug": "gamma",
+    "careers_url": "https://jobs.ashbyhq.com/gamma",
+    "source_type": "ashby",
+    "source_identifier": "gamma",
+    "industry": "Developer Tools & Infrastructure"
+  },
+  {
+    "name": "Otter.ai",
+    "slug": "otter-ai",
+    "careers_url": "https://boards.greenhouse.io/otterai",
+    "source_type": "greenhouse",
+    "source_identifier": "otterai",
+    "industry": "Developer Tools & Infrastructure"
+  },
+  {
+    "name": "Gorgias",
+    "slug": "gorgias",
+    "careers_url": "https://jobs.ashbyhq.com/gorgias",
+    "source_type": "ashby",
+    "source_identifier": "gorgias",
+    "industry": "Developer Tools & Infrastructure"
+  },
+  {
+    "name": "Chili Piper",
+    "slug": "chili-piper",
+    "careers_url": "https://jobs.ashbyhq.com/chilipiper",
+    "source_type": "ashby",
+    "source_identifier": "chilipiper",
+    "industry": "Developer Tools & Infrastructure"
+  },
+  {
+    "name": "Close",
+    "slug": "close",
+    "careers_url": "https://jobs.ashbyhq.com/close",
+    "source_type": "ashby",
+    "source_identifier": "close",
+    "industry": "Developer Tools & Infrastructure"
+  },
+  {
+    "name": "Attio",
+    "slug": "attio",
+    "careers_url": "https://jobs.ashbyhq.com/attio",
+    "source_type": "ashby",
+    "source_identifier": "attio",
+    "industry": "Developer Tools & Infrastructure"
+  },
+  {
+    "name": "ServiceNow",
+    "slug": "servicenow",
+    "careers_url": "https://jobs.smartrecruiters.com/Servicenow",
+    "source_type": "smartrecruiters",
+    "source_identifier": "Servicenow",
+    "industry": "Developer Tools & Infrastructure"
+  },
+  {
+    "name": "Redis",
+    "slug": "redis",
+    "careers_url": "https://jobs.ashbyhq.com/redis",
+    "source_type": "ashby",
+    "source_identifier": "redis",
+    "industry": "Developer Tools & Infrastructure"
+  },
+  {
+    "name": "Yugabyte",
+    "slug": "yugabyte",
+    "careers_url": "https://boards.greenhouse.io/yugabyte",
+    "source_type": "greenhouse",
+    "source_identifier": "yugabyte",
+    "industry": "Developer Tools & Infrastructure"
+  },
+  {
+    "name": "Dremio",
+    "slug": "dremio",
+    "careers_url": "https://boards.greenhouse.io/dremio",
+    "source_type": "greenhouse",
+    "source_identifier": "dremio",
+    "industry": "Developer Tools & Infrastructure"
+  },
+  {
+    "name": "Collibra",
+    "slug": "collibra",
+    "careers_url": "https://boards.greenhouse.io/collibra",
+    "source_type": "greenhouse",
+    "source_identifier": "collibra",
+    "industry": "Developer Tools & Infrastructure"
+  },
+  {
+    "name": "Atlan",
+    "slug": "atlan",
+    "careers_url": "https://jobs.ashbyhq.com/atlan",
+    "source_type": "ashby",
+    "source_identifier": "atlan",
+    "industry": "Developer Tools & Infrastructure"
+  },
+  {
+    "name": "Sigma Computing",
+    "slug": "sigma-computing",
+    "careers_url": "https://boards.greenhouse.io/sigmacomputing",
+    "source_type": "greenhouse",
+    "source_identifier": "sigmacomputing",
+    "industry": "Developer Tools & Infrastructure"
+  },
+  {
+    "name": "Hex",
+    "slug": "hex",
+    "careers_url": "https://jobs.ashbyhq.com/hex",
+    "source_type": "ashby",
+    "source_identifier": "hex",
+    "industry": "Developer Tools & Infrastructure"
+  },
+  {
+    "name": "Domino Data Lab",
+    "slug": "domino-data-lab",
+    "careers_url": "https://boards.greenhouse.io/dominodatalab",
+    "source_type": "greenhouse",
+    "source_identifier": "dominodatalab",
+    "industry": "Developer Tools & Infrastructure"
+  },
+  {
+    "name": "Neptune.ai",
+    "slug": "neptune-ai",
+    "careers_url": "https://jobs.ashbyhq.com/neptune",
+    "source_type": "ashby",
+    "source_identifier": "neptune",
+    "industry": "Developer Tools & Infrastructure"
+  },
+  {
+    "name": "Vast.ai",
+    "slug": "vast-ai",
+    "careers_url": "https://jobs.ashbyhq.com/vastai",
+    "source_type": "ashby",
+    "source_identifier": "vastai",
+    "industry": "Developer Tools & Infrastructure"
+  },
+  {
+    "name": "RunPod",
+    "slug": "runpod",
+    "careers_url": "https://jobs.ashbyhq.com/runpod",
+    "source_type": "ashby",
+    "source_identifier": "runpod",
+    "industry": "Developer Tools & Infrastructure"
+  },
+  {
+    "name": "Rho",
+    "slug": "rho",
+    "careers_url": "https://jobs.ashbyhq.com/rho",
+    "source_type": "ashby",
+    "source_identifier": "rho",
+    "industry": "Fintech"
+  },
+  {
+    "name": "Pleo",
+    "slug": "pleo",
+    "careers_url": "https://jobs.ashbyhq.com/pleo",
+    "source_type": "ashby",
+    "source_identifier": "pleo",
+    "industry": "Fintech"
+  },
+  {
+    "name": "Sezzle",
+    "slug": "sezzle",
+    "careers_url": "https://boards.greenhouse.io/sezzle",
+    "source_type": "greenhouse",
+    "source_identifier": "sezzle",
+    "industry": "Fintech"
+  },
+  {
+    "name": "Current",
+    "slug": "current",
+    "careers_url": "https://boards.greenhouse.io/current",
+    "source_type": "greenhouse",
+    "source_identifier": "current",
+    "industry": "Fintech"
+  },
+  {
+    "name": "Dave",
+    "slug": "dave",
+    "careers_url": "https://jobs.ashbyhq.com/dave",
+    "source_type": "ashby",
+    "source_identifier": "dave",
+    "industry": "Fintech"
+  },
+  {
+    "name": "Public",
+    "slug": "public",
+    "careers_url": "https://boards.greenhouse.io/public",
+    "source_type": "greenhouse",
+    "source_identifier": "public",
+    "industry": "Fintech"
+  },
+  {
+    "name": "Acorns",
+    "slug": "acorns",
+    "careers_url": "https://jobs.ashbyhq.com/acorns",
+    "source_type": "ashby",
+    "source_identifier": "acorns",
+    "industry": "Fintech"
+  },
+  {
+    "name": "Circle",
+    "slug": "circle",
+    "careers_url": "https://jobs.ashbyhq.com/circle",
+    "source_type": "ashby",
+    "source_identifier": "circle",
+    "industry": "Fintech"
+  },
+  {
+    "name": "Paxos",
+    "slug": "paxos",
+    "careers_url": "https://jobs.ashbyhq.com/paxos",
+    "source_type": "ashby",
+    "source_identifier": "paxos",
+    "industry": "Fintech"
+  },
+  {
+    "name": "Uniswap Labs",
+    "slug": "uniswap-labs",
+    "careers_url": "https://jobs.ashbyhq.com/uniswap",
+    "source_type": "ashby",
+    "source_identifier": "uniswap",
+    "industry": "Fintech"
+  },
+  {
+    "name": "Ledger",
+    "slug": "ledger",
+    "careers_url": "https://jobs.ashbyhq.com/ledger",
+    "source_type": "ashby",
+    "source_identifier": "ledger",
+    "industry": "Fintech"
+  },
+  {
+    "name": "OKX",
+    "slug": "okx",
+    "careers_url": "https://boards.greenhouse.io/okx",
+    "source_type": "greenhouse",
+    "source_identifier": "okx",
+    "industry": "Fintech"
+  },
+  {
+    "name": "Binance",
+    "slug": "binance",
+    "careers_url": "https://boards.greenhouse.io/binance",
+    "source_type": "greenhouse",
+    "source_identifier": "binance",
+    "industry": "Fintech"
+  },
+  {
+    "name": "Bybit",
+    "slug": "bybit",
+    "careers_url": "https://boards.greenhouse.io/bybit",
+    "source_type": "greenhouse",
+    "source_identifier": "bybit",
+    "industry": "Fintech"
+  },
+  {
+    "name": "dLocal",
+    "slug": "dlocal",
+    "careers_url": "https://jobs.lever.co/dlocal",
+    "source_type": "lever",
+    "source_identifier": "dlocal",
+    "industry": "Fintech"
+  },
+  {
+    "name": "Ebanx",
+    "slug": "ebanx",
+    "careers_url": "https://boards.greenhouse.io/ebanx",
+    "source_type": "greenhouse",
+    "source_identifier": "ebanx",
+    "industry": "Fintech"
+  },
+  {
+    "name": "Nium",
+    "slug": "nium",
+    "careers_url": "https://jobs.lever.co/nium",
+    "source_type": "lever",
+    "source_identifier": "nium",
+    "industry": "Fintech"
+  },
+  {
+    "name": "Thunes",
+    "slug": "thunes",
+    "careers_url": "https://boards.greenhouse.io/thunes",
+    "source_type": "greenhouse",
+    "source_identifier": "thunes",
+    "industry": "Fintech"
+  },
+  {
+    "name": "Lithic",
+    "slug": "lithic",
+    "careers_url": "https://boards.greenhouse.io/lithic",
+    "source_type": "greenhouse",
+    "source_identifier": "lithic",
+    "industry": "Fintech"
+  },
+  {
+    "name": "Highnote",
+    "slug": "highnote",
+    "careers_url": "https://boards.greenhouse.io/highnote",
+    "source_type": "greenhouse",
+    "source_identifier": "highnote",
+    "industry": "Fintech"
+  },
+  {
+    "name": "Column",
+    "slug": "column",
+    "careers_url": "https://jobs.ashbyhq.com/column",
+    "source_type": "ashby",
+    "source_identifier": "column",
+    "industry": "Fintech"
+  },
+  {
+    "name": "Finix",
+    "slug": "finix",
+    "careers_url": "https://jobs.lever.co/finix",
+    "source_type": "lever",
+    "source_identifier": "finix",
+    "industry": "Fintech"
+  },
+  {
+    "name": "Blend",
+    "slug": "blend",
+    "careers_url": "https://boards.greenhouse.io/blend",
+    "source_type": "greenhouse",
+    "source_identifier": "blend",
+    "industry": "Fintech"
+  },
+  {
+    "name": "Roofstock",
+    "slug": "roofstock",
+    "careers_url": "https://boards.greenhouse.io/roofstock",
+    "source_type": "greenhouse",
+    "source_identifier": "roofstock",
+    "industry": "Fintech"
+  },
+  {
+    "name": "Pacaso",
+    "slug": "pacaso",
+    "careers_url": "https://boards.greenhouse.io/pacaso",
+    "source_type": "greenhouse",
+    "source_identifier": "pacaso",
+    "industry": "Fintech"
+  },
+  {
+    "name": "Flex",
+    "slug": "flex",
+    "careers_url": "https://boards.greenhouse.io/flex",
+    "source_type": "greenhouse",
+    "source_identifier": "flex",
+    "industry": "Fintech"
+  },
+  {
+    "name": "Truv",
+    "slug": "truv",
+    "careers_url": "https://jobs.lever.co/truv",
+    "source_type": "lever",
+    "source_identifier": "truv",
+    "industry": "Fintech"
+  },
+  {
+    "name": "Alloy",
+    "slug": "alloy",
+    "careers_url": "https://boards.greenhouse.io/alloy",
+    "source_type": "greenhouse",
+    "source_identifier": "alloy",
+    "industry": "Fintech"
+  },
+  {
+    "name": "Socure",
+    "slug": "socure",
+    "careers_url": "https://jobs.ashbyhq.com/socure",
+    "source_type": "ashby",
+    "source_identifier": "socure",
+    "industry": "Fintech"
+  },
+  {
+    "name": "Persona",
+    "slug": "persona",
+    "careers_url": "https://jobs.ashbyhq.com/persona",
+    "source_type": "ashby",
+    "source_identifier": "persona",
+    "industry": "Fintech"
+  },
+  {
+    "name": "Jumio",
+    "slug": "jumio",
+    "careers_url": "https://boards.greenhouse.io/jumio",
+    "source_type": "greenhouse",
+    "source_identifier": "jumio",
+    "industry": "Fintech"
+  },
+  {
+    "name": "Sardine",
+    "slug": "sardine",
+    "careers_url": "https://jobs.ashbyhq.com/sardine",
+    "source_type": "ashby",
+    "source_identifier": "sardine",
+    "industry": "Fintech"
+  },
+  {
+    "name": "ComplyAdvantage",
+    "slug": "complyadvantage",
+    "careers_url": "https://boards.greenhouse.io/complyadvantage",
+    "source_type": "greenhouse",
+    "source_identifier": "complyadvantage",
+    "industry": "Fintech"
+  },
+  {
+    "name": "Forter",
+    "slug": "forter",
+    "careers_url": "https://boards.greenhouse.io/forter",
+    "source_type": "greenhouse",
+    "source_identifier": "forter",
+    "industry": "Fintech"
+  },
+  {
+    "name": "AngelList",
+    "slug": "angellist",
+    "careers_url": "https://jobs.lever.co/angellist",
+    "source_type": "lever",
+    "source_identifier": "angellist",
+    "industry": "Fintech"
+  },
+  {
+    "name": "Altruist",
+    "slug": "altruist",
+    "careers_url": "https://boards.greenhouse.io/altruist",
+    "source_type": "greenhouse",
+    "source_identifier": "altruist",
+    "industry": "Fintech"
+  },
+  {
+    "name": "Range",
+    "slug": "range",
+    "careers_url": "https://jobs.ashbyhq.com/range",
+    "source_type": "ashby",
+    "source_identifier": "range",
+    "industry": "Fintech"
+  },
+  {
+    "name": "Origin",
+    "slug": "origin",
+    "careers_url": "https://jobs.ashbyhq.com/originhq",
+    "source_type": "ashby",
+    "source_identifier": "originhq",
+    "industry": "Fintech"
+  },
+  {
+    "name": "Pilot",
+    "slug": "pilot",
+    "careers_url": "https://boards.greenhouse.io/pilothq",
+    "source_type": "greenhouse",
+    "source_identifier": "pilothq",
+    "industry": "Fintech"
+  },
+  {
+    "name": "Rillet",
+    "slug": "rillet",
+    "careers_url": "https://jobs.ashbyhq.com/rillet",
+    "source_type": "ashby",
+    "source_identifier": "rillet",
+    "industry": "Fintech"
+  },
+  {
+    "name": "Numeric",
+    "slug": "numeric",
+    "careers_url": "https://jobs.ashbyhq.com/numeric",
+    "source_type": "ashby",
+    "source_identifier": "numeric",
+    "industry": "Fintech"
+  },
+  {
+    "name": "FloQast",
+    "slug": "floqast",
+    "careers_url": "https://jobs.lever.co/floqast",
+    "source_type": "lever",
+    "source_identifier": "floqast",
+    "industry": "Fintech"
+  },
+  {
+    "name": "Paystand",
+    "slug": "paystand",
+    "careers_url": "https://boards.greenhouse.io/paystand",
+    "source_type": "greenhouse",
+    "source_identifier": "paystand",
+    "industry": "Fintech"
+  },
+  {
+    "name": "Billtrust",
+    "slug": "billtrust",
+    "careers_url": "https://boards.greenhouse.io/billtrust",
+    "source_type": "greenhouse",
+    "source_identifier": "billtrust",
+    "industry": "Fintech"
+  },
+  {
+    "name": "Versapay",
+    "slug": "versapay",
+    "careers_url": "https://jobs.lever.co/versapay",
+    "source_type": "lever",
+    "source_identifier": "versapay",
+    "industry": "Fintech"
+  },
+  {
+    "name": "Zuora",
+    "slug": "zuora",
+    "careers_url": "https://boards.greenhouse.io/zuora",
+    "source_type": "greenhouse",
+    "source_identifier": "zuora",
+    "industry": "Fintech"
+  },
+  {
+    "name": "Orb",
+    "slug": "orb",
+    "careers_url": "https://jobs.ashbyhq.com/orb",
+    "source_type": "ashby",
+    "source_identifier": "orb",
+    "industry": "Fintech"
+  },
+  {
+    "name": "Anrok",
+    "slug": "anrok",
+    "careers_url": "https://jobs.ashbyhq.com/anrok",
+    "source_type": "ashby",
+    "source_identifier": "anrok",
+    "industry": "Fintech"
+  },
+  {
+    "name": "Oyster",
+    "slug": "oyster",
+    "careers_url": "https://jobs.ashbyhq.com/oyster",
+    "source_type": "ashby",
+    "source_identifier": "oyster",
+    "industry": "Fintech"
+  },
+  {
+    "name": "Justworks",
+    "slug": "justworks",
+    "careers_url": "https://boards.greenhouse.io/justworks",
+    "source_type": "greenhouse",
+    "source_identifier": "justworks",
+    "industry": "Fintech"
+  },
+  {
+    "name": "Workhuman",
+    "slug": "workhuman",
+    "careers_url": "https://jobs.ashbyhq.com/workhuman",
+    "source_type": "ashby",
+    "source_identifier": "workhuman",
+    "industry": "Fintech"
+  },
+  {
+    "name": "Benevity",
+    "slug": "benevity",
+    "careers_url": "https://jobs.ashbyhq.com/benevity",
+    "source_type": "ashby",
+    "source_identifier": "benevity",
+    "industry": "Fintech"
+  },
+  {
+    "name": "Compa",
+    "slug": "compa",
+    "careers_url": "https://jobs.ashbyhq.com/compa",
+    "source_type": "ashby",
+    "source_identifier": "compa",
+    "industry": "Fintech"
+  },
+  {
+    "name": "Poshmark",
+    "slug": "poshmark",
+    "careers_url": "https://jobs.ashbyhq.com/poshmark",
+    "source_type": "ashby",
+    "source_identifier": "poshmark",
+    "industry": "E-commerce & Marketplaces"
+  },
+  {
+    "name": "Vestiaire Collective",
+    "slug": "vestiaire-collective",
+    "careers_url": "https://jobs.lever.co/vestiairecollective",
+    "source_type": "lever",
+    "source_identifier": "vestiairecollective",
+    "industry": "E-commerce & Marketplaces"
+  },
+  {
+    "name": "StockX",
+    "slug": "stockx",
+    "careers_url": "https://boards.greenhouse.io/stockx",
+    "source_type": "greenhouse",
+    "source_identifier": "stockx",
+    "industry": "E-commerce & Marketplaces"
+  },
+  {
+    "name": "Gopuff",
+    "slug": "gopuff",
+    "careers_url": "https://jobs.lever.co/gopuff",
+    "source_type": "lever",
+    "source_identifier": "gopuff",
+    "industry": "E-commerce & Marketplaces"
+  },
+  {
+    "name": "Swiggy",
+    "slug": "swiggy",
+    "careers_url": "https://jobs.smartrecruiters.com/Swiggy",
+    "source_type": "smartrecruiters",
+    "source_identifier": "Swiggy",
+    "industry": "E-commerce & Marketplaces"
+  },
+  {
+    "name": "Porter",
+    "slug": "porter",
+    "careers_url": "https://jobs.lever.co/porter",
+    "source_type": "lever",
+    "source_identifier": "porter",
+    "industry": "E-commerce & Marketplaces"
+  },
+  {
+    "name": "Bounce",
+    "slug": "bounce",
+    "careers_url": "https://jobs.ashbyhq.com/bounce",
+    "source_type": "ashby",
+    "source_identifier": "bounce",
+    "industry": "E-commerce & Marketplaces"
+  },
+  {
+    "name": "Druva",
+    "slug": "druva",
+    "careers_url": "https://boards.greenhouse.io/druva",
+    "source_type": "greenhouse",
+    "source_identifier": "druva",
+    "industry": "E-commerce & Marketplaces"
+  },
+  {
+    "name": "Mindtickle",
+    "slug": "mindtickle",
+    "careers_url": "https://jobs.lever.co/mindtickle",
+    "source_type": "lever",
+    "source_identifier": "mindtickle",
+    "industry": "E-commerce & Marketplaces"
+  },
+  {
+    "name": "HighRadius",
+    "slug": "highradius",
+    "careers_url": "https://boards.greenhouse.io/highradius",
+    "source_type": "greenhouse",
+    "source_identifier": "highradius",
+    "industry": "Fintech"
+  },
+  {
+    "name": "Hevo Data",
+    "slug": "hevo-data",
+    "careers_url": "https://jobs.lever.co/hevodata",
+    "source_type": "lever",
+    "source_identifier": "hevodata",
+    "industry": "E-commerce & Marketplaces"
+  },
+  {
+    "name": "Sigmoid",
+    "slug": "sigmoid",
+    "careers_url": "https://boards.greenhouse.io/sigmoid",
+    "source_type": "greenhouse",
+    "source_identifier": "sigmoid",
+    "industry": "E-commerce & Marketplaces"
+  },
+  {
+    "name": "Endava",
+    "slug": "endava",
+    "careers_url": "https://jobs.smartrecruiters.com/Endava",
+    "source_type": "smartrecruiters",
+    "source_identifier": "Endava",
+    "industry": "E-commerce & Marketplaces"
+  },
+  {
+    "name": "Thoughtworks",
+    "slug": "thoughtworks",
+    "careers_url": "https://boards.greenhouse.io/thoughtworks",
+    "source_type": "greenhouse",
+    "source_identifier": "thoughtworks",
+    "industry": "E-commerce & Marketplaces"
+  },
+  {
+    "name": "N-iX",
+    "slug": "n-ix",
+    "careers_url": "https://boards.greenhouse.io/nix",
+    "source_type": "greenhouse",
+    "source_identifier": "nix",
+    "industry": "E-commerce & Marketplaces"
+  },
+  {
+    "name": "Toptal",
+    "slug": "toptal",
+    "careers_url": "https://jobs.lever.co/toptal",
+    "source_type": "lever",
+    "source_identifier": "toptal",
+    "industry": "E-commerce & Marketplaces"
+  },
+  {
+    "name": "Andela",
+    "slug": "andela",
+    "careers_url": "https://jobs.ashbyhq.com/andela",
+    "source_type": "ashby",
+    "source_identifier": "andela",
+    "industry": "E-commerce & Marketplaces"
+  },
+  {
+    "name": "Lemon.io",
+    "slug": "lemon-io",
+    "careers_url": "https://jobs.ashbyhq.com/lemon-io",
+    "source_type": "ashby",
+    "source_identifier": "lemon-io",
+    "industry": "E-commerce & Marketplaces"
+  },
+  {
+    "name": "R/GA",
+    "slug": "r-ga",
+    "careers_url": "https://boards.greenhouse.io/rga",
+    "source_type": "greenhouse",
+    "source_identifier": "rga",
+    "industry": "E-commerce & Marketplaces"
+  },
+  {
+    "name": "Instrument",
+    "slug": "instrument",
+    "careers_url": "https://jobs.lever.co/instrument",
+    "source_type": "lever",
+    "source_identifier": "instrument",
+    "industry": "E-commerce & Marketplaces"
+  },
+  {
+    "name": "IDEO",
+    "slug": "ideo",
+    "careers_url": "https://boards.greenhouse.io/ideo",
+    "source_type": "greenhouse",
+    "source_identifier": "ideo",
+    "industry": "E-commerce & Marketplaces"
+  },
+  {
+    "name": "Bungie",
+    "slug": "bungie",
+    "careers_url": "https://boards.greenhouse.io/bungie",
+    "source_type": "greenhouse",
+    "source_identifier": "bungie",
+    "industry": "Consumer Tech & Media"
+  },
+  {
+    "name": "Scopely",
+    "slug": "scopely",
+    "careers_url": "https://boards.greenhouse.io/scopely",
+    "source_type": "greenhouse",
+    "source_identifier": "scopely",
+    "industry": "Consumer Tech & Media"
+  },
+  {
+    "name": "Jam City",
+    "slug": "jam-city",
+    "careers_url": "https://jobs.lever.co/jamcity",
+    "source_type": "lever",
+    "source_identifier": "jamcity",
+    "industry": "Consumer Tech & Media"
+  },
+  {
+    "name": "Kabam",
+    "slug": "kabam",
+    "careers_url": "https://jobs.lever.co/kabam",
+    "source_type": "lever",
+    "source_identifier": "kabam",
+    "industry": "Consumer Tech & Media"
+  },
+  {
+    "name": "Gameloft",
+    "slug": "gameloft",
+    "careers_url": "https://jobs.smartrecruiters.com/Gameloft",
+    "source_type": "smartrecruiters",
+    "source_identifier": "Gameloft",
+    "industry": "Consumer Tech & Media"
+  },
+  {
+    "name": "Remedy",
+    "slug": "remedy",
+    "careers_url": "https://boards.greenhouse.io/remedy",
+    "source_type": "greenhouse",
+    "source_identifier": "remedy",
+    "industry": "Consumer Tech & Media"
+  },
+  {
+    "name": "Agoda",
+    "slug": "agoda",
+    "careers_url": "https://boards.greenhouse.io/agoda",
+    "source_type": "greenhouse",
+    "source_identifier": "agoda",
+    "industry": "Consumer Tech & Media"
+  },
+  {
+    "name": "Kayak",
+    "slug": "kayak",
+    "careers_url": "https://jobs.ashbyhq.com/kayak",
+    "source_type": "ashby",
+    "source_identifier": "kayak",
+    "industry": "Consumer Tech & Media"
+  },
+  {
+    "name": "TripAdvisor",
+    "slug": "tripadvisor",
+    "careers_url": "https://boards.greenhouse.io/tripadvisor",
+    "source_type": "greenhouse",
+    "source_identifier": "tripadvisor",
+    "industry": "Consumer Tech & Media"
+  },
+  {
+    "name": "Nextdoor",
+    "slug": "nextdoor",
+    "careers_url": "https://boards.greenhouse.io/nextdoor",
+    "source_type": "greenhouse",
+    "source_identifier": "nextdoor",
+    "industry": "Consumer Tech & Media"
+  },
+  {
+    "name": "Thumbtack",
+    "slug": "thumbtack",
+    "careers_url": "https://jobs.ashbyhq.com/thumbtack",
+    "source_type": "ashby",
+    "source_identifier": "thumbtack",
+    "industry": "Consumer Tech & Media"
+  },
+  {
+    "name": "Angi",
+    "slug": "angi",
+    "careers_url": "https://jobs.ashbyhq.com/angi",
+    "source_type": "ashby",
+    "source_identifier": "angi",
+    "industry": "Consumer Tech & Media"
+  },
+  {
+    "name": "Houzz",
+    "slug": "houzz",
+    "careers_url": "https://jobs.lever.co/houzz",
+    "source_type": "lever",
+    "source_identifier": "houzz",
+    "industry": "Consumer Tech & Media"
+  },
+  {
+    "name": "CoStar",
+    "slug": "costar",
+    "careers_url": "https://boards.greenhouse.io/costar",
+    "source_type": "greenhouse",
+    "source_identifier": "costar",
+    "industry": "Consumer Tech & Media"
+  },
+  {
+    "name": "Rover",
+    "slug": "rover",
+    "careers_url": "https://jobs.lever.co/rover",
+    "source_type": "lever",
+    "source_identifier": "rover",
+    "industry": "Consumer Tech & Media"
+  },
+  {
+    "name": "Match Group",
+    "slug": "match-group",
+    "careers_url": "https://jobs.lever.co/matchgroup",
+    "source_type": "lever",
+    "source_identifier": "matchgroup",
+    "industry": "Consumer Tech & Media"
+  },
+  {
+    "name": "Babbel",
+    "slug": "babbel",
+    "careers_url": "https://jobs.ashbyhq.com/babbel",
+    "source_type": "ashby",
+    "source_identifier": "babbel",
+    "industry": "Consumer Tech & Media"
+  },
+  {
+    "name": "Udemy",
+    "slug": "udemy",
+    "careers_url": "https://boards.greenhouse.io/udemy",
+    "source_type": "greenhouse",
+    "source_identifier": "udemy",
+    "industry": "Consumer Tech & Media"
+  },
+  {
+    "name": "Khan Academy",
+    "slug": "khan-academy",
+    "careers_url": "https://boards.greenhouse.io/khanacademy",
+    "source_type": "greenhouse",
+    "source_identifier": "khanacademy",
+    "industry": "Consumer Tech & Media"
+  },
+  {
+    "name": "Outschool",
+    "slug": "outschool",
+    "careers_url": "https://jobs.ashbyhq.com/outschool",
+    "source_type": "ashby",
+    "source_identifier": "outschool",
+    "industry": "Consumer Tech & Media"
+  },
+  {
+    "name": "Unacademy",
+    "slug": "unacademy",
+    "careers_url": "https://jobs.smartrecruiters.com/Unacademy",
+    "source_type": "smartrecruiters",
+    "source_identifier": "Unacademy",
+    "industry": "Consumer Tech & Media"
+  },
+  {
+    "name": "Karat",
+    "slug": "karat",
+    "careers_url": "https://boards.greenhouse.io/karat",
+    "source_type": "greenhouse",
+    "source_identifier": "karat",
+    "industry": "Consumer Tech & Media"
+  },
+  {
+    "name": "LinkedIn",
+    "slug": "linkedin",
+    "careers_url": "https://jobs.lever.co/linkedin",
+    "source_type": "lever",
+    "source_identifier": "linkedin",
+    "industry": "Consumer Tech & Media"
+  },
+  {
+    "name": "ZipRecruiter",
+    "slug": "ziprecruiter",
+    "careers_url": "https://boards.greenhouse.io/ziprecruiter",
+    "source_type": "greenhouse",
+    "source_identifier": "ziprecruiter",
+    "industry": "Consumer Tech & Media"
+  },
+  {
+    "name": "Handshake",
+    "slug": "handshake",
+    "careers_url": "https://jobs.ashbyhq.com/handshake",
+    "source_type": "ashby",
+    "source_identifier": "handshake",
+    "industry": "Consumer Tech & Media"
+  },
+  {
+    "name": "Paraform",
+    "slug": "paraform",
+    "careers_url": "https://jobs.ashbyhq.com/paraform",
+    "source_type": "ashby",
+    "source_identifier": "paraform",
+    "industry": "Consumer Tech & Media"
+  },
+  {
+    "name": "Greenhouse",
+    "slug": "greenhouse",
+    "careers_url": "https://boards.greenhouse.io/greenhouse",
+    "source_type": "greenhouse",
+    "source_identifier": "greenhouse",
+    "industry": "Consumer Tech & Media"
+  },
+  {
+    "name": "SmartRecruiters",
+    "slug": "smartrecruiters",
+    "careers_url": "https://jobs.smartrecruiters.com/Smartrecruiters",
+    "source_type": "smartrecruiters",
+    "source_identifier": "Smartrecruiters",
+    "industry": "Consumer Tech & Media"
+  },
+  {
+    "name": "Paradox",
+    "slug": "paradox",
+    "careers_url": "https://jobs.smartrecruiters.com/Paradox",
+    "source_type": "smartrecruiters",
+    "source_identifier": "Paradox",
+    "industry": "Consumer Tech & Media"
+  },
+  {
+    "name": "HireVue",
+    "slug": "hirevue",
+    "careers_url": "https://jobs.smartrecruiters.com/Hirevue",
+    "source_type": "smartrecruiters",
+    "source_identifier": "Hirevue",
+    "industry": "Consumer Tech & Media"
+  },
+  {
+    "name": "Kit",
+    "slug": "kit",
+    "careers_url": "https://jobs.ashbyhq.com/kit",
+    "source_type": "ashby",
+    "source_identifier": "kit",
+    "industry": "Consumer Tech & Media"
+  },
+  {
+    "name": "Thinkific",
+    "slug": "thinkific",
+    "careers_url": "https://jobs.ashbyhq.com/thinkific",
+    "source_type": "ashby",
+    "source_identifier": "thinkific",
+    "industry": "Consumer Tech & Media"
+  },
+  {
+    "name": "Mighty Networks",
+    "slug": "mighty-networks",
+    "careers_url": "https://boards.greenhouse.io/mightynetworks",
+    "source_type": "greenhouse",
+    "source_identifier": "mightynetworks",
+    "industry": "Consumer Tech & Media"
+  },
+  {
+    "name": "Quora",
+    "slug": "quora",
+    "careers_url": "https://jobs.ashbyhq.com/quora",
+    "source_type": "ashby",
+    "source_identifier": "quora",
+    "industry": "Consumer Tech & Media"
+  },
+  {
+    "name": "Proton",
+    "slug": "proton",
+    "careers_url": "https://boards.greenhouse.io/proton",
+    "source_type": "greenhouse",
+    "source_identifier": "proton",
+    "industry": "Consumer Tech & Media"
+  },
+  {
+    "name": "Woven by Toyota",
+    "slug": "woven-by-toyota",
+    "careers_url": "https://jobs.lever.co/woven-by-toyota",
+    "source_type": "lever",
+    "source_identifier": "woven-by-toyota",
+    "industry": "Consumer Tech & Media"
+  },
+  {
+    "name": "PayPay",
+    "slug": "paypay",
+    "careers_url": "https://boards.greenhouse.io/paypay",
+    "source_type": "greenhouse",
+    "source_identifier": "paypay",
+    "industry": "Consumer Tech & Media"
+  },
+  {
+    "name": "FuriosaAI",
+    "slug": "furiosaai",
+    "careers_url": "https://boards.greenhouse.io/furiosaai",
+    "source_type": "greenhouse",
+    "source_identifier": "furiosaai",
+    "industry": "Consumer Tech & Media"
+  },
+  {
+    "name": "Moloco",
+    "slug": "moloco",
+    "careers_url": "https://boards.greenhouse.io/moloco",
+    "source_type": "greenhouse",
+    "source_identifier": "moloco",
+    "industry": "Consumer Tech & Media"
+  },
+  {
+    "name": "Shein",
+    "slug": "shein",
+    "careers_url": "https://boards.greenhouse.io/shein",
+    "source_type": "greenhouse",
+    "source_identifier": "shein",
+    "industry": "Consumer Tech & Media"
+  },
+  {
+    "name": "Baidu",
+    "slug": "baidu",
+    "careers_url": "https://boards.greenhouse.io/baidu",
+    "source_type": "greenhouse",
+    "source_identifier": "baidu",
+    "industry": "Consumer Tech & Media"
+  },
+  {
+    "name": "Elgato",
+    "slug": "elgato",
+    "careers_url": "https://jobs.smartrecruiters.com/Elgato",
+    "source_type": "smartrecruiters",
+    "source_identifier": "Elgato",
+    "industry": "Consumer Tech & Media"
+  },
+  {
+    "name": "Hims & Hers",
+    "slug": "hims-hers",
+    "careers_url": "https://jobs.ashbyhq.com/hims-and-hers",
+    "source_type": "ashby",
+    "source_identifier": "hims-and-hers",
+    "industry": "Consumer Tech & Media"
+  },
+  {
+    "name": "Talkspace",
+    "slug": "talkspace",
+    "careers_url": "https://boards.greenhouse.io/talkspace",
+    "source_type": "greenhouse",
+    "source_identifier": "talkspace",
+    "industry": "Consumer Tech & Media"
+  },
+  {
+    "name": "BetterHelp",
+    "slug": "betterhelp",
+    "careers_url": "https://boards.greenhouse.io/betterhelp",
+    "source_type": "greenhouse",
+    "source_identifier": "betterhelp",
+    "industry": "Consumer Tech & Media"
+  },
+  {
+    "name": "Headway",
+    "slug": "headway",
+    "careers_url": "https://jobs.ashbyhq.com/headway",
+    "source_type": "ashby",
+    "source_identifier": "headway",
+    "industry": "Consumer Tech & Media"
+  },
+  {
+    "name": "Grow Therapy",
+    "slug": "grow-therapy",
+    "careers_url": "https://jobs.ashbyhq.com/grow-therapy",
+    "source_type": "ashby",
+    "source_identifier": "grow-therapy",
+    "industry": "Consumer Tech & Media"
+  },
+  {
+    "name": "SonderMind",
+    "slug": "sondermind",
+    "careers_url": "https://jobs.ashbyhq.com/sondermind",
+    "source_type": "ashby",
+    "source_identifier": "sondermind",
+    "industry": "Consumer Tech & Media"
+  },
+  {
+    "name": "Rula",
+    "slug": "rula",
+    "careers_url": "https://jobs.ashbyhq.com/rula",
+    "source_type": "ashby",
+    "source_identifier": "rula",
+    "industry": "Consumer Tech & Media"
+  },
+  {
+    "name": "Two Chairs",
+    "slug": "two-chairs",
+    "careers_url": "https://boards.greenhouse.io/twochairs",
+    "source_type": "greenhouse",
+    "source_identifier": "twochairs",
+    "industry": "Consumer Tech & Media"
+  },
+  {
+    "name": "Amwell",
+    "slug": "amwell",
+    "careers_url": "https://boards.greenhouse.io/amwell",
+    "source_type": "greenhouse",
+    "source_identifier": "amwell",
+    "industry": "Consumer Tech & Media"
+  },
+  {
+    "name": "One Medical",
+    "slug": "one-medical",
+    "careers_url": "https://boards.greenhouse.io/onemedical",
+    "source_type": "greenhouse",
+    "source_identifier": "onemedical",
+    "industry": "Consumer Tech & Media"
+  },
+  {
+    "name": "Forward",
+    "slug": "forward",
+    "careers_url": "https://jobs.smartrecruiters.com/Forward",
+    "source_type": "smartrecruiters",
+    "source_identifier": "Forward",
+    "industry": "Consumer Tech & Media"
+  },
+  {
+    "name": "Parsley Health",
+    "slug": "parsley-health",
+    "careers_url": "https://boards.greenhouse.io/parsleyhealth",
+    "source_type": "greenhouse",
+    "source_identifier": "parsleyhealth",
+    "industry": "Consumer Tech & Media"
+  },
+  {
+    "name": "Privia Health",
+    "slug": "privia-health",
+    "careers_url": "https://jobs.smartrecruiters.com/Priviahealth",
+    "source_type": "smartrecruiters",
+    "source_identifier": "Priviahealth",
+    "industry": "Consumer Tech & Media"
+  },
+  {
+    "name": "Aledade",
+    "slug": "aledade",
+    "careers_url": "https://jobs.lever.co/aledade",
+    "source_type": "lever",
+    "source_identifier": "aledade",
+    "industry": "Consumer Tech & Media"
+  },
+  {
+    "name": "Clover Health",
+    "slug": "clover-health",
+    "careers_url": "https://boards.greenhouse.io/cloverhealth",
+    "source_type": "greenhouse",
+    "source_identifier": "cloverhealth",
+    "industry": "Consumer Tech & Media"
+  },
+  {
+    "name": "Collective Health",
+    "slug": "collective-health",
+    "careers_url": "https://jobs.ashbyhq.com/collective",
+    "source_type": "ashby",
+    "source_identifier": "collective",
+    "industry": "Consumer Tech & Media"
+  },
+  {
+    "name": "Sana Benefits",
+    "slug": "sana-benefits",
+    "careers_url": "https://jobs.lever.co/sanabenefits",
+    "source_type": "lever",
+    "source_identifier": "sanabenefits",
+    "industry": "Consumer Tech & Media"
+  },
+  {
+    "name": "Centivo",
+    "slug": "centivo",
+    "careers_url": "https://jobs.ashbyhq.com/centivo",
+    "source_type": "ashby",
+    "source_identifier": "centivo",
+    "industry": "Consumer Tech & Media"
+  },
+  {
+    "name": "Garner Health",
+    "slug": "garner-health",
+    "careers_url": "https://boards.greenhouse.io/garnerhealth",
+    "source_type": "greenhouse",
+    "source_identifier": "garnerhealth",
+    "industry": "Consumer Tech & Media"
+  },
+  {
+    "name": "Quantum Health",
+    "slug": "quantum-health",
+    "careers_url": "https://jobs.lever.co/quantum-health",
+    "source_type": "lever",
+    "source_identifier": "quantum-health",
+    "industry": "Consumer Tech & Media"
+  },
+  {
+    "name": "Omada Health",
+    "slug": "omada-health",
+    "careers_url": "https://boards.greenhouse.io/omadahealth",
+    "source_type": "greenhouse",
+    "source_identifier": "omadahealth",
+    "industry": "Consumer Tech & Media"
+  },
+  {
+    "name": "Virta Health",
+    "slug": "virta-health",
+    "careers_url": "https://jobs.ashbyhq.com/virtahealth",
+    "source_type": "ashby",
+    "source_identifier": "virtahealth",
+    "industry": "Consumer Tech & Media"
+  },
+  {
+    "name": "Hinge Health",
+    "slug": "hinge-health",
+    "careers_url": "https://jobs.ashbyhq.com/hinge-health",
+    "source_type": "ashby",
+    "source_identifier": "hinge-health",
+    "industry": "Consumer Tech & Media"
+  },
+  {
+    "name": "Maven Clinic",
+    "slug": "maven-clinic",
+    "careers_url": "https://boards.greenhouse.io/mavenclinic",
+    "source_type": "greenhouse",
+    "source_identifier": "mavenclinic",
+    "industry": "Consumer Tech & Media"
+  },
+  {
+    "name": "Carrot Fertility",
+    "slug": "carrot-fertility",
+    "careers_url": "https://boards.greenhouse.io/carrotfertility",
+    "source_type": "greenhouse",
+    "source_identifier": "carrotfertility",
+    "industry": "Consumer Tech & Media"
+  },
+  {
+    "name": "Tia",
+    "slug": "tia",
+    "careers_url": "https://boards.greenhouse.io/tia",
+    "source_type": "greenhouse",
+    "source_identifier": "tia",
+    "industry": "Consumer Tech & Media"
+  },
+  {
+    "name": "Midi Health",
+    "slug": "midi-health",
+    "careers_url": "https://boards.greenhouse.io/midihealth",
+    "source_type": "greenhouse",
+    "source_identifier": "midihealth",
+    "industry": "Consumer Tech & Media"
+  },
+  {
+    "name": "Equip Health",
+    "slug": "equip-health",
+    "careers_url": "https://jobs.ashbyhq.com/equip",
+    "source_type": "ashby",
+    "source_identifier": "equip",
+    "industry": "Consumer Tech & Media"
+  },
+  {
+    "name": "Charlie Health",
+    "slug": "charlie-health",
+    "careers_url": "https://boards.greenhouse.io/charliehealth",
+    "source_type": "greenhouse",
+    "source_identifier": "charliehealth",
+    "industry": "Consumer Tech & Media"
+  },
+  {
+    "name": "Ophelia",
+    "slug": "ophelia",
+    "careers_url": "https://boards.greenhouse.io/ophelia",
+    "source_type": "greenhouse",
+    "source_identifier": "ophelia",
+    "industry": "Consumer Tech & Media"
+  },
+  {
+    "name": "Bicycle Health",
+    "slug": "bicycle-health",
+    "careers_url": "https://boards.greenhouse.io/bicyclehealth",
+    "source_type": "greenhouse",
+    "source_identifier": "bicyclehealth",
+    "industry": "Consumer Tech & Media"
+  },
+  {
+    "name": "Boulder Care",
+    "slug": "boulder-care",
+    "careers_url": "https://boards.greenhouse.io/bouldercare",
+    "source_type": "greenhouse",
+    "source_identifier": "bouldercare",
+    "industry": "Consumer Tech & Media"
+  },
+  {
+    "name": "Workit Health",
+    "slug": "workit-health",
+    "careers_url": "https://boards.greenhouse.io/workithealth",
+    "source_type": "greenhouse",
+    "source_identifier": "workithealth",
+    "industry": "Consumer Tech & Media"
+  },
+  {
+    "name": "Everlywell",
+    "slug": "everlywell",
+    "careers_url": "https://jobs.lever.co/everlywell",
+    "source_type": "lever",
+    "source_identifier": "everlywell",
+    "industry": "Consumer Tech & Media"
+  },
+  {
+    "name": "Capsule",
+    "slug": "capsule",
+    "careers_url": "https://jobs.ashbyhq.com/capsule",
+    "source_type": "ashby",
+    "source_identifier": "capsule",
+    "industry": "Consumer Tech & Media"
+  },
+  {
+    "name": "SmithRx",
+    "slug": "smithrx",
+    "careers_url": "https://boards.greenhouse.io/smithrx",
+    "source_type": "greenhouse",
+    "source_identifier": "smithrx",
+    "industry": "Consumer Tech & Media"
+  },
+  {
+    "name": "Doximity",
+    "slug": "doximity",
+    "careers_url": "https://boards.greenhouse.io/doximity",
+    "source_type": "greenhouse",
+    "source_identifier": "doximity",
+    "industry": "Consumer Tech & Media"
+  },
+  {
+    "name": "OpenEvidence",
+    "slug": "openevidence",
+    "careers_url": "https://jobs.ashbyhq.com/openevidence",
+    "source_type": "ashby",
+    "source_identifier": "openevidence",
+    "industry": "Consumer Tech & Media"
+  },
+  {
+    "name": "Commure",
+    "slug": "commure",
+    "careers_url": "https://jobs.ashbyhq.com/commure",
+    "source_type": "ashby",
+    "source_identifier": "commure",
+    "industry": "Consumer Tech & Media"
+  },
+  {
+    "name": "AKASA",
+    "slug": "akasa",
+    "careers_url": "https://jobs.ashbyhq.com/akasa",
+    "source_type": "ashby",
+    "source_identifier": "akasa",
+    "industry": "Consumer Tech & Media"
+  },
+  {
+    "name": "Infinitus",
+    "slug": "infinitus",
+    "careers_url": "https://jobs.ashbyhq.com/infinitus",
+    "source_type": "ashby",
+    "source_identifier": "infinitus",
+    "industry": "Consumer Tech & Media"
+  },
+  {
+    "name": "Notable Health",
+    "slug": "notable-health",
+    "careers_url": "https://jobs.ashbyhq.com/notable",
+    "source_type": "ashby",
+    "source_identifier": "notable",
+    "industry": "Consumer Tech & Media"
+  },
+  {
+    "name": "Zus Health",
+    "slug": "zus-health",
+    "careers_url": "https://jobs.lever.co/zushealth",
+    "source_type": "lever",
+    "source_identifier": "zushealth",
+    "industry": "Consumer Tech & Media"
+  },
+  {
+    "name": "Canvas Medical",
+    "slug": "canvas-medical",
+    "careers_url": "https://jobs.lever.co/canvasmedical",
+    "source_type": "lever",
+    "source_identifier": "canvasmedical",
+    "industry": "Consumer Tech & Media"
+  },
+  {
+    "name": "Healthie",
+    "slug": "healthie",
+    "careers_url": "https://boards.greenhouse.io/healthie",
+    "source_type": "greenhouse",
+    "source_identifier": "healthie",
+    "industry": "Consumer Tech & Media"
+  },
+  {
+    "name": "Elation Health",
+    "slug": "elation-health",
+    "careers_url": "https://boards.greenhouse.io/elationhealth",
+    "source_type": "greenhouse",
+    "source_identifier": "elationhealth",
+    "industry": "Consumer Tech & Media"
+  },
+  {
+    "name": "HealthVerity",
+    "slug": "healthverity",
+    "careers_url": "https://boards.greenhouse.io/healthverity",
+    "source_type": "greenhouse",
+    "source_identifier": "healthverity",
+    "industry": "Consumer Tech & Media"
+  },
+  {
+    "name": "Truveta",
+    "slug": "truveta",
+    "careers_url": "https://boards.greenhouse.io/truveta",
+    "source_type": "greenhouse",
+    "source_identifier": "truveta",
+    "industry": "Consumer Tech & Media"
+  },
+  {
+    "name": "Science 37",
+    "slug": "science-37",
+    "careers_url": "https://boards.greenhouse.io/science37",
+    "source_type": "greenhouse",
+    "source_identifier": "science37",
+    "industry": "Consumer Tech & Media"
+  },
+  {
+    "name": "Unlearn.ai",
+    "slug": "unlearn-ai",
+    "careers_url": "https://jobs.ashbyhq.com/unlearn",
+    "source_type": "ashby",
+    "source_identifier": "unlearn",
+    "industry": "Consumer Tech & Media"
+  },
+  {
+    "name": "Formation Bio",
+    "slug": "formation-bio",
+    "careers_url": "https://boards.greenhouse.io/formationbio",
+    "source_type": "greenhouse",
+    "source_identifier": "formationbio",
+    "industry": "Consumer Tech & Media"
+  },
+  {
+    "name": "Dotmatics",
+    "slug": "dotmatics",
+    "careers_url": "https://boards.greenhouse.io/dotmatics",
+    "source_type": "greenhouse",
+    "source_identifier": "dotmatics",
+    "industry": "Consumer Tech & Media"
+  },
+  {
+    "name": "Twist Bioscience",
+    "slug": "twist-bioscience",
+    "careers_url": "https://boards.greenhouse.io/twistbioscience",
+    "source_type": "greenhouse",
+    "source_identifier": "twistbioscience",
+    "industry": "Consumer Tech & Media"
+  },
+  {
+    "name": "Asimov",
+    "slug": "asimov",
+    "careers_url": "https://jobs.ashbyhq.com/asimov",
+    "source_type": "ashby",
+    "source_identifier": "asimov",
+    "industry": "Consumer Tech & Media"
+  },
+  {
+    "name": "Synthego",
+    "slug": "synthego",
+    "careers_url": "https://jobs.lever.co/synthego",
+    "source_type": "lever",
+    "source_identifier": "synthego",
+    "industry": "Consumer Tech & Media"
+  },
+  {
+    "name": "Beam Therapeutics",
+    "slug": "beam-therapeutics",
+    "careers_url": "https://boards.greenhouse.io/beamtherapeutics",
+    "source_type": "greenhouse",
+    "source_identifier": "beamtherapeutics",
+    "industry": "Consumer Tech & Media"
+  },
+  {
+    "name": "Prime Medicine",
+    "slug": "prime-medicine",
+    "careers_url": "https://boards.greenhouse.io/primemedicine",
+    "source_type": "greenhouse",
+    "source_identifier": "primemedicine",
+    "industry": "Consumer Tech & Media"
+  },
+  {
+    "name": "Arcturus",
+    "slug": "arcturus",
+    "careers_url": "https://jobs.ashbyhq.com/arcturus",
+    "source_type": "ashby",
+    "source_identifier": "arcturus",
+    "industry": "Consumer Tech & Media"
+  },
+  {
+    "name": "Altos Labs",
+    "slug": "altos-labs",
+    "careers_url": "https://boards.greenhouse.io/altoslabs",
+    "source_type": "greenhouse",
+    "source_identifier": "altoslabs",
+    "industry": "Consumer Tech & Media"
+  },
+  {
+    "name": "NewLimit",
+    "slug": "newlimit",
+    "careers_url": "https://boards.greenhouse.io/newlimit",
+    "source_type": "greenhouse",
+    "source_identifier": "newlimit",
+    "industry": "Consumer Tech & Media"
+  },
+  {
+    "name": "Neuralink",
+    "slug": "neuralink",
+    "careers_url": "https://boards.greenhouse.io/neuralink",
+    "source_type": "greenhouse",
+    "source_identifier": "neuralink",
+    "industry": "Consumer Tech & Media"
+  },
+  {
+    "name": "Kernel",
+    "slug": "kernel",
+    "careers_url": "https://jobs.ashbyhq.com/kernel",
+    "source_type": "ashby",
+    "source_identifier": "kernel",
+    "industry": "Consumer Tech & Media"
+  },
+  {
+    "name": "Butterfly Network",
+    "slug": "butterfly-network",
+    "careers_url": "https://boards.greenhouse.io/butterflynetwork",
+    "source_type": "greenhouse",
+    "source_identifier": "butterflynetwork",
+    "industry": "Consumer Tech & Media"
+  },
+  {
+    "name": "Rad AI",
+    "slug": "rad-ai",
+    "careers_url": "https://jobs.ashbyhq.com/radai",
+    "source_type": "ashby",
+    "source_identifier": "radai",
+    "industry": "Consumer Tech & Media"
+  },
+  {
+    "name": "Eko Health",
+    "slug": "eko-health",
+    "careers_url": "https://jobs.lever.co/ekohealth",
+    "source_type": "lever",
+    "source_identifier": "ekohealth",
+    "industry": "Consumer Tech & Media"
+  },
+  {
+    "name": "Level Health",
+    "slug": "level-health",
+    "careers_url": "https://jobs.ashbyhq.com/level",
+    "source_type": "ashby",
+    "source_identifier": "level",
+    "industry": "Consumer Tech & Media"
+  },
+  {
+    "name": "January AI",
+    "slug": "january-ai",
+    "careers_url": "https://jobs.ashbyhq.com/january",
+    "source_type": "ashby",
+    "source_identifier": "january",
+    "industry": "Consumer Tech & Media"
+  },
+  {
+    "name": "Superpower",
+    "slug": "superpower",
+    "careers_url": "https://jobs.ashbyhq.com/superpower",
+    "source_type": "ashby",
+    "source_identifier": "superpower",
+    "industry": "Consumer Tech & Media"
+  },
+  {
+    "name": "Prenuvo",
+    "slug": "prenuvo",
+    "careers_url": "https://boards.greenhouse.io/prenuvo",
+    "source_type": "greenhouse",
+    "source_identifier": "prenuvo",
+    "industry": "Consumer Tech & Media"
+  },
+  {
+    "name": "Neko Health",
+    "slug": "neko-health",
+    "careers_url": "https://jobs.ashbyhq.com/neko-health",
+    "source_type": "ashby",
+    "source_identifier": "neko-health",
+    "industry": "Consumer Tech & Media"
+  },
+  {
+    "name": "Vonage",
+    "slug": "vonage",
+    "careers_url": "https://boards.greenhouse.io/vonage",
+    "source_type": "greenhouse",
+    "source_identifier": "vonage",
+    "industry": "SaaS & Enterprise Software"
+  },
+  {
+    "name": "Bandwidth",
+    "slug": "bandwidth",
+    "careers_url": "https://boards.greenhouse.io/bandwidth",
+    "source_type": "greenhouse",
+    "source_identifier": "bandwidth",
+    "industry": "SaaS & Enterprise Software"
+  },
+  {
+    "name": "Bird",
+    "slug": "bird",
+    "careers_url": "https://boards.greenhouse.io/bird",
+    "source_type": "greenhouse",
+    "source_identifier": "bird",
+    "industry": "SaaS & Enterprise Software"
+  },
+  {
+    "name": "Dialpad",
+    "slug": "dialpad",
+    "careers_url": "https://boards.greenhouse.io/dialpad",
+    "source_type": "greenhouse",
+    "source_identifier": "dialpad",
+    "industry": "SaaS & Enterprise Software"
+  },
+  {
+    "name": "Five9",
+    "slug": "five9",
+    "careers_url": "https://boards.greenhouse.io/five9",
+    "source_type": "greenhouse",
+    "source_identifier": "five9",
+    "industry": "SaaS & Enterprise Software"
+  },
+  {
+    "name": "NICE",
+    "slug": "nice",
+    "careers_url": "https://boards.greenhouse.io/nice",
+    "source_type": "greenhouse",
+    "source_identifier": "nice",
+    "industry": "SaaS & Enterprise Software"
+  },
+  {
+    "name": "Sprout Social",
+    "slug": "sprout-social",
+    "careers_url": "https://boards.greenhouse.io/sproutsocial",
+    "source_type": "greenhouse",
+    "source_identifier": "sproutsocial",
+    "industry": "SaaS & Enterprise Software"
+  },
+  {
+    "name": "Hootsuite",
+    "slug": "hootsuite",
+    "careers_url": "https://jobs.smartrecruiters.com/Hootsuite",
+    "source_type": "smartrecruiters",
+    "source_identifier": "Hootsuite",
+    "industry": "SaaS & Enterprise Software"
+  },
+  {
+    "name": "Later",
+    "slug": "later",
+    "careers_url": "https://boards.greenhouse.io/later",
+    "source_type": "greenhouse",
+    "source_identifier": "later",
+    "industry": "SaaS & Enterprise Software"
+  },
+  {
+    "name": "Brandwatch",
+    "slug": "brandwatch",
+    "careers_url": "https://boards.greenhouse.io/brandwatch",
+    "source_type": "greenhouse",
+    "source_identifier": "brandwatch",
+    "industry": "SaaS & Enterprise Software"
+  },
+  {
+    "name": "Cision",
+    "slug": "cision",
+    "careers_url": "https://boards.greenhouse.io/cision",
+    "source_type": "greenhouse",
+    "source_identifier": "cision",
+    "industry": "SaaS & Enterprise Software"
+  },
+  {
+    "name": "Muck Rack",
+    "slug": "muck-rack",
+    "careers_url": "https://boards.greenhouse.io/muckrack",
+    "source_type": "greenhouse",
+    "source_identifier": "muckrack",
+    "industry": "SaaS & Enterprise Software"
+  },
+  {
+    "name": "Iterable",
+    "slug": "iterable",
+    "careers_url": "https://jobs.ashbyhq.com/iterable",
+    "source_type": "ashby",
+    "source_identifier": "iterable",
+    "industry": "SaaS & Enterprise Software"
+  },
+  {
+    "name": "Customer.io",
+    "slug": "customer-io",
+    "careers_url": "https://boards.greenhouse.io/customerio",
+    "source_type": "greenhouse",
+    "source_identifier": "customerio",
+    "industry": "SaaS & Enterprise Software"
+  },
+  {
+    "name": "Okendo",
+    "slug": "okendo",
+    "careers_url": "https://jobs.lever.co/okendo",
+    "source_type": "lever",
+    "source_identifier": "okendo",
+    "industry": "SaaS & Enterprise Software"
+  },
+  {
+    "name": "Recharge",
+    "slug": "recharge",
+    "careers_url": "https://jobs.ashbyhq.com/recharge",
+    "source_type": "ashby",
+    "source_identifier": "recharge",
+    "industry": "SaaS & Enterprise Software"
+  },
+  {
+    "name": "Triple Whale",
+    "slug": "triple-whale",
+    "careers_url": "https://boards.greenhouse.io/triplewhale",
+    "source_type": "greenhouse",
+    "source_identifier": "triplewhale",
+    "industry": "SaaS & Enterprise Software"
+  },
+  {
+    "name": "Northbeam",
+    "slug": "northbeam",
+    "careers_url": "https://boards.greenhouse.io/northbeam",
+    "source_type": "greenhouse",
+    "source_identifier": "northbeam",
+    "industry": "SaaS & Enterprise Software"
+  },
+  {
+    "name": "AppsFlyer",
+    "slug": "appsflyer",
+    "careers_url": "https://boards.greenhouse.io/appsflyer",
+    "source_type": "greenhouse",
+    "source_identifier": "appsflyer",
+    "industry": "SaaS & Enterprise Software"
+  },
+  {
+    "name": "Singular",
+    "slug": "singular",
+    "careers_url": "https://jobs.ashbyhq.com/singular",
+    "source_type": "ashby",
+    "source_identifier": "singular",
+    "industry": "SaaS & Enterprise Software"
+  },
+  {
+    "name": "Liftoff",
+    "slug": "liftoff",
+    "careers_url": "https://boards.greenhouse.io/liftoff",
+    "source_type": "greenhouse",
+    "source_identifier": "liftoff",
+    "industry": "SaaS & Enterprise Software"
+  },
+  {
+    "name": "AppLovin",
+    "slug": "applovin",
+    "careers_url": "https://boards.greenhouse.io/applovin",
+    "source_type": "greenhouse",
+    "source_identifier": "applovin",
+    "industry": "SaaS & Enterprise Software"
+  },
+  {
+    "name": "Glance",
+    "slug": "glance",
+    "careers_url": "https://boards.greenhouse.io/glance",
+    "source_type": "greenhouse",
+    "source_identifier": "glance",
+    "industry": "SaaS & Enterprise Software"
+  },
+  {
+    "name": "PubMatic",
+    "slug": "pubmatic",
+    "careers_url": "https://boards.greenhouse.io/pubmatic",
+    "source_type": "greenhouse",
+    "source_identifier": "pubmatic",
+    "industry": "SaaS & Enterprise Software"
+  },
+  {
+    "name": "MNTN",
+    "slug": "mntn",
+    "careers_url": "https://boards.greenhouse.io/mntn",
+    "source_type": "greenhouse",
+    "source_identifier": "mntn",
+    "industry": "SaaS & Enterprise Software"
+  },
+  {
+    "name": "Vibe",
+    "slug": "vibe",
+    "careers_url": "https://jobs.ashbyhq.com/vibe",
+    "source_type": "ashby",
+    "source_identifier": "vibe",
+    "industry": "SaaS & Enterprise Software"
+  },
+  {
+    "name": "Madhive",
+    "slug": "madhive",
+    "careers_url": "https://jobs.ashbyhq.com/madhive",
+    "source_type": "ashby",
+    "source_identifier": "madhive",
+    "industry": "SaaS & Enterprise Software"
+  },
+  {
+    "name": "Samba TV",
+    "slug": "samba-tv",
+    "careers_url": "https://jobs.lever.co/sambatv",
+    "source_type": "lever",
+    "source_identifier": "sambatv",
+    "industry": "SaaS & Enterprise Software"
+  },
+  {
+    "name": "iSpot.tv",
+    "slug": "ispot-tv",
+    "careers_url": "https://boards.greenhouse.io/ispottv",
+    "source_type": "greenhouse",
+    "source_identifier": "ispottv",
+    "industry": "SaaS & Enterprise Software"
+  },
+  {
+    "name": "Experian",
+    "slug": "experian",
+    "careers_url": "https://jobs.smartrecruiters.com/Experian",
+    "source_type": "smartrecruiters",
+    "source_identifier": "Experian",
+    "industry": "SaaS & Enterprise Software"
+  },
+  {
+    "name": "Demandbase",
+    "slug": "demandbase",
+    "careers_url": "https://jobs.ashbyhq.com/demandbase",
+    "source_type": "ashby",
+    "source_identifier": "demandbase",
+    "industry": "SaaS & Enterprise Software"
+  },
+  {
+    "name": "G2",
+    "slug": "g2",
+    "careers_url": "https://jobs.ashbyhq.com/g2",
+    "source_type": "ashby",
+    "source_identifier": "g2",
+    "industry": "SaaS & Enterprise Software"
+  },
+  {
+    "name": "TrustRadius",
+    "slug": "trustradius",
+    "careers_url": "https://jobs.smartrecruiters.com/Trustradius",
+    "source_type": "smartrecruiters",
+    "source_identifier": "Trustradius",
+    "industry": "SaaS & Enterprise Software"
+  },
+  {
+    "name": "CB Insights",
+    "slug": "cb-insights",
+    "careers_url": "https://boards.greenhouse.io/cbinsights",
+    "source_type": "greenhouse",
+    "source_identifier": "cbinsights",
+    "industry": "SaaS & Enterprise Software"
+  },
+  {
+    "name": "BrightEdge",
+    "slug": "brightedge",
+    "careers_url": "https://jobs.lever.co/brightedge",
+    "source_type": "lever",
+    "source_identifier": "brightedge",
+    "industry": "SaaS & Enterprise Software"
+  },
+  {
+    "name": "Yext",
+    "slug": "yext",
+    "careers_url": "https://boards.greenhouse.io/yext",
+    "source_type": "greenhouse",
+    "source_identifier": "yext",
+    "industry": "SaaS & Enterprise Software"
+  },
+  {
+    "name": "Storyblok",
+    "slug": "storyblok",
+    "careers_url": "https://boards.greenhouse.io/storyblok",
+    "source_type": "greenhouse",
+    "source_identifier": "storyblok",
+    "industry": "SaaS & Enterprise Software"
+  },
+  {
+    "name": "Contentstack",
+    "slug": "contentstack",
+    "careers_url": "https://boards.greenhouse.io/contentstack",
+    "source_type": "greenhouse",
+    "source_identifier": "contentstack",
+    "industry": "SaaS & Enterprise Software"
+  },
+  {
+    "name": "Bubble",
+    "slug": "bubble",
+    "careers_url": "https://jobs.ashbyhq.com/bubble",
+    "source_type": "ashby",
+    "source_identifier": "bubble",
+    "industry": "SaaS & Enterprise Software"
+  },
+  {
+    "name": "Glide",
+    "slug": "glide",
+    "careers_url": "https://jobs.lever.co/glide",
+    "source_type": "lever",
+    "source_identifier": "glide",
+    "industry": "SaaS & Enterprise Software"
+  },
+  {
+    "name": "Coder",
+    "slug": "coder",
+    "careers_url": "https://jobs.ashbyhq.com/coder",
+    "source_type": "ashby",
+    "source_identifier": "coder",
+    "industry": "SaaS & Enterprise Software"
+  },
+  {
+    "name": "Glitch",
+    "slug": "glitch",
+    "careers_url": "https://jobs.ashbyhq.com/glitch",
+    "source_type": "ashby",
+    "source_identifier": "glitch",
+    "industry": "SaaS & Enterprise Software"
+  },
+  {
+    "name": "DataCamp",
+    "slug": "datacamp",
+    "careers_url": "https://boards.greenhouse.io/datacamp",
+    "source_type": "greenhouse",
+    "source_identifier": "datacamp",
+    "industry": "SaaS & Enterprise Software"
+  },
+  {
+    "name": "Educative",
+    "slug": "educative",
+    "careers_url": "https://jobs.lever.co/educative",
+    "source_type": "lever",
+    "source_identifier": "educative",
+    "industry": "SaaS & Enterprise Software"
+  },
+  {
+    "name": "Brilliant",
+    "slug": "brilliant",
+    "careers_url": "https://jobs.lever.co/brilliant",
+    "source_type": "lever",
+    "source_identifier": "brilliant",
+    "industry": "SaaS & Enterprise Software"
+  },
+  {
+    "name": "MasterClass",
+    "slug": "masterclass",
+    "careers_url": "https://boards.greenhouse.io/masterclass",
+    "source_type": "greenhouse",
+    "source_identifier": "masterclass",
+    "industry": "SaaS & Enterprise Software"
+  },
+  {
+    "name": "Docebo",
+    "slug": "docebo",
+    "careers_url": "https://jobs.ashbyhq.com/docebo",
+    "source_type": "ashby",
+    "source_identifier": "docebo",
+    "industry": "SaaS & Enterprise Software"
+  },
+  {
+    "name": "Absorb LMS",
+    "slug": "absorb-lms",
+    "careers_url": "https://jobs.ashbyhq.com/absorblms",
+    "source_type": "ashby",
+    "source_identifier": "absorblms",
+    "industry": "SaaS & Enterprise Software"
+  },
+  {
+    "name": "360Learning",
+    "slug": "360learning",
+    "careers_url": "https://jobs.lever.co/360learning",
+    "source_type": "lever",
+    "source_identifier": "360learning",
+    "industry": "SaaS & Enterprise Software"
+  },
+  {
+    "name": "Jobvite",
+    "slug": "jobvite",
+    "careers_url": "https://jobs.lever.co/jobvite",
+    "source_type": "lever",
+    "source_identifier": "jobvite",
+    "industry": "SaaS & Enterprise Software"
+  },
+  {
+    "name": "Beamery",
+    "slug": "beamery",
+    "careers_url": "https://jobs.smartrecruiters.com/Beamery",
+    "source_type": "smartrecruiters",
+    "source_identifier": "Beamery",
+    "industry": "SaaS & Enterprise Software"
+  },
+  {
+    "name": "SeekOut",
+    "slug": "seekout",
+    "careers_url": "https://jobs.smartrecruiters.com/Seekout",
+    "source_type": "smartrecruiters",
+    "source_identifier": "Seekout",
+    "industry": "SaaS & Enterprise Software"
+  },
+  {
+    "name": "Findem",
+    "slug": "findem",
+    "careers_url": "https://jobs.lever.co/findem",
+    "source_type": "lever",
+    "source_identifier": "findem",
+    "industry": "SaaS & Enterprise Software"
+  },
+  {
+    "name": "Workstream",
+    "slug": "workstream",
+    "careers_url": "https://boards.greenhouse.io/workstream",
+    "source_type": "greenhouse",
+    "source_identifier": "workstream",
+    "industry": "SaaS & Enterprise Software"
+  },
+  {
+    "name": "Homebase",
+    "slug": "homebase",
+    "careers_url": "https://jobs.ashbyhq.com/homebase",
+    "source_type": "ashby",
+    "source_identifier": "homebase",
+    "industry": "SaaS & Enterprise Software"
+  },
+  {
+    "name": "7shifts",
+    "slug": "7shifts",
+    "careers_url": "https://jobs.ashbyhq.com/7shifts",
+    "source_type": "ashby",
+    "source_identifier": "7shifts",
+    "industry": "SaaS & Enterprise Software"
+  },
+  {
+    "name": "Connecteam",
+    "slug": "connecteam",
+    "careers_url": "https://boards.greenhouse.io/connecteam",
+    "source_type": "greenhouse",
+    "source_identifier": "connecteam",
+    "industry": "SaaS & Enterprise Software"
+  },
+  {
+    "name": "Legion",
+    "slug": "legion",
+    "careers_url": "https://boards.greenhouse.io/legion",
+    "source_type": "greenhouse",
+    "source_identifier": "legion",
+    "industry": "SaaS & Enterprise Software"
+  },
+  {
+    "name": "ShiftKey",
+    "slug": "shiftkey",
+    "careers_url": "https://jobs.ashbyhq.com/shiftkey",
+    "source_type": "ashby",
+    "source_identifier": "shiftkey",
+    "industry": "SaaS & Enterprise Software"
+  },
+  {
+    "name": "Aya Healthcare",
+    "slug": "aya-healthcare",
+    "careers_url": "https://boards.greenhouse.io/ayahealthcare",
+    "source_type": "greenhouse",
+    "source_identifier": "ayahealthcare",
+    "industry": "SaaS & Enterprise Software"
+  },
+  {
+    "name": "Medely",
+    "slug": "medely",
+    "careers_url": "https://jobs.ashbyhq.com/medely",
+    "source_type": "ashby",
+    "source_identifier": "medely",
+    "industry": "SaaS & Enterprise Software"
+  },
+  {
+    "name": "Netskope",
+    "slug": "netskope",
+    "careers_url": "https://boards.greenhouse.io/netskope",
+    "source_type": "greenhouse",
+    "source_identifier": "netskope",
+    "industry": "Security"
+  },
+  {
+    "name": "Illumio",
+    "slug": "illumio",
+    "careers_url": "https://jobs.ashbyhq.com/illumio",
+    "source_type": "ashby",
+    "source_identifier": "illumio",
+    "industry": "Security"
+  },
+  {
+    "name": "Material Security",
+    "slug": "material-security",
+    "careers_url": "https://jobs.ashbyhq.com/materialsecurity",
+    "source_type": "ashby",
+    "source_identifier": "materialsecurity",
+    "industry": "Security"
+  },
+  {
+    "name": "KnowBe4",
+    "slug": "knowbe4",
+    "careers_url": "https://boards.greenhouse.io/knowbe4",
+    "source_type": "greenhouse",
+    "source_identifier": "knowbe4",
+    "industry": "Security"
+  },
+  {
+    "name": "Expel",
+    "slug": "expel",
+    "careers_url": "https://boards.greenhouse.io/expel",
+    "source_type": "greenhouse",
+    "source_identifier": "expel",
+    "industry": "Security"
+  },
+  {
+    "name": "Huntress",
+    "slug": "huntress",
+    "careers_url": "https://boards.greenhouse.io/huntress",
+    "source_type": "greenhouse",
+    "source_identifier": "huntress",
+    "industry": "Security"
+  },
+  {
+    "name": "Bugcrowd",
+    "slug": "bugcrowd",
+    "careers_url": "https://boards.greenhouse.io/bugcrowd",
+    "source_type": "greenhouse",
+    "source_identifier": "bugcrowd",
+    "industry": "Security"
+  },
+  {
+    "name": "HackerOne",
+    "slug": "hackerone",
+    "careers_url": "https://jobs.ashbyhq.com/hackerone",
+    "source_type": "ashby",
+    "source_identifier": "hackerone",
+    "industry": "Security"
+  },
+  {
+    "name": "Synack",
+    "slug": "synack",
+    "careers_url": "https://boards.greenhouse.io/synack",
+    "source_type": "greenhouse",
+    "source_identifier": "synack",
+    "industry": "Security"
+  },
+  {
+    "name": "Horizon3.ai",
+    "slug": "horizon3-ai",
+    "careers_url": "https://jobs.ashbyhq.com/horizon3ai",
+    "source_type": "ashby",
+    "source_identifier": "horizon3ai",
+    "industry": "Security"
+  },
+  {
+    "name": "Axonius",
+    "slug": "axonius",
+    "careers_url": "https://boards.greenhouse.io/axonius",
+    "source_type": "greenhouse",
+    "source_identifier": "axonius",
+    "industry": "Security"
+  },
+  {
+    "name": "Thoropass",
+    "slug": "thoropass",
+    "careers_url": "https://boards.greenhouse.io/thoropass",
+    "source_type": "greenhouse",
+    "source_identifier": "thoropass",
+    "industry": "Security"
+  },
+  {
+    "name": "Hyperproof",
+    "slug": "hyperproof",
+    "careers_url": "https://boards.greenhouse.io/hyperproof",
+    "source_type": "greenhouse",
+    "source_identifier": "hyperproof",
+    "industry": "Security"
+  },
+  {
+    "name": "OneTrust",
+    "slug": "onetrust",
+    "careers_url": "https://boards.greenhouse.io/onetrust",
+    "source_type": "greenhouse",
+    "source_identifier": "onetrust",
+    "industry": "Security"
+  },
+  {
+    "name": "BigID",
+    "slug": "bigid",
+    "careers_url": "https://boards.greenhouse.io/bigid",
+    "source_type": "greenhouse",
+    "source_identifier": "bigid",
+    "industry": "Security"
+  },
+  {
+    "name": "Rubrik",
+    "slug": "rubrik",
+    "careers_url": "https://boards.greenhouse.io/rubrik",
+    "source_type": "greenhouse",
+    "source_identifier": "rubrik",
+    "industry": "Security"
+  },
+  {
+    "name": "Commvault",
+    "slug": "commvault",
+    "careers_url": "https://boards.greenhouse.io/commvault",
+    "source_type": "greenhouse",
+    "source_identifier": "commvault",
+    "industry": "Security"
+  },
+  {
+    "name": "Island",
+    "slug": "island",
+    "careers_url": "https://boards.greenhouse.io/island",
+    "source_type": "greenhouse",
+    "source_identifier": "island",
+    "industry": "Security"
+  },
+  {
+    "name": "Menlo Security",
+    "slug": "menlo-security",
+    "careers_url": "https://jobs.ashbyhq.com/menlosecurity",
+    "source_type": "ashby",
+    "source_identifier": "menlosecurity",
+    "industry": "Security"
+  },
+  {
+    "name": "SonicWall",
+    "slug": "sonicwall",
+    "careers_url": "https://boards.greenhouse.io/sonicwall",
+    "source_type": "greenhouse",
+    "source_identifier": "sonicwall",
+    "industry": "Security"
+  },
+  {
+    "name": "WatchGuard",
+    "slug": "watchguard",
+    "careers_url": "https://jobs.lever.co/watchguard",
+    "source_type": "lever",
+    "source_identifier": "watchguard",
+    "industry": "Security"
+  },
+  {
+    "name": "Sophos",
+    "slug": "sophos",
+    "careers_url": "https://jobs.lever.co/sophos",
+    "source_type": "lever",
+    "source_identifier": "sophos",
+    "industry": "Security"
+  },
+  {
+    "name": "Gen Digital",
+    "slug": "gen-digital",
+    "careers_url": "https://jobs.ashbyhq.com/gen-digital",
+    "source_type": "ashby",
+    "source_identifier": "gen-digital",
+    "industry": "Security"
+  },
+  {
+    "name": "Recorded Future",
+    "slug": "recorded-future",
+    "careers_url": "https://boards.greenhouse.io/recordedfuture",
+    "source_type": "greenhouse",
+    "source_identifier": "recordedfuture",
+    "industry": "Security"
+  },
+  {
+    "name": "Censys",
+    "slug": "censys",
+    "careers_url": "https://boards.greenhouse.io/censys",
+    "source_type": "greenhouse",
+    "source_identifier": "censys",
+    "industry": "Security"
+  },
+  {
+    "name": "Veracode",
+    "slug": "veracode",
+    "careers_url": "https://boards.greenhouse.io/veracode",
+    "source_type": "greenhouse",
+    "source_identifier": "veracode",
+    "industry": "Security"
+  },
+  {
+    "name": "Sonatype",
+    "slug": "sonatype",
+    "careers_url": "https://jobs.lever.co/sonatype",
+    "source_type": "lever",
+    "source_identifier": "sonatype",
+    "industry": "Security"
+  },
+  {
+    "name": "Endor Labs",
+    "slug": "endor-labs",
+    "careers_url": "https://boards.greenhouse.io/endorlabs",
+    "source_type": "greenhouse",
+    "source_identifier": "endorlabs",
+    "industry": "Security"
+  },
+  {
+    "name": "Apiiro",
+    "slug": "apiiro",
+    "careers_url": "https://boards.greenhouse.io/apiiro",
+    "source_type": "greenhouse",
+    "source_identifier": "apiiro",
+    "industry": "Security"
+  },
+  {
+    "name": "Sonrai Security",
+    "slug": "sonrai-security",
+    "careers_url": "https://jobs.lever.co/sonrai-security",
+    "source_type": "lever",
+    "source_identifier": "sonrai-security",
+    "industry": "Security"
+  },
+  {
+    "name": "Corelight",
+    "slug": "corelight",
+    "careers_url": "https://boards.greenhouse.io/corelight",
+    "source_type": "greenhouse",
+    "source_identifier": "corelight",
+    "industry": "Security"
+  },
+  {
+    "name": "Arista Networks",
+    "slug": "arista-networks",
+    "careers_url": "https://jobs.smartrecruiters.com/Aristanetworks",
+    "source_type": "smartrecruiters",
+    "source_identifier": "Aristanetworks",
+    "industry": "Security"
+  },
+  {
+    "name": "Ubiquiti",
+    "slug": "ubiquiti",
+    "careers_url": "https://boards.greenhouse.io/ubiquiti",
+    "source_type": "greenhouse",
+    "source_identifier": "ubiquiti",
+    "industry": "Security"
+  },
+  {
+    "name": "Extreme Networks",
+    "slug": "extreme-networks",
+    "careers_url": "https://jobs.lever.co/extremenetworks",
+    "source_type": "lever",
+    "source_identifier": "extremenetworks",
+    "industry": "Security"
+  },
+  {
+    "name": "Rain AI",
+    "slug": "rain-ai",
+    "careers_url": "https://jobs.ashbyhq.com/rain",
+    "source_type": "ashby",
+    "source_identifier": "rain",
+    "industry": "Security"
+  },
+  {
+    "name": "d-Matrix",
+    "slug": "d-matrix",
+    "careers_url": "https://jobs.ashbyhq.com/d-matrix",
+    "source_type": "ashby",
+    "source_identifier": "d-matrix",
+    "industry": "Security"
+  },
+  {
+    "name": "MatX",
+    "slug": "matx",
+    "careers_url": "https://jobs.ashbyhq.com/matx",
+    "source_type": "ashby",
+    "source_identifier": "matx",
+    "industry": "Security"
+  },
+  {
+    "name": "Astera Labs",
+    "slug": "astera-labs",
+    "careers_url": "https://boards.greenhouse.io/asteralabs",
+    "source_type": "greenhouse",
+    "source_identifier": "asteralabs",
+    "industry": "Security"
+  },
+  {
+    "name": "Axelera AI",
+    "slug": "axelera-ai",
+    "careers_url": "https://jobs.ashbyhq.com/axelera",
+    "source_type": "ashby",
+    "source_identifier": "axelera",
+    "industry": "Security"
+  },
+  {
+    "name": "Microchip",
+    "slug": "microchip",
+    "careers_url": "https://jobs.smartrecruiters.com/Microchip",
+    "source_type": "smartrecruiters",
+    "source_identifier": "Microchip",
+    "industry": "Security"
+  },
+  {
+    "name": "Western Digital",
+    "slug": "western-digital",
+    "careers_url": "https://jobs.smartrecruiters.com/Westerndigital",
+    "source_type": "smartrecruiters",
+    "source_identifier": "Westerndigital",
+    "industry": "Security"
+  },
+  {
+    "name": "Mirantis",
+    "slug": "mirantis",
+    "careers_url": "https://jobs.smartrecruiters.com/Mirantis",
+    "source_type": "smartrecruiters",
+    "source_identifier": "Mirantis",
+    "industry": "Security"
+  },
+  {
+    "name": "Vantage",
+    "slug": "vantage",
+    "careers_url": "https://jobs.ashbyhq.com/vantage",
+    "source_type": "ashby",
+    "source_identifier": "vantage",
+    "industry": "Security"
+  },
+  {
+    "name": "CloudZero",
+    "slug": "cloudzero",
+    "careers_url": "https://jobs.ashbyhq.com/cloudzero",
+    "source_type": "ashby",
+    "source_identifier": "cloudzero",
+    "industry": "Security"
+  },
+  {
+    "name": "Finout",
+    "slug": "finout",
+    "careers_url": "https://jobs.ashbyhq.com/finout",
+    "source_type": "ashby",
+    "source_identifier": "finout",
+    "industry": "Security"
+  },
+  {
+    "name": "Faraday Future",
+    "slug": "faraday-future",
+    "careers_url": "https://boards.greenhouse.io/faradayfuture",
+    "source_type": "greenhouse",
+    "source_identifier": "faradayfuture",
+    "industry": "Climate & Energy"
+  },
+  {
+    "name": "BYD",
+    "slug": "byd",
+    "careers_url": "https://boards.greenhouse.io/byd",
+    "source_type": "greenhouse",
+    "source_identifier": "byd",
+    "industry": "Climate & Energy"
+  },
+  {
+    "name": "Solid Power",
+    "slug": "solid-power",
+    "careers_url": "https://boards.greenhouse.io/solidpower",
+    "source_type": "greenhouse",
+    "source_identifier": "solidpower",
+    "industry": "Climate & Energy"
+  },
+  {
+    "name": "Sila Nanotechnologies",
+    "slug": "sila-nanotechnologies",
+    "careers_url": "https://boards.greenhouse.io/silananotechnologies",
+    "source_type": "greenhouse",
+    "source_identifier": "silananotechnologies",
+    "industry": "Climate & Energy"
+  },
+  {
+    "name": "Group14",
+    "slug": "group14",
+    "careers_url": "https://boards.greenhouse.io/group14",
+    "source_type": "greenhouse",
+    "source_identifier": "group14",
+    "industry": "Climate & Energy"
+  },
+  {
+    "name": "ChargePoint",
+    "slug": "chargepoint",
+    "careers_url": "https://boards.greenhouse.io/chargepoint",
+    "source_type": "greenhouse",
+    "source_identifier": "chargepoint",
+    "industry": "Climate & Energy"
+  },
+  {
+    "name": "Form Energy",
+    "slug": "form-energy",
+    "careers_url": "https://jobs.ashbyhq.com/formenergy",
+    "source_type": "ashby",
+    "source_identifier": "formenergy",
+    "industry": "Climate & Energy"
+  },
+  {
+    "name": "Aurora Solar",
+    "slug": "aurora-solar",
+    "careers_url": "https://jobs.ashbyhq.com/aurorasolar",
+    "source_type": "ashby",
+    "source_identifier": "aurorasolar",
+    "industry": "Climate & Energy"
+  },
+  {
+    "name": "Ohme",
+    "slug": "ohme",
+    "careers_url": "https://boards.greenhouse.io/ohme",
+    "source_type": "greenhouse",
+    "source_identifier": "ohme",
+    "industry": "Climate & Energy"
+  },
+  {
+    "name": "Helion",
+    "slug": "helion",
+    "careers_url": "https://jobs.ashbyhq.com/helion",
+    "source_type": "ashby",
+    "source_identifier": "helion",
+    "industry": "Climate & Energy"
+  },
+  {
+    "name": "Oklo",
+    "slug": "oklo",
+    "careers_url": "https://boards.greenhouse.io/oklo",
+    "source_type": "greenhouse",
+    "source_identifier": "oklo",
+    "industry": "Climate & Energy"
+  },
+  {
+    "name": "Kairos Power",
+    "slug": "kairos-power",
+    "careers_url": "https://boards.greenhouse.io/kairospower",
+    "source_type": "greenhouse",
+    "source_identifier": "kairospower",
+    "industry": "Climate & Energy"
+  },
+  {
+    "name": "Fervo Energy",
+    "slug": "fervo-energy",
+    "careers_url": "https://boards.greenhouse.io/fervoenergy",
+    "source_type": "greenhouse",
+    "source_identifier": "fervoenergy",
+    "industry": "Climate & Energy"
+  },
+  {
+    "name": "Quaise",
+    "slug": "quaise",
+    "careers_url": "https://boards.greenhouse.io/quaise",
+    "source_type": "greenhouse",
+    "source_identifier": "quaise",
+    "industry": "Climate & Energy"
+  },
+  {
+    "name": "Charm Industrial",
+    "slug": "charm-industrial",
+    "careers_url": "https://jobs.lever.co/charmindustrial",
+    "source_type": "lever",
+    "source_identifier": "charmindustrial",
+    "industry": "Climate & Energy"
+  },
+  {
+    "name": "Patch",
+    "slug": "patch",
+    "careers_url": "https://boards.greenhouse.io/patch",
+    "source_type": "greenhouse",
+    "source_identifier": "patch",
+    "industry": "Climate & Energy"
+  },
+  {
+    "name": "Sweep",
+    "slug": "sweep",
+    "careers_url": "https://jobs.ashbyhq.com/sweep",
+    "source_type": "ashby",
+    "source_identifier": "sweep",
+    "industry": "Climate & Energy"
+  },
+  {
+    "name": "Sylvera",
+    "slug": "sylvera",
+    "careers_url": "https://jobs.ashbyhq.com/sylvera",
+    "source_type": "ashby",
+    "source_identifier": "sylvera",
+    "industry": "Climate & Energy"
+  },
+  {
+    "name": "Span",
+    "slug": "span",
+    "careers_url": "https://jobs.ashbyhq.com/span",
+    "source_type": "ashby",
+    "source_identifier": "span",
+    "industry": "Climate & Energy"
+  },
+  {
+    "name": "Lunar Energy",
+    "slug": "lunar-energy",
+    "careers_url": "https://boards.greenhouse.io/lunarenergy",
+    "source_type": "greenhouse",
+    "source_identifier": "lunarenergy",
+    "industry": "Climate & Energy"
+  },
+  {
+    "name": "Bedrock Energy",
+    "slug": "bedrock-energy",
+    "careers_url": "https://jobs.lever.co/bedrockenergy",
+    "source_type": "lever",
+    "source_identifier": "bedrockenergy",
+    "industry": "Climate & Energy"
+  },
+  {
+    "name": "Quilt",
+    "slug": "quilt",
+    "careers_url": "https://boards.greenhouse.io/quilt",
+    "source_type": "greenhouse",
+    "source_identifier": "quilt",
+    "industry": "Climate & Energy"
+  },
+  {
+    "name": "Gradient",
+    "slug": "gradient",
+    "careers_url": "https://jobs.ashbyhq.com/gradient",
+    "source_type": "ashby",
+    "source_identifier": "gradient",
+    "industry": "Climate & Energy"
+  },
+  {
+    "name": "Twelve",
+    "slug": "twelve",
+    "careers_url": "https://jobs.ashbyhq.com/twelve",
+    "source_type": "ashby",
+    "source_identifier": "twelve",
+    "industry": "Climate & Energy"
+  },
+  {
+    "name": "Pivot Bio",
+    "slug": "pivot-bio",
+    "careers_url": "https://boards.greenhouse.io/pivotbio",
+    "source_type": "greenhouse",
+    "source_identifier": "pivotbio",
+    "industry": "Climate & Energy"
+  },
+  {
+    "name": "Indigo Ag",
+    "slug": "indigo-ag",
+    "careers_url": "https://jobs.ashbyhq.com/indigo",
+    "source_type": "ashby",
+    "source_identifier": "indigo",
+    "industry": "Climate & Energy"
+  },
+  {
+    "name": "Too Good To Go",
+    "slug": "too-good-to-go",
+    "careers_url": "https://jobs.ashbyhq.com/toogoodtogo",
+    "source_type": "ashby",
+    "source_identifier": "toogoodtogo",
+    "industry": "Climate & Energy"
+  },
+  {
+    "name": "Afresh",
+    "slug": "afresh",
+    "careers_url": "https://boards.greenhouse.io/afresh",
+    "source_type": "greenhouse",
+    "source_identifier": "afresh",
+    "industry": "Climate & Energy"
+  },
+  {
+    "name": "Crisp",
+    "slug": "crisp",
+    "careers_url": "https://jobs.ashbyhq.com/crisp",
+    "source_type": "ashby",
+    "source_identifier": "crisp",
+    "industry": "Developer Tools & Infrastructure"
+  },
+  {
+    "name": "Uber Freight",
+    "slug": "uber-freight",
+    "careers_url": "https://boards.greenhouse.io/uberfreight",
+    "source_type": "greenhouse",
+    "source_identifier": "uberfreight",
+    "industry": "Logistics, Mobility & Industrial"
+  },
+  {
+    "name": "Loadsmart",
+    "slug": "loadsmart",
+    "careers_url": "https://jobs.lever.co/loadsmart",
+    "source_type": "lever",
+    "source_identifier": "loadsmart",
+    "industry": "Logistics, Mobility & Industrial"
+  },
+  {
+    "name": "ShipMonk",
+    "slug": "shipmonk",
+    "careers_url": "https://boards.greenhouse.io/shipmonk",
+    "source_type": "greenhouse",
+    "source_identifier": "shipmonk",
+    "industry": "Logistics, Mobility & Industrial"
+  },
+  {
+    "name": "Motive",
+    "slug": "motive",
+    "careers_url": "https://boards.greenhouse.io/motive",
+    "source_type": "greenhouse",
+    "source_identifier": "motive",
+    "industry": "Logistics, Mobility & Industrial"
+  },
+  {
+    "name": "Platform Science",
+    "slug": "platform-science",
+    "careers_url": "https://boards.greenhouse.io/platformscience",
+    "source_type": "greenhouse",
+    "source_identifier": "platformscience",
+    "industry": "Logistics, Mobility & Industrial"
+  },
+  {
+    "name": "Netradyne",
+    "slug": "netradyne",
+    "careers_url": "https://boards.greenhouse.io/netradyne",
+    "source_type": "greenhouse",
+    "source_identifier": "netradyne",
+    "industry": "Logistics, Mobility & Industrial"
+  },
+  {
+    "name": "Waabi",
+    "slug": "waabi",
+    "careers_url": "https://jobs.lever.co/waabi",
+    "source_type": "lever",
+    "source_identifier": "waabi",
+    "industry": "Logistics, Mobility & Industrial"
+  },
+  {
+    "name": "Stack AV",
+    "slug": "stack-av",
+    "careers_url": "https://boards.greenhouse.io/stackav",
+    "source_type": "greenhouse",
+    "source_identifier": "stackav",
+    "industry": "Logistics, Mobility & Industrial"
+  },
+  {
+    "name": "Kodiak",
+    "slug": "kodiak",
+    "careers_url": "https://boards.greenhouse.io/kodiak",
+    "source_type": "greenhouse",
+    "source_identifier": "kodiak",
+    "industry": "Logistics, Mobility & Industrial"
+  },
+  {
+    "name": "Torc Robotics",
+    "slug": "torc-robotics",
+    "careers_url": "https://boards.greenhouse.io/torcrobotics",
+    "source_type": "greenhouse",
+    "source_identifier": "torcrobotics",
+    "industry": "Logistics, Mobility & Industrial"
+  },
+  {
+    "name": "Outrider",
+    "slug": "outrider",
+    "careers_url": "https://boards.greenhouse.io/outrider",
+    "source_type": "greenhouse",
+    "source_identifier": "outrider",
+    "industry": "Logistics, Mobility & Industrial"
+  },
+  {
+    "name": "Locus Robotics",
+    "slug": "locus-robotics",
+    "careers_url": "https://boards.greenhouse.io/locusrobotics",
+    "source_type": "greenhouse",
+    "source_identifier": "locusrobotics",
+    "industry": "Logistics, Mobility & Industrial"
+  },
+  {
+    "name": "Formic",
+    "slug": "formic",
+    "careers_url": "https://boards.greenhouse.io/formic",
+    "source_type": "greenhouse",
+    "source_identifier": "formic",
+    "industry": "Logistics, Mobility & Industrial"
+  },
+  {
+    "name": "Bright Machines",
+    "slug": "bright-machines",
+    "careers_url": "https://jobs.lever.co/brightmachines",
+    "source_type": "lever",
+    "source_identifier": "brightmachines",
+    "industry": "Logistics, Mobility & Industrial"
+  },
+  {
+    "name": "Divergent",
+    "slug": "divergent",
+    "careers_url": "https://boards.greenhouse.io/divergent",
+    "source_type": "greenhouse",
+    "source_identifier": "divergent",
+    "industry": "Logistics, Mobility & Industrial"
+  },
+  {
+    "name": "Seurat Technologies",
+    "slug": "seurat-technologies",
+    "careers_url": "https://boards.greenhouse.io/seurat",
+    "source_type": "greenhouse",
+    "source_identifier": "seurat",
+    "industry": "Logistics, Mobility & Industrial"
+  },
+  {
+    "name": "Velo3D",
+    "slug": "velo3d",
+    "careers_url": "https://jobs.lever.co/velo3d",
+    "source_type": "lever",
+    "source_identifier": "velo3d",
+    "industry": "Logistics, Mobility & Industrial"
+  },
+  {
+    "name": "Markforged",
+    "slug": "markforged",
+    "careers_url": "https://boards.greenhouse.io/markforged",
+    "source_type": "greenhouse",
+    "source_identifier": "markforged",
+    "industry": "Logistics, Mobility & Industrial"
+  },
+  {
+    "name": "Formlabs",
+    "slug": "formlabs",
+    "careers_url": "https://boards.greenhouse.io/formlabs",
+    "source_type": "greenhouse",
+    "source_identifier": "formlabs",
+    "industry": "Logistics, Mobility & Industrial"
+  },
+  {
+    "name": "Xometry",
+    "slug": "xometry",
+    "careers_url": "https://boards.greenhouse.io/xometry",
+    "source_type": "greenhouse",
+    "source_identifier": "xometry",
+    "industry": "Logistics, Mobility & Industrial"
+  },
+  {
+    "name": "Fictiv",
+    "slug": "fictiv",
+    "careers_url": "https://boards.greenhouse.io/fictiv",
+    "source_type": "greenhouse",
+    "source_identifier": "fictiv",
+    "industry": "Logistics, Mobility & Industrial"
+  },
+  {
+    "name": "Protolabs",
+    "slug": "protolabs",
+    "careers_url": "https://jobs.lever.co/protolabs",
+    "source_type": "lever",
+    "source_identifier": "protolabs",
+    "industry": "Logistics, Mobility & Industrial"
+  },
+  {
+    "name": "Paperless Parts",
+    "slug": "paperless-parts",
+    "careers_url": "https://boards.greenhouse.io/paperlessparts",
+    "source_type": "greenhouse",
+    "source_identifier": "paperlessparts",
+    "industry": "Logistics, Mobility & Industrial"
+  },
+  {
+    "name": "Path Robotics",
+    "slug": "path-robotics",
+    "careers_url": "https://boards.greenhouse.io/pathrobotics",
+    "source_type": "greenhouse",
+    "source_identifier": "pathrobotics",
+    "industry": "Logistics, Mobility & Industrial"
+  },
+  {
+    "name": "Tulip",
+    "slug": "tulip",
+    "careers_url": "https://boards.greenhouse.io/tulip",
+    "source_type": "greenhouse",
+    "source_identifier": "tulip",
+    "industry": "Logistics, Mobility & Industrial"
+  },
+  {
+    "name": "MaintainX",
+    "slug": "maintainx",
+    "careers_url": "https://jobs.ashbyhq.com/maintainx",
+    "source_type": "ashby",
+    "source_identifier": "maintainx",
+    "industry": "Logistics, Mobility & Industrial"
+  },
+  {
+    "name": "Augury",
+    "slug": "augury",
+    "careers_url": "https://boards.greenhouse.io/augury",
+    "source_type": "greenhouse",
+    "source_identifier": "augury",
+    "industry": "Logistics, Mobility & Industrial"
+  },
+  {
+    "name": "ServiceTitan",
+    "slug": "servicetitan",
+    "careers_url": "https://jobs.smartrecruiters.com/Servicetitan",
+    "source_type": "smartrecruiters",
+    "source_identifier": "Servicetitan",
+    "industry": "Logistics, Mobility & Industrial"
+  },
+  {
+    "name": "BuildOps",
+    "slug": "buildops",
+    "careers_url": "https://boards.greenhouse.io/buildops",
+    "source_type": "greenhouse",
+    "source_identifier": "buildops",
+    "industry": "Logistics, Mobility & Industrial"
+  },
+  {
+    "name": "Fieldwire",
+    "slug": "fieldwire",
+    "careers_url": "https://boards.greenhouse.io/fieldwire",
+    "source_type": "greenhouse",
+    "source_identifier": "fieldwire",
+    "industry": "Logistics, Mobility & Industrial"
+  },
+  {
+    "name": "Built Robotics",
+    "slug": "built-robotics",
+    "careers_url": "https://jobs.ashbyhq.com/built-robotics",
+    "source_type": "ashby",
+    "source_identifier": "built-robotics",
+    "industry": "Logistics, Mobility & Industrial"
+  },
+  {
+    "name": "ICON",
+    "slug": "icon",
+    "careers_url": "https://jobs.ashbyhq.com/icon",
+    "source_type": "ashby",
+    "source_identifier": "icon",
+    "industry": "Logistics, Mobility & Industrial"
+  },
+  {
+    "name": "Juniper Square",
+    "slug": "juniper-square",
+    "careers_url": "https://jobs.ashbyhq.com/junipersquare",
+    "source_type": "ashby",
+    "source_identifier": "junipersquare",
+    "industry": "Logistics, Mobility & Industrial"
+  },
+  {
+    "name": "VTS",
+    "slug": "vts",
+    "careers_url": "https://boards.greenhouse.io/vts",
+    "source_type": "greenhouse",
+    "source_identifier": "vts",
+    "industry": "Logistics, Mobility & Industrial"
+  },
+  {
+    "name": "SmartRent",
+    "slug": "smartrent",
+    "careers_url": "https://boards.greenhouse.io/smartrent",
+    "source_type": "greenhouse",
+    "source_identifier": "smartrent",
+    "industry": "Logistics, Mobility & Industrial"
+  },
+  {
+    "name": "Entrata",
+    "slug": "entrata",
+    "careers_url": "https://jobs.lever.co/entrata",
+    "source_type": "lever",
+    "source_identifier": "entrata",
+    "industry": "Logistics, Mobility & Industrial"
+  },
+  {
+    "name": "AppFolio",
+    "slug": "appfolio",
+    "careers_url": "https://jobs.ashbyhq.com/appfolio",
+    "source_type": "ashby",
+    "source_identifier": "appfolio",
+    "industry": "Logistics, Mobility & Industrial"
+  },
+  {
+    "name": "Sonder",
+    "slug": "sonder",
+    "careers_url": "https://jobs.ashbyhq.com/sonder",
+    "source_type": "ashby",
+    "source_identifier": "sonder",
+    "industry": "Logistics, Mobility & Industrial"
+  },
+  {
+    "name": "Cloudbeds",
+    "slug": "cloudbeds",
+    "careers_url": "https://boards.greenhouse.io/cloudbeds",
+    "source_type": "greenhouse",
+    "source_identifier": "cloudbeds",
+    "industry": "Logistics, Mobility & Industrial"
+  },
+  {
+    "name": "SiteMinder",
+    "slug": "siteminder",
+    "careers_url": "https://jobs.ashbyhq.com/siteminder",
+    "source_type": "ashby",
+    "source_identifier": "siteminder",
+    "industry": "Logistics, Mobility & Industrial"
+  },
+  {
+    "name": "Away",
+    "slug": "away",
+    "careers_url": "https://jobs.ashbyhq.com/away",
+    "source_type": "ashby",
+    "source_identifier": "away",
+    "industry": "Retail, Consumer & Brands"
+  },
+  {
+    "name": "Brooklinen",
+    "slug": "brooklinen",
+    "careers_url": "https://jobs.ashbyhq.com/brooklinen",
+    "source_type": "ashby",
+    "source_identifier": "brooklinen",
+    "industry": "Retail, Consumer & Brands"
+  },
+  {
+    "name": "Everlane",
+    "slug": "everlane",
+    "careers_url": "https://boards.greenhouse.io/everlane",
+    "source_type": "greenhouse",
+    "source_identifier": "everlane",
+    "industry": "Retail, Consumer & Brands"
+  },
+  {
+    "name": "Reformation",
+    "slug": "reformation",
+    "careers_url": "https://boards.greenhouse.io/reformation",
+    "source_type": "greenhouse",
+    "source_identifier": "reformation",
+    "industry": "Retail, Consumer & Brands"
+  },
+  {
+    "name": "Stitch Fix",
+    "slug": "stitch-fix",
+    "careers_url": "https://boards.greenhouse.io/stitchfix",
+    "source_type": "greenhouse",
+    "source_identifier": "stitchfix",
+    "industry": "Retail, Consumer & Brands"
+  },
+  {
+    "name": "Alo Yoga",
+    "slug": "alo-yoga",
+    "careers_url": "https://boards.greenhouse.io/aloyoga",
+    "source_type": "greenhouse",
+    "source_identifier": "aloyoga",
+    "industry": "Retail, Consumer & Brands"
+  },
+  {
+    "name": "Gymshark",
+    "slug": "gymshark",
+    "careers_url": "https://boards.greenhouse.io/gymshark",
+    "source_type": "greenhouse",
+    "source_identifier": "gymshark",
+    "industry": "Retail, Consumer & Brands"
+  },
+  {
+    "name": "On Running",
+    "slug": "on-running",
+    "careers_url": "https://boards.greenhouse.io/onrunning",
+    "source_type": "greenhouse",
+    "source_identifier": "onrunning",
+    "industry": "Retail, Consumer & Brands"
+  },
+  {
+    "name": "Prose",
+    "slug": "prose",
+    "careers_url": "https://jobs.ashbyhq.com/prose",
+    "source_type": "ashby",
+    "source_identifier": "prose",
+    "industry": "Retail, Consumer & Brands"
+  },
+  {
+    "name": "Harry's",
+    "slug": "harry-s",
+    "careers_url": "https://boards.greenhouse.io/harrys",
+    "source_type": "greenhouse",
+    "source_identifier": "harrys",
+    "industry": "Retail, Consumer & Brands"
+  },
+  {
+    "name": "Dollar Shave Club",
+    "slug": "dollar-shave-club",
+    "careers_url": "https://boards.greenhouse.io/dollarshaveclub",
+    "source_type": "greenhouse",
+    "source_identifier": "dollarshaveclub",
+    "industry": "Retail, Consumer & Brands"
+  },
+  {
+    "name": "Quip",
+    "slug": "quip",
+    "careers_url": "https://boards.greenhouse.io/quip",
+    "source_type": "greenhouse",
+    "source_identifier": "quip",
+    "industry": "Retail, Consumer & Brands"
+  },
+  {
+    "name": "Tonal",
+    "slug": "tonal",
+    "careers_url": "https://jobs.ashbyhq.com/tonal",
+    "source_type": "ashby",
+    "source_identifier": "tonal",
+    "industry": "Retail, Consumer & Brands"
+  },
+  {
+    "name": "Olipop",
+    "slug": "olipop",
+    "careers_url": "https://boards.greenhouse.io/olipop",
+    "source_type": "greenhouse",
+    "source_identifier": "olipop",
+    "industry": "Retail, Consumer & Brands"
+  },
+  {
+    "name": "Factor",
+    "slug": "factor",
+    "careers_url": "https://jobs.lever.co/factor",
+    "source_type": "lever",
+    "source_identifier": "factor",
+    "industry": "Retail, Consumer & Brands"
+  },
+  {
+    "name": "Home Chef",
+    "slug": "home-chef",
+    "careers_url": "https://boards.greenhouse.io/homechef",
+    "source_type": "greenhouse",
+    "source_identifier": "homechef",
+    "industry": "Retail, Consumer & Brands"
+  },
+  {
+    "name": "Thrive Market",
+    "slug": "thrive-market",
+    "careers_url": "https://boards.greenhouse.io/thrivemarket",
+    "source_type": "greenhouse",
+    "source_identifier": "thrivemarket",
+    "industry": "Retail, Consumer & Brands"
+  },
+  {
+    "name": "Misfits Market",
+    "slug": "misfits-market",
+    "careers_url": "https://boards.greenhouse.io/misfitsmarket",
+    "source_type": "greenhouse",
+    "source_identifier": "misfitsmarket",
+    "industry": "Retail, Consumer & Brands"
+  },
+  {
+    "name": "Weee!",
+    "slug": "weee",
+    "careers_url": "https://boards.greenhouse.io/weee",
+    "source_type": "greenhouse",
+    "source_identifier": "weee",
+    "industry": "Retail, Consumer & Brands"
+  },
+  {
+    "name": "Sweetgreen",
+    "slug": "sweetgreen",
+    "careers_url": "https://boards.greenhouse.io/sweetgreen",
+    "source_type": "greenhouse",
+    "source_identifier": "sweetgreen",
+    "industry": "Retail, Consumer & Brands"
+  },
+  {
+    "name": "Domino's",
+    "slug": "domino-s",
+    "careers_url": "https://jobs.smartrecruiters.com/Dominos",
+    "source_type": "smartrecruiters",
+    "source_identifier": "Dominos",
+    "industry": "Retail, Consumer & Brands"
+  },
+  {
+    "name": "OpenTable",
+    "slug": "opentable",
+    "careers_url": "https://boards.greenhouse.io/opentable",
+    "source_type": "greenhouse",
+    "source_identifier": "opentable",
+    "industry": "Retail, Consumer & Brands"
+  },
+  {
+    "name": "Sunday",
+    "slug": "sunday",
+    "careers_url": "https://jobs.ashbyhq.com/sunday",
+    "source_type": "ashby",
+    "source_identifier": "sunday",
+    "industry": "Retail, Consumer & Brands"
+  },
+  {
+    "name": "Lightspeed",
+    "slug": "lightspeed",
+    "careers_url": "https://jobs.ashbyhq.com/lightspeed",
+    "source_type": "ashby",
+    "source_identifier": "lightspeed",
+    "industry": "Retail, Consumer & Brands"
+  },
+  {
+    "name": "SpotOn",
+    "slug": "spoton",
+    "careers_url": "https://jobs.ashbyhq.com/spoton",
+    "source_type": "ashby",
+    "source_identifier": "spoton",
+    "industry": "Retail, Consumer & Brands"
+  },
+  {
+    "name": "Zara",
+    "slug": "zara",
+    "careers_url": "https://zara.recruitee.com",
+    "source_type": "recruitee",
+    "source_identifier": "zara",
+    "industry": "Retail, Consumer & Brands"
+  },
+  {
+    "name": "Primark",
+    "slug": "primark",
+    "careers_url": "https://jobs.smartrecruiters.com/Primark",
+    "source_type": "smartrecruiters",
+    "source_identifier": "Primark",
+    "industry": "Retail, Consumer & Brands"
+  },
+  {
+    "name": "LVMH",
+    "slug": "lvmh",
+    "careers_url": "https://jobs.smartrecruiters.com/Lvmh",
+    "source_type": "smartrecruiters",
+    "source_identifier": "Lvmh",
+    "industry": "Retail, Consumer & Brands"
+  },
+  {
+    "name": "Kenvue",
+    "slug": "kenvue",
+    "careers_url": "https://jobs.smartrecruiters.com/Kenvue",
+    "source_type": "smartrecruiters",
+    "source_identifier": "Kenvue",
+    "industry": "Retail, Consumer & Brands"
+  },
+  {
+    "name": "AB InBev",
+    "slug": "ab-inbev",
+    "careers_url": "https://boards.greenhouse.io/abinbev",
+    "source_type": "greenhouse",
+    "source_identifier": "abinbev",
+    "industry": "Retail, Consumer & Brands"
+  },
+  {
+    "name": "Jane Street",
+    "slug": "jane-street",
+    "careers_url": "https://boards.greenhouse.io/janestreet",
+    "source_type": "greenhouse",
+    "source_identifier": "janestreet",
+    "industry": "Financial Services & Insurance"
+  },
+  {
+    "name": "Jump Trading",
+    "slug": "jump-trading",
+    "careers_url": "https://boards.greenhouse.io/jumptrading",
+    "source_type": "greenhouse",
+    "source_identifier": "jumptrading",
+    "industry": "Financial Services & Insurance"
+  },
+  {
+    "name": "Tower Research Capital",
+    "slug": "tower-research-capital",
+    "careers_url": "https://boards.greenhouse.io/towerresearchcapital",
+    "source_type": "greenhouse",
+    "source_identifier": "towerresearchcapital",
+    "industry": "Financial Services & Insurance"
+  },
+  {
+    "name": "Flow Traders",
+    "slug": "flow-traders",
+    "careers_url": "https://boards.greenhouse.io/flowtraders",
+    "source_type": "greenhouse",
+    "source_identifier": "flowtraders",
+    "industry": "Financial Services & Insurance"
+  },
+  {
+    "name": "Akuna Capital",
+    "slug": "akuna-capital",
+    "careers_url": "https://boards.greenhouse.io/akunacapital",
+    "source_type": "greenhouse",
+    "source_identifier": "akunacapital",
+    "industry": "Financial Services & Insurance"
+  },
+  {
+    "name": "Belvedere Trading",
+    "slug": "belvedere-trading",
+    "careers_url": "https://jobs.lever.co/belvederetrading",
+    "source_type": "lever",
+    "source_identifier": "belvederetrading",
+    "industry": "Financial Services & Insurance"
+  },
+  {
+    "name": "Point72",
+    "slug": "point72",
+    "careers_url": "https://boards.greenhouse.io/point72",
+    "source_type": "greenhouse",
+    "source_identifier": "point72",
+    "industry": "Financial Services & Insurance"
+  },
+  {
+    "name": "AQR",
+    "slug": "aqr",
+    "careers_url": "https://boards.greenhouse.io/aqr",
+    "source_type": "greenhouse",
+    "source_identifier": "aqr",
+    "industry": "Financial Services & Insurance"
+  },
+  {
+    "name": "Man Group",
+    "slug": "man-group",
+    "careers_url": "https://boards.greenhouse.io/mangroup",
+    "source_type": "greenhouse",
+    "source_identifier": "mangroup",
+    "industry": "Financial Services & Insurance"
+  },
+  {
+    "name": "Qube Research & Technologies",
+    "slug": "qube-research-technologies",
+    "careers_url": "https://boards.greenhouse.io/quberesearchandtechnologies",
+    "source_type": "greenhouse",
+    "source_identifier": "quberesearchandtechnologies",
+    "industry": "Financial Services & Insurance"
+  },
+  {
+    "name": "Winton",
+    "slug": "winton",
+    "careers_url": "https://boards.greenhouse.io/winton",
+    "source_type": "greenhouse",
+    "source_identifier": "winton",
+    "industry": "Financial Services & Insurance"
+  },
+  {
+    "name": "Schonfeld",
+    "slug": "schonfeld",
+    "careers_url": "https://boards.greenhouse.io/schonfeld",
+    "source_type": "greenhouse",
+    "source_identifier": "schonfeld",
+    "industry": "Financial Services & Insurance"
+  },
+  {
+    "name": "ExodusPoint",
+    "slug": "exoduspoint",
+    "careers_url": "https://boards.greenhouse.io/exoduspoint",
+    "source_type": "greenhouse",
+    "source_identifier": "exoduspoint",
+    "industry": "Financial Services & Insurance"
+  },
+  {
+    "name": "Lemonade",
+    "slug": "lemonade",
+    "careers_url": "https://jobs.ashbyhq.com/lemonade",
+    "source_type": "ashby",
+    "source_identifier": "lemonade",
+    "industry": "Financial Services & Insurance"
+  },
+  {
+    "name": "Branch Insurance",
+    "slug": "branch-insurance",
+    "careers_url": "https://jobs.ashbyhq.com/branchinsurance",
+    "source_type": "ashby",
+    "source_identifier": "branchinsurance",
+    "industry": "Financial Services & Insurance"
+  },
+  {
+    "name": "Pie Insurance",
+    "slug": "pie-insurance",
+    "careers_url": "https://boards.greenhouse.io/pieinsurance",
+    "source_type": "greenhouse",
+    "source_identifier": "pieinsurance",
+    "industry": "Financial Services & Insurance"
+  },
+  {
+    "name": "Coalition",
+    "slug": "coalition",
+    "careers_url": "https://boards.greenhouse.io/coalition",
+    "source_type": "greenhouse",
+    "source_identifier": "coalition",
+    "industry": "Financial Services & Insurance"
+  },
+  {
+    "name": "Bestow",
+    "slug": "bestow",
+    "careers_url": "https://jobs.ashbyhq.com/bestow",
+    "source_type": "ashby",
+    "source_identifier": "bestow",
+    "industry": "Financial Services & Insurance"
+  },
+  {
+    "name": "Tomo",
+    "slug": "tomo",
+    "careers_url": "https://jobs.ashbyhq.com/tomo",
+    "source_type": "ashby",
+    "source_identifier": "tomo",
+    "industry": "Financial Services & Insurance"
+  },
+  {
+    "name": "Zego",
+    "slug": "zego",
+    "careers_url": "https://jobs.ashbyhq.com/zego",
+    "source_type": "ashby",
+    "source_identifier": "zego",
+    "industry": "Financial Services & Insurance"
+  },
+  {
+    "name": "Marshmallow",
+    "slug": "marshmallow",
+    "careers_url": "https://jobs.ashbyhq.com/marshmallow",
+    "source_type": "ashby",
+    "source_identifier": "marshmallow",
+    "industry": "Financial Services & Insurance"
+  },
+  {
+    "name": "MetLife",
+    "slug": "metlife",
+    "careers_url": "https://jobs.lever.co/metlife",
+    "source_type": "lever",
+    "source_identifier": "metlife",
+    "industry": "Financial Services & Insurance"
+  },
+  {
+    "name": "Northwestern Mutual",
+    "slug": "northwestern-mutual",
+    "careers_url": "https://jobs.smartrecruiters.com/Northwesternmutual",
+    "source_type": "smartrecruiters",
+    "source_identifier": "Northwesternmutual",
+    "industry": "Financial Services & Insurance"
+  },
+  {
+    "name": "DNB",
+    "slug": "dnb",
+    "careers_url": "https://jobs.lever.co/dnb",
+    "source_type": "lever",
+    "source_identifier": "dnb",
+    "industry": "Financial Services & Insurance"
+  },
+  {
+    "name": "Koho",
+    "slug": "koho",
+    "careers_url": "https://jobs.ashbyhq.com/koho",
+    "source_type": "ashby",
+    "source_identifier": "koho",
+    "industry": "Financial Services & Insurance"
+  },
+  {
+    "name": "Neo Financial",
+    "slug": "neo-financial",
+    "careers_url": "https://jobs.ashbyhq.com/neofinancial",
+    "source_type": "ashby",
+    "source_identifier": "neofinancial",
+    "industry": "Financial Services & Insurance"
+  },
+  {
+    "name": "Dapper Labs",
+    "slug": "dapper-labs",
+    "careers_url": "https://jobs.ashbyhq.com/dapper",
+    "source_type": "ashby",
+    "source_identifier": "dapper",
+    "industry": "Financial Services & Insurance"
+  },
+  {
+    "name": "Wattpad",
+    "slug": "wattpad",
+    "careers_url": "https://jobs.lever.co/wattpad",
+    "source_type": "lever",
+    "source_identifier": "wattpad",
+    "industry": "Financial Services & Insurance"
+  },
+  {
+    "name": "Maple",
+    "slug": "maple",
+    "careers_url": "https://jobs.ashbyhq.com/maple",
+    "source_type": "ashby",
+    "source_identifier": "maple",
+    "industry": "Financial Services & Insurance"
+  },
+  {
+    "name": "CACI",
+    "slug": "caci",
+    "careers_url": "https://jobs.smartrecruiters.com/Caci",
+    "source_type": "smartrecruiters",
+    "source_identifier": "Caci",
+    "industry": "Consulting & Professional Services"
+  },
+  {
+    "name": "Vannevar Labs",
+    "slug": "vannevar-labs",
+    "careers_url": "https://boards.greenhouse.io/vannevarlabs",
+    "source_type": "greenhouse",
+    "source_identifier": "vannevarlabs",
+    "industry": "Consulting & Professional Services"
+  },
+  {
+    "name": "Second Front Systems",
+    "slug": "second-front-systems",
+    "careers_url": "https://jobs.ashbyhq.com/second-front-systems",
+    "source_type": "ashby",
+    "source_identifier": "second-front-systems",
+    "industry": "Consulting & Professional Services"
+  },
+  {
+    "name": "Primer",
+    "slug": "primer",
+    "careers_url": "https://jobs.ashbyhq.com/primer",
+    "source_type": "ashby",
+    "source_identifier": "primer",
+    "industry": "Consulting & Professional Services"
+  },
+  {
+    "name": "Hawkeye 360",
+    "slug": "hawkeye-360",
+    "careers_url": "https://boards.greenhouse.io/hawkeye360",
+    "source_type": "greenhouse",
+    "source_identifier": "hawkeye360",
+    "industry": "Consulting & Professional Services"
+  },
+  {
+    "name": "BlackSky",
+    "slug": "blacksky",
+    "careers_url": "https://boards.greenhouse.io/blacksky",
+    "source_type": "greenhouse",
+    "source_identifier": "blacksky",
+    "industry": "Consulting & Professional Services"
+  },
+  {
+    "name": "Continental",
+    "slug": "continental",
+    "careers_url": "https://jobs.smartrecruiters.com/Continental",
+    "source_type": "smartrecruiters",
+    "source_identifier": "Continental",
+    "industry": "Consulting & Professional Services"
+  },
+  {
+    "name": "Aeva",
+    "slug": "aeva",
+    "careers_url": "https://jobs.lever.co/aeva",
+    "source_type": "lever",
+    "source_identifier": "aeva",
+    "industry": "Consulting & Professional Services"
+  },
+  {
+    "name": "AbbVie",
+    "slug": "abbvie",
+    "careers_url": "https://jobs.smartrecruiters.com/Abbvie",
+    "source_type": "smartrecruiters",
+    "source_identifier": "Abbvie",
+    "industry": "Healthcare & Life Sciences"
+  },
+  {
+    "name": "Element Biosciences",
+    "slug": "element-biosciences",
+    "careers_url": "https://boards.greenhouse.io/elementbiosciences",
+    "source_type": "greenhouse",
+    "source_identifier": "elementbiosciences",
+    "industry": "Healthcare & Life Sciences"
+  },
+  {
+    "name": "Ultima Genomics",
+    "slug": "ultima-genomics",
+    "careers_url": "https://boards.greenhouse.io/ultimagenomics",
+    "source_type": "greenhouse",
+    "source_identifier": "ultimagenomics",
+    "industry": "Healthcare & Life Sciences"
+  },
+  {
+    "name": "Singular Genomics",
+    "slug": "singular-genomics",
+    "careers_url": "https://boards.greenhouse.io/singulargenomics",
+    "source_type": "greenhouse",
+    "source_identifier": "singulargenomics",
+    "industry": "Healthcare & Life Sciences"
+  },
+  {
+    "name": "Natera",
+    "slug": "natera",
+    "careers_url": "https://boards.greenhouse.io/natera",
+    "source_type": "greenhouse",
+    "source_identifier": "natera",
+    "industry": "Healthcare & Life Sciences"
+  },
+  {
+    "name": "Freenome",
+    "slug": "freenome",
+    "careers_url": "https://boards.greenhouse.io/freenome",
+    "source_type": "greenhouse",
+    "source_identifier": "freenome",
+    "industry": "Healthcare & Life Sciences"
+  },
+  {
+    "name": "Delfi Diagnostics",
+    "slug": "delfi-diagnostics",
+    "careers_url": "https://jobs.lever.co/delfidiagnostics",
+    "source_type": "lever",
+    "source_identifier": "delfidiagnostics",
+    "industry": "Healthcare & Life Sciences"
+  },
+  {
+    "name": "Cencora",
+    "slug": "cencora",
+    "careers_url": "https://jobs.smartrecruiters.com/Cencora",
+    "source_type": "smartrecruiters",
+    "source_identifier": "Cencora",
+    "industry": "Healthcare & Life Sciences"
+  },
+  {
+    "name": "Advocate Health",
+    "slug": "advocate-health",
+    "careers_url": "https://jobs.lever.co/advocate",
+    "source_type": "lever",
+    "source_identifier": "advocate",
+    "industry": "Healthcare & Life Sciences"
+  },
+  {
+    "name": "Swisscom",
+    "slug": "swisscom",
+    "careers_url": "https://swisscom.recruitee.com",
+    "source_type": "recruitee",
+    "source_identifier": "swisscom",
+    "industry": "Telecom & Media"
+  },
+  {
+    "name": "KPN",
+    "slug": "kpn",
+    "careers_url": "https://jobs.smartrecruiters.com/Kpn",
+    "source_type": "smartrecruiters",
+    "source_identifier": "Kpn",
+    "industry": "Telecom & Media"
+  },
+  {
+    "name": "Nintendo",
+    "slug": "nintendo",
+    "careers_url": "https://boards.greenhouse.io/nintendo",
+    "source_type": "greenhouse",
+    "source_identifier": "nintendo",
+    "industry": "Telecom & Media"
+  },
+  {
+    "name": "Roku",
+    "slug": "roku",
+    "careers_url": "https://boards.greenhouse.io/roku",
+    "source_type": "greenhouse",
+    "source_identifier": "roku",
+    "industry": "Telecom & Media"
+  },
+  {
+    "name": "fuboTV",
+    "slug": "fubotv",
+    "careers_url": "https://boards.greenhouse.io/fubotv",
+    "source_type": "greenhouse",
+    "source_identifier": "fubotv",
+    "industry": "Telecom & Media"
+  },
+  {
+    "name": "Crunchyroll",
+    "slug": "crunchyroll",
+    "careers_url": "https://boards.greenhouse.io/crunchyroll",
+    "source_type": "greenhouse",
+    "source_identifier": "crunchyroll",
+    "industry": "Telecom & Media"
+  },
+  {
+    "name": "Axios",
+    "slug": "axios",
+    "careers_url": "https://boards.greenhouse.io/axios",
+    "source_type": "greenhouse",
+    "source_identifier": "axios",
+    "industry": "Telecom & Media"
+  },
+  {
+    "name": "Vox Media",
+    "slug": "vox-media",
+    "careers_url": "https://boards.greenhouse.io/voxmedia",
+    "source_type": "greenhouse",
+    "source_identifier": "voxmedia",
+    "industry": "Telecom & Media"
+  },
+  {
+    "name": "Hearst",
+    "slug": "hearst",
+    "careers_url": "https://boards.greenhouse.io/hearst",
+    "source_type": "greenhouse",
+    "source_identifier": "hearst",
+    "industry": "Telecom & Media"
+  },
+  {
+    "name": "Elsevier",
+    "slug": "elsevier",
+    "careers_url": "https://boards.greenhouse.io/elsevier",
+    "source_type": "greenhouse",
+    "source_identifier": "elsevier",
+    "industry": "Telecom & Media"
+  },
+  {
+    "name": "Springer Nature",
+    "slug": "springer-nature",
+    "careers_url": "https://jobs.smartrecruiters.com/Springernature",
+    "source_type": "smartrecruiters",
+    "source_identifier": "Springernature",
+    "industry": "Telecom & Media"
+  },
+  {
+    "name": "NewsBreak",
+    "slug": "newsbreak",
+    "careers_url": "https://boards.greenhouse.io/newsbreak",
+    "source_type": "greenhouse",
+    "source_identifier": "newsbreak",
+    "industry": "Telecom & Media"
+  },
+  {
+    "name": "Ground News",
+    "slug": "ground-news",
+    "careers_url": "https://jobs.ashbyhq.com/groundnews",
+    "source_type": "ashby",
+    "source_identifier": "groundnews",
+    "industry": "Telecom & Media"
+  },
+  {
+    "name": "BlaBlaCar",
+    "slug": "blablacar",
+    "careers_url": "https://jobs.lever.co/blablacar",
+    "source_type": "lever",
+    "source_identifier": "blablacar",
+    "industry": "Europe & Israel Startups"
+  },
+  {
+    "name": "Mirakl",
+    "slug": "mirakl",
+    "careers_url": "https://boards.greenhouse.io/mirakl",
+    "source_type": "greenhouse",
+    "source_identifier": "mirakl",
+    "industry": "Europe & Israel Startups"
+  },
+  {
+    "name": "Sorare",
+    "slug": "sorare",
+    "careers_url": "https://jobs.ashbyhq.com/sorare",
+    "source_type": "ashby",
+    "source_identifier": "sorare",
+    "industry": "Europe & Israel Startups"
+  },
+  {
+    "name": "Malt",
+    "slug": "malt",
+    "careers_url": "https://jobs.lever.co/malt",
+    "source_type": "lever",
+    "source_identifier": "malt",
+    "industry": "Europe & Israel Startups"
+  },
+  {
+    "name": "Agicap",
+    "slug": "agicap",
+    "careers_url": "https://jobs.lever.co/agicap",
+    "source_type": "lever",
+    "source_identifier": "agicap",
+    "industry": "Europe & Israel Startups"
+  },
+  {
+    "name": "Swan",
+    "slug": "swan",
+    "careers_url": "https://jobs.ashbyhq.com/swan",
+    "source_type": "ashby",
+    "source_identifier": "swan",
+    "industry": "Europe & Israel Startups"
+  },
+  {
+    "name": "Glia",
+    "slug": "glia",
+    "careers_url": "https://jobs.ashbyhq.com/glia",
+    "source_type": "ashby",
+    "source_identifier": "glia",
+    "industry": "Europe & Israel Startups"
+  },
+  {
+    "name": "Cabify",
+    "slug": "cabify",
+    "careers_url": "https://boards.greenhouse.io/cabify",
+    "source_type": "greenhouse",
+    "source_identifier": "cabify",
+    "industry": "Europe & Israel Startups"
+  },
+  {
+    "name": "Wallapop",
+    "slug": "wallapop",
+    "careers_url": "https://boards.greenhouse.io/wallapop",
+    "source_type": "greenhouse",
+    "source_identifier": "wallapop",
+    "industry": "Europe & Israel Startups"
+  },
+  {
+    "name": "Jobandtalent",
+    "slug": "jobandtalent",
+    "careers_url": "https://jobs.lever.co/jobandtalent",
+    "source_type": "lever",
+    "source_identifier": "jobandtalent",
+    "industry": "Europe & Israel Startups"
+  },
+  {
+    "name": "OakNorth",
+    "slug": "oaknorth",
+    "careers_url": "https://jobs.ashbyhq.com/oaknorth",
+    "source_type": "ashby",
+    "source_identifier": "oaknorth",
+    "industry": "Europe & Israel Startups"
+  },
+  {
+    "name": "GoCardless",
+    "slug": "gocardless",
+    "careers_url": "https://boards.greenhouse.io/gocardless",
+    "source_type": "greenhouse",
+    "source_identifier": "gocardless",
+    "industry": "Europe & Israel Startups"
+  },
+  {
+    "name": "Cleo",
+    "slug": "cleo",
+    "careers_url": "https://boards.greenhouse.io/cleo",
+    "source_type": "greenhouse",
+    "source_identifier": "cleo",
+    "industry": "Europe & Israel Startups"
+  },
+  {
+    "name": "Improbable",
+    "slug": "improbable",
+    "careers_url": "https://jobs.ashbyhq.com/improbable",
+    "source_type": "ashby",
+    "source_identifier": "improbable",
+    "industry": "Europe & Israel Startups"
+  },
+  {
+    "name": "Tractable",
+    "slug": "tractable",
+    "careers_url": "https://jobs.ashbyhq.com/tractable",
+    "source_type": "ashby",
+    "source_identifier": "tractable",
+    "industry": "Europe & Israel Startups"
+  },
+  {
+    "name": "Cera Care",
+    "slug": "cera-care",
+    "careers_url": "https://jobs.smartrecruiters.com/Ceracare",
+    "source_type": "smartrecruiters",
+    "source_identifier": "Ceracare",
+    "industry": "Europe & Israel Startups"
+  },
+  {
+    "name": "Zilch",
+    "slug": "zilch",
+    "careers_url": "https://jobs.ashbyhq.com/zilch",
+    "source_type": "ashby",
+    "source_identifier": "zilch",
+    "industry": "Europe & Israel Startups"
+  },
+  {
+    "name": "Moneybox",
+    "slug": "moneybox",
+    "careers_url": "https://jobs.ashbyhq.com/moneybox",
+    "source_type": "ashby",
+    "source_identifier": "moneybox",
+    "industry": "Europe & Israel Startups"
+  },
+  {
+    "name": "Freetrade",
+    "slug": "freetrade",
+    "careers_url": "https://jobs.ashbyhq.com/freetrade",
+    "source_type": "ashby",
+    "source_identifier": "freetrade",
+    "industry": "Europe & Israel Startups"
+  },
+  {
+    "name": "Lendable",
+    "slug": "lendable",
+    "careers_url": "https://jobs.ashbyhq.com/lendable",
+    "source_type": "ashby",
+    "source_identifier": "lendable",
+    "industry": "Europe & Israel Startups"
+  },
+  {
+    "name": "Lunar",
+    "slug": "lunar",
+    "careers_url": "https://jobs.ashbyhq.com/lunar",
+    "source_type": "ashby",
+    "source_identifier": "lunar",
+    "industry": "Europe & Israel Startups"
+  },
+  {
+    "name": "ICEYE",
+    "slug": "iceye",
+    "careers_url": "https://jobs.ashbyhq.com/iceye",
+    "source_type": "ashby",
+    "source_identifier": "iceye",
+    "industry": "Europe & Israel Startups"
+  },
+  {
+    "name": "Smartly.io",
+    "slug": "smartly-io",
+    "careers_url": "https://boards.greenhouse.io/smartlyio",
+    "source_type": "greenhouse",
+    "source_identifier": "smartlyio",
+    "industry": "Europe & Israel Startups"
+  },
+  {
+    "name": "Bunq BV",
+    "slug": "bunq-bv",
+    "careers_url": "https://bunq.recruitee.com",
+    "source_type": "recruitee",
+    "source_identifier": "bunq",
+    "industry": "Europe & Israel Startups"
+  },
+  {
+    "name": "Bitvavo",
+    "slug": "bitvavo",
+    "careers_url": "https://jobs.ashbyhq.com/bitvavo",
+    "source_type": "ashby",
+    "source_identifier": "bitvavo",
+    "industry": "Europe & Israel Startups"
+  },
+  {
+    "name": "Mews Systems",
+    "slug": "mews-systems",
+    "careers_url": "https://boards.greenhouse.io/mewssystems",
+    "source_type": "greenhouse",
+    "source_identifier": "mewssystems",
+    "industry": "Europe & Israel Startups"
+  },
+  {
+    "name": "Rohlik",
+    "slug": "rohlik",
+    "careers_url": "https://jobs.ashbyhq.com/rohlik",
+    "source_type": "ashby",
+    "source_identifier": "rohlik",
+    "industry": "Europe & Israel Startups"
+  },
+  {
+    "name": "Kiwi.com",
+    "slug": "kiwi-com",
+    "careers_url": "https://jobs.ashbyhq.com/kiwi-com",
+    "source_type": "ashby",
+    "source_identifier": "kiwi-com",
+    "industry": "Europe & Israel Startups"
+  },
+  {
+    "name": "eMAG",
+    "slug": "emag",
+    "careers_url": "https://boards.greenhouse.io/emag",
+    "source_type": "greenhouse",
+    "source_identifier": "emag",
+    "industry": "Europe & Israel Startups"
+  },
+  {
+    "name": "Scandit",
+    "slug": "scandit",
+    "careers_url": "https://boards.greenhouse.io/scandit",
+    "source_type": "greenhouse",
+    "source_identifier": "scandit",
+    "industry": "Europe & Israel Startups"
+  },
+  {
+    "name": "Nexthink",
+    "slug": "nexthink",
+    "careers_url": "https://jobs.smartrecruiters.com/Nexthink",
+    "source_type": "smartrecruiters",
+    "source_identifier": "Nexthink",
+    "industry": "Europe & Israel Startups"
+  },
+  {
+    "name": "Frontify",
+    "slug": "frontify",
+    "careers_url": "https://jobs.ashbyhq.com/frontify",
+    "source_type": "ashby",
+    "source_identifier": "frontify",
+    "industry": "Europe & Israel Startups"
+  },
+  {
+    "name": "Grover",
+    "slug": "grover",
+    "careers_url": "https://boards.greenhouse.io/grover",
+    "source_type": "greenhouse",
+    "source_identifier": "grover",
+    "industry": "Europe & Israel Startups"
+  },
+  {
+    "name": "Auto1 Group",
+    "slug": "auto1-group",
+    "careers_url": "https://boards.greenhouse.io/auto1group",
+    "source_type": "greenhouse",
+    "source_identifier": "auto1group",
+    "industry": "Europe & Israel Startups"
+  },
+  {
+    "name": "Fiverr",
+    "slug": "fiverr",
+    "careers_url": "https://jobs.smartrecruiters.com/Fiverr",
+    "source_type": "smartrecruiters",
+    "source_identifier": "Fiverr",
+    "industry": "Europe & Israel Startups"
+  },
+  {
+    "name": "Transmit Security",
+    "slug": "transmit-security",
+    "careers_url": "https://boards.greenhouse.io/transmitsecurity",
+    "source_type": "greenhouse",
+    "source_identifier": "transmitsecurity",
+    "industry": "Europe & Israel Startups"
+  },
+  {
+    "name": "Gong.io",
+    "slug": "gong-io",
+    "careers_url": "https://boards.greenhouse.io/gongio",
+    "source_type": "greenhouse",
+    "source_identifier": "gongio",
+    "industry": "Europe & Israel Startups"
+  },
+  {
+    "name": "Pagaya",
+    "slug": "pagaya",
+    "careers_url": "https://boards.greenhouse.io/pagaya",
+    "source_type": "greenhouse",
+    "source_identifier": "pagaya",
+    "industry": "Europe & Israel Startups"
+  },
+  {
+    "name": "Paytm Payments",
+    "slug": "paytm-payments",
+    "careers_url": "https://jobs.lever.co/paytmpayments",
+    "source_type": "lever",
+    "source_identifier": "paytmpayments",
+    "industry": "India Startups & Tech"
+  },
+  {
+    "name": "Pocket FM",
+    "slug": "pocket-fm",
+    "careers_url": "https://jobs.lever.co/pocketfm",
+    "source_type": "lever",
+    "source_identifier": "pocketfm",
+    "industry": "India Startups & Tech"
+  },
+  {
+    "name": "River",
+    "slug": "river",
+    "careers_url": "https://jobs.ashbyhq.com/river",
+    "source_type": "ashby",
+    "source_identifier": "river",
+    "industry": "India Startups & Tech"
+  },
+  {
+    "name": "Bluestone",
+    "slug": "bluestone",
+    "careers_url": "https://jobs.smartrecruiters.com/Bluestone",
+    "source_type": "smartrecruiters",
+    "source_identifier": "Bluestone",
+    "industry": "India Startups & Tech"
+  },
+  {
+    "name": "Refyne",
+    "slug": "refyne",
+    "careers_url": "https://jobs.smartrecruiters.com/Refyne",
+    "source_type": "smartrecruiters",
+    "source_identifier": "Refyne",
+    "industry": "India Startups & Tech"
+  },
+  {
+    "name": "Velocity",
+    "slug": "velocity",
+    "careers_url": "https://jobs.ashbyhq.com/velocity",
+    "source_type": "ashby",
+    "source_identifier": "velocity",
+    "industry": "India Startups & Tech"
+  },
+  {
+    "name": "Zeta",
+    "slug": "zeta",
+    "careers_url": "https://jobs.lever.co/zeta",
+    "source_type": "lever",
+    "source_identifier": "zeta",
+    "industry": "India Startups & Tech"
+  },
+  {
+    "name": "Instahyre",
+    "slug": "instahyre",
+    "careers_url": "https://jobs.smartrecruiters.com/Instahyre",
+    "source_type": "smartrecruiters",
+    "source_identifier": "Instahyre",
+    "industry": "India Startups & Tech"
+  },
+  {
+    "name": "UpCodes",
+    "slug": "upcodes",
+    "careers_url": "https://jobs.ashbyhq.com/upcodes",
+    "source_type": "ashby",
+    "source_identifier": "upcodes",
+    "industry": "Technology"
+  },
+  {
+    "name": "Caribou",
+    "slug": "caribou",
+    "careers_url": "https://boards.greenhouse.io/caribou",
+    "source_type": "greenhouse",
+    "source_identifier": "caribou",
+    "industry": "Technology"
+  },
+  {
+    "name": "Yassir",
+    "slug": "yassir",
+    "careers_url": "https://jobs.smartrecruiters.com/Yassir",
+    "source_type": "smartrecruiters",
+    "source_identifier": "Yassir",
+    "industry": "Technology"
+  },
+  {
+    "name": "Phoenix",
+    "slug": "phoenix",
+    "careers_url": "https://jobs.ashbyhq.com/phoenix",
+    "source_type": "ashby",
+    "source_identifier": "phoenix",
+    "industry": "Technology"
+  },
+  {
+    "name": "Parallel Bio",
+    "slug": "parallel-bio",
+    "careers_url": "https://jobs.ashbyhq.com/parallel-bio",
+    "source_type": "ashby",
+    "source_identifier": "parallel-bio",
+    "industry": "Technology"
+  },
+  {
+    "name": "Rivia.AI",
+    "slug": "rivia-ai",
+    "careers_url": "https://jobs.ashbyhq.com/rivia",
+    "source_type": "ashby",
+    "source_identifier": "rivia",
+    "industry": "Technology"
+  },
+  {
+    "name": "Agency",
+    "slug": "agency",
+    "careers_url": "https://jobs.smartrecruiters.com/Agency",
+    "source_type": "smartrecruiters",
+    "source_identifier": "Agency",
+    "industry": "Technology"
+  },
+  {
+    "name": "Kombo",
+    "slug": "kombo",
+    "careers_url": "https://jobs.smartrecruiters.com/Kombo",
+    "source_type": "smartrecruiters",
+    "source_identifier": "Kombo",
+    "industry": "Technology"
+  },
+  {
+    "name": "Finn",
+    "slug": "finn",
+    "careers_url": "https://jobs.lever.co/finn",
+    "source_type": "lever",
+    "source_identifier": "finn",
+    "industry": "Technology"
+  },
+  {
+    "name": "Reflex",
+    "slug": "reflex",
+    "careers_url": "https://boards.greenhouse.io/reflex",
+    "source_type": "greenhouse",
+    "source_identifier": "reflex",
+    "industry": "Technology"
+  },
+  {
+    "name": "Morph",
+    "slug": "morph",
+    "careers_url": "https://boards.greenhouse.io/morph",
+    "source_type": "greenhouse",
+    "source_identifier": "morph",
+    "industry": "Technology"
+  },
+  {
+    "name": "Unusual",
+    "slug": "unusual",
+    "careers_url": "https://jobs.lever.co/unusual",
+    "source_type": "lever",
+    "source_identifier": "unusual",
+    "industry": "Technology"
+  },
+  {
+    "name": "Text.ai",
+    "slug": "text-ai",
+    "careers_url": "https://jobs.lever.co/text",
+    "source_type": "lever",
+    "source_identifier": "text",
+    "industry": "Technology"
+  },
+  {
+    "name": "Bank of America",
+    "slug": "bank-of-america",
+    "careers_url": "https://ghr.wd1.myworkdayjobs.com/Lateral-US",
+    "source_type": "workday",
+    "source_identifier": "ghr.wd1/Lateral-US",
+    "industry": "Banking"
+  },
+  {
+    "name": "Wells Fargo",
+    "slug": "wells-fargo",
+    "careers_url": "https://wf.wd1.myworkdayjobs.com/WellsFargoJobs",
+    "source_type": "workday",
+    "source_identifier": "wf.wd1/WellsFargoJobs",
+    "industry": "Banking"
+  },
+  {
+    "name": "Morgan Stanley",
+    "slug": "morgan-stanley",
+    "careers_url": "https://ms.wd5.myworkdayjobs.com/External",
+    "source_type": "workday",
+    "source_identifier": "ms.wd5/External",
+    "industry": "Financial Services"
+  },
+  {
+    "name": "Fidelity Investments",
+    "slug": "fidelity-investments",
+    "careers_url": "https://fmr.wd1.myworkdayjobs.com/FidelityCareers",
+    "source_type": "workday",
+    "source_identifier": "fmr.wd1/FidelityCareers",
+    "industry": "Financial Services"
+  },
+  {
+    "name": "PNC",
+    "slug": "pnc",
+    "careers_url": "https://pnc.wd5.myworkdayjobs.com/External",
+    "source_type": "workday",
+    "source_identifier": "pnc.wd5/External",
+    "industry": "Banking"
+  },
+  {
+    "name": "KeyBank",
+    "slug": "keybank",
+    "careers_url": "https://keybank.wd5.myworkdayjobs.com/External_Career_Site",
+    "source_type": "workday",
+    "source_identifier": "keybank.wd5/External_Career_Site",
+    "industry": "Banking"
+  },
+  {
+    "name": "Regions",
+    "slug": "regions",
+    "careers_url": "https://regions.wd5.myworkdayjobs.com/Regions_Careers",
+    "source_type": "workday",
+    "source_identifier": "regions.wd5/Regions_Careers",
+    "industry": "Banking"
+  },
+  {
+    "name": "Fifth Third Bank",
+    "slug": "fifth-third-bank",
+    "careers_url": "https://fifththird.wd5.myworkdayjobs.com/53careers",
+    "source_type": "workday",
+    "source_identifier": "fifththird.wd5/53careers",
+    "industry": "Banking"
+  },
+  {
+    "name": "Huntington Bank",
+    "slug": "huntington-bank",
+    "careers_url": "https://huntington.wd12.myworkdayjobs.com/HNBcareers",
+    "source_type": "workday",
+    "source_identifier": "huntington.wd12/HNBcareers",
+    "industry": "Banking"
+  },
+  {
+    "name": "M&T Bank",
+    "slug": "m-t-bank",
+    "careers_url": "https://mtb.wd5.myworkdayjobs.com/MTB",
+    "source_type": "workday",
+    "source_identifier": "mtb.wd5/MTB",
+    "industry": "Banking"
+  },
+  {
+    "name": "Synchrony",
+    "slug": "synchrony",
+    "careers_url": "https://synchronyfinancial.wd5.myworkdayjobs.com/Careers",
+    "source_type": "workday",
+    "source_identifier": "synchronyfinancial.wd5/Careers",
+    "industry": "Financial Services"
+  },
+  {
+    "name": "Ally",
+    "slug": "ally",
+    "careers_url": "https://ally.wd1.myworkdayjobs.com/ally",
+    "source_type": "workday",
+    "source_identifier": "ally.wd1/ally",
+    "industry": "Financial Services"
+  },
+  {
+    "name": "Prudential",
+    "slug": "prudential",
+    "careers_url": "https://pru.wd5.myworkdayjobs.com/Careers",
+    "source_type": "workday",
+    "source_identifier": "pru.wd5/Careers",
+    "industry": "Insurance"
+  },
+  {
+    "name": "Travelers",
+    "slug": "travelers",
+    "careers_url": "https://travelers.wd5.myworkdayjobs.com/External",
+    "source_type": "workday",
+    "source_identifier": "travelers.wd5/External",
+    "industry": "Insurance"
+  },
+  {
+    "name": "Nationwide",
+    "slug": "nationwide",
+    "careers_url": "https://nationwide.wd1.myworkdayjobs.com/Nationwide_Career",
+    "source_type": "workday",
+    "source_identifier": "nationwide.wd1/Nationwide_Career",
+    "industry": "Insurance"
+  },
+  {
+    "name": "Allstate",
+    "slug": "allstate",
+    "careers_url": "https://allstate.wd5.myworkdayjobs.com/allstate_careers",
+    "source_type": "workday",
+    "source_identifier": "allstate.wd5/allstate_careers",
+    "industry": "Insurance"
+  },
+  {
+    "name": "Humana",
+    "slug": "humana",
+    "careers_url": "https://humana.wd5.myworkdayjobs.com/Humana_External_Career_Site",
+    "source_type": "workday",
+    "source_identifier": "humana.wd5/Humana_External_Career_Site",
+    "industry": "Healthcare"
+  },
+  {
+    "name": "Elevance Health",
+    "slug": "elevance-health",
+    "careers_url": "https://elevancehealth.wd1.myworkdayjobs.com/ANT",
+    "source_type": "workday",
+    "source_identifier": "elevancehealth.wd1/ANT",
+    "industry": "Healthcare"
+  },
+  {
+    "name": "Cigna",
+    "slug": "cigna",
+    "careers_url": "https://cigna.wd5.myworkdayjobs.com/cignacareers",
+    "source_type": "workday",
+    "source_identifier": "cigna.wd5/cignacareers",
+    "industry": "Healthcare"
+  },
+  {
+    "name": "Centene",
+    "slug": "centene",
+    "careers_url": "https://centene.wd5.myworkdayjobs.com/Centene_External",
+    "source_type": "workday",
+    "source_identifier": "centene.wd5/Centene_External",
+    "industry": "Healthcare"
+  },
+  {
+    "name": "Merck",
+    "slug": "merck",
+    "careers_url": "https://msd.wd5.myworkdayjobs.com/SearchJobs",
+    "source_type": "workday",
+    "source_identifier": "msd.wd5/SearchJobs",
+    "industry": "Pharmaceuticals"
+  },
+  {
+    "name": "Regeneron",
+    "slug": "regeneron",
+    "careers_url": "https://regeneron.wd1.myworkdayjobs.com/Careers",
+    "source_type": "workday",
+    "source_identifier": "regeneron.wd1/Careers",
+    "industry": "Biotechnology"
+  },
+  {
+    "name": "Vertex Pharmaceuticals",
+    "slug": "vertex-pharmaceuticals",
+    "careers_url": "https://vrtx.wd501.myworkdayjobs.com/Vertex_Careers",
+    "source_type": "workday",
+    "source_identifier": "vrtx.wd501/Vertex_Careers",
+    "industry": "Biotechnology"
+  },
+  {
+    "name": "Biogen",
+    "slug": "biogen",
+    "careers_url": "https://biibhr.wd3.myworkdayjobs.com/external",
+    "source_type": "workday",
+    "source_identifier": "biibhr.wd3/external",
+    "industry": "Biotechnology"
+  },
+  {
+    "name": "Moderna",
+    "slug": "moderna",
+    "careers_url": "https://modernatx.wd1.myworkdayjobs.com/M_tx",
+    "source_type": "workday",
+    "source_identifier": "modernatx.wd1/M_tx",
+    "industry": "Biotechnology"
+  },
+  {
+    "name": "Johnson & Johnson",
+    "slug": "johnson-johnson",
+    "careers_url": "https://jj.wd5.myworkdayjobs.com/JJ",
+    "source_type": "workday",
+    "source_identifier": "jj.wd5/JJ",
+    "industry": "Healthcare"
+  },
+  {
+    "name": "Stryker",
+    "slug": "stryker",
+    "careers_url": "https://stryker.wd1.myworkdayjobs.com/StrykerCareers",
+    "source_type": "workday",
+    "source_identifier": "stryker.wd1/StrykerCareers",
+    "industry": "Medical Devices"
+  },
+  {
+    "name": "Abbott",
+    "slug": "abbott",
+    "careers_url": "https://abbott.wd5.myworkdayjobs.com/abbottcareers",
+    "source_type": "workday",
+    "source_identifier": "abbott.wd5/abbottcareers",
+    "industry": "Medical Devices"
+  },
+  {
+    "name": "Baxter",
+    "slug": "baxter",
+    "careers_url": "https://baxter.wd1.myworkdayjobs.com/baxter",
+    "source_type": "workday",
+    "source_identifier": "baxter.wd1/baxter",
+    "industry": "Medical Devices"
+  },
+  {
+    "name": "Danaher",
+    "slug": "danaher",
+    "careers_url": "https://danaher.wd1.myworkdayjobs.com/DanaherJobs",
+    "source_type": "workday",
+    "source_identifier": "danaher.wd1/DanaherJobs",
+    "industry": "Life Sciences"
+  },
+  {
+    "name": "GE HealthCare",
+    "slug": "ge-healthcare",
+    "careers_url": "https://gehc.wd5.myworkdayjobs.com/GEHC_ExternalSite",
+    "source_type": "workday",
+    "source_identifier": "gehc.wd5/GEHC_ExternalSite",
+    "industry": "Medical Devices"
+  },
+  {
+    "name": "ResMed",
+    "slug": "resmed",
+    "careers_url": "https://resmed.wd3.myworkdayjobs.com/ResMed_External_Careers",
+    "source_type": "workday",
+    "source_identifier": "resmed.wd3/ResMed_External_Careers",
+    "industry": "Medical Devices"
+  },
+  {
+    "name": "Cardinal Health",
+    "slug": "cardinal-health",
+    "careers_url": "https://cardinalhealth.wd1.myworkdayjobs.com/EXT",
+    "source_type": "workday",
+    "source_identifier": "cardinalhealth.wd1/EXT",
+    "industry": "Healthcare"
+  },
+  {
+    "name": "McKesson",
+    "slug": "mckesson",
+    "careers_url": "https://mckesson.wd3.myworkdayjobs.com/External_Careers",
+    "source_type": "workday",
+    "source_identifier": "mckesson.wd3/External_Careers",
+    "industry": "Healthcare"
+  },
+  {
+    "name": "Gap",
+    "slug": "gap",
+    "careers_url": "https://gapinc.wd1.myworkdayjobs.com/gapinc",
+    "source_type": "workday",
+    "source_identifier": "gapinc.wd1/gapinc",
+    "industry": "Retail"
+  },
+  {
+    "name": "Chewy",
+    "slug": "chewy",
+    "careers_url": "https://chewy.wd5.myworkdayjobs.com/External",
+    "source_type": "workday",
+    "source_identifier": "chewy.wd5/External",
+    "industry": "E-commerce"
+  },
+  {
+    "name": "Nike",
+    "slug": "nike",
+    "careers_url": "https://nike.wd1.myworkdayjobs.com/nke",
+    "source_type": "workday",
+    "source_identifier": "nike.wd1/nke",
+    "industry": "Consumer Goods"
+  },
+  {
+    "name": "VF Corporation",
+    "slug": "vf-corporation",
+    "careers_url": "https://vfc.wd5.myworkdayjobs.com/vfc_careers",
+    "source_type": "workday",
+    "source_identifier": "vfc.wd5/vfc_careers",
+    "industry": "Consumer Goods"
+  },
+  {
+    "name": "Mondelez",
+    "slug": "mondelez",
+    "careers_url": "https://mdlz.wd3.myworkdayjobs.com/External",
+    "source_type": "workday",
+    "source_identifier": "mdlz.wd3/External",
+    "industry": "Consumer Goods"
+  },
+  {
+    "name": "Chipotle",
+    "slug": "chipotle",
+    "careers_url": "https://chipotle.wd5.myworkdayjobs.com/ChipotleCareers",
+    "source_type": "workday",
+    "source_identifier": "chipotle.wd5/ChipotleCareers",
+    "industry": "Restaurants"
+  },
+  {
+    "name": "Disney",
+    "slug": "disney",
+    "careers_url": "https://disney.wd5.myworkdayjobs.com/disneycareer",
+    "source_type": "workday",
+    "source_identifier": "disney.wd5/disneycareer",
+    "industry": "Media & Entertainment"
+  },
+  {
+    "name": "Warner Bros. Discovery",
+    "slug": "warner-bros-discovery",
+    "careers_url": "https://warnerbros.wd5.myworkdayjobs.com/global",
+    "source_type": "workday",
+    "source_identifier": "warnerbros.wd5/global",
+    "industry": "Media & Entertainment"
+  },
+  {
+    "name": "Verizon",
+    "slug": "verizon",
+    "careers_url": "https://verizon.wd12.myworkdayjobs.com/verizon-careers",
+    "source_type": "workday",
+    "source_identifier": "verizon.wd12/verizon-careers",
+    "industry": "Telecommunications"
+  },
+  {
+    "name": "Hewlett Packard Enterprise",
+    "slug": "hewlett-packard-enterprise",
+    "careers_url": "https://hpe.wd5.myworkdayjobs.com/Jobsathpe",
+    "source_type": "workday",
+    "source_identifier": "hpe.wd5/Jobsathpe",
+    "industry": "Technology"
+  },
+  {
+    "name": "Red Hat",
+    "slug": "red-hat",
+    "careers_url": "https://redhat.wd5.myworkdayjobs.com/jobs",
+    "source_type": "workday",
+    "source_identifier": "redhat.wd5/jobs",
+    "industry": "Technology"
+  },
+  {
+    "name": "Marvell",
+    "slug": "marvell",
+    "careers_url": "https://marvell.wd1.myworkdayjobs.com/MarvellCareers",
+    "source_type": "workday",
+    "source_identifier": "marvell.wd1/MarvellCareers",
+    "industry": "Semiconductors"
+  },
+  {
+    "name": "CrowdStrike",
+    "slug": "crowdstrike",
+    "careers_url": "https://crowdstrike.wd5.myworkdayjobs.com/crowdstrikecareers",
+    "source_type": "workday",
+    "source_identifier": "crowdstrike.wd5/crowdstrikecareers",
+    "industry": "Cybersecurity"
+  },
+  {
+    "name": "Booz Allen Hamilton",
+    "slug": "booz-allen-hamilton",
+    "careers_url": "https://bah.wd1.myworkdayjobs.com/BAH_Jobs",
+    "source_type": "workday",
+    "source_identifier": "bah.wd1/BAH_Jobs",
+    "industry": "Consulting"
+  },
+  {
+    "name": "CACI",
+    "slug": "caci-workday",
+    "careers_url": "https://caci.wd1.myworkdayjobs.com/External",
+    "source_type": "workday",
+    "source_identifier": "caci.wd1/External",
+    "industry": "Defense"
+  },
+  {
+    "name": "General Dynamics",
+    "slug": "general-dynamics",
+    "careers_url": "https://gdit.wd5.myworkdayjobs.com/External_Career_Site",
+    "source_type": "workday",
+    "source_identifier": "gdit.wd5/External_Career_Site",
+    "industry": "Defense"
+  },
+  {
+    "name": "Northrop Grumman",
+    "slug": "northrop-grumman",
+    "careers_url": "https://ngc.wd1.myworkdayjobs.com/Northrop_Grumman_External_Site",
+    "source_type": "workday",
+    "source_identifier": "ngc.wd1/Northrop_Grumman_External_Site",
+    "industry": "Defense"
+  },
+  {
+    "name": "RTX",
+    "slug": "rtx",
+    "careers_url": "https://globalhr.wd5.myworkdayjobs.com/REC_RTX_Ext_Gateway",
+    "source_type": "workday",
+    "source_identifier": "globalhr.wd5/REC_RTX_Ext_Gateway",
+    "industry": "Defense"
+  },
+  {
+    "name": "Caterpillar",
+    "slug": "caterpillar",
+    "careers_url": "https://cat.wd5.myworkdayjobs.com/CaterpillarCareers",
+    "source_type": "workday",
+    "source_identifier": "cat.wd5/CaterpillarCareers",
+    "industry": "Industrial"
+  },
+  {
+    "name": "Rockwell Automation",
+    "slug": "rockwell-automation",
+    "careers_url": "https://rockwellautomation.wd1.myworkdayjobs.com/External_Rockwell_Automation",
+    "source_type": "workday",
+    "source_identifier": "rockwellautomation.wd1/External_Rockwell_Automation",
+    "industry": "Industrial"
+  },
+  {
+    "name": "Johnson Controls",
+    "slug": "johnson-controls",
+    "careers_url": "https://jci.wd5.myworkdayjobs.com/JCI",
+    "source_type": "workday",
+    "source_identifier": "jci.wd5/JCI",
+    "industry": "Industrial"
+  },
+  {
+    "name": "Carrier",
+    "slug": "carrier",
+    "careers_url": "https://carrier.wd5.myworkdayjobs.com/jobs",
+    "source_type": "workday",
+    "source_identifier": "carrier.wd5/jobs",
+    "industry": "Industrial"
+  },
+  {
+    "name": "Illinois Tool Works",
+    "slug": "illinois-tool-works",
+    "careers_url": "https://itw.wd5.myworkdayjobs.com/External",
+    "source_type": "workday",
+    "source_identifier": "itw.wd5/External",
+    "industry": "Industrial"
+  },
+  {
+    "name": "GM",
+    "slug": "gm",
+    "careers_url": "https://generalmotors.wd5.myworkdayjobs.com/Careers_GM",
+    "source_type": "workday",
+    "source_identifier": "generalmotors.wd5/Careers_GM",
+    "industry": "Automotive"
+  },
+  {
+    "name": "Chevron",
+    "slug": "chevron",
+    "careers_url": "https://chevron.wd5.myworkdayjobs.com/jobs",
+    "source_type": "workday",
+    "source_identifier": "chevron.wd5/jobs",
+    "industry": "Energy"
+  },
+  {
+    "name": "ConocoPhillips",
+    "slug": "conocophillips",
+    "careers_url": "https://conocophillips.wd1.myworkdayjobs.com/External",
+    "source_type": "workday",
+    "source_identifier": "conocophillips.wd1/External",
+    "industry": "Energy"
+  },
+  {
+    "name": "Shell",
+    "slug": "shell",
+    "careers_url": "https://shell.wd3.myworkdayjobs.com/ShellCareers",
+    "source_type": "workday",
+    "source_identifier": "shell.wd3/ShellCareers",
+    "industry": "Energy"
+  },
+  {
+    "name": "Baker Hughes",
+    "slug": "baker-hughes",
+    "careers_url": "https://bakerhughes.wd5.myworkdayjobs.com/BakerHughes",
+    "source_type": "workday",
+    "source_identifier": "bakerhughes.wd5/BakerHughes",
+    "industry": "Energy"
+  },
+  {
+    "name": "C.H. Robinson",
+    "slug": "c-h-robinson",
+    "careers_url": "https://chrobinson.wd5.myworkdayjobs.com/chrobinson",
+    "source_type": "workday",
+    "source_identifier": "chrobinson.wd5/chrobinson",
+    "industry": "Logistics"
+  },
+  {
+    "name": "Southwest Airlines",
+    "slug": "southwest-airlines",
+    "careers_url": "https://swa.wd1.myworkdayjobs.com/External",
+    "source_type": "workday",
+    "source_identifier": "swa.wd1/External",
+    "industry": "Airlines"
+  },
+  {
+    "name": "Accenture India",
+    "slug": "accenture-india",
+    "careers_url": "https://accenture.wd103.myworkdayjobs.com/AccentureCareers",
+    "source_type": "workday",
+    "source_identifier": "accenture.wd103/AccentureCareers",
+    "industry": "Consulting"
+  },
+  {
+    "name": "Novartis",
+    "slug": "novartis",
+    "careers_url": "https://novartis.wd3.myworkdayjobs.com/Novartis_Careers",
+    "source_type": "workday",
+    "source_identifier": "novartis.wd3/Novartis_Careers",
+    "industry": "Pharmaceuticals"
+  },
+  {
+    "name": "AstraZeneca",
+    "slug": "astrazeneca",
+    "careers_url": "https://astrazeneca.wd3.myworkdayjobs.com/Careers",
+    "source_type": "workday",
+    "source_identifier": "astrazeneca.wd3/Careers",
+    "industry": "Pharmaceuticals"
+  },
+  {
+    "name": "GSK",
+    "slug": "gsk",
+    "careers_url": "https://gsk.wd5.myworkdayjobs.com/GSKCareers",
+    "source_type": "workday",
+    "source_identifier": "gsk.wd5/GSKCareers",
+    "industry": "Pharmaceuticals"
+  },
+  {
+    "name": "Sanofi",
+    "slug": "sanofi",
+    "careers_url": "https://sanofi.wd3.myworkdayjobs.com/SanofiCareers",
+    "source_type": "workday",
+    "source_identifier": "sanofi.wd3/SanofiCareers",
+    "industry": "Pharmaceuticals"
+  },
+  {
+    "name": "Roche",
+    "slug": "roche",
+    "careers_url": "https://roche.wd3.myworkdayjobs.com/roche-ext",
+    "source_type": "workday",
+    "source_identifier": "roche.wd3/roche-ext",
+    "industry": "Pharmaceuticals"
+  },
+  {
+    "name": "Barclays",
+    "slug": "barclays",
+    "careers_url": "https://barclays.wd3.myworkdayjobs.com/External_Career_Site_Barclays",
+    "source_type": "workday",
+    "source_identifier": "barclays.wd3/External_Career_Site_Barclays",
+    "industry": "Banking"
+  },
+  {
+    "name": "Lloyds Banking Group",
+    "slug": "lloyds-banking-group",
+    "careers_url": "https://lbg.wd3.myworkdayjobs.com/lbg_careers",
+    "source_type": "workday",
+    "source_identifier": "lbg.wd3/lbg_careers",
+    "industry": "Banking"
+  },
+  {
+    "name": "Santander",
+    "slug": "santander",
+    "careers_url": "https://santander.wd3.myworkdayjobs.com/SantanderCareers",
+    "source_type": "workday",
+    "source_identifier": "santander.wd3/SantanderCareers",
+    "industry": "Banking"
+  },
+  {
+    "name": "Deutsche Bank",
+    "slug": "deutsche-bank",
+    "careers_url": "https://db.wd3.myworkdayjobs.com/DBWebsite",
+    "source_type": "workday",
+    "source_identifier": "db.wd3/DBWebsite",
+    "industry": "Banking"
+  },
+  {
+    "name": "CIBC",
+    "slug": "cibc",
+    "careers_url": "https://cibc.wd3.myworkdayjobs.com/search",
+    "source_type": "workday",
+    "source_identifier": "cibc.wd3/search",
+    "industry": "Banking"
+  },
+  {
+    "name": "Sun Life",
+    "slug": "sun-life",
+    "careers_url": "https://sunlife.wd3.myworkdayjobs.com/Experienced-Jobs",
+    "source_type": "workday",
+    "source_identifier": "sunlife.wd3/Experienced-Jobs",
+    "industry": "Insurance"
+  },
+  {
+    "name": "Telstra",
+    "slug": "telstra",
+    "careers_url": "https://telstra.wd3.myworkdayjobs.com/telstra_careers",
+    "source_type": "workday",
+    "source_identifier": "telstra.wd3/telstra_careers",
+    "industry": "Telecommunications"
   }
 ]
