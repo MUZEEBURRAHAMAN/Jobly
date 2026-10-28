@@ -23,8 +23,9 @@ class Settings(BaseSettings):
     CRAWL_PROFILE: str = "light"
     # Job boards read at once. 5 suits the 512 MB server; the scheduled crawl on GitHub Actions runs with more.
     CRAWL_CONCURRENCY: int = 5
-    # Full crawl only: pages of 20 read per Workday employer (60 pages = the newest 1,200 jobs of a big employer).
-    WORKDAY_MAX_PAGES: int = 60
+    # Full crawl only: pages of 20 read per Workday employer (125 pages = up to 2,500 jobs of a big employer; at 60, many
+    # big employers stopped at the cap). About 0.7 s a page, so the largest employers take under two minutes each.
+    WORKDAY_MAX_PAGES: int = 125
 
     # Jobs posted longer ago than this are never stored or shown (stale/ghost listings; keeps the DB small).
     MAX_JOB_AGE_DAYS: int = 60
