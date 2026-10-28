@@ -14,8 +14,9 @@ interface Props { role: Role }
 const { role } = Astro.props;
 const guide = role.guide ? (await getGuides()).find((g) => g.id === role.guide) : undefined;
 const others = [DESIGN_IT, ...ALL_ROLES].filter((r) => r.slug !== role.slug);
-const ranges = [{ d: 1, l: 'Past 24 hours' }, { d: 7, l: 'Past week' }, { d: 14, l: 'Past 2 weeks' }, { d: 30, l: 'Past month' }];
+const ranges = [{ d: 1, l: 'Past 24 hours' }, { d: 7, l: 'Past week' }, { d: 14, l: 'Past 2 weeks' }, { d: 30, l: 'Past month' }, { d: 60, l: 'Past 2 months' }];
 const title = `Latest ${role.name.toLowerCase()} jobs`;
+const isList = role.id === 'design_it' || role.id === 'all';
 ---
 <Base title={title} description={`The newest ${role.plural} from company career pages, updated every four hours, each with its real posting date. No promoted listings, no account.`}>
   <PageHero crumbs={[{ label: 'Jobs', href: '/jobs' }, { label: role.name }]} eyebrow={`${role.name} jobs`} title={`${role.name} jobs, straight from the source.`} lead={role.lead} figure={role.figure} intensity={0.7}>
@@ -44,8 +45,8 @@ const title = `Latest ${role.name.toLowerCase()} jobs`;
     <div class="panel panel-pad">
       <div class="container about">
         <div>
-          <SectionHead eyebrow="What’s included" id="titles-title" title={role.id === 'design_it' ? 'Every area in this list' : `Every title Jobly counts as ${role.name.toLowerCase()}`}
-            lead={role.id === 'design_it' ? 'Each area also has its own page. Jobly sorts every job by its title, at every level from intern to VP.' : 'Employers name the same job in many ways. Jobly reads the title and groups these together, at every level from intern to VP.'} />
+          <SectionHead eyebrow="What’s included" id="titles-title" title={isList ? 'Every area in this list' : `Every title Jobly counts as ${role.name.toLowerCase()}`}
+            lead={isList ? 'Each area also has its own page. Jobly sorts every job by its title, at every level from intern to VP.' : 'Employers name the same job in many ways. Jobly reads the title and groups these together, at every level from intern to VP.'} />
           <ul class="titles">{role.titles.map((t) => <li>{t}</li>)}</ul>
           <p class="others">Other lists: {others.map((o, i) => <>{i > 0 && ' · '}<a href={`/jobs/${o.slug}`}>{o.name}</a></>)}</p>
         </div>
@@ -54,7 +55,7 @@ const title = `Latest ${role.name.toLowerCase()} jobs`;
     </div>
   </section>
 
-  <FinalCta title={`Get an alert for the next one.`} lead={`Pick ${role.name.toLowerCase()} in Jobly and it tells you when a new job matches, usually within a few hours of it going up. Free, no account.`} />
+  <FinalCta title={`Get an alert for the next one.`} lead={`Pick ${role.id === 'all' ? 'your roles' : role.name.toLowerCase()} in Jobly and it tells you when a new job matches, usually within a few hours of it going up. Free, no account.`} />
   <script>import '../../scripts/role-jobs';</script>
 </Base>
 

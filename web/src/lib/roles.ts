@@ -24,7 +24,7 @@ export const AREAS: Role[] = [
   { slug: 'backend', id: 'backend', name: 'Backend development', plural: 'backend jobs', figure: 'router',
     titles: ['Backend engineer', 'Java developer', 'Python developer', 'Go engineer', 'Node.js developer', '.NET developer', 'PHP developer', 'Ruby on Rails', 'API engineer'],
     lead: 'New backend and server-side roles, Java, Python, Go, Node, .NET and more, from company career pages, newest first, each with its real posting date.' },
-  { slug: 'mobile', id: 'mobile', name: 'Mobile development', plural: 'mobile developer jobs', figure: 'format',
+  { slug: 'mobile', id: 'mobile', name: 'Mobile development', plural: 'mobile developer jobs', figure: 'phone',
     titles: ['iOS engineer', 'Android developer', 'Mobile engineer', 'Flutter developer', 'React Native developer', 'Swift', 'Kotlin'],
     lead: 'New iOS, Android and cross-platform mobile roles from company career pages, newest first, each with its real posting date.' },
   { slug: 'devops-cloud', id: 'devops', name: 'DevOps, cloud & SRE', plural: 'DevOps and cloud jobs', figure: 'hub',
@@ -48,13 +48,44 @@ export const AREAS: Role[] = [
   { slug: 'creative-design', id: 'design', name: 'Graphic, brand & creative design', plural: 'creative design jobs', figure: 'turntable',
     titles: ['Graphic designer', 'Brand designer', 'Motion designer', 'Illustrator', '3D artist', 'Art director', 'Creative director', 'Game designer'],
     lead: 'New graphic, brand, motion and creative roles from company career pages, newest first, each with its real posting date.' },
-  { slug: 'other-engineering', id: 'engineering', name: 'Other engineering', plural: 'engineering jobs', figure: 'exploded',
+  { slug: 'other-engineering', id: 'engineering', name: 'Other engineering', plural: 'engineering jobs', figure: 'keyboard',
     titles: ['Embedded engineer', 'Firmware engineer', 'Game developer', 'Solutions architect', 'Engineering manager', 'Technical writer', 'Blockchain developer'],
     lead: 'Engineering roles outside the areas above, embedded, firmware, games, architecture and leadership, from company career pages, newest first.' },
 ];
 
+// Every other kind of job Jobly lists (ids match backend/app/categories.py).
+const other = (slug: string, id: string, name: string, plural: string, figure: string, titles: string[], what: string): Role =>
+  ({ slug, id, name, plural, figure, titles, lead: `New ${what} roles from company career pages, newest first, each with the date the employer posted it.` });
+export const OTHERS: Role[] = [
+  other('marketing', 'marketing', 'Marketing', 'marketing jobs', 'plot',
+    ['Marketing manager', 'Growth marketer', 'Content marketer', 'SEO specialist', 'Product marketing manager', 'Social media manager', 'Copywriter'], 'marketing, growth, content and communications'),
+  other('sales', 'sales', 'Sales', 'sales jobs', 'settle',
+    ['Account executive', 'Sales development rep', 'Account manager', 'Business development', 'Sales engineer', 'Sales manager'], 'sales, business development and account management'),
+  other('customer-success', 'customer', 'Customer success & support', 'customer success jobs', 'dish',
+    ['Customer success manager', 'Customer support specialist', 'Implementation manager', 'Onboarding specialist', 'Client services'], 'customer success, support and onboarding'),
+  other('people-recruiting', 'people', 'People & recruiting', 'HR and recruiting jobs', 'lockers',
+    ['Recruiter', 'Talent acquisition', 'HR business partner', 'People operations', 'HR generalist', 'Learning & development'], 'recruiting, HR and people operations'),
+  other('finance', 'finance', 'Finance & accounting', 'finance jobs', 'vault',
+    ['Accountant', 'Financial analyst', 'Controller', 'FP&A', 'Payroll specialist', 'Tax', 'Audit'], 'finance, accounting and FP&A'),
+  other('legal', 'legal', 'Legal & compliance', 'legal jobs', 'padlock',
+    ['Counsel', 'Paralegal', 'Compliance analyst', 'Privacy counsel', 'Contracts manager'], 'legal, compliance and risk'),
+  other('operations', 'operations', 'Operations', 'operations jobs', 'patch',
+    ['Operations manager', 'Business operations', 'Program manager', 'Supply chain', 'Logistics', 'Office manager', 'Project manager'], 'operations, programs, supply chain and logistics'),
+  other('healthcare-science', 'healthcare', 'Healthcare & science', 'healthcare and science jobs', 'phosphor',
+    ['Nurse', 'Clinical specialist', 'Pharmacist', 'Research associate', 'Lab technician', 'Medical writer'], 'healthcare, clinical and life-science'),
+  other('other-jobs', 'other', 'Other', 'other jobs', 'basket',
+    ['Retail', 'Hospitality', 'Store associate', 'Driver', 'Warehouse', 'Administrative'], 'retail, hospitality, field and other'),
+];
+
+/** Every job Jobly lists, in one list. */
+export const EVERY: Role = {
+  slug: 'all', id: 'all', name: 'All', plural: 'jobs', figure: 'riffle',
+  titles: [...ROLES, ...AREAS, ...OTHERS].map((r) => r.name),
+  lead: 'Every job Jobly lists, from all 1,600+ employers and job boards, in one list: design, development, IT and every other role. Newest first, each with the date the employer posted it.',
+};
+
 /** Every role and area with its own page. */
-export const ALL_ROLES: Role[] = [...ROLES, ...AREAS];
+export const ALL_ROLES: Role[] = [...ROLES, ...AREAS, ...OTHERS, EVERY];
 
 /** The all-in-one "Design & IT" list (role id understood by shared/jobdata.ts). */
 export const DESIGN_IT: Role = {
