@@ -3,7 +3,7 @@
 > **Fresh tech jobs from company career pages, in your toolbar.**  
 > A free Chrome extension, a website and a small server that read the public job boards of about 600 employers, keep each job's real posting date, hide anything older than 60 days and alert you to new matches. No account; preferences stay in the browser.
 
-Live: website https://joblyextension.netlify.app · server https://jobly-yd6l.onrender.com (`/health` shows its state).
+Live: website https://jobly-88t.pages.dev · Studio https://jobly-studio.pages.dev · job data https://jobly-data.pages.dev/v1 · server https://jobly-yd6l.onrender.com (`/health` shows its state).
 
 ---
 
@@ -20,7 +20,7 @@ Live: website https://joblyextension.netlify.app · server https://jobly-yd6l.on
                                                    |
                           +------------------------+-----------------------+
                           v                                                v
-        Chrome extension (Manifest V3, React)                Website (Astro, Netlify)
+        Chrome extension (Manifest V3, React)                Website (Astro, Cloudflare Pages)
         popup + dashboard, alerts computed on-device         guides, jobs by role, world map, forms
 ```
 
@@ -73,7 +73,7 @@ cd extension && npx tsc --noEmit             # type-check
 | `DATABASE_PATH` | `./hiring_radar.db` | SQLite file. Render's free tier has no persistent disk: the server re-seeds and re-crawls on every restart |
 | `ADMIN_TOKEN` | *(unset)* | Enables company create/toggle and `?wait_for_completion=true` via the `X-Admin-Token` header. Unset = disabled |
 | `EXTENSION_IDS` | *(any extension)* | Comma-separated Chrome extension IDs allowed by CORS. **Set this after publishing** |
-| `SITE_ORIGINS` | `https://joblyextension.netlify.app` | Comma-separated web origins allowed by CORS: the website and Jobly Studio (for example `https://jobly-studio.pages.dev`) |
+| `SITE_ORIGINS` | `https://jobly-88t.pages.dev,https://jobly-studio.pages.dev` | Comma-separated web origins allowed by CORS: the website and Jobly Studio (for example `https://jobly-studio.pages.dev`) |
 | `ENABLE_DOCS` | `false` | Serves `/docs` when `true` |
 | `AUTO_SYNC_INTERVAL_HOURS` | `2` | Background crawl interval |
 | `SNAPSHOT_REPO` / `SNAPSHOT_TAG` / `SNAPSHOT_ASSET` | `MUZEEBURRAHAMAN/Jobly` / `snapshot` / `jobly.db.gz` | Where an empty server restores a database snapshot from (set `SNAPSHOT_REPO=` empty to disable) |
@@ -176,8 +176,7 @@ JOB EXTENSION/
 │   ├── seed_companies.py         # Seed companies into SQLite
 │   ├── sync_jobs.py              # Ingestion CLI trigger
 │   └── generate_icons.py         # PNG icon generator
-├── web/                          # The website (Astro, static): landing, guides, jobs by role, privacy; deployed on Netlify
-├── netlify.toml                  # Netlify: build web/ and publish web/dist
+├── web/                          # The website (Astro, static): landing, guides, jobs by role, privacy; deployed to Cloudflare Pages by .github/workflows/web.yml
 ├── render.yaml                   # Render blueprint (the live service is configured in the Render dashboard)
 ├── store-assets/                 # Web Store screenshots, promo tile and LISTING.md (npm run e2e:screens)
 └── README.md

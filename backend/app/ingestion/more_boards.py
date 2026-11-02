@@ -22,7 +22,7 @@ import httpx
 from .base import NormalizedJob, clean_text
 
 logger = logging.getLogger(__name__)
-HEADERS = {"User-Agent": "HiringRadar/1.0 (job discovery; +https://joblyextension.netlify.app)", "Accept": "application/json"}
+HEADERS = {"User-Agent": "HiringRadar/1.0 (job discovery; +https://jobly-88t.pages.dev)", "Accept": "application/json"}
 SMARTRECRUITERS_PAGE = 100
 SMARTRECRUITERS_MAX = 600   # a few huge employers list thousands of jobs; the newest are returned first
 MAX_BYTES = 12_000_000

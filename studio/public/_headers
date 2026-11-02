@@ -1,4 +1,4 @@
-# Cloudflare Pages headers (same format as Netlify's).
+# Cloudflare Pages headers.
 /*
   Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; worker-src 'self' blob:; connect-src 'self' https: http://localhost:* http://127.0.0.1:*; frame-ancestors 'none'; base-uri 'none'; form-action 'none'; object-src 'none'
   X-Content-Type-Options: nosniff

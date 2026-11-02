@@ -12,15 +12,15 @@ Fill in these three things, nothing else is needed:
 | Country of residence or incorporation | ______ |
 | Postal address (needed for GDPR and many consumer rules) | ______ |
 
-Contact email already published on the site: rahamanmuzeeb1108@gmail.com. Form messages are emailed there (Netlify notification set 2026-10-22).
+Contact email already published on the site: rahamanmuzeeb1108@gmail.com. The site's support and uninstall forms open the visitor's own email app addressed to it; the site stores nothing.
 
 **What to ask for:** a review of the privacy policy, terms of use and security page (live at the addresses below), answers to the ten questions in section 2, and a view on the risks in section 7. A flat-fee privacy lawyer with GDPR/UK GDPR and platform-terms experience is the right fit; expect one to two weeks. The listing can go live before the review ends, because the policy URL does not change.
 
 **The documents** (live, and as Markdown in the repository):
-- Privacy policy: https://joblyextension.netlify.app/privacy (`web/src/content/docs/privacy.md`)
-- Terms of use: https://joblyextension.netlify.app/terms (`web/src/content/docs/terms.md`)
-- Security page: https://joblyextension.netlify.app/security (`web/src/content/docs/security.md`)
-- Chrome Web Store listing and data-use answers: `store-assets/LISTING.md`
+- Privacy policy: https://jobly-88t.pages.dev/privacy (`web/src/content/docs/privacy.md`)
+- Terms of use: https://jobly-88t.pages.dev/terms (`web/src/content/docs/terms.md`)
+- Security page: https://jobly-88t.pages.dev/security (`web/src/content/docs/security.md`)
+- Chrome Web Store listing and data-use answers: `docs/store-listing-1.1.md`
 
 ## 1. The product in six sentences
 
@@ -29,10 +29,10 @@ Jobly is a free Chrome extension, a website and a small server. It lists tech jo
 ## 2. Questions for the lawyer (most important first)
 
 1. **Who is the controller, and what must the policies say about them?** Today they name no person, company or postal address, only an email. What is the minimum for GDPR / UK GDPR and for the operator's own country, and should the operator be a company?
-2. **Is there personal data at all?** The server briefly holds IP addresses (rate limiting, in memory) and sees search words; hosts keep logs; Netlify stores form messages with the sender's IP. Is the policy's description correct, and is a legal basis (legitimate interest) needed in the text?
+2. **Is there personal data at all?** The server briefly holds IP addresses (rate limiting, in memory) and sees search words; hosts keep logs; form messages arrive as ordinary emails in the operator's inbox. Is the policy's description correct, and is a legal basis (legitimate interest) needed in the text?
 3. **Can we aggregate job data from these sources?** See section 6: most publish a public feed and state no third-party terms; two (Remotive, Himalayas) state terms; one (SmartRecruiters) documents only key-based access. Do we need permission, a different approach, or nothing more than we do?
-4. **International transfers.** Server on Render (US) behind Cloudflare, site on Netlify (US). Netlify states it relies on the EU-U.S. Data Privacy Framework and standard contractual clauses (verified, section 5). Render's mechanism is **not verified**. What do we need to say or sign?
-5. **Forms.** The support form stores an email and message; the uninstall form stores a reason and note; Netlify adds the sender's IP and cannot switch that off (section 5). Is a 12-month manual deletion promise reasonable, and do we need a recorded process for access and deletion requests?
+4. **International transfers.** Server on Render (US) behind Cloudflare; the website, Jobly Studio and the public job files on Cloudflare Pages. The privacy policy says Cloudflare relies on the EU-U.S. Data Privacy Framework (not re-verified for this packet, section 5). Render's mechanism is **not verified**. What do we need to say or sign?
+5. **Forms.** The support and uninstall forms store nothing on the site: they open the visitor's own email app with the message filled in, so messages (email address, message, reason) sit in the operator's inbox. Is a 12-month manual deletion promise reasonable, and do we need a recorded process for access and deletion requests?
 6. **Terms of use.** Are the "as is" and liability wording enforceable for a free service in the operator's country and for EU/UK consumers? Governing law, venue and operator identity clauses are missing (draft wording in section 8).
 7. **Employers named in listings.** The terms now say employers can ask for a correction or removal, and that removing a job from their board removes it from Jobly at the next refresh. Enough?
 8. **Children.** The policy says Jobly is not directed at under-13s. Is that the right age for the main markets (16 in parts of the EU)?
@@ -50,15 +50,15 @@ Jobly is a free Chrome extension, a website and a small server. It lists tech jo
 | Server memory | Caller IP address, to count requests per minute | About a minute, memory only | `backend/app/security.py` |
 | Server logs | No access log (`--no-access-log` in the Render start command, seen in the deploy log 2026-10-20). Application errors and crawl results only | Render's retention | Render dashboard |
 | **Website** | No cookies, analytics or third-party scripts; fonts served from the site. Theme choice in the browser's local storage | Until cleared | `web/` |
-| **Forms** (Netlify Forms) | Support: email, message, optional name. Uninstall: reason and note. **Netlify also stores the sender's IP** | Promised: removed once handled, at most 12 months. **No automatic deletion exists; it is done by hand** | Netlify dashboard |
+| **Forms** (open the visitor's email app) | Support: email, message, optional name. Uninstall: reason and note. Arrive as emails; the site stores nothing | Promised: removed once handled, at most 12 months. **No automatic deletion exists; it is done by hand** | Operator's inbox |
 | Google favicon service (`t2.gstatic.com`) | The extension asks it for company logos: Google sees the company domains and the user's IP | Google's policy | extension manifest (`img-src`) |
 | Place names | The server matches job locations to countries using a bundled GeoNames table; no user data involved | n/a | `backend/app/data/world.json` |
 
-Extension permissions: `storage`, `notifications`, `alarms`, one host (`https://jobly-yd6l.onrender.com/*`). No content scripts, no `tabs`, no `history`, no remote code.
+Extension permissions (1.1.0): `storage`, `notifications`, `alarms`, `activeTab`, `scripting`, `contextMenus`; hosts `https://jobly-data.pages.dev/*` and `https://jobly-yd6l.onrender.com/*`; optional host `https://api.hunter.io/*` (asked for only when the user searches contacts with their own key). No content scripts that run on their own, no `tabs`, no `history`, no remote code.
 
 ## 4. Changes already made since the first draft (so you review the current text)
 
-- Privacy policy: IP stored by Netlify with form messages; where data goes (US hosts, Netlify's DPF and SCC statement); a rights section with a 30-day answer promise; IP held in server memory for rate limiting.
+- Privacy policy: where data goes (US hosts; the website and job files on Cloudflare Pages); forms that open the visitor's email app instead of storing messages; a rights section with a 30-day answer promise; IP held in server memory for rate limiting.
 - Terms: employer correction and removal paragraph; GeoNames credit (CC BY 4.0).
 - Remotive removed as a source (its terms need attribution and at most about 4 calls a day).
 - Job cards from We Work Remotely, Himalayas and Arbeitnow say "via <board>".
@@ -68,7 +68,7 @@ Extension permissions: `storage`, `notifications`, `alarms`, one host (`https://
 
 | Provider | Role | What we found | Status |
 | --- | --- | --- | --- |
-| Netlify | Website and forms | Collects IP addresses and device data automatically; retention "consistent with the original purpose" with no fixed period; processes outside the country of collection; relies on the EU-U.S. DPF (and UK and Swiss extensions) and the Commission's standard contractual clauses 2021/914 ([netlify.com/privacy](https://www.netlify.com/privacy/)). Community answers from Netlify staff: form submissions store the IP, it cannot be hidden, and there is no auto-delete ([forum](https://answers.netlify.com/t/forms-are-collecting-ip-address-can-we-turn-off/11690), [forum](https://answers.netlify.com/t/data-in-netlify-forms-auto-delete-after-30-days-gdpr-compliance/30713)) | Verified; staff answers are informal |
+| Cloudflare Pages | Website, Jobly Studio and the public job files | Short-lived request logs (IP, time, address requested). The privacy policy states Cloudflare relies on the EU-U.S. DPF; retention and role (processor) **not verified** for this packet | Not verified |
 | Render | Server host | Log retention depends on the plan (Hobby 7 days, Professional 14, Organization 30 days; [render.com/docs/logging](https://render.com/docs/logging)). HTTP request logs in its explorer need a paid workspace. Privacy-policy page text could not be read automatically | Partly verified; **transfer mechanism not verified** |
 | Cloudflare | Network in front of Render | Seen in response headers (`server: cloudflare`); retention and role (processor) **not verified** | Not verified |
 | Google | Favicons, Chrome Web Store, theme sync | Governed by Google's own policies | Not reviewed |
@@ -100,7 +100,7 @@ Practical safeguards in place: one request (or a few pages) per employer per cra
 
 **Medium**
 4. No governing-law or venue clause; no named contact for legal notices.
-5. The 12-month form retention is manual with no automation; Netlify cannot auto-delete and stores IPs (question 5).
+5. The 12-month form retention is manual with no automation: messages are emails in the operator's inbox (question 5).
 6. Render and Cloudflare transfer mechanisms and retention not verified (question 4).
 7. Several sources' terms not reviewed (Workday, Amazon, We Work Remotely, Arbeitnow's terms of service, Workable, Recruitee).
 

@@ -81,7 +81,7 @@ If a later build includes Google Calendar import, it also asks for `identity` (s
 - Usage: app functionality only. Not sold, not used for anything unrelated, not for credit.
 - Tick all three certifications.
 
-**Privacy policy URL:** https://jobly-88t.pages.dev/privacy (live; replace the old Netlify address in the dashboard)
+**Privacy policy URL:** https://jobly-88t.pages.dev/privacy (live; replace the old address in the dashboard)
 
 ## Notes for the reviewer
 ```

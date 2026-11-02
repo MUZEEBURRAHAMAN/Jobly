@@ -42,7 +42,7 @@ COMPANIES = ROOT / "backend" / "app" / "data" / "companies.json"
 CANDIDATES = ROOT / "scripts" / "employer_candidates.csv"
 TRIED = ROOT / "scripts" / "employer_tried.txt"
 ANYWHERE = {"us", "yc"}   # regions whose role jobs count wherever they are
-USER_AGENT = "HiringRadar/1.0 (job discovery; +https://joblyextension.netlify.app)"
+USER_AGENT = "HiringRadar/1.0 (job discovery; +https://jobly-88t.pages.dev)"
 
 
 def slug_variants(name: str, extra: list[str]) -> list[str]:

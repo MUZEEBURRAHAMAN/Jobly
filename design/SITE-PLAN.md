@@ -1,3 +1,5 @@
+> **Historical plan (October 2026).** The website was built on Netlify as planned here and moved to Cloudflare Pages on 2026-10-28; forms now open the visitor's email app. See `.github/workflows/web.yml`.
+
 # Jobly website: build plan (for your review)
 
 Goal: a full product website for Jobly with the look and interactions of wrangle.ai, the page set of the GoFully site,
