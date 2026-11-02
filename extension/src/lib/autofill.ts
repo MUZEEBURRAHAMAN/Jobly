@@ -62,7 +62,7 @@ export function scanForm(): ScanResult {
   });
   // Many career sites embed the real form from a hiring system in a frame Chrome won't let Jobly read; offer to open it.
   const frames = Array.from(document.querySelectorAll('iframe')).map((f) => f.src)
-    .filter((src) => /greenhouse\.io|lever\.co|ashbyhq\.com|myworkdayjobs\.com|smartrecruiters\.com|workable\.com|recruitee\.com|teamtailor\.com|personio\./.test(src)).slice(0, 3);
+    .filter((src) => /greenhouse\.io|lever\.co|ashbyhq\.com|myworkdayjobs\.com|smartrecruiters\.com|workable\.com|recruitee\.com|teamtailor\.com|personio\.|keka\.com/.test(src)).slice(0, 3);
   return { fields: out.slice(0, 120), frames };
 }
 

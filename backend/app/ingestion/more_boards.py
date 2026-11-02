@@ -1,10 +1,11 @@
-"""Readers for five more hiring systems that employers publish public job feeds on.
+"""Readers for six more hiring systems that employers publish public job feeds on.
 
     SmartRecruiters  api.smartrecruiters.com/v1/companies/{id}/postings        (JSON, paged)
     Workable         apply.workable.com/api/v1/widget/accounts/{slug}           (JSON)
     Recruitee        {slug}.recruitee.com/api/offers/                           (JSON)
     Teamtailor       {slug}.teamtailor.com/jobs.rss                             (RSS)
     Personio         {slug}.jobs.personio.de/xml                                (XML)
+    Keka             {slug}.keka.com/careers/api/jobs/default/active            (JSON; used by many Indian employers)
 
 Every reader keeps the posting's own date, the apply link on the employer's page, and the board's own company name
 (raw_data["board_name"]) so that a company slug that belongs to somebody else can be caught. They never raise for a missing
@@ -211,5 +212,49 @@ async def fetch_personio_jobs(slug: str, company_name: str, client: httpx.AsyncC
             application_url=f"https://{slug}.jobs.personio.de/job/{ident}", location=_place(*offices[:2]),
             source_updated_at=field("createdAt") or None,
             raw_data={"board_name": None, "department": field("department")},
+        ))
+    return jobs
+
+
+# ---------------------------------------------------------------- Keka
+KEKA_JOB_TYPES = {1: "part_time", 2: "full_time"}
+
+
+def _keka_location(locations: list[dict[str, Any]]) -> tuple[str | None, bool]:
+    """'Bengaluru, India / Delhi, India' from a Keka posting's locations, and whether one of them is "Remote"."""
+    places, remote = [], False
+    for loc in locations[:4]:
+        if clean_text(loc.get("name")).lower() == "remote":
+            remote = True
+        country = clean_text(loc.get("countryName")) or ("India" if loc.get("countryCode") == "IN" else "")
+        place = _place(loc.get("city"), country)
+        if place and place not in places:
+            places.append(place)
+    return " / ".join(places) or None, remote
+
+
+async def fetch_keka_jobs(slug: str, company_name: str, client: httpx.AsyncClient | None = None) -> list[NormalizedJob]:
+    """A Keka careers portal ({slug}.keka.com/careers, which robots.txt allows): its active openings and its company name."""
+    resp = await _get(client, f"https://{slug}.keka.com/careers/api/jobs/default/active")
+    if resp is None:
+        return []
+    items = resp.json()
+    if not isinstance(items, list):
+        return []
+    info = await _get(client, f"https://{slug}.keka.com/careers/api/organization/default/careerportalinfo")
+    board_name = (info.json() or {}).get("name") if info is not None else None
+    jobs = []
+    for item in items:
+        title, ident = clean_text(item.get("title")), item.get("id")
+        if not title or not ident:
+            continue
+        location, remote = _keka_location(item.get("jobLocations") or [])
+        jobs.append(NormalizedJob(
+            company_name=company_name, source_type="keka", external_id=str(ident), title=title,
+            application_url=f"https://{slug}.keka.com/careers/jobdetails/{ident}", location=location,
+            description=item.get("description"), work_mode="remote" if remote else None,
+            source_updated_at=item.get("publishedOn"),
+            raw_data={"board_name": board_name, "department": item.get("departmentName"),
+                      "employment_type": KEKA_JOB_TYPES.get(item.get("jobType"))},
         ))
     return jobs

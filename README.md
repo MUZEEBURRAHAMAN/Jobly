@@ -10,7 +10,7 @@ Live: website https://jobly-88t.pages.dev · Studio https://jobly-studio.pages.d
 ## Architecture Overview
 
 ```
- Employers' public job feeds (Greenhouse, Ashby, Lever, Workday, SmartRecruiters, Workable, Recruitee, Teamtailor, Personio, Amazon)
+ Employers' public job feeds (Greenhouse, Ashby, Lever, Workday, SmartRecruiters, Workable, Recruitee, Teamtailor, Personio, Keka, Amazon)
  + three remote job boards (We Work Remotely, Himalayas, Arbeitnow)
         |
         | every 4 h: GitHub Actions "Crawl and publish jobs" (backend/ code, CRAWL_PROFILE=full)
@@ -90,7 +90,7 @@ come from [`@lucasmarkes/hairline`](https://hairline.lucasmarkes.com) via `exten
 | System | How it is read | Notes |
 | :--- | :--- | :--- |
 | **Greenhouse**, **Ashby**, **Lever** | Public job-board APIs | Bulk of the jobs; real publish dates |
-| **SmartRecruiters**, **Workable**, **Recruitee**, **Teamtailor**, **Personio** | Public feeds employers embed on their careers pages | `backend/app/ingestion/more_boards.py` |
+| **SmartRecruiters**, **Workable**, **Recruitee**, **Teamtailor**, **Personio**, **Keka** | Public feeds employers embed on their careers pages (Keka: many Indian startups) | `backend/app/ingestion/more_boards.py` |
 | **Workday** | Public careers-site search, one search per role family | Heavy: full crawl only |
 | **Amazon Jobs** | Public search | |
 | We Work Remotely, Himalayas, Arbeitnow | RSS / public APIs | Cards say "via <board>" |

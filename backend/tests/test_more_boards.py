@@ -5,7 +5,7 @@ import httpx
 
 from backend.app.ingestion.base import normalize_posted_at
 from backend.app.ingestion.more_boards import (
-    fetch_personio_jobs, fetch_recruitee_jobs, fetch_smartrecruiters_jobs, fetch_teamtailor_jobs, fetch_workable_jobs,
+    fetch_keka_jobs, fetch_personio_jobs, fetch_recruitee_jobs, fetch_smartrecruiters_jobs, fetch_teamtailor_jobs, fetch_workable_jobs,
 )
 
 
@@ -166,3 +166,40 @@ class TestLocationsFromSources(unittest.IsolatedAsyncioTestCase):
         async with client(lambda r: httpx.Response(200, json=payload)) as c:
             jobs = await fetch_lever_jobs("x", "X", c)
         self.assertEqual(jobs[0].location, "Remote, Germany, Spain")
+
+
+class TestKeka(unittest.IsolatedAsyncioTestCase):
+    async def test_jobs_locations_types_and_board_name(self):
+        jobs_payload = [
+            {"id": 145977, "title": "Frontend Engineer", "description": "<p>Build things</p>", "departmentName": "Engineering", "jobType": 2,
+             "publishedOn": "2026-11-02T07:55:27.49Z",
+             "jobLocations": [{"name": "India", "city": "India", "countryCode": "IN", "countryName": ""},
+                              {"name": "Remote", "city": "Delhi", "countryCode": "IN", "countryName": "India"}]},
+            {"id": 145978, "title": "Support Associate", "jobType": 1, "publishedOn": "2026-10-30T10:00:00Z",
+             "jobLocations": [{"name": "Bengaluru", "city": "Bengaluru", "countryCode": "IN", "countryName": "India"}]},
+            {"id": None, "title": "Broken"},
+        ]
+
+        def handler(req: httpx.Request) -> httpx.Response:
+            if req.url.path.endswith("/careers/api/jobs/default/active"):
+                return httpx.Response(200, json=jobs_payload)
+            if req.url.path.endswith("/careerportalinfo"):
+                return httpx.Response(200, json={"name": "Wingify Software Pvt. Ltd."})
+            return httpx.Response(404)
+
+        async with client(handler) as c:
+            jobs = await fetch_keka_jobs("wingify", "Wingify", c)
+        self.assertEqual([j.title for j in jobs], ["Frontend Engineer", "Support Associate"])
+        first, second = jobs
+        self.assertEqual(first.application_url, "https://wingify.keka.com/careers/jobdetails/145977")
+        self.assertEqual(first.location, "India / Delhi, India")
+        self.assertEqual(first.work_mode, "remote")
+        self.assertEqual(first.raw_data["employment_type"], "full_time")
+        self.assertEqual(second.raw_data["employment_type"], "part_time")
+        self.assertEqual(first.raw_data["board_name"], "Wingify Software Pvt. Ltd.")
+        self.assertEqual(normalize_posted_at(first.source_updated_at)[:16], "2026-11-02T07:55")
+
+    async def test_unknown_portal_gives_no_jobs(self):
+        async with client(lambda r: httpx.Response(404)) as c:
+            self.assertEqual(await fetch_keka_jobs("nobody", "Nobody", c), [])
+

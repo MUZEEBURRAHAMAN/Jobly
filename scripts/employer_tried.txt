@@ -1713,3 +1713,445 @@ Vyra
 Volaren Inc.
 Spine
 The Subvocal Company
+BharatPe
+Pine Labs
+PayU India
+Juspay
+MobiKwik
+Navi
+smallcase
+INDmoney
+Upstox
+Dhan
+Acko
+Digit Insurance
+Policybazaar
+Onsurity
+Setu
+M2P Fintech
+Perfios
+IDfy
+OneCard
+Uni Cards
+Khatabook
+OkCredit
+Kreditbee
+Moneyview
+Fibe
+Lendingkart
+Yubi
+Rupeek
+Jar
+Scapia
+Kiwi
+PayGlocal
+Blinkit
+Myntra
+boAt
+Honasa Consumer
+Licious
+FreshToHome
+BigBasket
+Udaan
+Jumbotail
+Ninjacart
+DeHaat
+Country Delight
+Spinny
+CarDekho
+Ola Electric
+Ather Energy
+Yulu
+Zoomcar
+OYO
+MakeMyTrip
+Cleartrip
+EaseMyTrip
+Practo
+Tata 1mg
+HealthifyMe
+Cult.fit
+Pristyn Care
+Games24x7
+Zupee
+WinZO
+MPL
+Pratilipi
+Dailyhunt
+Rebel Foods
+Curefoods
+Bewakoof
+FirstCry
+Purplle
+Sugar Cosmetics
+Pepperfry
+Livspace
+HomeLane
+NoBroker
+Shiprocket
+Shadowfax
+Ecom Express
+Xpressbees
+Dunzo
+OfBusiness
+Infra.Market
+Moglix
+Zetwerk
+Bizongo
+Physics Wallah
+Scaler
+Masai School
+Vedantu
+BYJU'S
+Eruditus
+Simplilearn
+Great Learning
+Newton School
+Leap Scholar
+Classplus
+Cuemath
+PlanetSpark
+Innovaccer
+Icertis
+Darwinbox
+LeadSquared
+Whatfix
+Exotel
+Gupshup
+Yellow.ai
+Haptik
+Rocketlane
+Spyne
+Krutrim
+Increff
+Fyle
+Sprinto
+Capillary Technologies
+Netcore Cloud
+MoEngage
+CleverTap
+WebEngage
+Mfine
+Qure.ai
+SigTuple
+Tricog
+Niramai
+Unbxd
+Kapture CX
+Appsmith
+ToolJet
+DronaHQ
+Kissflow
+Freshdesk
+Locus
+FarEye
+LogiNext
+Ezetap
+Instamojo
+Pixis
+Vymo
+Cleartax
+Gojek
+CoinDCX
+CoinSwitch
+WazirX
+Mudrex
+Polygon
+Ola Cabs
+Moj
+Glance InMobi
+Eloelo
+Josh
+Chingari
+Dream Sports
+Nazara
+Junglee Games
+Rooter
+Loco
+LEAD School
+Toppr
+Seekho
+Testbook
+Doubtnut
+Embibe
+Leverage Edu
+Yocket
+Ather
+Euler Motors
+Simple Energy
+Ultraviolette
+Log9 Materials
+BluSmart
+ChargeZone
+Statiq
+Battery Smart
+Sun Mobility
+HealthPlix
+Innov8
+WeWork India
+Nestaway
+Housing.com
+Magicbricks
+99acres
+Square Yards
+Rentomojo
+CaratLane
+Wow Skin Science
+The Souled Store
+Rare Rabbit
+Hopscotch
+EatSure
+Box8
+Wow! Momo
+Chaayos
+Third Wave Coffee
+Blue Tokai
+Milkbasket
+Otipy
+Kirana
+Vyapar
+Dukaan
+Simpl
+LazyPay
+ZestMoney
+Kissht
+Stashfin
+Avail
+EarlySalary
+Indifi
+FlexiLoans
+NeoGrowth
+Kinara Capital
+Aye
+Vastu Housing
+Aavas
+Five Star Business
+Ugro Capital
+Northern Arc
+Vivriti Capital
+CredAvenue
+Recur
+Klub
+GetVantage
+Jupiter Money
+Open Financial
+BillDesk
+CCAvenue
+Easebuzz
+Paysense
+Freecharge
+Airtel
+Fino
+Spice Money
+PayNearby
+Eko India
+Bharat Matrimony
+Shaadi.com
+Naukri
+Info Edge
+WorkIndia
+Hirect
+Cutshort
+iimjobs
+Hirist
+Unstop
+Internshala
+Foundit
+TeamLease
+Quess Corp
+CIEL HR
+Xpheno
+Taggd
+Toplyne
+Atomicwork
+Rupifi
+Skuad
+Ultrahuman
+Sugarfit
+Cashify
+Gnani.ai
+Avaamo
+Murf AI
+Knowlarity
+Ozonetel
+MyOperator
+Kaleyra
+Plivo
+Airmeet
+Hubilo
+Leegality
+Zipy
+now.gg
+Vogo
+Kazam
+Revfin
+Agnikul
+Skyroot Aerospace
+Pixxel
+Dhruva Space
+Bellatrix Aerospace
+Garuda Aerospace
+ideaForge
+Fyers
+Angel One
+5paisa
+Stable Money
+Wint Wealth
+Grip Invest
+Jiraaf
+Fello
+Freo
+Lentra
+Happay
+Volopay
+EnKash
+Paisabazaar
+InsuranceDekho
+Turtlemint
+RenewBuy
+Riskcovry
+Even Healthcare
+Pazcare
+Nova Benefits
+Keka
+greytHR
+Zimyo
+Springworks
+Salesken
+Verloop.io
+Engati
+Gallabox
+Interakt
+WATI
+DoubleTick
+AiSensy
+Hiver
+Spendflo
+Sequretek
+Appknox
+Beagle Security
+InstaSafe
+Seclore
+Quick Heal
+Fractal Analytics
+Tiger Analytics
+Mu Sigma
+LatentView Analytics
+Tredence
+Quantiphi
+Course5 Intelligence
+Gramener
+Affine
+Polestar Solutions
+MathCo
+Wadhwani AI
+Bira 91
+Sleepy Owl
+The Whole Truth
+Mokobara
+Bombay Shaving Company
+Wakefit
+The Sleep Company
+Duroflex
+Pilgrim
+Minimalist
+Plum Goodness
+mCaffeine
+Bellavita
+GIVA
+Libas
+Zouk
+Traya
+Allo Health
+Kapiva
+OZiva
+HealthKart
+CureSkin
+Medikabazaar
+Zeno Health
+Truemeds
+Redcliffe Labs
+Healthians
+Orange Health
+Sunstone
+Kalvium
+Coding Ninjas
+GUVI
+Imarticus Learning
+Jaro Education
+BlackBuck
+Rivigo
+LetsTransport
+Vahak
+Pickrr
+Borzo
+Stanza Living
+Colive
+Thrillophilia
+Zostel
+Treebo
+FabHotels
+Pickyourtrail
+NODWIN Gaming
+SuperGaming
+Gametion
+Moonfrog
+Octro
+Hitwicket
+Kutumb
+Inshorts
+Arzooo
+ElasticRun
+ShopKirana
+Arya.ag
+AgroStar
+Bijak
+Gramophone
+Fasal
+CropIn
+WayCool
+Recykal
+Ohmium
+Lohum
+Credgenics
+Pocket Aces
+Zype
+Kotak Securities
+Tata Digital
+Tata Neu
+Airtel Digital
+Jio Platforms
+Reliance Jio
+Myntra Jabong
+upGrad Education
+Licious Meat
+Infoedge
+Nykaa E-Retail
+Hasura India
+Postman Inc
+InVideo
+Rephrase.ai
+Simplismart
+Giskard India
+Neysa
+Peppo
+Cleardekho
+Jumbotail Technologies
+Kuvera
+Smallcase Technologies
+Ezyhire
+Arthan Finance
+Mobile Premier League
+Gameskraft
+A23 Games
+Baazi Games
+Probo
+Rario
+Fantasy Akhada
+Dukaan Technologies
+Zomato Hyperpure
+Magicpin
+Ninjacart Technologies
+Udaan India
+Infra.Market Technologies
+STAGE

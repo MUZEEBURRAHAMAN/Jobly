@@ -12383,5 +12383,473 @@
     "source_type": "workday",
     "source_identifier": "telstra.wd3/telstra_careers",
     "industry": "Telecommunications"
+  },
+  {
+    "name": "Jupiter",
+    "slug": "jupiter",
+    "careers_url": "https://jupiter.money/careers/",
+    "source_type": "keka",
+    "source_identifier": "jupiter",
+    "industry": null,
+    "region": "in"
+  },
+  {
+    "name": "Signzy",
+    "slug": "signzy",
+    "careers_url": "https://signzy.keka.com/careers/",
+    "source_type": "keka",
+    "source_identifier": "signzy",
+    "industry": null,
+    "region": "in"
+  },
+  {
+    "name": "Decentro",
+    "slug": "decentro",
+    "careers_url": "https://decentro.keka.com/careers/",
+    "source_type": "keka",
+    "source_identifier": "decentro",
+    "industry": null,
+    "region": "in"
+  },
+  {
+    "name": "ixigo",
+    "slug": "ixigo",
+    "careers_url": "https://jobs.smartrecruiters.com/ixigo",
+    "source_type": "smartrecruiters",
+    "source_identifier": "ixigo",
+    "industry": null,
+    "region": "in"
+  },
+  {
+    "name": "Kuku FM",
+    "slug": "kuku-fm",
+    "careers_url": "https://kukufm.keka.com/careers/",
+    "source_type": "keka",
+    "source_identifier": "kukufm",
+    "industry": null,
+    "region": "in"
+  },
+  {
+    "name": "Vegrow",
+    "slug": "vegrow",
+    "careers_url": "https://jobs.smartrecruiters.com/vegrow",
+    "source_type": "smartrecruiters",
+    "source_identifier": "vegrow",
+    "industry": null,
+    "region": "in"
+  },
+  {
+    "name": "Captain Fresh",
+    "slug": "captain-fresh",
+    "careers_url": "https://jobs.smartrecruiters.com/captainfresh",
+    "source_type": "smartrecruiters",
+    "source_identifier": "captainfresh",
+    "industry": null,
+    "region": "in"
+  },
+  {
+    "name": "Teachmint",
+    "slug": "teachmint",
+    "careers_url": "https://teachmint.keka.com/careers/",
+    "source_type": "keka",
+    "source_identifier": "teachmint",
+    "industry": null,
+    "region": "in"
+  },
+  {
+    "name": "Zluri",
+    "slug": "zluri",
+    "careers_url": "https://zluri.keka.com/careers/",
+    "source_type": "keka",
+    "source_identifier": "zluri",
+    "industry": null,
+    "region": "in"
+  },
+  {
+    "name": "Zenoti",
+    "slug": "zenoti",
+    "careers_url": "https://boards.greenhouse.io/zenoti",
+    "source_type": "greenhouse",
+    "source_identifier": "zenoti",
+    "industry": null,
+    "region": "in"
+  },
+  {
+    "name": "Wingify",
+    "slug": "wingify",
+    "careers_url": "https://wingify.keka.com/careers/",
+    "source_type": "keka",
+    "source_identifier": "wingify",
+    "industry": null,
+    "region": "in"
+  },
+  {
+    "name": "Chalo",
+    "slug": "chalo",
+    "careers_url": "https://chalo.keka.com/careers/",
+    "source_type": "keka",
+    "source_identifier": "chalo",
+    "industry": null,
+    "region": "in"
+  },
+  {
+    "name": "Shipsy",
+    "slug": "shipsy",
+    "careers_url": "https://jobs.smartrecruiters.com/shipsy",
+    "source_type": "smartrecruiters",
+    "source_identifier": "shipsy",
+    "industry": null,
+    "region": "in"
+  },
+  {
+    "name": "Sahaj Software",
+    "slug": "sahaj-software",
+    "careers_url": "https://boards.greenhouse.io/sahajsoftware",
+    "source_type": "greenhouse",
+    "source_identifier": "sahajsoftware",
+    "industry": null,
+    "region": "in"
+  },
+  {
+    "name": "Adda247",
+    "slug": "adda247",
+    "careers_url": "https://adda247.keka.com/careers/",
+    "source_type": "keka",
+    "source_identifier": "adda247",
+    "industry": null,
+    "region": "in"
+  },
+  {
+    "name": "Eka Care",
+    "slug": "eka-care",
+    "careers_url": "https://ekacare.keka.com/careers/",
+    "source_type": "keka",
+    "source_identifier": "ekacare",
+    "industry": null,
+    "region": "in"
+  },
+  {
+    "name": "Awfis",
+    "slug": "awfis",
+    "careers_url": "https://awfis.keka.com/careers/",
+    "source_type": "keka",
+    "source_identifier": "awfis",
+    "industry": null,
+    "region": "in"
+  },
+  {
+    "name": "Furlenco",
+    "slug": "furlenco",
+    "careers_url": "https://furlenco.keka.com/careers/",
+    "source_type": "keka",
+    "source_identifier": "furlenco",
+    "industry": null,
+    "region": "in"
+  },
+  {
+    "name": "Snitch",
+    "slug": "snitch",
+    "careers_url": "https://snitch.keka.com/careers/",
+    "source_type": "keka",
+    "source_identifier": "snitch",
+    "industry": null,
+    "region": "in"
+  },
+  {
+    "name": "Shopflo",
+    "slug": "shopflo",
+    "careers_url": "https://shopflo.keka.com/careers/",
+    "source_type": "keka",
+    "source_identifier": "shopflo",
+    "industry": null,
+    "region": "in"
+  },
+  {
+    "name": "GoKwik",
+    "slug": "gokwik",
+    "careers_url": "https://gokwik.keka.com/careers/",
+    "source_type": "keka",
+    "source_identifier": "gokwik",
+    "industry": null,
+    "region": "in"
+  },
+  {
+    "name": "Apna",
+    "slug": "apna",
+    "careers_url": "https://apply.workable.com/apna",
+    "source_type": "workable",
+    "source_identifier": "apna",
+    "industry": null,
+    "region": "in"
+  },
+  {
+    "name": "Fynd",
+    "slug": "fynd",
+    "careers_url": "https://fynd.keka.com/careers/",
+    "source_type": "keka",
+    "source_identifier": "fynd",
+    "industry": null,
+    "region": "in"
+  },
+  {
+    "name": "Bureau",
+    "slug": "bureau",
+    "careers_url": "https://jobs.ashbyhq.com/bureau",
+    "source_type": "ashby",
+    "source_identifier": "bureau",
+    "industry": null,
+    "region": "in"
+  },
+  {
+    "name": "Skit.ai",
+    "slug": "skit-ai",
+    "careers_url": "https://skit.keka.com/careers/",
+    "source_type": "keka",
+    "source_identifier": "skit",
+    "industry": null,
+    "region": "in"
+  },
+  {
+    "name": "SpotDraft",
+    "slug": "spotdraft",
+    "careers_url": "https://jobs.ashbyhq.com/spotdraft",
+    "source_type": "ashby",
+    "source_identifier": "spotdraft",
+    "industry": null,
+    "region": "in"
+  },
+  {
+    "name": "Testsigma",
+    "slug": "testsigma",
+    "careers_url": "https://testsigma.keka.com/careers/",
+    "source_type": "keka",
+    "source_identifier": "testsigma",
+    "industry": null,
+    "region": "in"
+  },
+  {
+    "name": "LambdaTest",
+    "slug": "lambdatest",
+    "careers_url": "https://lambdatest.keka.com/careers/",
+    "source_type": "keka",
+    "source_identifier": "lambdatest",
+    "industry": null,
+    "region": "in"
+  },
+  {
+    "name": "DevRev",
+    "slug": "devrev",
+    "careers_url": "https://boards.greenhouse.io/devrev",
+    "source_type": "greenhouse",
+    "source_identifier": "devrev",
+    "industry": null,
+    "region": "in"
+  },
+  {
+    "name": "Zypp Electric",
+    "slug": "zypp-electric",
+    "careers_url": "https://zypp.keka.com/careers/",
+    "source_type": "keka",
+    "source_identifier": "zypp",
+    "industry": null,
+    "region": "in"
+  },
+  {
+    "name": "Turno",
+    "slug": "turno",
+    "careers_url": "https://turno.keka.com/careers/",
+    "source_type": "keka",
+    "source_identifier": "turno",
+    "industry": null,
+    "region": "in"
+  },
+  {
+    "name": "Niyo",
+    "slug": "niyo",
+    "careers_url": "https://niyo.keka.com/careers/",
+    "source_type": "keka",
+    "source_identifier": "niyo",
+    "industry": null,
+    "region": "in"
+  },
+  {
+    "name": "Mintoak",
+    "slug": "mintoak",
+    "careers_url": "https://mintoak.keka.com/careers/",
+    "source_type": "keka",
+    "source_identifier": "mintoak",
+    "industry": null,
+    "region": "in"
+  },
+  {
+    "name": "Zaggle",
+    "slug": "zaggle",
+    "careers_url": "https://zaggle.keka.com/careers/",
+    "source_type": "keka",
+    "source_identifier": "zaggle",
+    "industry": null,
+    "region": "in"
+  },
+  {
+    "name": "Loop Health",
+    "slug": "loop-health",
+    "careers_url": "https://loop.keka.com/careers/",
+    "source_type": "keka",
+    "source_identifier": "loop",
+    "industry": null,
+    "region": "in"
+  },
+  {
+    "name": "Scrut Automation",
+    "slug": "scrut-automation",
+    "careers_url": "https://scrut.keka.com/careers/",
+    "source_type": "keka",
+    "source_identifier": "scrut",
+    "industry": null,
+    "region": "in"
+  },
+  {
+    "name": "CloudSEK",
+    "slug": "cloudsek",
+    "careers_url": "https://boards.greenhouse.io/cloudsek",
+    "source_type": "greenhouse",
+    "source_identifier": "cloudsek",
+    "industry": null,
+    "region": "in"
+  },
+  {
+    "name": "Safe Security",
+    "slug": "safe-security",
+    "careers_url": "https://jobs.lever.co/safe",
+    "source_type": "lever",
+    "source_identifier": "safe",
+    "industry": null,
+    "region": "in"
+  },
+  {
+    "name": "Salty",
+    "slug": "salty",
+    "careers_url": "https://salty.keka.com/careers/",
+    "source_type": "keka",
+    "source_identifier": "salty",
+    "industry": null,
+    "region": "in"
+  },
+  {
+    "name": "Mosaic Wellness",
+    "slug": "mosaic-wellness",
+    "careers_url": "https://mosaicwellness.keka.com/careers/",
+    "source_type": "keka",
+    "source_identifier": "mosaicwellness",
+    "industry": null,
+    "region": "in"
+  },
+  {
+    "name": "ClickPost",
+    "slug": "clickpost",
+    "careers_url": "https://clickpost.keka.com/careers/",
+    "source_type": "keka",
+    "source_identifier": "clickpost",
+    "industry": null,
+    "region": "in"
+  },
+  {
+    "name": "Zippee",
+    "slug": "zippee",
+    "careers_url": "https://zippee.keka.com/careers/",
+    "source_type": "keka",
+    "source_identifier": "zippee",
+    "industry": null,
+    "region": "in"
+  },
+  {
+    "name": "Blitz",
+    "slug": "blitz",
+    "careers_url": "https://blitznow.keka.com/careers/",
+    "source_type": "keka",
+    "source_identifier": "blitznow",
+    "industry": null,
+    "region": "in"
+  },
+  {
+    "name": "Zolo",
+    "slug": "zolo",
+    "careers_url": "https://zolo.keka.com/careers/",
+    "source_type": "keka",
+    "source_identifier": "zolo",
+    "industry": null,
+    "region": "in"
+  },
+  {
+    "name": "Lokal",
+    "slug": "lokal",
+    "careers_url": "https://jobs.smartrecruiters.com/lokal",
+    "source_type": "smartrecruiters",
+    "source_identifier": "lokal",
+    "industry": null,
+    "region": "in"
+  },
+  {
+    "name": "Attero",
+    "slug": "attero",
+    "careers_url": "https://attero.keka.com/careers/",
+    "source_type": "keka",
+    "source_identifier": "attero",
+    "industry": null,
+    "region": "in"
+  },
+  {
+    "name": "Composio",
+    "slug": "composio",
+    "careers_url": "https://jobs.ashbyhq.com/composio",
+    "source_type": "ashby",
+    "source_identifier": "composio",
+    "industry": null,
+    "region": "in"
+  },
+  {
+    "name": "Ema Unlimited",
+    "slug": "ema-unlimited",
+    "careers_url": "https://jobs.ashbyhq.com/ema",
+    "source_type": "ashby",
+    "source_identifier": "ema",
+    "industry": null,
+    "region": "in"
+  },
+  {
+    "name": "Smallest.ai",
+    "slug": "smallest-ai",
+    "careers_url": "https://jobs.ashbyhq.com/smallest",
+    "source_type": "ashby",
+    "source_identifier": "smallest",
+    "industry": null,
+    "region": "in"
+  },
+  {
+    "name": "Bolna",
+    "slug": "bolna",
+    "careers_url": "https://jobs.ashbyhq.com/bolna",
+    "source_type": "ashby",
+    "source_identifier": "bolna",
+    "industry": null,
+    "region": "in"
+  },
+  {
+    "name": "Cricbuzz",
+    "slug": "cricbuzz",
+    "careers_url": "https://cricbuzz.keka.com/careers/",
+    "source_type": "keka",
+    "source_identifier": "cricbuzz",
+    "industry": null,
+    "region": "in"
+  },
+  {
+    "name": "Exponent Energy",
+    "slug": "exponent-energy",
+    "careers_url": "https://apply.workable.com/exponent-energy",
+    "source_type": "workable",
+    "source_identifier": "exponent-energy",
+    "industry": null,
+    "region": "in"
   }
 ]

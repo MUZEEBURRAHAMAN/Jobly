@@ -3,11 +3,14 @@
     .venv/bin/python scripts/verify_employers.py                    # dry run: test every candidate, print a report
     .venv/bin/python scripts/verify_employers.py --write            # also add the eligible ones to backend/app/data/companies.json
     .venv/bin/python scripts/verify_employers.py --only ca,in       # only these regions of the candidate file
+    .venv/bin/python scripts/verify_employers.py --only in --country India   # eligible = open jobs (any role) in India
     .venv/bin/python scripts/verify_employers.py --recheck          # test the employers already in the list, report dead boards
 
-Each candidate (scripts/employer_candidates.csv) is tried on Greenhouse, Ashby, Lever, SmartRecruiters, Workable, Recruitee, Teamtailor and Personio under a few board names, using the
+Each candidate (scripts/employer_candidates.csv) is tried on Greenhouse, Ashby, Lever, SmartRecruiters, Workable, Recruitee, Teamtailor, Personio and Keka under a few board names, using the
 same readers the server uses. An employer is eligible when its board answers and has at least --min-role jobs in Jobly's
-five roles outside the United States (for candidates tagged "us" or "yc": anywhere). Nothing is written unless --write is given.
+five roles outside the United States (for candidates tagged "us" or "yc": anywhere), or with --country, at least --min-role
+open jobs of any role in that country. Nothing is written unless --write is given. A candidate with no website domain gets
+its job board's own page as its careers link.
 """
 from __future__ import annotations
 
@@ -29,7 +32,7 @@ from backend.app.ingestion.ashby import fetch_ashby_jobs  # noqa: E402
 from backend.app.ingestion.greenhouse import fetch_greenhouse_jobs  # noqa: E402
 from backend.app.ingestion.lever import fetch_lever_jobs  # noqa: E402
 from backend.app.ingestion.more_boards import (  # noqa: E402
-    fetch_personio_jobs, fetch_recruitee_jobs, fetch_smartrecruiters_jobs, fetch_teamtailor_jobs, fetch_workable_jobs,
+    fetch_keka_jobs, fetch_personio_jobs, fetch_recruitee_jobs, fetch_smartrecruiters_jobs, fetch_teamtailor_jobs, fetch_workable_jobs,
 )
 from backend.app.matching import classify_role  # noqa: E402
 
@@ -37,6 +40,7 @@ logging.disable(logging.CRITICAL)  # the readers warn on every missing board; th
 READERS = {
     "greenhouse": fetch_greenhouse_jobs, "ashby": fetch_ashby_jobs, "lever": fetch_lever_jobs, "smartrecruiters": fetch_smartrecruiters_jobs,
     "workable": fetch_workable_jobs, "recruitee": fetch_recruitee_jobs, "teamtailor": fetch_teamtailor_jobs, "personio": fetch_personio_jobs,
+    "keka": fetch_keka_jobs,
 }
 COMPANIES = ROOT / "backend" / "app" / "data" / "companies.json"
 CANDIDATES = ROOT / "scripts" / "employer_candidates.csv"
@@ -80,12 +84,24 @@ def same_company(candidate: str, board_name: str | None) -> bool:
     return bool(a and b and (a in b or b in a or a[:5] == b[:5]))
 
 
+COUNTRY: str | None = None   # set by --country: count every job placed in this country
+
+
 def score(jobs) -> dict:
     mine = [(j, classify_role(j.title, j.normalized_role)) for j in jobs]
     role = [j for j, r in mine if r]
     countries = Counter(place_of_job(j.location, j.title)[0] for j in role)
     outside = sum(n for c, n in countries.items() if c and c != "United States")
-    return {"jobs": len(jobs), "role": len(role), "outside": outside, "countries": [(c or "not stated", n) for c, n in countries.most_common(4)]}
+    in_country = sum(1 for j in jobs if COUNTRY and place_of_job(j.location, j.title)[0] == COUNTRY)
+    return {"jobs": len(jobs), "role": len(role), "outside": outside, "in_country": in_country,
+            "countries": [(c or "not stated", n) for c, n in countries.most_common(4)]}
+
+
+BOARD_URLS = {
+    "greenhouse": "https://boards.greenhouse.io/{}", "ashby": "https://jobs.ashbyhq.com/{}", "lever": "https://jobs.lever.co/{}",
+    "smartrecruiters": "https://jobs.smartrecruiters.com/{}", "workable": "https://apply.workable.com/{}", "recruitee": "https://{}.recruitee.com",
+    "teamtailor": "https://{}.teamtailor.com/jobs", "personio": "https://{}.jobs.personio.de", "keka": "https://{}.keka.com/careers/",
+}
 
 
 async def try_board(client, sem, kind: str, slug: str, name: str):
@@ -97,6 +113,11 @@ async def try_board(client, sem, kind: str, slug: str, name: str):
     if not jobs:
         return None
     board = next((j.raw_data.get("board_name") for j in jobs if j.raw_data.get("board_name")), None)
+    if board is None and kind == "greenhouse":   # its job list doesn't name the employer; the board itself does
+        try:
+            board = (await client.get(f"https://boards-api.greenhouse.io/v1/boards/{slug}")).json().get("name")
+        except Exception:
+            board = None
     if not same_company(name, board):
         return None
     return (kind, slug, score(jobs))
@@ -104,7 +125,7 @@ async def try_board(client, sem, kind: str, slug: str, name: str):
 
 async def best_board(client, sem, cand: dict):
     results = [r for r in await asyncio.gather(*[try_board(client, sem, k, s, cand["name"]) for s in cand["slugs"] for k in READERS]) if r]
-    return max(results, key=lambda r: (r[2]["outside"], r[2]["role"], r[2]["jobs"])) if results else None
+    return max(results, key=lambda r: (r[2]["in_country"], r[2]["outside"], r[2]["role"], r[2]["jobs"])) if results else None
 
 
 async def careers_url(client, domain: str) -> str:
@@ -126,10 +147,13 @@ async def main() -> None:
     ap.add_argument("--write", action="store_true", help="add eligible employers to companies.json")
     ap.add_argument("--only", help="comma-separated regions from the candidate file")
     ap.add_argument("--min-role", type=int, default=2, help="minimum role jobs outside the US (default 2); region 'us' counts role jobs anywhere")
+    ap.add_argument("--country", help="eligible when at least --min-role open jobs of any role are in this country (e.g. India)")
     ap.add_argument("--fix-links", action="store_true", help="re-resolve careers links that are just a home page")
     ap.add_argument("--retry", action="store_true", help="test candidates again even if an earlier run found nothing")
     ap.add_argument("--recheck", action="store_true", help="test the employers already in the list instead")
     args = ap.parse_args()
+    global COUNTRY
+    COUNTRY = args.country
     sem = asyncio.Semaphore(10)
     async with httpx.AsyncClient(headers={"User-Agent": USER_AGENT}, timeout=25.0) as client:
         existing = json.loads(COMPANIES.read_text(encoding="utf-8"))
@@ -159,15 +183,21 @@ async def main() -> None:
             kind, slug, sc = hit
             if (kind, slug.lower()) in known_ids:
                 rows.append((cand, hit, "already in the list")); continue
-            ok = (sc["role"] if cand["region"] in ANYWHERE else sc["outside"]) >= args.min_role
-            rows.append((cand, hit, "ELIGIBLE" if ok else f"only {sc['outside']} role jobs outside the US"))
+            if args.country:
+                ok = sc["in_country"] >= args.min_role
+                why = f"only {sc['in_country']} jobs in {args.country}"
+            else:
+                ok = (sc["role"] if cand["region"] in ANYWHERE else sc["outside"]) >= args.min_role
+                why = f"only {sc['outside']} role jobs outside the US"
+            rows.append((cand, hit, "ELIGIBLE" if ok else why))
             if ok:
                 eligible.append((cand, kind, slug, sc))
 
         for cand, hit, verdict in rows:
             if hit:
                 kind, slug, sc = hit
-                print(f"{cand['name']:26}{cand['region']:11}{kind:11}{slug:20} jobs={sc['jobs']:4} role={sc['role']:3} outside-US={sc['outside']:3}  {verdict}  {sc['countries'][:3]}")
+                extra = f" {COUNTRY}={sc['in_country']:3}" if COUNTRY else ""
+                print(f"{cand['name']:26}{cand['region']:11}{kind:16}{slug:22} jobs={sc['jobs']:4} role={sc['role']:3} outside-US={sc['outside']:3}{extra}  {verdict}  {sc['countries'][:3]}")
         misses = [c["name"] for c, h, _ in rows if not h]
         print(f"\nno board found for {len(misses)}: {', '.join(misses)}")
         print(f"\n{len(eligible)} eligible employers, {sum(e[3]['outside'] for e in eligible)} role jobs outside the US between them")
@@ -179,7 +209,9 @@ async def main() -> None:
             old = TRIED.read_text(encoding="utf-8").splitlines() if TRIED.exists() else []
             TRIED.write_text("\n".join(old + [n for n in lost if n not in old]) + "\n", encoding="utf-8")
         if args.write and eligible:
-            urls = await asyncio.gather(*[careers_url(client, e[0]["domain"]) for e in eligible])
+            async def link(cand, kind, slug):
+                return await careers_url(client, cand["domain"]) if cand["domain"] else BOARD_URLS[kind].format(slug)
+            urls = await asyncio.gather(*[link(e[0], e[1], e[2]) for e in eligible])
             added = 0
             for (cand, kind, slug, sc), url in zip(eligible, urls):
                 base = re.sub(r"[^a-z0-9]+", "-", cand["name"].lower()).strip("-")

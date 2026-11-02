@@ -28,7 +28,7 @@ ROLES = {
 }
 SOURCES = {
     "greenhouse": ("Greenhouse", True), "ashby": ("Ashby", True), "lever": ("Lever", True), "workday": ("Workday", True), "amazon": ("Amazon Jobs", True),
-    "smartrecruiters": ("SmartRecruiters", True), "personio": ("Personio", True), "workable": ("Workable", True), "recruitee": ("Recruitee", True), "teamtailor": ("Teamtailor", True),
+    "smartrecruiters": ("SmartRecruiters", True), "personio": ("Personio", True), "workable": ("Workable", True), "recruitee": ("Recruitee", True), "teamtailor": ("Teamtailor", True), "keka": ("Keka", True),
     "weworkremotely": ("We Work Remotely", False), "himalayas": ("Himalayas", False), "arbeitnow": ("Arbeitnow", False),
 }
 

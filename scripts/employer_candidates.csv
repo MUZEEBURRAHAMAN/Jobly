@@ -2411,3 +2411,525 @@ Vyra|usevyra.com|yc|vyra,usevyra|F26
 Volaren Inc.|volaren.ai|yc|volaren-inc,volaren|F26
 Spine|joinspine.ai|yc|spine,joinspine|F26
 The Subvocal Company|subvocal.company|yc|the-subvocal-company,subvocal|F26
+
+# India: startups and tech companies hiring in Bengaluru, Mumbai, Pune, Delhi NCR, Hyderabad and Chennai (added 2026-11-02;
+# no domain = the job board page is used as the careers link). Test with --only in --country India.
+BharatPe||in|bharatpe
+Pine Labs||in|pinelabs
+PayU India||in|payu,payuindia
+Juspay||in|juspay,juspaytechnologies
+MobiKwik||in|mobikwik
+Navi||in|navi,navitech
+smallcase||in|smallcase
+INDmoney||in|indmoney,finzoom
+Upstox||in|upstox,rksv
+Dhan||in|dhan,raise,dhanhq
+Acko||in|acko,ackotech
+Digit Insurance||in|godigit,digit
+Policybazaar||in|policybazaar,pbfintech
+Ditto Insurance||in|joinditto,ditto
+Onsurity||in|onsurity
+Setu||in|setu,setuhq
+M2P Fintech||in|m2p,m2pfintech
+Perfios||in|perfios
+Signzy||in|signzy
+IDfy||in|idfy
+Decentro||in|decentro
+OneCard||in|onecard,fplabs
+Uni Cards||in|uni,unicards
+Khatabook||in|khatabook
+OkCredit||in|okcredit
+Kreditbee||in|kreditbee
+Moneyview||in|moneyview,whizdm
+Fibe||in|fibe,earlysalary
+Lendingkart||in|lendingkart
+Yubi||in|yubi,credavenue
+Rupeek||in|rupeek
+Jar||in|jar,jarapp,changejar
+Scapia||in|scapia
+Kiwi||in|kiwi,gokiwi
+PayGlocal||in|payglocal
+Zeta||in|zeta,zetasuite
+Blinkit||in|blinkit,grofers
+Myntra||in|myntra
+boAt||in|boat,imaginemarketing
+Honasa Consumer||in|honasa,mamaearth
+Licious||in|licious
+FreshToHome||in|freshtohome
+BigBasket||in|bigbasket
+Udaan||in|udaan
+Jumbotail||in|jumbotail
+Ninjacart||in|ninjacart
+DeHaat||in|dehaat
+Country Delight||in|countrydelight
+Spinny||in|spinny
+CarDekho||in|cardekho,girnarsoft
+Ola Electric||in|olaelectric
+Ather Energy||in|atherenergy,ather
+Yulu||in|yulu
+Bounce||in|bounce
+Zoomcar||in|zoomcar
+OYO||in|oyo,oyorooms
+MakeMyTrip||in|makemytrip,mmt
+ixigo||in|ixigo
+Cleartrip||in|cleartrip
+EaseMyTrip||in|easemytrip
+Practo||in|practo
+Tata 1mg||in|1mg,tata1mg
+HealthifyMe||in|healthifyme,healthify
+Cult.fit||in|curefit,cultfit
+Pristyn Care||in|pristyncare
+Games24x7||in|games24x7
+Zupee||in|zupee
+WinZO||in|winzo
+MPL||in|mpl,mobilepremierleague
+Pocket FM||in|pocketfm
+Kuku FM||in|kukufm
+Pratilipi||in|pratilipi
+Dailyhunt||in|dailyhunt,verse,versemedia
+Glance||in|glance
+Rebel Foods||in|rebelfoods
+Curefoods||in|curefoods
+Bewakoof||in|bewakoof
+FirstCry||in|firstcry,brainbees
+Purplle||in|purplle
+Sugar Cosmetics||in|sugarcosmetics,sugar
+Pepperfry||in|pepperfry
+Livspace||in|livspace
+HomeLane||in|homelane
+NoBroker||in|nobroker
+Shiprocket||in|shiprocket
+Shadowfax||in|shadowfax
+Ecom Express||in|ecomexpress
+Xpressbees||in|xpressbees
+Dunzo||in|dunzo
+OfBusiness||in|ofbusiness
+Infra.Market||in|inframarket
+Moglix||in|moglix
+Zetwerk||in|zetwerk
+Bizongo||in|bizongo
+Vegrow||in|vegrow
+Captain Fresh||in|captainfresh
+Physics Wallah||in|physicswallah,pw
+Scaler||in|scaler,interviewbit
+Masai School||in|masai,masaischool
+Vedantu||in|vedantu
+BYJU'S||in|byjus
+Eruditus||in|eruditus,emeritus
+Simplilearn||in|simplilearn
+Great Learning||in|greatlearning
+Newton School||in|newtonschool
+Leap Scholar||in|leapscholar,leap
+Classplus||in|classplus
+Teachmint||in|teachmint
+Cuemath||in|cuemath
+PlanetSpark||in|planetspark
+Druva||in|druva
+Innovaccer||in|innovaccer
+Icertis||in|icertis
+Darwinbox||in|darwinbox
+MindTickle||in|mindtickle
+LeadSquared||in|leadsquared
+Whatfix||in|whatfix
+Exotel||in|exotel
+Gupshup||in|gupshup
+Yellow.ai||in|yellowai,yellowmessenger
+Haptik||in|haptik
+Rocketlane||in|rocketlane
+Zluri||in|zluri
+Spyne||in|spyne
+Sarvam AI||in|sarvam,sarvamai
+Krutrim||in|krutrim
+Increff||in|increff
+Hevo Data||in|hevodata,hevo
+Fyle||in|fyle
+Sprinto||in|sprinto
+Zenoti||in|zenoti
+Capillary Technologies||in|capillary,capillarytech
+Netcore Cloud||in|netcore,netcorecloud
+MoEngage||in|moengage
+CleverTap||in|clevertap
+WebEngage||in|webengage
+Mfine||in|mfine
+Qure.ai||in|qureai,qure
+SigTuple||in|sigtuple
+Tricog||in|tricog
+Niramai||in|niramai
+Observe.AI||in|observeai
+Unbxd||in|unbxd
+Kapture CX||in|kapturecx,kapture
+Wingify||in|wingify,vwo
+Appsmith||in|appsmith
+ToolJet||in|tooljet
+DronaHQ||in|dronahq
+Kissflow||in|kissflow
+Freshdesk||in|freshdesk
+Chalo||in|chalo
+Locus||in|locus,locussh
+FarEye||in|fareye
+Shipsy||in|shipsy
+LogiNext||in|loginext
+Ezetap||in|ezetap
+Instamojo||in|instamojo
+Pixis||in|pixis,pixisai
+Vymo||in|vymo
+Sahaj Software||in|sahaj
+Thoughtworks India||in|thoughtworks
+Cleartax||in|cleartax,clear,defmacro
+Gojek||in|gojek
+CoinDCX||in|coindcx
+CoinSwitch||in|coinswitch,coinswitchkuber
+WazirX||in|wazirx,zanmai
+Mudrex||in|mudrex
+Polygon||in|polygon,polygontechnology
+Ola Cabs||in|olacabs
+Paytm Payments||in|paytmpayments
+Moj||in|moj
+Glance InMobi||in|glanceinmobi
+Eloelo||in|eloelo
+Josh||in|josh
+Chingari||in|chingari
+Dream Sports||in|dreamsports
+Nazara||in|nazara
+Junglee Games||in|jungleegames
+Rooter||in|rooter
+Loco||in|loco
+LEAD School||in|leadschool
+Toppr||in|toppr
+Seekho||in|seekho
+Testbook||in|testbook
+Adda247||in|adda247
+Doubtnut||in|doubtnut
+Embibe||in|embibe
+Leverage Edu||in|leverageedu
+Yocket||in|yocket
+Ather||in|ather
+Euler Motors||in|eulermotors
+Simple Energy||in|simpleenergy
+River||in|river
+Ultraviolette||in|ultraviolette
+Exponent Energy||in|exponentenergy
+Log9 Materials||in|log9materials
+BluSmart||in|blusmart
+ChargeZone||in|chargezone
+Statiq||in|statiq
+Battery Smart||in|batterysmart
+Sun Mobility||in|sunmobility
+Eka Care||in|ekacare
+HealthPlix||in|healthplix
+Innov8||in|innov8
+Awfis||in|awfis
+WeWork India||in|weworkindia
+Nestaway||in|nestaway
+Housing.com||in|housingcom
+Magicbricks||in|magicbricks
+99acres||in|99acres
+Square Yards||in|squareyards
+Furlenco||in|furlenco
+Rentomojo||in|rentomojo
+Bluestone||in|bluestone
+CaratLane||in|caratlane
+Wow Skin Science||in|wowskinscience
+The Souled Store||in|thesouledstore
+Snitch||in|snitch
+Rare Rabbit||in|rarerabbit
+Hopscotch||in|hopscotch
+EatSure||in|eatsure
+Box8||in|box8
+Wow! Momo||in|wowmomo
+Chaayos||in|chaayos
+Third Wave Coffee||in|thirdwavecoffee
+Blue Tokai||in|bluetokai
+Milkbasket||in|milkbasket
+Otipy||in|otipy
+Kirana||in|kirana
+Vyapar||in|vyapar
+Dukaan||in|dukaan
+Shopflo||in|shopflo
+GoKwik||in|gokwik
+Simpl||in|simpl
+LazyPay||in|lazypay
+ZestMoney||in|zestmoney
+Fi||in|fi
+Kissht||in|kissht
+Stashfin||in|stashfin
+Avail||in|avail
+Refyne||in|refyne
+EarlySalary||in|earlysalary
+Indifi||in|indifi
+FlexiLoans||in|flexiloans
+NeoGrowth||in|neogrowth
+Kinara Capital||in|kinaracapital
+Aye||in|aye
+Vastu Housing||in|vastuhousing
+Aavas||in|aavas
+Five Star Business||in|fivestarbusiness
+Ugro Capital||in|ugrocapital
+Northern Arc||in|northernarc
+Vivriti Capital||in|vivriticapital
+CredAvenue||in|credavenue
+Recur||in|recur
+Klub||in|klub
+GetVantage||in|getvantage
+Velocity||in|velocity
+Jupiter Money||in|jupitermoney
+Open Financial||in|openfinancial
+BillDesk||in|billdesk
+CCAvenue||in|ccavenue
+Easebuzz||in|easebuzz
+Paysense||in|paysense
+Freecharge||in|freecharge
+Airtel||in|airtel
+Fino||in|fino
+Spice Money||in|spicemoney
+PayNearby||in|paynearby
+Eko India||in|ekoindia
+Bharat Matrimony||in|bharatmatrimony
+Shaadi.com||in|shaadicom
+Naukri||in|naukri
+Info Edge||in|infoedge
+Apna||in|apna
+WorkIndia||in|workindia
+Hirect||in|hirect
+Instahyre||in|instahyre
+Cutshort||in|cutshort
+iimjobs||in|iimjobs
+Hirist||in|hirist
+Unstop||in|unstop
+Internshala||in|internshala
+Foundit||in|foundit
+TeamLease||in|teamlease
+Quess Corp||in|quesscorp
+CIEL HR||in|cielhr
+Xpheno||in|xpheno
+Taggd||in|taggd
+Fynd||in|gofynd
+Toplyne||in|
+Bureau||in|bureauid
+Atomicwork||in|
+Rupifi||in|
+Skuad||in|
+Ultrahuman||in|
+Sugarfit||in|
+Cashify||in|
+Skit.ai||in|skit
+Gnani.ai||in|gnani
+Avaamo||in|
+Murf AI||in|murf
+Knowlarity||in|
+Ozonetel||in|
+MyOperator||in|
+Kaleyra||in|
+Plivo||in|
+Airmeet||in|
+Hubilo||in|
+SpotDraft||in|
+Leegality||in|
+Zipy||in|
+now.gg||in|nowgg,bluestacks
+Testsigma||in|
+LambdaTest||in|
+DevRev||in|
+Vogo||in|
+Zypp Electric||in|zypp
+Kazam||in|
+Revfin||in|
+Turno||in|
+Agnikul||in|
+Skyroot Aerospace||in|skyroot
+Pixxel||in|
+Dhruva Space||in|dhruvaspace
+Bellatrix Aerospace||in|bellatrix
+Garuda Aerospace||in|garuda
+ideaForge||in|ideaforge
+Fyers||in|
+Angel One||in|angelone,angelbroking
+5paisa||in|5paisa
+Stable Money||in|stablemoney
+Wint Wealth||in|wintwealth
+Grip Invest||in|grip,gripinvest
+Jiraaf||in|
+Fello||in|
+Niyo||in|niyo,niyosolutions
+Freo||in|freo,moneytap
+Lentra||in|lentra
+Mintoak||in|
+Zaggle||in|
+Happay||in|
+Volopay||in|
+EnKash||in|
+Paisabazaar||in|
+InsuranceDekho||in|insurancedekho
+Turtlemint||in|
+RenewBuy||in|
+Riskcovry||in|
+Loop Health||in|loophealth,loop
+Even Healthcare||in|evenhealthcare,even
+Pazcare||in|
+Nova Benefits||in|novabenefits
+Keka||in|keka
+greytHR||in|greythr,greytip
+Zimyo||in|
+Springworks||in|
+Salesken||in|
+Verloop.io||in|verloop
+Engati||in|
+Gallabox||in|
+Interakt||in|
+WATI||in|wati,clare
+DoubleTick||in|doubletick
+AiSensy||in|aisensy
+Hiver||in|hiver,grexit
+Spendflo||in|
+Scrut Automation||in|scrut
+CloudSEK||in|cloudsek
+Safe Security||in|safesecurity,safe
+Sequretek||in|
+Appknox||in|
+Beagle Security||in|beagle
+InstaSafe||in|instasafe
+Seclore||in|
+Quick Heal||in|quickheal
+Fractal Analytics||in|fractal
+Tiger Analytics||in|tigeranalytics
+Mu Sigma||in|musigma
+LatentView Analytics||in|latentview
+Sigmoid||in|
+Tredence||in|
+Quantiphi||in|
+Course5 Intelligence||in|course5,course5i
+Gramener||in|
+Affine||in|affine,affineanalytics
+Polestar Solutions||in|polestar
+MathCo||in|themathcompany,mathco
+Wadhwani AI||in|wadhwaniai
+Bira 91||in|bira91,b9beverages
+Sleepy Owl||in|sleepyowl
+The Whole Truth||in|thewholetruth,wholetruth
+Mokobara||in|
+Bombay Shaving Company||in|bombayshavingcompany,bombayshaving
+Wakefit||in|
+The Sleep Company||in|thesleepcompany
+Duroflex||in|
+Pilgrim||in|pilgrim,discoverpilgrim
+Minimalist||in|minimalist,beminimalist
+Plum Goodness||in|plumgoodness
+mCaffeine||in|mcaffeine
+Bellavita||in|
+GIVA||in|giva
+Salty||in|
+Libas||in|
+Zouk||in|
+Mosaic Wellness||in|mosaicwellness
+Traya||in|traya,trayahealth
+Allo Health||in|allohealth
+Kapiva||in|
+OZiva||in|oziva
+HealthKart||in|healthkart
+CureSkin||in|cureskin
+Medikabazaar||in|
+Zeno Health||in|zenohealth
+Truemeds||in|
+Redcliffe Labs||in|redcliffelabs,redcliffe
+Healthians||in|
+Orange Health||in|orangehealth
+Sunstone||in|
+Kalvium||in|
+Coding Ninjas||in|codingninjas
+GUVI||in|guvi
+Imarticus Learning||in|imarticus
+Jaro Education||in|jaroeducation
+BlackBuck||in|blackbuck,zinka
+Rivigo||in|
+LetsTransport||in|letstransport
+Vahak||in|
+Pickrr||in|
+ClickPost||in|clickpost
+Zippee||in|
+Blitz||in|blitz,blitznow
+Borzo||in|borzo,wefast
+Zolo||in|zolo,zolostays
+Stanza Living||in|stanzaliving
+Colive||in|
+Thrillophilia||in|
+Zostel||in|
+Treebo||in|treebo
+FabHotels||in|fabhotels
+Pickyourtrail||in|pickyourtrail
+NODWIN Gaming||in|nodwin,nodwingaming
+SuperGaming||in|supergaming
+Gametion||in|gametion,ludoking
+Moonfrog||in|moonfrog,moonfroglabs
+Octro||in|
+Hitwicket||in|
+STAGE||in|stage,stageott
+Kutumb||in|kutumb,primetrace
+Inshorts||in|inshorts
+Public||in|publicapp,public
+Lokal||in|lokal,getlokal
+Arzooo||in|
+ElasticRun||in|elasticrun
+ShopKirana||in|shopkirana
+Arya.ag||in|arya,aryaag
+AgroStar||in|agrostar
+Bijak||in|
+Gramophone||in|gramophone,agrimedia
+Fasal||in|
+CropIn||in|cropin
+WayCool||in|waycool
+Recykal||in|
+Ohmium||in|
+Lohum||in|
+Attero||in|
+PubMatic India||in|pubmatic
+Credgenics||in|
+Pocket Aces||in|pocketaces
+Zype||in|
+Kotak Securities||in|kotaksecurities
+Tata Digital||in|tatadigital
+Tata Neu||in|tataneu
+Airtel Digital||in|airteldigital
+Jio Platforms||in|jio,jioplatforms
+Reliance Jio||in|reliancejio
+Myntra Jabong||in|myntra
+Swiggy Instamart||in|swiggy
+Unacademy Group||in|unacademy
+upGrad Education||in|upgrad,upgradeducation
+Licious Meat||in|licious
+Infoedge||in|infoedge
+Nykaa E-Retail||in|nykaa
+Hasura India||in|hasura
+Postman Inc||in|postman
+InVideo||in|invideo
+Rephrase.ai||in|rephrase
+Simplismart||in|
+Composio||in|
+Giskard India||in|giskard
+Neysa||in|
+Ema Unlimited||in|ema
+Smallest.ai||in|smallest
+Bolna||in|
+Atlan Technologies||in|atlan
+Peppo||in|
+Cleardekho||in|
+Jumbotail Technologies||in|jumbotail
+Kuvera||in|
+Smallcase Technologies||in|smallcase
+Ezyhire||in|ezyhire
+Arthan Finance||in|arthan
+Mobile Premier League||in|mpl
+Gameskraft||in|
+A23 Games||in|a23
+Baazi Games||in|baazi
+Probo||in|
+Rario||in|
+Fantasy Akhada||in|fantasyakhada
+Cricbuzz||in|
+Dukaan Technologies||in|dukaan
+Zomato Hyperpure||in|hyperpure
+Magicpin||in|
+Swiggy Genie||in|swiggy
+Ninjacart Technologies||in|ninjacart
+Udaan India||in|udaan
+Infra.Market Technologies||in|inframarket
+Meesho Technologies||in|meesho

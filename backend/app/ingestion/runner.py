@@ -19,7 +19,7 @@ from .lever import fetch_lever_jobs
 from .ashby import fetch_ashby_jobs
 from .workday import fetch_workday_jobs
 from .more_boards import (
-    fetch_personio_jobs, fetch_recruitee_jobs, fetch_smartrecruiters_jobs, fetch_teamtailor_jobs, fetch_workable_jobs,
+    fetch_keka_jobs, fetch_personio_jobs, fetch_recruitee_jobs, fetch_smartrecruiters_jobs, fetch_teamtailor_jobs, fetch_workable_jobs,
 )
 from .amazon import fetch_amazon_jobs
 from .custom_portal import fetch_custom_portal_jobs
@@ -310,6 +310,8 @@ async def fetch_company_jobs(
             jobs = await fetch_teamtailor_jobs(source_id, name, client)
         elif source_type == "personio":
             jobs = await fetch_personio_jobs(source_id, name, client)
+        elif source_type == "keka":
+            jobs = await fetch_keka_jobs(source_id, name, client)
         elif source_type == "workday":
             if settings.CRAWL_PROFILE == "full":
                 # The scheduled full crawl lists every role: page through the whole board instead of tech searches
@@ -364,7 +366,7 @@ async def sync_all_sources(company_id_filter: int | None = None, include_aggrega
         # Workday costs about ten requests per employer; on the free server those come from the restored snapshot instead.
         heavy = ("workday",) if settings.CRAWL_PROFILE != "full" else ()
         sources = [t for t in ('greenhouse', 'lever', 'ashby', 'workday', 'amazon', 'custom',
-                               'smartrecruiters', 'workable', 'recruitee', 'teamtailor', 'personio') if t not in heavy]
+                               'smartrecruiters', 'workable', 'recruitee', 'teamtailor', 'personio', 'keka') if t not in heavy]
         query = f"""
             SELECT * FROM companies
             WHERE is_active = 1

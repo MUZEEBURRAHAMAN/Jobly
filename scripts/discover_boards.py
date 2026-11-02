@@ -3,7 +3,7 @@
 Candidates (scripts/candidates/):
   names.txt     one employer per line: "Name" or "Name|industry"; a "## Industry" line sets the industry for the
                 names after it. Tried on Greenhouse, Lever, Ashby, Workable,
-                SmartRecruiters and Recruitee under slugs made from the name ("Acme Corp" -> acmecorp, acme-corp).
+                SmartRecruiters, Recruitee and Keka under slugs made from the name ("Acme Corp" -> acmecorp, acme-corp).
   workday.txt   "Name|tenant|site hint" for big employers on Workday; the tenant is tried on the usual hosts
                 (wd1, wd3, wd5, wd12...) with the hint and common site names.
 A board counts when it answers with at least MIN_JOBS open jobs and, where the system reports the employer's
@@ -148,7 +148,19 @@ async def probe_recruitee(client, name, slug) -> Board | None:
     return Board(name, "recruitee", slug, f"https://{slug}.recruitee.com", jobs)
 
 
-PROBES = (probe_greenhouse, probe_ashby, probe_lever, probe_workable, probe_smartrecruiters, probe_recruitee)
+async def probe_keka(client, name, slug) -> Board | None:
+    if "-" in slug:
+        return None
+    data = await get_json(client, f"https://{slug}.keka.com/careers/api/jobs/default/active")
+    if not isinstance(data, list) or len(data) < MIN_JOBS:
+        return None
+    info = await get_json(client, f"https://{slug}.keka.com/careers/api/organization/default/careerportalinfo")
+    if not similar(name, (info or {}).get("name")):
+        return None
+    return Board(name, "keka", slug, f"https://{slug}.keka.com/careers/", len(data))
+
+
+PROBES = (probe_greenhouse, probe_ashby, probe_lever, probe_workable, probe_smartrecruiters, probe_recruitee, probe_keka)
 
 
 async def probe_workday(client, name, tenant, hint) -> Board | None:
