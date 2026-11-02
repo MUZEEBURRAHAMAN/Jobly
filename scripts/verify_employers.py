@@ -6,10 +6,10 @@
     .venv/bin/python scripts/verify_employers.py --only in --country India   # eligible = open jobs (any role) in India
     .venv/bin/python scripts/verify_employers.py --recheck          # test the employers already in the list, report dead boards
 
-Each candidate (scripts/employer_candidates.csv) is tried on Greenhouse, Ashby, Lever, SmartRecruiters, Workable, Recruitee, Teamtailor, Personio and Keka under a few board names, using the
+Each candidate (scripts/employer_candidates.csv) is tried on Greenhouse, Ashby, Lever, SmartRecruiters, Workable, Recruitee, Teamtailor, Personio, Keka and Darwinbox under a few board names, using the
 same readers the server uses. An employer is eligible when its board answers and has at least --min-role jobs in Jobly's
 five roles outside the United States (for candidates tagged "us" or "yc": anywhere), or with --country, at least --min-role
-open jobs of any role in that country. Nothing is written unless --write is given. A candidate with no website domain gets
+open jobs of any role in that country posted in the last MAX_JOB_AGE_DAYS. Nothing is written unless --write is given. A candidate with no website domain gets
 its job board's own page as its careers link.
 """
 from __future__ import annotations
@@ -21,18 +21,21 @@ import logging
 import re
 import sys
 from collections import Counter
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 import httpx
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
+from backend.app.config import settings  # noqa: E402
 from backend.app.geo import place_of_job  # noqa: E402
+from backend.app.ingestion.base import normalize_posted_at  # noqa: E402
 from backend.app.ingestion.ashby import fetch_ashby_jobs  # noqa: E402
 from backend.app.ingestion.greenhouse import fetch_greenhouse_jobs  # noqa: E402
 from backend.app.ingestion.lever import fetch_lever_jobs  # noqa: E402
 from backend.app.ingestion.more_boards import (  # noqa: E402
-    fetch_keka_jobs, fetch_personio_jobs, fetch_recruitee_jobs, fetch_smartrecruiters_jobs, fetch_teamtailor_jobs, fetch_workable_jobs,
+    fetch_darwinbox_jobs, fetch_keka_jobs, fetch_personio_jobs, fetch_recruitee_jobs, fetch_smartrecruiters_jobs, fetch_teamtailor_jobs, fetch_workable_jobs,
 )
 from backend.app.matching import classify_role  # noqa: E402
 
@@ -40,7 +43,7 @@ logging.disable(logging.CRITICAL)  # the readers warn on every missing board; th
 READERS = {
     "greenhouse": fetch_greenhouse_jobs, "ashby": fetch_ashby_jobs, "lever": fetch_lever_jobs, "smartrecruiters": fetch_smartrecruiters_jobs,
     "workable": fetch_workable_jobs, "recruitee": fetch_recruitee_jobs, "teamtailor": fetch_teamtailor_jobs, "personio": fetch_personio_jobs,
-    "keka": fetch_keka_jobs,
+    "keka": fetch_keka_jobs, "darwinbox": fetch_darwinbox_jobs,
 }
 COMPANIES = ROOT / "backend" / "app" / "data" / "companies.json"
 CANDIDATES = ROOT / "scripts" / "employer_candidates.csv"
@@ -92,7 +95,9 @@ def score(jobs) -> dict:
     role = [j for j, r in mine if r]
     countries = Counter(place_of_job(j.location, j.title)[0] for j in role)
     outside = sum(n for c, n in countries.items() if c and c != "United States")
-    in_country = sum(1 for j in jobs if COUNTRY and place_of_job(j.location, j.title)[0] == COUNTRY)
+    cutoff = (datetime.now(timezone.utc) - timedelta(days=settings.MAX_JOB_AGE_DAYS)).isoformat()
+    fresh = lambda j: (normalize_posted_at(j.source_updated_at) or cutoff) >= cutoff   # noqa: E731  (no date: Jobly keeps it)
+    in_country = sum(1 for j in jobs if COUNTRY and fresh(j) and place_of_job(j.location, j.title)[0] == COUNTRY)
     return {"jobs": len(jobs), "role": len(role), "outside": outside, "in_country": in_country,
             "countries": [(c or "not stated", n) for c, n in countries.most_common(4)]}
 
@@ -101,6 +106,7 @@ BOARD_URLS = {
     "greenhouse": "https://boards.greenhouse.io/{}", "ashby": "https://jobs.ashbyhq.com/{}", "lever": "https://jobs.lever.co/{}",
     "smartrecruiters": "https://jobs.smartrecruiters.com/{}", "workable": "https://apply.workable.com/{}", "recruitee": "https://{}.recruitee.com",
     "teamtailor": "https://{}.teamtailor.com/jobs", "personio": "https://{}.jobs.personio.de", "keka": "https://{}.keka.com/careers/",
+    "darwinbox": "https://{}.darwinbox.in/ms/candidate/careers",
 }
 
 
@@ -148,12 +154,16 @@ async def main() -> None:
     ap.add_argument("--only", help="comma-separated regions from the candidate file")
     ap.add_argument("--min-role", type=int, default=2, help="minimum role jobs outside the US (default 2); region 'us' counts role jobs anywhere")
     ap.add_argument("--country", help="eligible when at least --min-role open jobs of any role are in this country (e.g. India)")
+    ap.add_argument("--systems", help="comma-separated hiring systems to try (default: all), e.g. darwinbox,keka")
     ap.add_argument("--fix-links", action="store_true", help="re-resolve careers links that are just a home page")
     ap.add_argument("--retry", action="store_true", help="test candidates again even if an earlier run found nothing")
     ap.add_argument("--recheck", action="store_true", help="test the employers already in the list instead")
     args = ap.parse_args()
     global COUNTRY
     COUNTRY = args.country
+    if args.systems:
+        for kind in set(READERS) - set(args.systems.split(",")):
+            del READERS[kind]
     sem = asyncio.Semaphore(10)
     async with httpx.AsyncClient(headers={"User-Agent": USER_AGENT}, timeout=25.0) as client:
         existing = json.loads(COMPANIES.read_text(encoding="utf-8"))

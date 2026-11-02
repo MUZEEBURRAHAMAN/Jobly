@@ -13,7 +13,7 @@ if (root) {
   const labels: Record<string, [string, 'career' | 'board']> = {
     greenhouse: ['Greenhouse', 'career'], ashby: ['Ashby', 'career'], lever: ['Lever', 'career'], workday: ['Workday', 'career'],
     smartrecruiters: ['SmartRecruiters', 'career'], workable: ['Workable', 'career'], recruitee: ['Recruitee', 'career'], teamtailor: ['Teamtailor', 'career'],
-    personio: ['Personio', 'career'], keka: ['Keka', 'career'], amazon: ['Amazon Jobs', 'career'], custom: ['Careers page', 'career'], weworkremotely: ['We Work Remotely', 'board'],
+    personio: ['Personio', 'career'], keka: ['Keka', 'career'], darwinbox: ['Darwinbox', 'career'], oracle: ['Oracle Recruiting', 'career'], amazon: ['Amazon Jobs', 'career'], custom: ['Careers page', 'career'], weworkremotely: ['We Work Remotely', 'board'],
     himalayas: ['Himalayas', 'board'], arbeitnow: ['Arbeitnow', 'board'],
   };
   const arrow = list.querySelector('.co-link svg')?.outerHTML ?? '↗';

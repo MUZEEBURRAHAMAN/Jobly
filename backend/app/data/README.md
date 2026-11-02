@@ -4,7 +4,7 @@
 (`source_identifier`). The `region` field is a note for people; the server ignores it.
 
 - Add employers with `scripts/verify_employers.py` (candidates live in `scripts/employer_candidates.csv`). It tests each name on
-  Greenhouse, Ashby, Lever, SmartRecruiters, Workable, Recruitee, Teamtailor, Personio and Keka and adds only boards with real role jobs.
+  Greenhouse, Ashby, Lever, SmartRecruiters, Workable, Recruitee, Teamtailor, Personio, Keka and Darwinbox (plus Oracle Recruiting sites added by hand) and adds only boards with real role jobs.
 - Workday employers are added by hand: `source_identifier` is `{tenant}.{wdN}/{site}` (see `ingestion/workday.py`).
 - Boards that close are reported by `scripts/verify_employers.py --recheck`. Remove them here and add the slug to
   `RETIRED_COMPANY_SLUGS` in `backend/app/seed.py` so their old jobs are deleted too.

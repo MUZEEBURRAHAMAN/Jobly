@@ -5,7 +5,7 @@ import httpx
 
 from backend.app.ingestion.base import normalize_posted_at
 from backend.app.ingestion.more_boards import (
-    fetch_keka_jobs, fetch_personio_jobs, fetch_recruitee_jobs, fetch_smartrecruiters_jobs, fetch_teamtailor_jobs, fetch_workable_jobs,
+    fetch_darwinbox_jobs, fetch_keka_jobs, fetch_oracle_jobs, fetch_personio_jobs, fetch_recruitee_jobs, fetch_smartrecruiters_jobs, fetch_teamtailor_jobs, fetch_workable_jobs,
 )
 
 
@@ -202,4 +202,67 @@ class TestKeka(unittest.IsolatedAsyncioTestCase):
     async def test_unknown_portal_gives_no_jobs(self):
         async with client(lambda r: httpx.Response(404)) as c:
             self.assertEqual(await fetch_keka_jobs("nobody", "Nobody", c), [])
+
+
+class TestDarwinbox(unittest.IsolatedAsyncioTestCase):
+    async def test_pages_types_dates_and_closed_postings(self):
+        page1 = [{"id": f"a{i}", "title": f"Role {i}", "emp_type_name": "PERMANENT", "is_remote": 0, "jd": "&lt;p&gt;Text&lt;/p&gt;",
+                  "tool_tip_locations": ["Bangalore, Karnataka, India"], "job_posting": {"careers": {"from": 1730000000, "to": None}}} for i in range(100)]
+        page2 = [{"id": "b1", "title": "Intern - Data", "emp_type_name": "Intern", "is_remote": 1, "jd": "Please enter job description",
+                  "tool_tip_locations": ["Noida, Uttar Pradesh, India", "Pune, Maharashtra, India"], "posted_on": 1731436200},
+                 {"id": "b2", "title": "Closed role", "job_posting": {"careers": {"from": 1600000000, "to": 1600000001}}}]
+        bodies = []
+
+        def handler(req: httpx.Request) -> httpx.Response:
+            if req.url.path.endswith("/job/alljobs"):
+                body = __import__("json").loads(req.content)
+                bodies.append(body)
+                return httpx.Response(200, json={"status": "success", "data": page1 if body["page"] == 1 else page2, "job_counts": 102})
+            if req.url.path.endswith("/getCompanyConfig"):
+                return httpx.Response(200, json={"message": {"company": {"company_name": "Treebo Hospitality Ventures"}}, "status": "success"})
+            return httpx.Response(404)
+
+        async with client(handler) as c:
+            jobs = await fetch_darwinbox_jobs("treebo", "Treebo", c)
+        self.assertEqual([b["page"] for b in bodies], [1, 2])
+        self.assertEqual(len(jobs), 101)                       # the closed posting is left out
+        intern = jobs[-1]
+        self.assertEqual(intern.application_url, "https://treebo.darwinbox.in/ms/candidatev2/main/careers/jobDetails/b1")
+        self.assertEqual(intern.location, "Noida, Uttar Pradesh, India / Pune, Maharashtra, India")
+        self.assertEqual(intern.work_mode, "remote")
+        self.assertIsNone(intern.description)                 # the placeholder text is not a description
+        self.assertEqual(intern.raw_data["employment_type"], "internship")
+        self.assertEqual(jobs[0].raw_data["employment_type"], "full_time")
+        self.assertEqual(jobs[0].description, "<p>Text</p>")
+        self.assertEqual(jobs[0].raw_data["board_name"], "Treebo Hospitality Ventures")
+        self.assertEqual(normalize_posted_at(intern.source_updated_at)[:10], "2024-11-12")
+
+    async def test_unknown_subdomain_gives_no_jobs(self):
+        async with client(lambda r: httpx.Response(500, json={"status": "error"})) as c:
+            self.assertEqual(await fetch_darwinbox_jobs("nobody", "Nobody", c), [])
+
+
+class TestOracle(unittest.IsolatedAsyncioTestCase):
+    async def test_requisitions_links_and_modes(self):
+        payload = {"items": [{"TotalJobsCount": 2, "requisitionList": [
+            {"Id": "143458", "Title": "Salesforce CPQ Developer", "PostedDate": "2026-11-02", "PrimaryLocation": "Pune, Maharashtra, India",
+             "WorkplaceType": "Hybrid/Club", "secondaryLocations": [{"Name": "Hyderabad, Telangana, India"}]},
+            {"Id": "143459", "Title": "Remote Analyst", "PostedDate": "2026-10-30", "PrimaryLocation": "India", "WorkplaceType": "Remote"},
+        ]}]}
+        seen = []
+
+        def handler(req: httpx.Request) -> httpx.Response:
+            seen.append(req.url.params.get("finder"))
+            return httpx.Response(200, json=payload)
+
+        async with client(handler) as c:
+            jobs = await fetch_oracle_jobs("fa-etvl-saasfaprod1.fa.ocs.oraclecloud.com/CX_1", "Zensar", c)
+        self.assertEqual(seen, ["findReqs;siteNumber=CX_1,limit=200,offset=0,sortBy=POSTING_DATES_DESC"])
+        self.assertEqual(jobs[0].application_url, "https://fa-etvl-saasfaprod1.fa.ocs.oraclecloud.com/hcmUI/CandidateExperience/en/sites/CX_1/job/143458")
+        self.assertEqual(jobs[0].location, "Pune, Maharashtra, India / Hyderabad, Telangana, India")
+        self.assertEqual([j.work_mode for j in jobs], ["hybrid", "remote"])
+        self.assertEqual(jobs[1].source_updated_at, "2026-10-30")
+
+    async def test_identifier_needs_a_site(self):
+        self.assertEqual(await fetch_oracle_jobs("host-only.oraclecloud.com", "X", None), [])
 

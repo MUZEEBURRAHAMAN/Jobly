@@ -12,6 +12,8 @@ export const SOURCES: Record<string, { label: string; kind: 'career' | 'board'; 
   teamtailor: { label: 'Teamtailor', kind: 'career', field: 'pubDate (RSS)', note: 'When the employer published the job' },
   personio: { label: 'Personio', kind: 'career', field: 'createdAt', note: 'When the position was created' },
   keka: { label: 'Keka', kind: 'career', field: 'publishedOn', note: 'When the employer published the job' },
+  oracle: { label: 'Oracle Recruiting', kind: 'career', field: 'PostedDate', note: 'When the employer posted the requisition' },
+  darwinbox: { label: 'Darwinbox', kind: 'career', field: 'job_posting.careers.from', note: 'When the job was opened on the careers page' },
   custom: { label: 'Careers page', kind: 'career', field: 'datePosted (JSON-LD)', note: 'The structured date many careers pages publish for search engines' },
   weworkremotely: { label: 'We Work Remotely', kind: 'board', field: 'published (RSS)', note: 'When the board published the listing' },
   himalayas: { label: 'Himalayas', kind: 'board', field: 'created_at', note: 'When the listing was created' },

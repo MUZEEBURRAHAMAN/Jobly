@@ -94,7 +94,7 @@ export async function findContacts(domain: string, department: string): Promise<
 export function companyDomain(url: string | null | undefined): string {
   try {
     const host = new URL(url ?? '').hostname.replace(/^www\./, '');
-    if (/greenhouse\.io|lever\.co|ashbyhq\.com|myworkdayjobs\.com|smartrecruiters\.com|workable\.com|recruitee\.com|teamtailor\.com|personio\.|keka\.com|weworkremotely|himalayas|arbeitnow|linkedin\.com|indeed\./.test(host)) return '';
+    if (/greenhouse\.io|lever\.co|ashbyhq\.com|myworkdayjobs\.com|smartrecruiters\.com|workable\.com|recruitee\.com|teamtailor\.com|personio\.|keka\.com|darwinbox\.|oraclecloud\.com|weworkremotely|himalayas|arbeitnow|linkedin\.com|indeed\./.test(host)) return '';
     return host.replace(/^(careers|jobs|apply)\./, '');
   } catch {
     return '';

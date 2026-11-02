@@ -3,7 +3,7 @@
 Candidates (scripts/candidates/):
   names.txt     one employer per line: "Name" or "Name|industry"; a "## Industry" line sets the industry for the
                 names after it. Tried on Greenhouse, Lever, Ashby, Workable,
-                SmartRecruiters, Recruitee and Keka under slugs made from the name ("Acme Corp" -> acmecorp, acme-corp).
+                SmartRecruiters, Recruitee, Keka and Darwinbox under slugs made from the name ("Acme Corp" -> acmecorp, acme-corp).
   workday.txt   "Name|tenant|site hint" for big employers on Workday; the tenant is tried on the usual hosts
                 (wd1, wd3, wd5, wd12...) with the hint and common site names.
 A board counts when it answers with at least MIN_JOBS open jobs and, where the system reports the employer's
@@ -160,7 +160,25 @@ async def probe_keka(client, name, slug) -> Board | None:
     return Board(name, "keka", slug, f"https://{slug}.keka.com/careers/", len(data))
 
 
-PROBES = (probe_greenhouse, probe_ashby, probe_lever, probe_workable, probe_smartrecruiters, probe_recruitee, probe_keka)
+async def probe_darwinbox(client, name, slug) -> Board | None:
+    if "-" in slug:
+        return None
+    try:
+        r = await client.post(f"https://{slug}.darwinbox.in/ms/candidateapi/job/alljobs?companyId=main", json={"limit": 100})
+        data = r.json() if r.status_code == 200 else None
+    except (httpx.HTTPError, ValueError):
+        return None
+    jobs = len((data or {}).get("data") or []) if isinstance((data or {}).get("data"), list) else 0
+    if jobs < MIN_JOBS:
+        return None
+    config = await get_json(client, f"https://{slug}.darwinbox.in/ms/candidateapi/getCompanyConfig?is_preview=false&companyId=main")
+    company = ((config or {}).get("message") or {}).get("company") or {}
+    if not similar(name, company.get("company_name")):
+        return None
+    return Board(name, "darwinbox", slug, f"https://{slug}.darwinbox.in/ms/candidate/careers", jobs)
+
+
+PROBES = (probe_greenhouse, probe_ashby, probe_lever, probe_workable, probe_smartrecruiters, probe_recruitee, probe_keka, probe_darwinbox)
 
 
 async def probe_workday(client, name, tenant, hint) -> Board | None:

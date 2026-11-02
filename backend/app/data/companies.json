@@ -12851,5 +12851,283 @@
     "source_identifier": "exponent-energy",
     "industry": null,
     "region": "in"
+  },
+  {
+    "name": "BrowserStack",
+    "slug": "browserstack",
+    "careers_url": "https://www.browserstack.com/careers",
+    "source_type": "workday",
+    "source_identifier": "browserstack.wd3/External",
+    "industry": "Developer Tools",
+    "region": "in"
+  },
+  {
+    "name": "Sprinklr",
+    "slug": "sprinklr",
+    "careers_url": "https://www.sprinklr.com/careers/",
+    "source_type": "workday",
+    "source_identifier": "sprinklr.wd1/careers",
+    "industry": "SaaS & Enterprise Software",
+    "region": "in"
+  },
+  {
+    "name": "Uniphore",
+    "slug": "uniphore",
+    "careers_url": "https://www.uniphore.com/careers/",
+    "source_type": "workday",
+    "source_identifier": "uniphore.wd503/Uniphore",
+    "industry": "Artificial Intelligence",
+    "region": "in"
+  },
+  {
+    "name": "Fractal Analytics",
+    "slug": "fractal-analytics",
+    "careers_url": "https://fractal.ai/careers/",
+    "source_type": "workday",
+    "source_identifier": "fractal.wd1/Careers",
+    "industry": "Artificial Intelligence",
+    "region": "in"
+  },
+  {
+    "name": "Quantiphi",
+    "slug": "quantiphi",
+    "careers_url": "https://quantiphi.com/careers/",
+    "source_type": "workday",
+    "source_identifier": "quantiphi.wd1/Careers_at_Quantiphi",
+    "industry": "Artificial Intelligence",
+    "region": "in"
+  },
+  {
+    "name": "Unilever",
+    "slug": "unilever",
+    "careers_url": "https://careers.unilever.com/",
+    "source_type": "workday",
+    "source_identifier": "unilever.wd3/Unilever_Experienced_Professionals",
+    "industry": "Retail, Consumer & Brands"
+  },
+  {
+    "name": "Upstox",
+    "slug": "upstox",
+    "careers_url": "https://upstox.darwinbox.in/ms/candidate/careers",
+    "source_type": "darwinbox",
+    "source_identifier": "upstox",
+    "industry": null,
+    "region": "in"
+  },
+  {
+    "name": "M2P Fintech",
+    "slug": "m2p-fintech",
+    "careers_url": "https://m2p.darwinbox.in/ms/candidate/careers",
+    "source_type": "darwinbox",
+    "source_identifier": "m2p",
+    "industry": null,
+    "region": "in"
+  },
+  {
+    "name": "Kreditbee",
+    "slug": "kreditbee",
+    "careers_url": "https://kreditbee.darwinbox.in/ms/candidate/careers",
+    "source_type": "darwinbox",
+    "source_identifier": "kreditbee",
+    "industry": null,
+    "region": "in"
+  },
+  {
+    "name": "Moneyview",
+    "slug": "moneyview",
+    "careers_url": "https://moneyview.darwinbox.in/ms/candidate/careers",
+    "source_type": "darwinbox",
+    "source_identifier": "moneyview",
+    "industry": null,
+    "region": "in"
+  },
+  {
+    "name": "CarDekho",
+    "slug": "cardekho",
+    "careers_url": "https://cardekho.darwinbox.in/ms/candidate/careers",
+    "source_type": "darwinbox",
+    "source_identifier": "cardekho",
+    "industry": null,
+    "region": "in"
+  },
+  {
+    "name": "Ather Energy",
+    "slug": "ather-energy",
+    "careers_url": "https://atherenergy.darwinbox.in/ms/candidate/careers",
+    "source_type": "darwinbox",
+    "source_identifier": "atherenergy",
+    "industry": null,
+    "region": "in"
+  },
+  {
+    "name": "Tata 1mg",
+    "slug": "tata-1mg",
+    "careers_url": "https://1mg.darwinbox.in/ms/candidate/careers",
+    "source_type": "darwinbox",
+    "source_identifier": "1mg",
+    "industry": null,
+    "region": "in"
+  },
+  {
+    "name": "Great Learning",
+    "slug": "great-learning",
+    "careers_url": "https://greatlearning.darwinbox.in/ms/candidate/careers",
+    "source_type": "darwinbox",
+    "source_identifier": "greatlearning",
+    "industry": null,
+    "region": "in"
+  },
+  {
+    "name": "Locus",
+    "slug": "locus",
+    "careers_url": "https://locus.darwinbox.in/ms/candidate/careers",
+    "source_type": "darwinbox",
+    "source_identifier": "locus",
+    "industry": null,
+    "region": "in"
+  },
+  {
+    "name": "CaratLane",
+    "slug": "caratlane",
+    "careers_url": "https://caratlane.darwinbox.in/ms/candidate/careers",
+    "source_type": "darwinbox",
+    "source_identifier": "caratlane",
+    "industry": null,
+    "region": "in"
+  },
+  {
+    "name": "Airtel",
+    "slug": "airtel",
+    "careers_url": "https://airtel.darwinbox.in/ms/candidate/careers",
+    "source_type": "darwinbox",
+    "source_identifier": "airtel",
+    "industry": null,
+    "region": "in"
+  },
+  {
+    "name": "Pixxel",
+    "slug": "pixxel",
+    "careers_url": "https://pixxel.darwinbox.in/ms/candidate/careers",
+    "source_type": "darwinbox",
+    "source_identifier": "pixxel",
+    "industry": null,
+    "region": "in"
+  },
+  {
+    "name": "Seclore",
+    "slug": "seclore",
+    "careers_url": "https://seclore.darwinbox.in/ms/candidate/careers",
+    "source_type": "darwinbox",
+    "source_identifier": "seclore",
+    "industry": null,
+    "region": "in"
+  },
+  {
+    "name": "LatentView Analytics",
+    "slug": "latentview-analytics",
+    "careers_url": "https://latentview.darwinbox.in/ms/candidate/careers",
+    "source_type": "darwinbox",
+    "source_identifier": "latentview",
+    "industry": null,
+    "region": "in"
+  },
+  {
+    "name": "Duroflex",
+    "slug": "duroflex",
+    "careers_url": "https://duroflex.darwinbox.in/ms/candidate/careers",
+    "source_type": "darwinbox",
+    "source_identifier": "duroflex",
+    "industry": null,
+    "region": "in"
+  },
+  {
+    "name": "Orange Health",
+    "slug": "orange-health",
+    "careers_url": "https://orangehealth.darwinbox.in/ms/candidate/careers",
+    "source_type": "darwinbox",
+    "source_identifier": "orangehealth",
+    "industry": null,
+    "region": "in"
+  },
+  {
+    "name": "Treebo",
+    "slug": "treebo",
+    "careers_url": "https://treebo.darwinbox.in/ms/candidate/careers",
+    "source_type": "darwinbox",
+    "source_identifier": "treebo",
+    "industry": null,
+    "region": "in"
+  },
+  {
+    "name": "AgroStar",
+    "slug": "agrostar",
+    "careers_url": "https://agrostar.darwinbox.in/ms/candidate/careers",
+    "source_type": "darwinbox",
+    "source_identifier": "agrostar",
+    "industry": null,
+    "region": "in"
+  },
+  {
+    "name": "Kotak Securities",
+    "slug": "kotak-securities",
+    "careers_url": "https://kotaksecurities.darwinbox.in/ms/candidate/careers",
+    "source_type": "darwinbox",
+    "source_identifier": "kotaksecurities",
+    "industry": null,
+    "region": "in"
+  },
+  {
+    "name": "Baazi Games",
+    "slug": "baazi-games",
+    "careers_url": "https://baazigames.darwinbox.in/ms/candidate/careers",
+    "source_type": "darwinbox",
+    "source_identifier": "baazigames",
+    "industry": null,
+    "region": "in"
+  },
+  {
+    "name": "Emeritus",
+    "slug": "emeritus",
+    "careers_url": "https://emeritus.darwinbox.in/ms/candidate/careers",
+    "source_type": "darwinbox",
+    "source_identifier": "emeritus",
+    "industry": null,
+    "region": "in"
+  },
+  {
+    "name": "HomeLane",
+    "slug": "homelane",
+    "careers_url": "https://homelane.darwinbox.in/ms/candidate/careers",
+    "source_type": "darwinbox",
+    "source_identifier": "homelane",
+    "industry": null,
+    "region": "in"
+  },
+  {
+    "name": "Icertis",
+    "slug": "icertis",
+    "careers_url": "https://www.icertis.com/company/careers/",
+    "source_type": "oracle",
+    "source_identifier": "iaaviz.fa.ocs.oraclecloud.com/CX_1",
+    "industry": "SaaS & Enterprise Software",
+    "region": "in"
+  },
+  {
+    "name": "Zensar Technologies",
+    "slug": "zensar-technologies",
+    "careers_url": "https://www.zensar.com/careers",
+    "source_type": "oracle",
+    "source_identifier": "fa-etvl-saasfaprod1.fa.ocs.oraclecloud.com/CX_1",
+    "industry": "Consulting & Professional Services",
+    "region": "in"
+  },
+  {
+    "name": "Kotak Mahindra Bank",
+    "slug": "kotak-mahindra-bank",
+    "careers_url": "https://www.kotak.bank.in/en/careers.html",
+    "source_type": "oracle",
+    "source_identifier": "hcbt.fa.em2.oraclecloud.com/CX",
+    "industry": "Financial Services & Insurance",
+    "region": "in"
   }
 ]
