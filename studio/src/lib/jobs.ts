@@ -1,8 +1,7 @@
-// Fresh jobs from Jobly's job data, with the date each one was really posted: the static files on Cloudflare Pages
-// (shared/jobdata.ts) first, Jobly's API as the fallback. The API must list this site in SITE_ORIGINS (CORS).
+// Fresh jobs from Jobly's job data, with the date each one was really posted: static files on Cloudflare Pages
+// (shared/jobdata.ts), filtered in the browser. There is no server.
 import { DATA_BASE, JobData, type DataJob } from '../../../shared/jobdata';
 
-const API = (import.meta.env.VITE_JOBLY_API as string | undefined) ?? 'https://jobly-yd6l.onrender.com';
 const jobData = new JobData((import.meta.env.VITE_JOBLY_DATA as string | undefined) ?? DATA_BASE);
 
 export interface JoblyJob {
@@ -61,24 +60,8 @@ export async function searchJobs(q: JobQuery, offset = 0, signal?: AbortSignal):
     return { items: page.items.map(fromData), total: page.total };
   } catch (e) {
     if ((e as Error).name === 'AbortError') throw e;
-    // the static data is unreachable: ask the API
+    throw new Error(/HTTP 429/.test(String(e)) ? 'Too many searches in a row. Wait a few seconds and try again.' : 'Couldn’t load Jobly’s job list. Check your connection and try again.');
   }
-  const p = new URLSearchParams({ role: q.role || 'tech', limit: '30', offset: String(offset), freshness_days: String(q.days) });
-  if (q.search.trim()) p.set('search', q.search.trim().slice(0, 100));
-  if (q.location.trim()) p.set('location', q.location.trim().slice(0, 100));
-  if (q.remote) p.set('work_mode', 'remote');
-  if (q.yc) p.set('yc', 'true');
-  let res: Response;
-  try {
-    res = await fetch(`${API}/api/jobs?${p}`, { signal, headers: { Accept: 'application/json' } });
-  } catch (e) {
-    if ((e as Error).name === 'AbortError') throw e;
-    throw new Error('Couldn’t reach Jobly’s job server. It runs on a free plan and may take up to a minute to wake up; try again shortly.');
-  }
-  if (res.status === 429) throw new Error('Too many searches in a row. Wait a few seconds and try again.');
-  if (!res.ok) throw new Error(`Jobly’s job server returned an error (${res.status}).`);
-  const data = await res.json();
-  return { items: data.items ?? [], total: data.total ?? 0 };
 }
 
 const fromData = (j: DataJob): JoblyJob => ({ ...j, description: null });
@@ -89,7 +72,7 @@ export async function withDescription(j: JoblyJob): Promise<JoblyJob> {
   try { return { ...j, description: await jobData.description(j.id) }; } catch { return j; }
 }
 
-/** The posting as text Studio can analyse: what the server knows about the job. */
+/** The posting as text Studio can analyse: what Jobly's job data knows about the job. */
 export function jobAsPostingText(j: JoblyJob): string {
   return [
     `${j.title} at ${j.company_name}`,

@@ -21,7 +21,7 @@ export const StatusPill: React.FC<{ status: ConnectionStatus; onRetry?: () => vo
   <span role="status" aria-live="polite" className="row text-xs muted" style={{ gap: 6 }}>
     <span className={`dot ${status === 'online' ? 'dot-live' : 'dot-warn'}`} aria-hidden="true" />
     {status === 'online' && <span>Live</span>}
-    {status === 'connecting' && <span>Connecting… the server may be waking up</span>}
+    {status === 'connecting' && <span>Connecting…</span>}
     {status === 'offline' && (
       <>
         <span>Offline</span>

@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Bookmark, Briefcase, Building2, SlidersHorizontal, Wand } from '../lib/icons';
 import { api, ConnectionStatus } from '../lib/api';
-import { IS_DEV_BUILD } from '../lib/config';
 import { DEFAULT_FILTERS, JobFilters } from '../lib/filters';
 import { useMutedCompanies } from '../lib/mutedCompanies';
 import { useSavedJobs } from '../lib/useSavedJobs';
@@ -78,7 +77,7 @@ export const PopupApp: React.FC = () => {
     setLoading(false);
   }, [jobQuery]);
 
-  // Next page from the server once everything loaded so far has been shown.
+  // Next page once everything loaded so far has been shown.
   const loadMoreJobs = useCallback(async () => {
     if (loadingMore || jobs.length >= jobsTotal) return;
     setLoadingMore(true);
@@ -98,10 +97,10 @@ export const PopupApp: React.FC = () => {
     setCompanies(comps); setStats(st);
   }, []);
 
-  // Paint from the local cache immediately, then wait (patiently) for a sleeping free-tier server.
+  // Paint from the local cache immediately, then connect to the job data.
   const connect = useCallback(async () => {
     setStatus('connecting');
-    const online = await api.waitForBackend();
+    const online = await api.connect();
     setStatus(online ? 'online' : 'offline');
     if (online) await loadSideData();
     return online;
@@ -134,25 +133,13 @@ export const PopupApp: React.FC = () => {
     return () => clearTimeout(timer);
   }, [tab, status, fetchJobs]);
 
-  // A brand-new server is still collecting its first jobs: poll until some arrive.
-  const gathering = status === 'online' && !!stats && stats.total_jobs === 0;
-  useEffect(() => {
-    if (!gathering) return;
-    const id = window.setInterval(async () => {
-      const st = await api.getStats();
-      setStats(st);
-      if (st.total_jobs > 0) { await loadSideData(); await fetchJobs(); }
-    }, 8000);
-    return () => window.clearInterval(id);
-  }, [gathering, loadSideData, fetchJobs]);
-
   const handleSync = async () => {
     if (isSyncing) return;
     setIsSyncing(true);
     const started = Date.now();
     try {
       const result = await api.triggerSync();
-      if (!result.ok) showNotice("Couldn't reach the server to refresh. Showing your last results.");
+      if (!result.ok) showNotice("Couldn't reach Jobly's job list. Showing your last results.");
       try { chrome.runtime?.sendMessage({ type: 'TRIGGER_BACKGROUND_CHECK' }, () => void chrome.runtime?.lastError); } catch { /* not in an extension context */ }
       const online = await api.checkHealth();
       setStatus(online ? 'online' : 'offline');
@@ -175,11 +162,6 @@ export const PopupApp: React.FC = () => {
     try { chrome.runtime?.sendMessage({ type: 'TRIGGER_BACKGROUND_CHECK', silent: true }, () => void chrome.runtime?.lastError); } catch { /* not in an extension context */ }
     if (status === 'online') await loadSideData();
     await fetchJobs();
-  };
-
-  const handleAddCompany = async (data: Parameters<typeof api.addCompany>[0]) => {
-    const created = await api.addCompany(data);
-    setCompanies((p) => [...p, created]);
   };
 
   const openOptions = () => {
@@ -217,7 +199,7 @@ export const PopupApp: React.FC = () => {
           <JobsFeed
             jobs={savedStore.jobs} loading={loading} preferences={preferences} mutedCompanyIds={muted}
             onToggleSave={handleToggleSave} onOpenPreferences={() => setTab('preferences')}
-            loadError={loadError} onRetryLoad={() => { status === 'online' ? fetchJobs() : connect(); }} gathering={gathering}
+            loadError={loadError} onRetryLoad={() => { status === 'online' ? fetchJobs() : connect(); }}
             hasMore={jobs.length < jobsTotal} onLoadMore={loadMoreJobs} loadingMore={loadingMore} cachedAt={cachedAt}
             onOpenCompanies={() => setTab('companies')}
             roleFilter={roleFilter} onRoleFilterChange={(r) => { setRoleFilter(r); setDisplayLimit(30); }}
@@ -227,7 +209,7 @@ export const PopupApp: React.FC = () => {
         )}
         {tab === 'apply' && <ApplyKitView profiles={profiles} tracker={tracker} notify={showNotice}
           openDashboard={(hash) => { try { void chrome.tabs.create({ url: chrome.runtime.getURL(`options.html#${hash}`) }); } catch { window.open(`/options.html#${hash}`, '_blank'); } }} />}
-        {tab === 'companies' && <CompaniesView companies={companies} mutedCompanyIds={muted} onToggleMuted={toggleMuted} canManage={IS_DEV_BUILD} onAddCompany={handleAddCompany} offline={status === 'offline'} loading={status === 'connecting'} />}
+        {tab === 'companies' && <CompaniesView companies={companies} mutedCompanyIds={muted} onToggleMuted={toggleMuted} offline={status === 'offline'} loading={status === 'connecting'} />}
         {tab === 'saved' && <SavedJobsView savedJobs={savedJobs} onToggleSave={handleToggleSave} onBrowseJobs={() => setTab('jobs')} />}
         {tab === 'preferences' && preferences && <PreferencesView preferences={preferences} onSave={handleSavePreferences} onReplayWelcome={resetOnboarding} />}
         {tab === 'preferences' && !preferences && (

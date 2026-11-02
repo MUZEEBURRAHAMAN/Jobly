@@ -70,7 +70,7 @@ if (root) {
   sort.addEventListener('change', render);
   root.querySelectorAll('input[name="kind"]').forEach((r) => r.addEventListener('change', render));
 
-  apiGet<Company[]>('/api/companies', {}, { timeoutMs: 60000, onSlow: () => { if (!data) status.textContent = 'Waking up the server, this can take up to a minute…'; } })
+  apiGet<Company[]>('/api/companies', {})
     .then((live) => {
       data = live;
       const career = live.filter((c) => (labels[c.source_type]?.[1] ?? 'career') === 'career').length;

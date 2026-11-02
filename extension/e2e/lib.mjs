@@ -6,8 +6,7 @@ import os from 'os';
 import path from 'path';
 
 export const BUILD = process.env.EXT_DIST || '';   // set by run.sh (a build in the system temp dir)
-export const API = 'http://127.0.0.1:8000';
-export const LOCAL = /^http:\/\/(127\.0\.0\.1|localhost):8000\//;
+export const DATA = /^https:\/\/jobly-data\.pages\.dev\//;   // Jobly's job data (the tests answer it from the fixture)
 export const JSON_HEADERS = { 'access-control-allow-origin': '*', 'content-type': 'application/json' };
 export const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
@@ -29,16 +28,31 @@ export function chromiumPath() {
 
 export const STATIC = process.env.STATIC_DIR || '';   // the fixture database as static job data (set by run.sh)
 
+/** One of the fixture's static job-data files, parsed. */
+export const readStatic = (rel) => JSON.parse(fs.readFileSync(path.join(STATIC, 'v1', rel), 'utf8'));
+
+/** Every job in the fixture's static data as objects, newest buckets first. */
+export function staticJobs() {
+  const meta = readStatic('meta.json');
+  const rows = [];
+  for (const dir of fs.readdirSync(path.join(STATIC, 'v1', 'jobs'))) {
+    for (const f of fs.readdirSync(path.join(STATIC, 'v1', 'jobs', dir))) {
+      for (const r of readStatic(`jobs/${dir}/${f}`).rows) rows.push({ ...Object.fromEntries(meta.columns.map((c, i) => [c, r[i]])), bucket: f.replace('.json', '') });
+    }
+  }
+  return rows;
+}
+
 /** Answer requests for Jobly's static job data from a local export. */
 export async function serveStatic(ctx, dir = STATIC) {
-  await ctx.route(/^https:\/\/jobly-data\.pages\.dev\//, async (route) => {
+  await ctx.route(DATA, async (route) => {
     const file = path.join(dir, new URL(route.request().url()).pathname);
     if (!file.startsWith(dir) || !fs.existsSync(file)) return route.fulfill({ status: 404, headers: { 'access-control-allow-origin': '*' }, body: 'not found' });
     await route.fulfill({ status: 200, headers: JSON_HEADERS, body: fs.readFileSync(file) });
   });
 }
 
-export async function launch({ onboarded = true, blockProd = true, colorScheme = 'light', dist = BUILD, scale = 1, staticData = false } = {}) {
+export async function launch({ onboarded = true, colorScheme = 'light', dist = BUILD, scale = 1, staticData = true } = {}) {
   const userDataDir = fs.mkdtempSync(path.join(os.tmpdir(), 'jobly-e2e-'));
   const ctx = await chromium.launchPersistentContext(userDataDir, {
     executablePath: chromiumPath(), headless: false, colorScheme, viewport: { width: 1280, height: 800 }, deviceScaleFactor: scale,
@@ -49,17 +63,18 @@ export async function launch({ onboarded = true, blockProd = true, colorScheme =
   const closeBrowser = ctx.close.bind(ctx);
   ctx.close = async (...args) => { try { await closeBrowser(...args); } finally { fs.rmSync(userDataDir, { recursive: true, force: true }); } };
   process.once('exit', () => fs.rmSync(userDataDir, { recursive: true, force: true }));
-  if (blockProd) await ctx.route(/^https:\/\/jobly-yd6l\.onrender\.com\//, (r) => r.abort('connectionrefused'));
-  // Development builds read their (absent) static data from the local server and fall back to its API.
-  // Production builds read jobly-data.pages.dev: tests either serve the fixture as static data or block it.
-  if (staticData) await serveStatic(ctx);
-  else if (dist !== BUILD) await ctx.route(/^https:\/\/jobly-data\.pages\.dev\//, (r) => r.abort('connectionrefused'));
+  // Every build reads jobly-data.pages.dev: the tests answer it from the fixture, or leave it unreachable (staticData: false).
+  if (staticData) await serveStatic(ctx); else await goOffline(ctx);
   let [sw] = ctx.serviceWorkers();
   if (!sw) sw = await ctx.waitForEvent('serviceworker', { timeout: 20000 });
   const id = sw.url().split('/')[2];
   if (onboarded) await sw.evaluate(() => chrome.storage.local.set({ onboarded: true }));
   return { ctx, sw, id };
 }
+
+/** Make the job data unreachable, and reachable again. */
+export const goOffline = async (ctx) => { await ctx.unroute(DATA); await ctx.route(DATA, (r) => r.abort('connectionrefused')); };
+export const goOnline = async (ctx) => { await ctx.unroute(DATA); await serveStatic(ctx); };
 
 export async function open(h, page = 'popup.html', { theme = 'light', width = 400, height = 590 } = {}) {
   const p = await h.ctx.newPage();
@@ -85,5 +100,3 @@ export function makeRunner(name, hardTimeoutMs = 600000) {
   const done = () => { console.log(`\n${name}: ${pass} passed, ${fail} failed`); process.exit(fail ? 1 : 0); };
   return { ok, step, axe, done };
 }
-
-export const json = async (p, init) => (await fetch(API + p, init)).json();

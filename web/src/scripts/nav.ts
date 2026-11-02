@@ -111,7 +111,7 @@ let statsLoaded = false;
 function loadLiveStats() {
   if (statsLoaded) return;
   statsLoaded = true;
-  apiGet<Record<string, number>>('/api/stats', {}, { timeoutMs: 15000 })
+  apiGet<Record<string, number>>('/api/stats', {})
     .then((stats) => {
       document.querySelectorAll<HTMLElement>('[data-live-stat]').forEach((el) => {
         const v = stats[el.dataset.liveStat!];

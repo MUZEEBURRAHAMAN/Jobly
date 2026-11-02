@@ -2,7 +2,7 @@ import { AlertItem, Job, Preferences } from '../types';
 
 /**
  * Everything personal lives on this device (chrome.storage.local): preferences, saved jobs and alerts.
- * The server is stateless: preferences travel with each request only to pick matching jobs, and are never stored there.
+ * Jobly has no server: the job list is downloaded as static files and matched to the preferences in the browser.
  */
 
 const KEYS = {
@@ -63,7 +63,7 @@ export function onKeysChanged(keys: string[], fn: () => void): () => void {
   return () => chrome.storage.onChanged.removeListener(listener);
 }
 
-/** A job's identity on this device. Database ids change when the free-tier server rebuilds, the apply link doesn't. */
+/** A job's identity on this device. Database ids can change when the job data is rebuilt, the apply link doesn't. */
 export const jobKey = (job: Pick<Job, 'application_url' | 'company_name' | 'external_id'>): string =>
   job.application_url || `${job.company_name}|${job.external_id}`;
 
@@ -79,22 +79,13 @@ export async function hasStoredPreferences(): Promise<boolean> {
 
 export const storePreferences = (prefs: Preferences) => writeKey(KEYS.preferences, prefs);
 
-/** The `prefs` request parameter: only what the server needs to pick matching jobs. */
-export function prefsParam(p: Preferences): string {
-  return JSON.stringify({
-    roles: p.roles, seniorities: p.seniorities, locations: p.locations, remote_only: p.remote_only,
-    custom_keywords: p.custom_keywords, excluded_keywords: p.excluded_keywords,
-    min_salary: p.min_salary || 0, employment_types: p.employment_types ?? [],
-  });
-}
-
 // ------------------------------------------------------------------ saved jobs
 export async function loadSaved(): Promise<Job[]> {
   const saved = (await readKey<Job[]>(KEYS.saved)) ?? (await readKey<Job[]>(LEGACY.saved)) ?? [];
   return Array.isArray(saved) ? saved : [];
 }
 
-/** Full copies are kept so a saved job still shows after the posting is gone or the server restarts. */
+/** Full copies are kept so a saved job still shows after the posting is gone from the job data. */
 export async function storeSaved(jobs: Job[]): Promise<boolean> {
   return writeKey(KEYS.saved, jobs.slice(0, MAX_SAVED_JOBS).map((j) => ({ ...j, is_saved: true })));
 }

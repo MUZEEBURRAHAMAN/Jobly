@@ -31,14 +31,14 @@ export const FAQ_GROUPS: { id: string; title: string; items: Faq[] }[] = [
   },
   {
     id: 'privacy', title: 'Privacy', items: [
-      { top: true, q: 'What do you store about me?', a: 'Nothing in a database. Your preferences, saved jobs and alerts stay in your browser. Jobly downloads its public job files and filters them in your browser, so your preferences never leave it. Only if those files can’t be reached does it ask Jobly’s backup server, which gets your preferences with that request and doesn’t keep them.' },
-      { q: 'Can Jobly see the pages I visit?', a: 'Only the tab you click on, and only when you ask: Save, Fit check or Autofill. It never reads your history or other tabs, and it only talks to its own job data and server.' },
+      { top: true, q: 'What do you store about me?', a: 'Nothing in a database. Your preferences, saved jobs and alerts stay in your browser. Jobly downloads its public job files and filters them in your browser, so your preferences never leave it. Jobly has no server, so there is nowhere for them to go.' },
+      { q: 'Can Jobly see the pages I visit?', a: 'Only the tab you click on, and only when you ask: Save, Fit check or Autofill. It never reads your history or other tabs, and the only Jobly address it talks to is its public job files.' },
       { q: 'Why does the extension need notifications and alarms?', a: 'Alarms let it check for new jobs in the background every 60 to 90 minutes. Notifications let it tell you about a new match, only if you turn alerts on.' },
     ],
   },
   {
     id: 'help', title: 'Troubleshooting', items: [
-      { q: 'Jobs take a long time to load.', a: 'Jobs now load from fast public files, usually in under a second. If those can’t be reached, Jobly falls back to its server, which runs on a free plan and can take up to a minute to wake up.' },
+      { q: 'Jobs take a long time to load.', a: 'Jobs load from fast public files, usually in under a second. If they don’t, check your connection; Jobly keeps showing the jobs it loaded last time and tries again on its own.' },
       { q: 'A job is gone when I click Apply.', a: 'The employer probably closed it after Jobly’s last refresh. Closed jobs disappear from Jobly within about four hours.' },
       { q: 'A listing looks wrong or suspicious.', a: 'Use Report this listing on the job card, or write to us through the support page. We read every report.' },
     ],

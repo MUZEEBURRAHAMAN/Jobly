@@ -17,7 +17,7 @@ export const ConnectionsSetting: React.FC<{ onChange?: () => void }> = ({ onChan
           <input id="hunter-key" type="password" autoComplete="off" className="input" value={key} placeholder={stored ? 'Saved. Paste a new key to replace it' : 'Paste your key from hunter.io'} onChange={(e) => setKey(e.target.value)} />
           <button type="button" className="btn btn-outline btn-sm" onClick={() => void save()} disabled={!key.trim() && !stored}>{key.trim() || !stored ? 'Save' : 'Remove'}</button>
         </div>
-        <p className="hint">Your own Hunter account, used straight from this browser. Jobly's server never sees the key or the searches.</p>
+        <p className="hint">Your own Hunter account, used straight from this browser. Jobly never sees the key or the searches.</p>
       </div>
       <div className="row" style={{ justifyContent: 'space-between' }}>
         <span><span className="font-medium" style={{ display: 'block' }}>Google Calendar</span>

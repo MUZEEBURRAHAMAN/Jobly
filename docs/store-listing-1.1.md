@@ -36,8 +36,9 @@ APPLY FASTER
 • Find recruiters with your own Hunter key and draft outreach messages
 
 PRIVATE BY DESIGN
-• No account, no tracking, no ads
-• Your tracker, profiles and contacts stay in your browser; optional sync uses your own Chrome account
+• No account, no server, no tracking, no ads
+• Your searches, tracker, profiles and contacts stay in your browser; optional sync uses your own Chrome account
+• Reporting a listing or suggesting a company opens your email app; nothing is sent without you
 • Jobly reads a page only when you click Save, Fit check or Autofill, and only that tab
 
 GOOD TO KNOW
@@ -65,7 +66,6 @@ Jobly helps people find and apply for tech jobs: it lists recent jobs from compa
 | `scripting` | Runs Jobly's packaged page-reading and form-filling functions in the active tab after the user clicks, using the activeTab grant. Jobly has no content scripts that run on their own. |
 | `contextMenus` | Adds "Save this job to Jobly" to the page's right-click menu. |
 | Host `https://jobly-data.pages.dev/*` | Reads Jobly's public job list, published as static files. Nothing is sent to it except the request for those files. |
-| Host `https://jobly-yd6l.onrender.com/*` | Jobly's own server: a fallback for the job list if the static files can't be reached. |
 | Optional host `https://api.hunter.io/*` | Requested only when the user searches for contacts with their own Hunter API key. |
 
 If a later build includes Google Calendar import, it also asks for `identity` (sign in to Google to read upcoming events, read-only) and the optional host `https://www.googleapis.com/*`. The 1.1.0 package doesn't include them.
@@ -76,7 +76,7 @@ If a later build includes Google Calendar import, it also asks for `identity` (s
 - **Personally identifiable information:** yes. The user types their name, email, phone and work history into a profile, stored on their device and used to fill forms when they ask.
 - **Authentication information:** yes. The user may store their own Hunter API key on their device to search contacts.
 - **Website content:** yes. When the user clicks, Jobly reads the job page in the active tab (title, company, description) to save it, check fit or fill its form.
-- **User activity:** yes. Jobs are filtered in the browser from the static job files; only if those can't be reached are search words and filters sent to Jobly's server to return jobs.
+- **User activity:** no. Searches and filters are applied in the browser to the downloaded job files; Jobly has no server and sends them nowhere.
 - Everything else: no.
 - Usage: app functionality only. Not sold, not used for anything unrelated, not for credit.
 - Tick all three certifications.

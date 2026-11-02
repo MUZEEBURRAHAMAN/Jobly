@@ -105,7 +105,7 @@ def report(companies: list[dict], jobs: list[dict], now: datetime) -> str:
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument("--base", default="https://jobly-yd6l.onrender.com", help="API address")
+    parser.add_argument("--base", default="http://127.0.0.1:8000", help="API address (run the local API on a crawled database first)")
     parser.add_argument("--out", help="write to this file instead of printing")
     args = parser.parse_args()
     companies, jobs = fetch(args.base)

@@ -3,8 +3,8 @@ import { Cabinet, Drawer, Lockers, Loupe, Plug, Router, Sieve, Slow, Stack } fro
 
 // One illustration per situation, so people can tell at a glance what is going on.
 const ART = {
-  offline: Plug,        // can't reach the server
-  error: Stack,         // the server answered with an error
+  offline: Plug,        // can't reach the job data
+  error: Stack,         // the job data answered with an error
   search: Loupe,        // a search matched nothing
   filters: Sieve,       // filters excluded everything
   nomatch: Cabinet,     // nothing fits the preferences

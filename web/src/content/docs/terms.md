@@ -1,16 +1,16 @@
 ---
 title: Terms of use
 eyebrow: Terms
-description: The plain-language terms for using the Jobly extension, website and server. Free, no account, no warranty.
-updated: 2026-10-18
+description: The plain-language terms for using the Jobly extension, website and job data. Free, no account, no warranty.
+updated: 2026-11-02
 figure: format
 ---
 
-> **The short version.** Jobly is free. It shows public job listings from other companies, so check details on the employer's site before you rely on them. Use the extension and the server fairly, and we'll keep them running as well as we can.
+> **The short version.** Jobly is free. It shows public job listings from other companies, so check details on the employer's site before you rely on them. Use the extension and the job data fairly, and we'll keep them running as well as we can.
 
 ## Agreeing to these terms
 
-By installing the Jobly extension or using this website or Jobly's server, you agree to these terms. If you don't agree, please don't use them. The [privacy policy](/privacy) explains how data is handled and is part of these terms.
+By installing the Jobly extension or using this website or Jobly's job data, you agree to these terms. If you don't agree, please don't use them. The [privacy policy](/privacy) explains how data is handled and is part of these terms.
 
 ## What Jobly does
 
@@ -28,16 +28,16 @@ Jobly shows jobs that employers publish on their own public job boards. If a lis
 
 ## Free, with no guarantees
 
-Jobly is free and has no paid tier. The server runs on a free hosting plan, so it can be slow to wake up or briefly unavailable. We may change, pause or end any part of the service.
+Jobly is free and has no paid tier. It runs on free hosting, so it can be briefly unavailable. We may change, pause or end any part of the service.
 
 Jobly is provided "as is", without warranty of any kind. To the extent the law allows, the people who make Jobly are not liable for any loss that comes from using it, including a missed job or a listing that turned out to be wrong.
 
-## Fair use of the server
+## Fair use of the job data
 
-Jobly's server exists to answer the extension and this website. Please don't:
+Jobly's job files exist for the extension, Jobly Studio and this website. Please don't:
 
-- Send automated traffic at a rate that slows it down for others, or try to get around its rate limits.
-- Try to break into it, test its security without telling us, or use it to attack anyone else.
+- Download them automatically at a rate that slows them down for others.
+- Try to break into Jobly's hosting, test its security without telling us, or use it to attack anyone else.
 - Resell its data or present it as your own service.
 
 We may block traffic that does this. If you'd like to build something on Jobly's data, [ask us first](/support).

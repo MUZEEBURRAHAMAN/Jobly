@@ -146,7 +146,7 @@ def client_ip(scope: dict) -> str:
 
 
 class RateLimitMiddleware:
-    """Small in-memory sliding-window limiter (per instance; fine for a single Render service)."""
+    """Small in-memory sliding-window limiter (per process; the API runs only locally)."""
 
     def __init__(self, app, general_per_min: int | None = None, write_per_min: int | None = None,
                  sync_per_min: int | None = None, max_tracked: int = 20000):

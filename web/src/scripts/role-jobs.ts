@@ -57,9 +57,7 @@ if (root) {
     if (reset) { offset = 0; list.replaceChildren(...Array.from({ length: 5 }, () => el('li', 'skel'))); list.setAttribute('aria-busy', 'true'); }
     more.disabled = true;
     try {
-      const page = await apiGet<Page>('/api/jobs', { role: role(), yc: yc ? 'true' : undefined, freshness_days: days(), work_mode: remote.checked ? 'remote' : undefined, limit: PAGE, offset }, {
-        timeoutMs: 60000, onSlow: () => { if (mine === request) status.textContent = 'Waking up the server, this can take up to a minute…'; },
-      });
+      const page = await apiGet<Page>('/api/jobs', { role: role(), yc: yc ? 'true' : undefined, freshness_days: days(), work_mode: remote.checked ? 'remote' : undefined, limit: PAGE, offset });
       if (mine !== request) return;
       total = page.total;
       const cards = page.items.map(card);
@@ -84,7 +82,7 @@ if (root) {
 
   // The "posted in the last 7 days" badge in the hero.
   const week = document.querySelector<HTMLElement>('[data-week]');
-  if (week) apiGet<Page>('/api/jobs', { role: role(), yc: yc ? 'true' : undefined, freshness_days: 7, limit: 1 }, { timeoutMs: 60000 })
+  if (week) apiGet<Page>('/api/jobs', { role: role(), yc: yc ? 'true' : undefined, freshness_days: 7, limit: 1 })
     .then((p) => { week.textContent = formatNumber(p.total); })
     .catch(() => { week.parentElement!.hidden = true; });
 }

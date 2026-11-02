@@ -95,7 +95,7 @@ export const ContactsView: React.FC<{ tracker: TrackerStore; profile: Profile | 
                 {r.linkedin && <a className="btn btn-ghost btn-sm btn-icon" href={r.linkedin} target="_blank" rel="noopener noreferrer" aria-label={`${r.name} on LinkedIn`}><ExternalLink size={14} aria-hidden="true" /></a>}
                 {saved.has(r.email) ? <span className="badge badge-success">Saved</span> : <button type="button" className="btn btn-outline btn-sm" onClick={() => void keep(r)}>Save</button>}
               </li>))}</ul>)}
-        <p className="hint">Searches go from this browser to Hunter with your key; Jobly's server never sees them.</p>
+        <p className="hint">Searches go from this browser to Hunter with your key; Jobly never sees them.</p>
       </div>
 
       <div className="stack">

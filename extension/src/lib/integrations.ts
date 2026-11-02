@@ -2,7 +2,7 @@
  * Optional connections, each turned on by the user:
  *   Google Calendar: reads upcoming events to import interviews (read-only scope, the user's own Google sign-in).
  *   Hunter: finds recruiters and hiring managers at a company with the user's own Hunter API key.
- * Both talk to those services straight from this browser; nothing passes through Jobly's server. Chrome asks the user
+ * Both talk to those services straight from this browser; nothing passes through Jobly. Chrome asks the user
  * for access to each service's address the first time it is used (optional host permissions).
  */
 import { readKey, writeKey } from './userData';

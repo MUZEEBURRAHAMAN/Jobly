@@ -14,7 +14,7 @@ Inspired by [Dossier](https://github.com/AienTech/dossier), a self-hosted Next.j
 - **Email it**: opens your mail app with the letter and the posting's address.
 - **Board and table** of applications (drag between stages), notes, follow-up dates and interviews.
 - **Dashboard**: a funnel (30 days, 90 days or all time), applications per week, and what's worth doing next.
-- **Find jobs**: fresh tech jobs from Jobly's server, with real posting dates, then "Tailor for this".
+- **Find jobs**: fresh jobs from Jobly's public job data, with real posting dates, then "Tailor for this".
 - **Your data**: one IndexedDB record in this browser. Export and import it as one file, or delete everything. Works offline (service worker).
 
 ## The AI
@@ -44,6 +44,5 @@ npm run build    # type-check and build to dist/
 1. Cloudflare dashboard → Workers & Pages → Create → Pages → Connect to Git → pick this repository.
 2. Build settings: framework preset **None**, root directory **`studio`**, build command **`npm run build`**, output directory **`dist`**. Add the environment variable `NODE_VERSION` = `22`.
 3. Deploy. The site gets a `*.pages.dev` address. Security headers come from `public/_headers`.
-4. For Find jobs, add the Studio address to the job server's `SITE_ORIGINS` on Render (comma-separated, next to the website's), so the server allows the requests.
 
 Each push to the production branch redeploys. The free plan allows 500 builds a month.

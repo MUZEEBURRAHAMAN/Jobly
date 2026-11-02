@@ -2,7 +2,7 @@
 import { apiGet, formatNumber } from './api';
 
 document.querySelectorAll<HTMLElement>('[data-count-role]').forEach((el) => {
-  apiGet<{ total: number }>('/api/jobs', { role: el.dataset.countRole, freshness_days: 7, limit: 1 }, { timeoutMs: 60000 })
+  apiGet<{ total: number }>('/api/jobs', { role: el.dataset.countRole, freshness_days: 7, limit: 1 })
     .then((p) => { el.textContent = formatNumber(p.total); })
     .catch(() => { el.closest('.count')?.setAttribute('hidden', ''); });
 });

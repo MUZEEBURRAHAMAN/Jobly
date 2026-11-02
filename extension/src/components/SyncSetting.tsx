@@ -16,7 +16,7 @@ export const SyncSetting: React.FC = () => {
     <div className="card" style={{ padding: 12 }}>
       <label className="row" style={{ justifyContent: 'space-between', cursor: 'pointer' }}>
         <span><span className="font-medium" style={{ display: 'block' }}>Sync across your Chrome browsers</span>
-          <span className="text-xs muted">Preferences, tracker, interviews, tasks and profiles follow you to Chrome on your other computers, through your Google account. Jobly's server never sees them.</span></span>
+          <span className="text-xs muted">Preferences, tracker, interviews, tasks and profiles follow you to Chrome on your other computers, through your Google account. Jobly never sees them.</span></span>
         <input type="checkbox" className="switch" role="switch" checked={on} onChange={(e) => { setOn(e.target.checked); void writeKey(SYNC_SETTING, e.target.checked); }} />
       </label>
       {on && (

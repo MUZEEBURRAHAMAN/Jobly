@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 
-// "Mute a company" is a personal choice, so it lives on this device (not in the shared server database).
+// "Mute a company" is a personal choice, so it lives on this device (not in the shared job data).
 const KEY = 'mutedCompanyIds';
 const hasChromeStorage = () => typeof chrome !== 'undefined' && !!chrome.storage?.local;
 

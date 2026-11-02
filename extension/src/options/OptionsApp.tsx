@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Bell, Bookmark, Briefcase, Building2, Calendar, FileText, Kanban, ListChecks, Mail, Moon, RefreshCw, SlidersHorizontal, Sun, User, Contacts } from '../lib/icons';
 import { api, ConnectionStatus } from '../lib/api';
-import { IS_DEV_BUILD, MAX_PAGE_SIZE } from '../lib/config';
+import { MAX_PAGE_SIZE } from '../lib/config';
 import { DEFAULT_FILTERS, JobFilters } from '../lib/filters';
 import { useMutedCompanies } from '../lib/mutedCompanies';
 import { useSavedJobs } from '../lib/useSavedJobs';
@@ -94,7 +94,7 @@ export const OptionsApp: React.FC = () => {
   // Preferences, saved jobs and alerts are on this device, so they are there instantly (even offline).
   useEffect(() => { api.getPreferences().then(setPreferences); }, []);
 
-  // Everything from the server except the job list (that has its own effect so filters/search/pagination stay in one place).
+  // Everything except the job list (that has its own effect so filters/search/pagination stay in one place).
   const loadSideData = useCallback(async () => {
     const [comps, st] = await Promise.all([api.getCompanies(), api.getStats()]);
     setCompanies(comps); setStats(st);
@@ -102,7 +102,7 @@ export const OptionsApp: React.FC = () => {
 
   const connect = useCallback(async () => {
     setStatus('connecting');
-    const online = await api.waitForBackend();
+    const online = await api.connect();
     setStatus(online ? 'online' : 'offline');
     if (online) await loadSideData();
     return online;
@@ -153,7 +153,7 @@ export const OptionsApp: React.FC = () => {
     return () => clearTimeout(timer);
   }, [tab, status, fetchJobs]);
 
-  // The server caps a page at MAX_PAGE_SIZE, so "show more" past that fetches the next page.
+  // A page is capped at MAX_PAGE_SIZE, so "show more" past that fetches the next page.
   const loadMoreJobs = useCallback(async () => {
     if (loadingMore || jobs.length >= jobsTotal) return;
     setLoadingMore(true);
@@ -165,24 +165,13 @@ export const OptionsApp: React.FC = () => {
     setLoadingMore(false);
   }, [loadingMore, jobs.length, jobsTotal, jobQuery]);
 
-  const gathering = status === 'online' && !!stats && stats.total_jobs === 0;
-  useEffect(() => {
-    if (!gathering) return;
-    const id = window.setInterval(async () => {
-      const st = await api.getStats();
-      setStats(st);
-      if (st.total_jobs > 0) { await loadSideData(); await fetchJobs(); }
-    }, 8000);
-    return () => window.clearInterval(id);
-  }, [gathering, loadSideData, fetchJobs]);
-
   const handleSync = async () => {
     if (isSyncing) return;
     setIsSyncing(true);
     const started = Date.now();
     try {
       const result = await api.triggerSync();
-      if (!result.ok) showNotice("Couldn't reach the server to refresh. Showing your last results.");
+      if (!result.ok) showNotice("Couldn't reach Jobly's job list. Showing your last results.");
       try { chrome.runtime?.sendMessage({ type: 'TRIGGER_BACKGROUND_CHECK' }, () => void chrome.runtime?.lastError); } catch { /* not in an extension context */ }
       const online = await api.checkHealth();
       setStatus(online ? 'online' : 'offline');
@@ -205,11 +194,6 @@ export const OptionsApp: React.FC = () => {
     try { chrome.runtime?.sendMessage({ type: 'TRIGGER_BACKGROUND_CHECK', silent: true }, () => void chrome.runtime?.lastError); } catch { /* not in an extension context */ }
     if (status === 'online') await loadSideData();
     await fetchJobs();
-  };
-
-  const handleAddCompany = async (data: Parameters<typeof api.addCompany>[0]) => {
-    const created = await api.addCompany(data);
-    setCompanies((p) => [...p, created]);
   };
 
   const markAlertsRead = async () => {
@@ -279,7 +263,7 @@ export const OptionsApp: React.FC = () => {
                   <JobsFeed
                     large jobs={savedStore.jobs} loading={loading} preferences={preferences} mutedCompanyIds={muted}
                     onToggleSave={handleToggleSave} onOpenPreferences={() => setTab('preferences')}
-                    loadError={loadError} onRetryLoad={() => { status === 'online' ? fetchJobs() : connect(); }} gathering={gathering}
+                    loadError={loadError} onRetryLoad={() => { status === 'online' ? fetchJobs() : connect(); }}
                     hasMore={jobs.length < jobsTotal} onLoadMore={loadMoreJobs} loadingMore={loadingMore} cachedAt={cachedAt} onOpenCompanies={() => setTab('companies')}
                     roleFilter={roleFilter} onRoleFilterChange={(r) => { setRoleFilter(r); setDisplayLimit(30); }}
                     filters={filters} onFiltersChange={(f) => { setFilters(f); setDisplayLimit(30); }}
@@ -287,7 +271,7 @@ export const OptionsApp: React.FC = () => {
                   />
                 </div>
               )}
-              {tab === 'companies' && <CompaniesView large companies={companies} mutedCompanyIds={muted} onToggleMuted={toggleMuted} canManage={IS_DEV_BUILD} onAddCompany={handleAddCompany} offline={status === 'offline'} loading={status === 'connecting'} />}
+              {tab === 'companies' && <CompaniesView large companies={companies} mutedCompanyIds={muted} onToggleMuted={toggleMuted} offline={status === 'offline'} loading={status === 'connecting'} />}
               {tab === 'saved' && <SavedJobsView large savedJobs={savedJobs} onToggleSave={handleToggleSave} onBrowseJobs={() => setTab('jobs')} />}
               {tab === 'tracker' && <TrackerView store={tracker} savedJobs={savedJobs} notify={showNotice} onBrowseJobs={() => setTab('jobs')} />}
               {tab === 'interviews' && <InterviewsView store={tracker} onOpenTracker={() => setTab('tracker')} calendarImport={<CalendarImport store={tracker} notify={showNotice} />} />}

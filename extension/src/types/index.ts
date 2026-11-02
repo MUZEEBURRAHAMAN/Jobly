@@ -36,9 +36,9 @@ export interface JobsResponse {
   total: number;
   limit: number;
   offset: number;
-  /** Set when the request failed: 'offline' = unreachable, 'server' = the server answered with an error. */
+  /** Set when loading failed: 'offline' = unreachable, 'server' = the host answered with an error, 'busy' = too many requests. */
   error?: 'offline' | 'server' | 'busy';
-  /** True when `items` came from the local cache instead of the server. */
+  /** True when `items` came from the local cache instead of the job data. */
   fromCache?: boolean;
   /** When the cached items were saved (ms since epoch). */
   cachedAt?: number | null;
@@ -111,5 +111,4 @@ export interface RadarStats {
   matched_jobs: number;
   new_jobs_today: number;
   last_sync_time: string | null;
-  is_syncing?: boolean;
 }

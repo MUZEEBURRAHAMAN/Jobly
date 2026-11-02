@@ -6,9 +6,7 @@ const chart = document.querySelector<HTMLElement>('[data-freshness]');
 if (chart) {
   const status = chart.querySelector<HTMLElement>('[data-chart-status]')!;
   const days = [1, 7, 14, 30, 60];
-  Promise.all(days.map((d) => apiGet<{ total: number }>('/api/jobs', { freshness_days: d, limit: 1 }, {
-    timeoutMs: 60000, onSlow: () => { status.textContent = 'Waking up the server, this can take up to a minute…'; },
-  })))
+  Promise.all(days.map((d) => apiGet<{ total: number }>('/api/jobs', { freshness_days: d, limit: 1 })))
     .then((res) => {
       const totals = res.map((r) => r.total);
       const counts = totals.map((t, i) => Math.max(0, t - (i ? totals[i - 1] : 0)));

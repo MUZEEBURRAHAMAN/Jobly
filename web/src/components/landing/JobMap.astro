@@ -3,7 +3,6 @@
 // one (or pick a country below) for its numbers. The headline, the stats and the country list are real text, so the
 // section reads fine without the canvas. Numbers: build-time copy of /api/geo, refreshed live by scripts/job-map.ts.
 import { geoAtBuild } from '../../lib/geo';
-import { SITE } from '../../lib/site';
 
 interface Props { title?: string; lead?: string }
 const {
@@ -15,7 +14,7 @@ const fmt = (n: number) => new Intl.NumberFormat('en-US').format(n);
 const top = geo?.by_country.slice(0, 10) ?? [];
 const hubs = geo?.places.filter((p) => p.kind === 'hub').length ?? 0;
 ---
-<section class="shell map-wrap" aria-labelledby="map-title" data-job-map data-api={SITE.api}>
+<section class="shell map-wrap" aria-labelledby="map-title" data-job-map>
   <div class="panel panel-pad map-panel">
     <div class="container">
       <header class="head" data-stagger>

@@ -3,7 +3,7 @@ name: Crawl and publish jobs
 # Every 4 hours: crawl every company's job board, then publish
 #   1. the static job data (backend/app/static_export.py) to the Cloudflare Pages project that the extension,
 #      website and Studio read from (needs the CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID repository secrets), and
-#   2. the database snapshot the Render API restores on boot (release "snapshot").
+#   2. the database snapshot the next run starts from (release "snapshot").
 # Each run starts from the previous snapshot, so first-seen dates carry over. Unlimited minutes need a public repo.
 on:
   schedule:

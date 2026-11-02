@@ -60,7 +60,7 @@ function countUp(el: HTMLElement, to: number) {
 }
 
 if (countEls.length || sinceEls.length) {
-  apiGet<Stats>('/api/stats', {}, { timeoutMs: 20000 }).then((s) => {
+  apiGet<Stats>('/api/stats', {}).then((s) => {
     const values = Object.fromEntries(Object.entries(s).filter(([, v]) => typeof v === 'number')) as Record<string, number>;
     const counter = new IntersectionObserver((entries) => {
       for (const e of entries) {

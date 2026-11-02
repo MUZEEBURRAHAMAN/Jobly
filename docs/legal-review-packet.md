@@ -24,14 +24,14 @@ Contact email already published on the site: rahamanmuzeeb1108@gmail.com. The si
 
 ## 1. The product in six sentences
 
-Jobly is a free Chrome extension, a website and a small server. It lists tech jobs (product design, frontend, product management, AI/ML, fullstack) that employers publish on their own public job boards and a few remote job boards, with each job's real posting date. There are no accounts, no ads, no payments and no analytics. The user's preferences, saved jobs and alerts stay in their browser; the extension sends search words and filters to the server to get matching jobs, and the server does not keep them. About 600 employers are read (about 400 through their own career pages on Greenhouse, Ashby, Lever, Workday, SmartRecruiters, Workable, Recruitee, Teamtailor, Personio and Amazon, and the rest found through three remote job boards). Users are worldwide; most jobs are US, then India, UK, Canada and Europe.
+Jobly is a free Chrome extension, a website and a browser app (Jobly Studio), with no server of its own: a scheduled GitHub job publishes the job list as public static files. It lists tech jobs (product design, frontend, product management, AI/ML, fullstack) that employers publish on their own public job boards and a few remote job boards, with each job's real posting date. There are no accounts, no ads, no payments and no analytics. The user's preferences, saved jobs and alerts stay in their browser; the extension sends search words and filters to the server to get matching jobs, and the server does not keep them. About 600 employers are read (about 400 through their own career pages on Greenhouse, Ashby, Lever, Workday, SmartRecruiters, Workable, Recruitee, Teamtailor, Personio and Amazon, and the rest found through three remote job boards). Users are worldwide; most jobs are US, then India, UK, Canada and Europe.
 
 ## 2. Questions for the lawyer (most important first)
 
 1. **Who is the controller, and what must the policies say about them?** Today they name no person, company or postal address, only an email. What is the minimum for GDPR / UK GDPR and for the operator's own country, and should the operator be a company?
-2. **Is there personal data at all?** The server briefly holds IP addresses (rate limiting, in memory) and sees search words; hosts keep logs; form messages arrive as ordinary emails in the operator's inbox. Is the policy's description correct, and is a legal basis (legitimate interest) needed in the text?
+2. **Is there personal data at all?** Jobly runs no server, so it receives no searches or preferences; the host (Cloudflare Pages) keeps short-lived request logs (IP, time, file requested); form messages arrive as ordinary emails in the operator's inbox. Is the policy's description correct, and is a legal basis (legitimate interest) needed in the text?
 3. **Can we aggregate job data from these sources?** See section 6: most publish a public feed and state no third-party terms; two (Remotive, Himalayas) state terms; one (SmartRecruiters) documents only key-based access. Do we need permission, a different approach, or nothing more than we do?
-4. **International transfers.** Server on Render (US) behind Cloudflare; the website, Jobly Studio and the public job files on Cloudflare Pages. The privacy policy says Cloudflare relies on the EU-U.S. Data Privacy Framework (not re-verified for this packet, section 5). Render's mechanism is **not verified**. What do we need to say or sign?
+4. **International transfers.** The website, Jobly Studio and the public job files are on Cloudflare Pages (global network); there is no other host. The privacy policy says Cloudflare relies on the EU-U.S. Data Privacy Framework (not re-verified for this packet, section 5). What do we need to say or sign?
 5. **Forms.** The support and uninstall forms store nothing on the site: they open the visitor's own email app with the message filled in, so messages (email address, message, reason) sit in the operator's inbox. Is a 12-month manual deletion promise reasonable, and do we need a recorded process for access and deletion requests?
 6. **Terms of use.** Are the "as is" and liability wording enforceable for a free service in the operator's country and for EU/UK consumers? Governing law, venue and operator identity clauses are missing (draft wording in section 8).
 7. **Employers named in listings.** The terms now say employers can ask for a correction or removal, and that removing a job from their board removes it from Jobly at the next refresh. Enough?
@@ -45,32 +45,28 @@ Jobly is a free Chrome extension, a website and a small server. It lists tech jo
 | --- | --- | --- | --- |
 | **User's device** (Chrome extension storage) | Preferences (roles, experience, remote-only, keywords, alert setting), saved jobs, alerts, muted companies, welcome flag, cache of recent results | Until uninstall | `extension/src/lib/*` |
 | Device, Chrome **sync storage** | Theme (light or dark) only; Chrome may sync it via the user's Google account | Until uninstall | `extension/src/lib/theme.ts` |
-| **Sent to the Jobly server** with job requests | Search text, filters, and the user's roles, experience levels, remote setting and keywords (as a query parameter) | **Not stored.** Identical requests are cached in memory for 120 s | `backend/app/api/routes.py`, `cache.py` |
-| **Report this listing** | The job, a reason, a note (up to 500 characters); no identity | In the server database until the server restarts and restores a snapshot (reports are removed from snapshots) | `reports` table, `snapshot.py` |
-| Server memory | Caller IP address, to count requests per minute | About a minute, memory only | `backend/app/security.py` |
-| Server logs | No access log (`--no-access-log` in the Render start command, seen in the deploy log 2026-10-20). Application errors and crawl results only | Render's retention | Render dashboard |
+| **Job data downloads** | The extension, website and Studio download the same public files for everyone (`jobly-data.pages.dev`); searches, filters and preferences are applied in the browser and sent nowhere | Cloudflare's request logs only (IP, time, file requested) | `shared/jobdata.ts` |
+| **Report this listing**, **Suggest a company** | Open the user's email app with the job, reason and note (or the company); nothing is sent unless the user sends the email | As emails in the operator's inbox, like form messages | `extension/src/lib/mail.ts` |
 | **Website** | No cookies, analytics or third-party scripts; fonts served from the site. Theme choice in the browser's local storage | Until cleared | `web/` |
 | **Forms** (open the visitor's email app) | Support: email, message, optional name. Uninstall: reason and note. Arrive as emails; the site stores nothing | Promised: removed once handled, at most 12 months. **No automatic deletion exists; it is done by hand** | Operator's inbox |
 | Google favicon service (`t2.gstatic.com`) | The extension asks it for company logos: Google sees the company domains and the user's IP | Google's policy | extension manifest (`img-src`) |
-| Place names | The server matches job locations to countries using a bundled GeoNames table; no user data involved | n/a | `backend/app/data/world.json` |
+| Place names | The crawl matches job locations to countries using a bundled GeoNames table; no user data involved | n/a | `backend/app/data/world.json` |
 
-Extension permissions (1.1.0): `storage`, `notifications`, `alarms`, `activeTab`, `scripting`, `contextMenus`; hosts `https://jobly-data.pages.dev/*` and `https://jobly-yd6l.onrender.com/*`; optional host `https://api.hunter.io/*` (asked for only when the user searches contacts with their own key). No content scripts that run on their own, no `tabs`, no `history`, no remote code.
+Extension permissions (1.1.0): `storage`, `notifications`, `alarms`, `activeTab`, `scripting`, `contextMenus`; host `https://jobly-data.pages.dev/*`; optional host `https://api.hunter.io/*` (asked for only when the user searches contacts with their own key). No content scripts that run on their own, no `tabs`, no `history`, no remote code.
 
 ## 4. Changes already made since the first draft (so you review the current text)
 
-- Privacy policy: where data goes (US hosts; the website and job files on Cloudflare Pages); forms that open the visitor's email app instead of storing messages; a rights section with a 30-day answer promise; IP held in server memory for rate limiting.
+- Privacy policy: where data goes (US hosts; the website and job files on Cloudflare Pages); forms that open the visitor's email app instead of storing messages; a rights section with a 30-day answer promise; since 2026-11-02, no server at all (searches never leave the browser).
 - Terms: employer correction and removal paragraph; GeoNames credit (CC BY 4.0).
 - Remotive removed as a source (its terms need attribution and at most about 4 calls a day).
 - Job cards from We Work Remotely, Himalayas and Arbeitnow say "via <board>".
-- Never claimed anywhere: "open source" (the repository is private).
+- The repository is now public on GitHub with an MIT licence file (checked 2026-11-02). The site does not call Jobly "open source"; decide whether it should, and whether MIT is the licence you want.
 
 ## 5. Provider facts (what each host says about logs, retention and transfers)
 
 | Provider | Role | What we found | Status |
 | --- | --- | --- | --- |
 | Cloudflare Pages | Website, Jobly Studio and the public job files | Short-lived request logs (IP, time, address requested). The privacy policy states Cloudflare relies on the EU-U.S. DPF; retention and role (processor) **not verified** for this packet | Not verified |
-| Render | Server host | Log retention depends on the plan (Hobby 7 days, Professional 14, Organization 30 days; [render.com/docs/logging](https://render.com/docs/logging)). HTTP request logs in its explorer need a paid workspace. Privacy-policy page text could not be read automatically | Partly verified; **transfer mechanism not verified** |
-| Cloudflare | Network in front of Render | Seen in response headers (`server: cloudflare`); retention and role (processor) **not verified** | Not verified |
 | Google | Favicons, Chrome Web Store, theme sync | Governed by Google's own policies | Not reviewed |
 
 ## 6. Where the job data comes from, and what each source says
@@ -101,7 +97,7 @@ Practical safeguards in place: one request (or a few pages) per employer per cra
 **Medium**
 4. No governing-law or venue clause; no named contact for legal notices.
 5. The 12-month form retention is manual with no automation: messages are emails in the operator's inbox (question 5).
-6. Render and Cloudflare transfer mechanisms and retention not verified (question 4).
+6. Cloudflare's transfer mechanism and retention not verified (question 4).
 7. Several sources' terms not reviewed (Workday, Amazon, We Work Remotely, Arbeitnow's terms of service, Workable, Recruitee).
 
 **Low**
@@ -114,7 +110,7 @@ Practical safeguards in place: one request (or a few pages) per employer per cra
 
 **Governing law (terms):** "These terms are governed by the laws of [COUNTRY]. If you are a consumer, you also keep any rights the law of the country you live in gives you that cannot be waived. Disputes go to the courts of [VENUE], unless the law of your country says otherwise."
 
-**Legal basis (privacy policy):** "We handle the small amount of technical data our server and website receive (IP address, request time) because it is needed to keep the service running and secure (our legitimate interest). We handle messages you send through our forms because you ask us to reply (your consent)."
+**Legal basis (privacy policy):** "We handle the small amount of technical data our hosting provider receives (IP address, request time) because it is needed to keep the service running and secure (our legitimate interest). We handle messages you send through our forms because you ask us to reply (your consent)."
 
 **Retention of form messages (privacy policy):** replace "at the latest after 12 months" with whatever period the lawyer recommends and add the date of the last clean-up.
 

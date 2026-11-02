@@ -6,7 +6,7 @@ import { SITE } from '../lib/site';
 
 const topics = ['A question', 'Something is broken', 'An idea or a missing company', 'A wrong or suspicious listing', 'Privacy or security', 'Something else'];
 const fixes = [
-  { q: 'Jobs take a while to load', a: 'Jobly’s server sleeps when nobody is using it. The first request can take up to a minute while it wakes up; after that it’s quick.' },
+  { q: 'Jobs take a while to load', a: 'Jobs load from fast public files, usually in under a second. If they don’t, check your connection; Jobly shows the jobs it loaded last time and keeps trying on its own.' },
   { q: 'No desktop alerts', a: 'Turn alerts on in Jobly’s Preferences, then check that Chrome is allowed to show notifications in your computer’s settings.' },
   { q: 'Too few matches', a: 'Add more roles or experience levels, remove an exclude keyword, or turn off Remote only. Under Preferences, “More development, IT and design roles” adds areas like backend, DevOps or QA.' },
   { q: 'A job is gone when I click Apply', a: 'The employer may have just closed it. Jobly removes closed jobs at the next refresh, within about four hours.' },

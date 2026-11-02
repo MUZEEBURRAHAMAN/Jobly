@@ -2,7 +2,8 @@ import React, { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { CheckCircle2, X } from '../lib/icons';
 import { Job } from '../types';
-import { api } from '../lib/api';
+import { openMail, supportMailto } from '../lib/mail';
+import { safeHttpUrl } from '../lib/url';
 
 interface ReportModalProps {
   job: Job;
@@ -21,8 +22,6 @@ export const ReportModal: React.FC<ReportModalProps> = ({ job, onClose }) => {
   const [selected, setSelected] = useState('');
   const [details, setDetails] = useState('');
   const [submitted, setSubmitted] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const dialogRef = useRef<HTMLDivElement>(null);
 
   // Focus management: move focus into the dialog, keep Tab inside it, and restore focus to the trigger on close.
@@ -47,13 +46,15 @@ export const ReportModal: React.FC<ReportModalProps> = ({ job, onClose }) => {
     return () => { document.removeEventListener('keydown', onKey); document.body.style.overflow = prevOverflow; opener?.focus?.(); };
   }, [onClose]);
 
-  const submit = async (e: React.FormEvent) => {
+  const reason = REASONS.find((r) => r.id === selected);
+  const mailto = supportMailto(`Report: ${job.title} at ${job.company_name}`, [
+    `Job: ${job.title} at ${job.company_name}`, `Link: ${safeHttpUrl(job.application_url) ?? 'none'}`, `Jobly job id: ${job.id}`,
+    `Problem: ${reason?.label ?? ''}`, '', details.slice(0, 500),
+  ]);
+  const submit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!selected || submitting) return;
-    setSubmitting(true); setError(null);
-    const ok = await api.reportJob(job.id, selected, details);
-    setSubmitting(false);
-    if (!ok) { setError("Couldn't send your report. Check your connection and try again."); return; }
+    if (!selected) return;
+    openMail(mailto);
     setSubmitted(true);
   };
 
@@ -68,8 +69,8 @@ export const ReportModal: React.FC<ReportModalProps> = ({ job, onClose }) => {
         {submitted ? (
           <div className="empty">
             <CheckCircle2 size={32} color="var(--success)" aria-hidden="true" />
-            <p className="empty-title" role="status">Report sent</p>
-            <p className="empty-desc">Thanks. Your report about this listing has been recorded.</p>
+            <p className="empty-title" role="status">Your email app is open</p>
+            <p className="empty-desc">Send the email it prepared and we'll look at this listing. If nothing opened, <a href={mailto} target="_blank" rel="noopener">write the email here</a>.</p>
             <button type="button" className="btn" style={{ marginTop: 8 }} onClick={onClose}>Close</button>
           </div>
         ) : (
@@ -88,10 +89,10 @@ export const ReportModal: React.FC<ReportModalProps> = ({ job, onClose }) => {
               <label className="label" htmlFor="report-details">More details (optional)</label>
               <textarea id="report-details" className="textarea" rows={3} maxLength={500} value={details} onChange={(e) => setDetails(e.target.value)} />
             </div>
-            {error && <p role="alert" className="text-sm" style={{ color: 'var(--warning)' }}>{error}</p>}
+            <p className="text-xs muted">This opens your email app with the report filled in; you send it.</p>
             <div className="row" style={{ justifyContent: 'flex-end' }}>
               <button type="button" className="btn btn-outline" onClick={onClose}>Cancel</button>
-              <button type="submit" className="btn" disabled={!selected || submitting}>{submitting ? 'Sending…' : 'Send report'}</button>
+              <button type="submit" className="btn" disabled={!selected}>Write report email</button>
             </div>
           </form>
         )}

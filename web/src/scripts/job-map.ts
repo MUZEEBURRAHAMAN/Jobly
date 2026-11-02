@@ -290,7 +290,7 @@ function init(root: HTMLElement) {
 
   Promise.all([
     fetch('/data/world-dots.json').then((r) => r.json() as Promise<Grid>),
-    apiGet<Geo>('/api/geo', {}, { timeoutMs: 60000 }).catch(() => null),
+    apiGet<Geo>('/api/geo', {}).catch(() => null),
   ]).then(([g, live]) => {
     grid = g;
     layout();

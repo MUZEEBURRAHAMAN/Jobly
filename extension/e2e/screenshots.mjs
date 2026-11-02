@@ -1,6 +1,6 @@
 // Generates marketing + Chrome Web Store images from the real UI (fictional demo companies, no real brands).
 //   npm run e2e:screens   ->  store-assets/*.png  and  web/public/img/*.webp (the website's product window)
-import { launch, open, sleep } from './lib.mjs';
+import { launch, open, sleep, staticJobs } from './lib.mjs';
 import { execFileSync } from 'child_process';
 import fs from 'fs';
 import os from 'os';
@@ -64,7 +64,7 @@ await h.ctx.close();
 const py = process.env.PYTHON || path.join(root, '.venv', 'bin', 'python');
 // website hero showcase: four views of the dashboard at 1440x900, retina, light and dark (converted to WebP below)
 const hi = await launch({ scale: 2 }); await hi.ctx.route(/t2\.gstatic\.com/, (r) => r.abort());
-const all = (await (await fetch('http://127.0.0.1:8000/api/jobs?limit=200')).json()).items;
+const all = staticJobs().filter((j) => j.bucket !== 'u').slice(0, 200);
 const demo = all.filter((j) => j.title.length < 40 && j.application_url.startsWith('https'));
 // Everything the fixture has counts as seen, so the background check can't add a flood of alerts on top of these.
 const seedUserData = () => hi.sw.evaluate(({ demo, all }) => chrome.storage.local.set({

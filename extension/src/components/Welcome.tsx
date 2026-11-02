@@ -92,7 +92,7 @@ export const Welcome: React.FC<WelcomeProps> = ({ initial, onFinish, onSkip, com
           </label>
           <div className="card" style={{ padding: 12 }}>
             <h2 className="text-lg">Your privacy</h2>
-            <p className="text-sm" style={{ marginTop: 4 }}>No account, no email, no tracking, no ads. Your preferences, saved jobs and alerts stay on this device. Your preferences and search words are sent with each request only to pick matching jobs; the server doesn't keep them. Company logos come from Google's favicon service.</p>
+            <p className="text-sm" style={{ marginTop: 4 }}>No account, no email, no tracking, no ads. Your preferences, saved jobs and alerts stay on this device. Jobly downloads its public job list and matches it to your preferences in this browser, so your preferences and searches never leave it. Company logos come from Google's favicon service.</p>
           </div>
         </div>
       )}

@@ -1,5 +1,5 @@
-"""First-boot bootstrap. The production image ships without a database (and Render's free tier has no persistent
-disk), so an empty database is the normal state after every deploy/restart: seed the company list, then crawl."""
+"""First-boot bootstrap. Every crawl run starts from an empty database (or the last snapshot), so an empty database must
+become useful on its own: seed the company list, then crawl."""
 from __future__ import annotations
 
 import json

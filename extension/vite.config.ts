@@ -3,22 +3,25 @@ import react from '@vitejs/plugin-react';
 import { resolve } from 'path';
 import { readFileSync, writeFileSync } from 'fs';
 
-// Production builds talk only to the real backend. `vite build --mode development` (npm run build:dev) also
-// allows the local API at 127.0.0.1:8000 / localhost:8000 — it must never ship to the Web Store.
-function localDevBackend(): Plugin {
-  const hosts = ['http://127.0.0.1:8000', 'http://localhost:8000'];
+// `vite build --mode development` (npm run build:dev) marks the name "(DEV)" and, when VITE_JOBLY_DATA points at a local
+// export of the job data, allows that address too. Such a build must never ship to the Web Store.
+function devBuild(): Plugin {
+  const data = process.env.VITE_JOBLY_DATA;
   let outDir = 'dist';
   return {
-    name: 'jobly-local-dev-backend',
+    name: 'jobly-dev-build',
     apply: 'build',
     configResolved(config) { outDir = config.build.outDir; },
     closeBundle() {
       const file = resolve(outDir, 'manifest.json');
       const manifest = JSON.parse(readFileSync(file, 'utf8'));
-      manifest.host_permissions.push(...hosts.map((h) => `${h}/*`));
-      manifest.content_security_policy.extension_pages = manifest.content_security_policy.extension_pages.replace(
-        /connect-src ([^;]*)/, (_m: string, list: string) => `connect-src ${list} ${hosts.join(' ')}`
-      );
+      if (data) {
+        const origin = new URL(data).origin;
+        manifest.host_permissions.push(`${origin}/*`);
+        manifest.content_security_policy.extension_pages = manifest.content_security_policy.extension_pages.replace(
+          /connect-src ([^;]*)/, (_m: string, list: string) => `connect-src ${list} ${origin}`
+        );
+      }
       manifest.name += ' (DEV)';
       writeFileSync(file, JSON.stringify(manifest, null, 2) + '\n');
     },
@@ -50,7 +53,7 @@ function googleOAuth(): Plugin {
 }
 
 export default defineConfig(({ mode }) => ({
-  plugins: [react(), googleOAuth(), ...(mode === 'development' ? [localDevBackend()] : [])],
+  plugins: [react(), googleOAuth(), ...(mode === 'development' ? [devBuild()] : [])],
   build: {
     outDir: mode === 'development' ? 'dist-dev' : 'dist',
     emptyOutDir: true,

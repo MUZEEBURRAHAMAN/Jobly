@@ -21,9 +21,7 @@ interface JobsFeedProps {
   loadingMore?: boolean;
   /** Lets the "you hid these companies" messages link to the Companies screen. */
   onOpenCompanies?: () => void;
-  /** The server is still collecting jobs for the first time. */
-  gathering?: boolean;
-  /** More jobs exist on the server than are loaded (server pages are capped). */
+  /** More jobs match than are loaded (pages are capped). */
   hasMore?: boolean;
   onLoadMore?: () => void;
   roleFilter: string;
@@ -38,7 +36,7 @@ interface JobsFeedProps {
 const PAGE = 30;
 
 export const JobsFeed: React.FC<JobsFeedProps> = ({
-  jobs, loading, preferences, mutedCompanyIds, onToggleSave, onOpenPreferences, loadError, onRetryLoad, cachedAt, loadingMore, onOpenCompanies, gathering,
+  jobs, loading, preferences, mutedCompanyIds, onToggleSave, onOpenPreferences, loadError, onRetryLoad, cachedAt, loadingMore, onOpenCompanies,
   hasMore, onLoadMore, roleFilter, onRoleFilterChange, filters, onFiltersChange, displayLimit, onDisplayLimitChange, large,
 }) => {
   const [showFilters, setShowFilters] = useState(false);
@@ -75,12 +73,9 @@ export const JobsFeed: React.FC<JobsFeedProps> = ({
     }
     if (visible.length === 0 && loadError) {
       const retry = onRetryLoad && <button type="button" className="btn" onClick={onRetryLoad}><RotateCcw size={14} aria-hidden="true" /> Try again</button>;
-      if (loadError === 'offline') return <EmptyState art="offline" large={large} title="Can't reach Jobly" description="The server may be waking up, or you may be offline. Your preferences are safe. This page keeps trying on its own." actions={retry} />;
-      if (loadError === 'busy') return <EmptyState art="error" large={large} title="Jobly is busy right now" description="The server is handling a lot of requests. Wait a minute, then try again." actions={retry} />;
-      return <EmptyState art="error" role="alert" large={large} title="Something went wrong on our side" description="The server answered with an error. This isn't caused by your filters." actions={retry} />;
-    }
-    if (visible.length === 0 && gathering) {
-      return <EmptyState art="gathering" play large={large} title="Gathering jobs for the first time" description="Jobly is reading hundreds of company career pages. This takes a minute or two; jobs appear here as soon as they're ready." />;
+      if (loadError === 'offline') return <EmptyState art="offline" large={large} title="Can't reach Jobly" description="Jobly can't load its job list. You may be offline. Your preferences are safe, and this page keeps trying on its own." actions={retry} />;
+      if (loadError === 'busy') return <EmptyState art="error" large={large} title="Jobly is busy right now" description="Too many requests right now. Wait a minute, then try again." actions={retry} />;
+      return <EmptyState art="error" role="alert" large={large} title="Something went wrong on our side" description="Jobly's job list answered with an error. This isn't caused by your filters." actions={retry} />;
     }
     if (visible.length === 0 && mutedHidden > 0 && !hasSearch && filterCount === 0) {
       return <EmptyState art="companies" large={large} title="You've hidden every company in this list" description={`${mutedHidden} job${mutedHidden === 1 ? ' is' : 's are'} hidden because you turned those companies off.`}
@@ -220,7 +215,7 @@ export const JobsFeed: React.FC<JobsFeedProps> = ({
           <div className="banner" role="status">
             <span className="grow">
               {loadError === 'offline' && `You're offline. Showing jobs saved ${cachedAt ? timeAgo(cachedAt).toLowerCase() : 'on this device'}.`}
-              {loadError === 'server' && "Jobly's server had a problem. Showing jobs saved earlier."}
+              {loadError === 'server' && "Jobly's job list had a problem. Showing jobs saved earlier."}
               {loadError === 'busy' && 'Jobly is busy right now. Showing jobs saved earlier; try again in a minute.'}
             </span>
           </div>

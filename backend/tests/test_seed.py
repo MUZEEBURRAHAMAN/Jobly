@@ -11,7 +11,7 @@ from backend.app.seed import RETIRED_COMPANY_SLUGS, needs_initial_sync, retire_s
 
 
 class TestBootstrap(unittest.IsolatedAsyncioTestCase):
-    """A brand-new database (the normal state after every Render deploy) must become useful on its own."""
+    """A brand-new database (the normal state at the start of a crawl run) must become useful on its own."""
 
     async def asyncSetUp(self):
         self._tmp = tempfile.TemporaryDirectory()

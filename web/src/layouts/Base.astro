@@ -50,7 +50,7 @@ const ogImage = new URL(ogPath, SITE.url).href;
     <meta name="twitter:image" content={ogImage} />
     <link rel="sitemap" href="/sitemap.xml" />
     <slot name="head" />
-    <link rel="preconnect" href={SITE.api} crossorigin />
+    <link rel="preconnect" href={new URL(SITE.data).origin} crossorigin />
     <script is:inline src="/theme-init.js"></script>
   </head>
   <body>

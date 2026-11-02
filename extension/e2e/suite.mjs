@@ -1,5 +1,5 @@
-// End-to-end suite: real Chromium + the built extension + a backend on a fixture database.
-import { launch, open, makeRunner, LOCAL, JSON_HEADERS, sleep, json, API } from './lib.mjs';
+// End-to-end suite: real Chromium + the built extension, reading a fixture database published as static job data.
+import { launch, open, makeRunner, DATA, JSON_HEADERS, sleep, readStatic, staticJobs, goOffline, goOnline } from './lib.mjs';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -53,10 +53,8 @@ await step('jobs: search, categories, date posted, 2-month rule', async () => {
   await p.getByRole('button', { name: /Filters/ }).click();
   ok(await p.getByText('Jobs older than 2 months are never shown.').count() === 1, 'Date posted explains the 2-month limit');
   const options = await p.locator('#f-new option').allInnerTexts(); ok(options.join('|') === 'Any time|Past 24 hours|Past 3 days|Past week|Past 2 weeks|Past month', `Date posted options: ${options.join(', ')}`);
-  const reqs = []; p.on('request', (r) => { if (/\/api\/jobs\?/.test(r.url())) reqs.push(new URL(r.url()).searchParams.get('freshness_days')); });
   const counts = { all };
   for (const [value, label] of [['1', 'day'], ['7', 'week'], ['30', 'month']]) { await p.locator('#f-new').selectOption(value); await sleep(1400); counts[label] = await count(p); }
-  ok(reqs.includes('1') && reqs.includes('7') && reqs.includes('30'), 'Date posted is sent to the server (so paging stays correct)');
   ok(counts.day < counts.week && counts.week < counts.month && counts.month <= counts.all, `narrower date → fewer jobs (all ${counts.all} ≥ month ${counts.month} > week ${counts.week} > day ${counts.day})`);
   await p.locator('#f-new').selectOption('1'); await p.getByLabel('Search jobs').fill('Unknown Date'); await p.getByText(/No jobs match/).waitFor({ timeout: 10000 });
   ok(true, 'with a Date posted filter, unknown-date jobs are excluded (like LinkedIn)');
@@ -73,17 +71,25 @@ await step('report dialog + failure handling', async () => {
   ok(await p.evaluate(() => !!document.activeElement?.closest('[role="dialog"]')), 'focus moves into the dialog');
   const seq = []; for (let i = 0; i < 10; i++) { await p.keyboard.press('Tab'); seq.push(await p.evaluate(() => !!document.activeElement?.closest('[role="dialog"]'))); }
   ok(seq.every(Boolean), 'Tab stays inside the dialog');
-  await p.getByRole('radio', { name: /Spam/ }).check(); await h.ctx.route(LOCAL, (r) => (r.request().method() === 'POST' ? r.abort('connectionrefused') : r.continue()));
-  await p.getByRole('button', { name: 'Send report' }).click(); await sleep(2500);
-  ok(await p.getByRole('alert').filter({ hasText: /Couldn't send/ }).count() === 1, 'a failed report shows an error, not "sent"');
-  await h.ctx.unroute(LOCAL); await p.getByRole('button', { name: 'Send report' }).click(); await p.getByText('Report sent').waitFor({ timeout: 8000 }); ok(true, 'a successful report is confirmed');
+  ok(await p.getByRole('button', { name: 'Write report email' }).isDisabled(), 'the report needs a reason first');
+  await p.getByRole('radio', { name: /Spam/ }).check(); await p.getByLabel('More details (optional)').fill('Posted twice');
+  await p.getByRole('button', { name: 'Write report email' }).click(); await p.getByText('Your email app is open').waitFor({ timeout: 5000 });
+  const mail = await p.getByRole('link', { name: 'write the email here' }).getAttribute('href');
+  const body = decodeURIComponent(mail.split('body=')[1] ?? '');
+  ok(mail.startsWith('mailto:') && /subject=Report%3A/.test(mail) && body.includes('Spam or duplicate') && body.includes('Posted twice') && /Link: https:/.test(body), 'the report opens an email with the job, its link, the reason and the details');
+  await axe(p, 'report sent');
+  ok(true, 'reports go by email; Jobly has no server to send them to');
   await p.keyboard.press('Escape'); await sleep(300); ok(await p.getByRole('dialog').count() === 0, 'Escape closes the dialog'); await h.ctx.close();
 });
 
 await step('on-device data: preferences, saved jobs, alerts', async () => {
   const h = await launch();
-  const writes = []; const jobReqs = [];
-  h.ctx.on('request', (r) => { if (LOCAL.test(r.url())) { if (!['GET', 'HEAD', 'OPTIONS'].includes(r.method())) writes.push(`${r.method()} ${new URL(r.url()).pathname}`); if (/\/api\/(jobs|stats)\?/.test(r.url())) jobReqs.push(r.url()); } });
+  const writes = []; const leaks = [];
+  h.ctx.on('request', (r) => {
+    if (!['GET', 'HEAD', 'OPTIONS'].includes(r.method())) writes.push(`${r.method()} ${r.url()}`);
+    const u = new URL(r.url());
+    if (/^https?:$/.test(u.protocol) && (u.hostname === 'jobly-data.pages.dev' ? !!u.search : u.hostname !== 't2.gstatic.com')) leaks.push(r.url());
+  });
   let p = await open(h); await firstCard(p);
   // saving a job
   const card = p.locator('article').first(); const label = await card.getAttribute('aria-label');
@@ -91,19 +97,19 @@ await step('on-device data: preferences, saved jobs, alerts', async () => {
   ok(await card.getByRole('button', { name: /^Remove from saved:/ }).count() === 1, 'Save is instant');
   ok((await h.sw.evaluate(() => chrome.storage.local.get('savedJobs'))).savedJobs?.length === 1, 'the saved job is stored on the device');
   // it survives a restart of the page, even with the server down, and shows in the dashboard
-  await p.close(); await h.ctx.route(LOCAL, (r) => r.abort('connectionrefused'));
+  await p.close(); await goOffline(h.ctx);
   const d = await open(h, 'options.html', { width: 1280, height: 860 });
   await d.getByRole('button', { name: /^Saved/ }).click(); await d.locator('article').first().waitFor({ timeout: 10000 });
   ok((await d.locator('article').first().getAttribute('aria-label')) === label, 'saved jobs are there with the server unreachable');
   await d.locator('article').first().getByRole('button', { name: /^Remove from saved:/ }).click(); await d.getByText('Nothing saved yet').waitFor({ timeout: 5000 });
   ok((await h.sw.evaluate(() => chrome.storage.local.get('savedJobs'))).savedJobs?.length === 0, 'removing it clears the device copy'); await d.close();
-  await h.ctx.unroute(LOCAL);
+  await goOnline(h.ctx);
   // preferences
   p = await open(h); await firstCard(p); await p.getByRole('button', { name: /^Preferences/ }).click(); await sleep(600);
   await p.getByRole('checkbox', { name: /Product design/ }).click(); await p.getByRole('button', { name: 'Save preferences' }).click(); await p.getByText('Saved on this device.').waitFor({ timeout: 5000 });
   const stored = (await h.sw.evaluate(() => chrome.storage.local.get('userPreferences'))).userPreferences; ok(stored && !stored.roles.includes('product_design'), 'preferences are stored on the device');
   await p.getByRole('button', { name: /^Jobs/ }).click(); await sleep(1500);
-  const last = jobReqs.filter((u) => /\/api\/jobs\?/.test(u)).pop(); const prefs = JSON.parse(new URL(last).searchParams.get('prefs')); ok(!prefs.roles.includes('product_design') && prefs.roles.length === 4, 'the job request carries the new preferences');
+  ok(leaks.length === 0, `preferences never leave the device: only plain reads of the job data and logos${leaks.length ? ': ' + leaks.slice(0, 2).join(', ') : ''}`);
   ok(await p.locator('article').first().getAttribute('aria-label').then((l) => !!l), 'the list still renders after changing preferences');
   // alerts: computed on the device
   await h.sw.evaluate(() => chrome.storage.local.set({ alerts: [], seenAlertKeys: [] }));
@@ -122,22 +128,11 @@ await step('on-device data: preferences, saved jobs, alerts', async () => {
   await dash.getByRole('button', { name: /^Alerts/ }).click(); await dash.getByText(/\d+ new/).waitFor({ timeout: 5000 }); await axe(dash, 'alerts with items');
   await sleep(800); ok((await h.sw.evaluate(() => chrome.storage.local.get('alerts'))).alerts.every((a) => a.is_read), 'opening Alerts stores them as read (the badge clears)');
   ok(await dash.getByText(/new since your last visit/).count() === 1 && await dash.locator('.badge', { hasText: 'New' }).count() > 0, 'but they stay highlighted as new for this visit');
-  ok(writes.every((w) => w.startsWith('POST /api/jobs/') && w.endsWith('/report')), `the server only ever receives reports: ${writes.length ? writes.join(', ') : 'no writes at all'}`);
+  ok(writes.length === 0, `Jobly sends nothing anywhere: ${writes.length ? writes.join(', ') : 'only reads of the job data'}`);
   await h.ctx.close();
 });
 
-await step('efficiency: repeat visits are cached and revalidated', async () => {
-  const h = await launch({ blockProd: false }); const seen = []; // no request interception: Playwright switches the HTTP cache off when routes are active
-  h.ctx.on('requestfinished', async (r) => {
-    if (!LOCAL.test(r.url()) || !/\/api\/(jobs|companies)/.test(r.url())) return;
-    const res = await r.response(); const sizes = await r.sizes();
-    seen.push({ revalidated: !!(await r.allHeaders())['if-none-match'], body: sizes.responseBodySize, cache: res.headers()['x-cache'] });
-  });
-  let p = await open(h); await firstCard(p); await sleep(1500); await p.close();
-  p = await open(h); await firstCard(p); await sleep(1500);
-  ok(seen.some((r) => r.revalidated && r.body === 0), `a repeat visit asks "has it changed?" and gets an empty "not modified" answer (${seen.filter((r) => r.revalidated && r.body === 0).length} of ${seen.length} requests)`);
-  ok(seen.some((r) => r.cache === 'HIT'), 'the server answered the repeat from memory');
-  ok(await cards(p) > 0, 'the list still renders after a "not modified" answer'); await h.ctx.close();
+await step('background check schedule', async () => {
   const g = await launch(); const a = await open(g); await firstCard(a);
   const period = await g.sw.evaluate(async () => (await chrome.alarms.get('jobly-sync'))?.periodInMinutes);
   ok(period >= 60 && period <= 90, `background check runs every ${period} minutes (60-90)`);
@@ -147,27 +142,22 @@ await step('efficiency: repeat visits are cached and revalidated', async () => {
   ok(migrated >= 60 && migrated <= 90, `an old 30-minute schedule is replaced after an update (now ${migrated})`); await g.ctx.close();
 });
 
-await step('states: offline, 429, 500, gathering, empty, hidden', async () => {
+await step('states: offline, 429, 500, empty, hidden', async () => {
   // offline, nothing cached
-  let h = await launch(); await h.ctx.route(LOCAL, (r) => r.abort('connectionrefused')); let p = await open(h); await p.getByText("Can't reach Jobly").waitFor({ timeout: 70000 });
+  let h = await launch({ staticData: false }); let p = await open(h); await p.getByText("Can't reach Jobly").waitFor({ timeout: 70000 });
   ok(await art(p) === 1, 'offline: plug illustration'); await axe(p, 'offline');
   await p.getByRole('button', { name: /^Companies/ }).click(); ok(await p.getByText("Can't load companies").count() === 1, 'offline: companies');
   await p.getByRole('button', { name: /^Saved/ }).click(); ok(await p.getByText('Nothing saved yet').count() === 1, 'offline: saved jobs live on the device, so the page still works');
   await p.getByRole('button', { name: /^Preferences/ }).click(); await sleep(800); ok(await p.getByRole('button', { name: 'Save preferences' }).count() === 1, 'offline: preferences still usable');
   await h.ctx.close();
   // offline with cache
-  h = await launch(); p = await open(h); await firstCard(p); await sleep(1500); await p.close(); await h.ctx.route(LOCAL, (r) => r.abort('connectionrefused'));
+  h = await launch(); p = await open(h); await firstCard(p); await sleep(1500); await p.close(); await goOffline(h.ctx);
   p = await open(h); await p.getByText(/You're offline/).waitFor({ timeout: 70000 }); ok(await cards(p) > 0, 'offline with cache: saved jobs stay visible + banner'); await h.ctx.close();
   // 429 / 500
   for (const [status, expect] of [[429, 'Jobly is busy right now'], [503, 'Jobly is busy right now'], [500, 'Something went wrong on our side']]) {
-    h = await launch(); await h.ctx.route(LOCAL, (r) => (r.request().url().includes('/api/jobs?') ? r.fulfill({ status, headers: JSON_HEADERS, body: '{}' }) : r.continue()));
+    h = await launch(); await h.ctx.route(/jobly-data\.pages\.dev\/v1\/jobs\//, (r) => r.fulfill({ status, headers: JSON_HEADERS, body: '{}' }));
     p = await open(h); await p.getByText(expect).first().waitFor({ timeout: 40000 }); ok(await art(p) === 1, `${status}: "${expect}" state`); await h.ctx.close();
   }
-  // brand-new server
-  h = await launch();
-  await h.ctx.route(/\/api\/stats/, (r) => r.fulfill({ status: 200, headers: JSON_HEADERS, body: JSON.stringify({ total_jobs: 0, active_companies: 1, matched_jobs: 0, new_jobs_today: 0, last_sync_time: null, is_syncing: true }) }));
-  await h.ctx.route(/\/api\/jobs\?/, (r) => r.fulfill({ status: 200, headers: JSON_HEADERS, body: JSON.stringify({ items: [], total: 0, limit: 100, offset: 0 }) }));
-  p = await open(h); await p.getByText('Gathering jobs for the first time').waitFor({ timeout: 40000 }); ok(await art(p) === 1, 'brand-new server: gathering state'); await h.ctx.close();
   // empty search, narrow filters, hidden companies
   h = await launch(); p = await open(h); await firstCard(p);
   await p.getByLabel('Search jobs').fill('zzzzqqqq'); await p.getByText(/No jobs match "zzzzqqqq"/).waitFor({ timeout: 10000 }); ok(await art(p) === 1, 'no search results: loupe'); await axe(p, 'empty search');
@@ -178,7 +168,7 @@ await step('states: offline, 429, 500, gathering, empty, hidden', async () => {
   const first = (await p.locator('article').first().getAttribute('aria-label')).split(' at ').pop();
   await p.getByRole('button', { name: /^Companies/ }).click(); await p.getByLabel('Search companies').fill(first); await p.getByRole('switch', { name: new RegExp('Show jobs from ' + first) }).first().uncheck();
   await p.getByRole('button', { name: /^Jobs/ }).click(); await sleep(900); ok(/hidden from companies you turned off/.test(await text(p)), 'hidden-company hint');
-  const ids = (await json('/api/companies')).map((c) => c.id); await h.sw.evaluate((all) => chrome.storage.local.set({ mutedCompanyIds: all }), ids); await sleep(1200);
+  const ids = readStatic('companies.json').map((c) => c.id); await h.sw.evaluate((all) => chrome.storage.local.set({ mutedCompanyIds: all }), ids); await sleep(1200);
   ok(await p.getByText("You've hidden every company in this list").count() === 1, 'everything hidden: explained, with a way back'); await h.ctx.close();
 });
 
@@ -193,8 +183,8 @@ await step('dashboard layout fills the window', async () => {
   await h.ctx.close();
 });
 
-await step('static job data: the popup reads jobly-data, with the API down', async () => {
-  const h = await launch({ dist: process.env.EXT_PROD, staticData: true });   // blockProd: the API is unreachable
+await step('static job data: the production build reads jobly-data', async () => {
+  const h = await launch({ dist: process.env.EXT_PROD });
   const reqs = []; const errors = []; const p = await h.ctx.newPage(); p.on('request', (r) => reqs.push(r.url())); p.on('console', (m) => { if (m.type() === 'error') errors.push(m.text()); });
   await p.setViewportSize({ width: 400, height: 590 }); await p.goto(`chrome-extension://${h.id}/popup.html`); await firstCard(p); await sleep(800);
   ok(await cards(p) > 0, 'jobs render from the static data');
@@ -202,8 +192,8 @@ await step('static job data: the popup reads jobly-data, with the API down', asy
   ok(!/offline|can.t reach/i.test(await text(p)), 'no offline message');
   ok(!errors.some((e) => /Content Security Policy/.test(e)), 'no CSP violations reading the data');
   const shown = await count(p);
-  const apiTotal = (await json('/api/jobs?limit=1')).total;
-  ok(shown > 0 && shown <= apiTotal, `the count (${shown}) is within what the API holds (${apiTotal})`);
+  const total = readStatic('meta.json').total;
+  ok(shown > 0 && shown <= total, `the count (${shown}) is within what the job data holds (${total})`);
   await p.getByLabel('More roles').selectOption('sales'); await p.getByText('Enterprise Account Executive').waitFor({ timeout: 15000 });
   ok(await cards(p) === 1, '"More roles" → Sales lists the one sales job');
   await axe(p, 'jobs with "More roles" picked');
@@ -216,20 +206,14 @@ await step('static job data: the popup reads jobly-data, with the API down', asy
 });
 
 await step('production build: https only, no localhost, no CSP errors', async () => {
-  const h = await launch({ blockProd: false, dist: process.env.EXT_PROD });
-  await h.ctx.route(/^https:\/\/jobly-yd6l\.onrender\.com\//, async (route) => {
-    const u = new URL(route.request().url()); const req = route.request();
-    try {
-      const res = await fetch(API + u.pathname + u.search, { method: req.method(), headers: { 'content-type': req.headers()['content-type'] || 'application/json' }, body: ['GET', 'HEAD'].includes(req.method()) ? undefined : req.postData() });
-      await route.fulfill({ status: res.status, headers: { 'access-control-allow-origin': '*', 'content-type': res.headers.get('content-type') || 'application/json' }, body: Buffer.from(await res.arrayBuffer()) });
-    } catch { await route.abort(); }
-  });
+  const h = await launch({ dist: process.env.EXT_PROD });
   const reqs = []; const errors = []; const p = await h.ctx.newPage(); p.on('request', (r) => reqs.push(r.url())); p.on('console', (m) => { if (m.type() === 'error') errors.push(m.text()); });
   await p.setViewportSize({ width: 400, height: 590 }); await p.goto(`chrome-extension://${h.id}/popup.html`); await firstCard(p); await sleep(1500);
   ok(await cards(p) > 0, 'production build renders jobs over https');
   ok(!reqs.some((u) => /127\.0\.0\.1|localhost|getcatchly/.test(u)), 'no requests to localhost or getcatchly');
   ok(!errors.some((e) => /Content Security Policy/.test(e)), 'no CSP violations');
-  const manifest = await h.sw.evaluate(() => chrome.runtime.getManifest()); ok(manifest.host_permissions.every((x) => x.startsWith('https://')) && manifest.host_permissions.length === 2 && manifest.host_permissions.includes('https://jobly-data.pages.dev/*'), `host permissions: ${manifest.host_permissions.join(', ')}`);
+  const manifest = await h.sw.evaluate(() => chrome.runtime.getManifest()); ok(manifest.host_permissions.join() === 'https://jobly-data.pages.dev/*', `one host permission, the job data: ${manifest.host_permissions.join(', ')}`);
+  ok(!JSON.stringify(manifest).includes('onrender'), 'no server address anywhere in the manifest');
   await h.ctx.close();
 });
 
@@ -316,8 +300,8 @@ await step('tracker: track, details, interviews, tasks, import/export, reminders
 });
 
 await step('dealbreakers, job type filter, following companies', async () => {
-  const h = await launch(); const jobReqs = [];
-  h.ctx.on('request', (r) => { if (/\/api\/jobs\?/.test(r.url())) jobReqs.push(new URL(r.url())); });
+  const h = await launch(); const urls = [];
+  h.ctx.on('request', (r) => urls.push(r.url()));
   const p = await open(h); await firstCard(p);
   await p.getByRole('button', { name: /^Preferences/ }).click(); await sleep(500);
   await p.getByRole('button', { name: 'Contract' }).click(); await p.getByLabel('Lowest yearly salary').fill('150000');
@@ -325,8 +309,7 @@ await step('dealbreakers, job type filter, following companies', async () => {
   const prefs = (await h.sw.evaluate(() => chrome.storage.local.get('userPreferences'))).userPreferences;
   ok(prefs.min_salary === 150000 && prefs.employment_types.join() === 'contract', 'dealbreakers are stored on the device');
   await p.getByRole('button', { name: /^Jobs/ }).click(); await sleep(1500);
-  const sent = JSON.parse(jobReqs.filter((u) => u.searchParams.get('prefs')).pop().searchParams.get('prefs'));
-  ok(sent.min_salary === 150000 && sent.employment_types[0] === 'contract', 'the job request carries the dealbreakers');
+  ok(!urls.some((u) => /150000|contract/.test(u)), 'the dealbreakers stay on the device (no request carries them)');
   await p.getByRole('button', { name: /^All/ }).click(); await p.getByRole('button', { name: /Filters/ }).click();
   ok(await p.locator('#f-type option').count() === 5, 'the filters offer a Job type');
   await p.locator('#f-type').selectOption('internship'); await sleep(600);
@@ -341,13 +324,12 @@ await step('dealbreakers, job type filter, following companies', async () => {
   ok(followed?.length === 1, 'following a company is stored on the device');
   await axe(d, 'companies with follow');
   // follow a company that has jobs from the last 3 days, so the check has something to find
-  const recent = await json('/api/jobs?freshness_days=3&limit=1'); const recentCompany = recent.items[0].company_id;
+  const recentCompany = staticJobs().find((j) => j.bucket === '1' || j.bucket === '3').company_id;
   await h.sw.evaluate((id) => chrome.storage.local.set({ followedCompanyIds: [id] }), recentCompany);
   await h.sw.evaluate(() => chrome.storage.local.set({ alerts: [], seenAlertKeys: [], userPreferences: { roles: ['nonexistent_role'], seniorities: [], locations: [], remote_only: false, custom_keywords: '', excluded_keywords: '', min_salary: 0, employment_types: [], notify_enabled: false, sync_interval_mins: 30 } }));
   await d.evaluate(() => new Promise((res) => chrome.runtime.sendMessage({ type: 'TRIGGER_BACKGROUND_CHECK' }, res))); await sleep(800);
   const alerts = (await h.sw.evaluate(() => chrome.storage.local.get('alerts'))).alerts;
   ok(alerts.length > 0 && alerts.every((a) => a.reason === 'follow'), `new jobs at a followed company become alerts even with no matching preferences (${alerts.length})`);
-  ok(jobReqs.some((u) => u.searchParams.get('company_ids') === String(recentCompany)), 'followed companies are asked for in one request');
   await h.ctx.close();
 });
 

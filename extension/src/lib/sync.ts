@@ -1,6 +1,6 @@
 /**
- * Optional sync across the user's own Chrome browsers, through Chrome's sync storage (their Google account; Jobly's
- * server never sees it). Off by default. The whole state travels as one snapshot split into chunks, and the newest
+ * Optional sync across the user's own Chrome browsers, through Chrome's sync storage (their Google account; Jobly
+ * never sees it). Off by default. The whole state travels as one snapshot split into chunks, and the newest
  * snapshot wins: a device that changed something last is the one the others follow.
  *
  * Chrome limits sync storage to about 100 KB, so the snapshot keeps the newest applications and trims long notes when

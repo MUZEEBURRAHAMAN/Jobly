@@ -2,11 +2,11 @@
 title: Security
 eyebrow: Security
 description: The permissions Jobly asks for, when it reads a page, the services it talks to, how data moves, and how to report a security problem.
-updated: 2026-10-27
+updated: 2026-11-02
 figure: vault
 ---
 
-> **The short version.** Jobly talks to its own server for job listings. It reads the page you're on only when you click Save, Fit check or Autofill, and only that tab. Optional services (Google Calendar, Hunter) are asked for the first time you use them. Everything personal stays in your browser.
+> **The short version.** Jobly has no server: it downloads public job files and filters them in your browser. It reads the page you're on only when you click Save, Fit check or Autofill, and only that tab. Optional services (Google Calendar, Hunter) are asked for the first time you use them. Everything personal stays in your browser.
 
 ## Permissions
 
@@ -20,7 +20,7 @@ These are all the permissions in Jobly's manifest. Chrome shows them when you in
 | `activeTab` + `scripting` | Read or fill the tab you're on when you click Save, Fit check or Autofill | Touch any other tab, or any page you didn't click on |
 | `contextMenus` | Add "Save this job to Jobly" to the right-click menu | Do anything until you choose it |
 | `identity` (versions with calendar import) | Sign in to Google Calendar when you import interviews | Read any Google data without that sign-in |
-| `https://jobly-yd6l.onrender.com/*` | Fetch job listings from Jobly's server | Reach any other website |
+| `https://jobly-data.pages.dev/*` | Download Jobly's public job files | Reach any other website |
 | Optional: `https://api.hunter.io/*` (and `https://www.googleapis.com/*` with calendar import) | Contact search and calendar import, asked for the first time you use them | Anything before you allow it |
 
 Jobly does **not** ask for `tabs`, `history`, `cookies`, `webRequest` or access to "all sites", and it has no content scripts that run on pages by themselves. Autofill never presses Submit and never touches password fields.
@@ -28,25 +28,23 @@ Jobly does **not** ask for `tabs`, `history`, `cookies`, `webRequest` or access 
 ## How data moves
 
 1. You open Jobly or the background check runs.
-2. The extension sends a request to Jobly's server with your search and filters.
-3. The server picks matching jobs from its database of public listings and sends them back.
-4. The extension stores what it needs in your browser and shows the list.
+2. The extension downloads the public job files it needs from `jobly-data.pages.dev`. They are the same for everyone and carry nothing about you.
+3. It searches, filters and matches them to your preferences in your browser.
+4. It stores what it needs in your browser and shows the list.
 
-The server keeps no record of who asked for what. Identical requests are cached in memory for about two minutes, then dropped.
+There is no Jobly server, so there is nothing that receives your searches, preferences or reports. A report or a company suggestion opens your email app; you decide whether to send it.
 
 ## Built-in protections
 
-- **Content Security Policy.** The extension only runs its own scripts and only connects to Jobly's server and the optional services you turn on: `default-src 'self'; script-src 'self'; connect-src https://jobly-yd6l.onrender.com https://api.hunter.io` (plus Google's API addresses in versions with calendar import).
+- **Content Security Policy.** The extension only runs its own scripts and only connects to Jobly's job files and the optional services you turn on: `default-src 'self'; script-src 'self'; connect-src https://jobly-data.pages.dev https://api.hunter.io` (plus Google's API addresses in versions with calendar import).
 - **Links that don't leak.** Apply links open the job's original page in a new tab with `noopener noreferrer`, so that site can't see or control the page you came from.
-- **Limits on the server.** Request rate limits, size limits on every input, a cap on how many heavy queries run at once, and a guard that stops the crawler from being pointed at private network addresses.
-- **No secrets in the extension.** The extension ships with no API keys or tokens. If you add your own Hunter key, it stays in your browser and is left out of backups. Changing the list of companies needs an admin key that only the server holds.
+- **Nothing to attack on our side.** With no server, there is no database of users, no login and no API that accepts input. The job files are read-only.
+- **No secrets in the extension.** The extension ships with no API keys or tokens. If you add your own Hunter key, it stays in your browser and is left out of backups.
 - **This website** uses a strict policy too: no inline scripts, no third-party scripts, self-hosted fonts.
 
 ## Logs
 
-Jobly's own server keeps no access log. It logs only errors and crawl results, never your search words or preferences.
-
-The hosting providers (Render and Cloudflare) keep short-lived technical logs such as IP address, time and the address requested, like any website. Because a search request carries your search words in its address, those can appear in the provider's logs for a short time.
+Jobly keeps no logs: it has no server. Cloudflare, which hosts the job files and this website, keeps short-lived technical logs such as IP address, time and the file requested, like any website. Your search words and preferences never appear there, because they never leave your browser.
 
 ## Report a security problem
 
