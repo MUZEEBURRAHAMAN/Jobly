@@ -2348,3 +2348,5 @@ ANZ
 Westpac
 Woolworths Group
 Coles
+Hazel Technologies
+Pipedrive Inc
