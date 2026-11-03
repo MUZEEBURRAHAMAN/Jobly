@@ -45,6 +45,8 @@ await step('jobs: search, categories, date posted, 2-month rule', async () => {
   await p.getByLabel('Search jobs').fill('Ancient Listing'); await p.getByText(/No jobs match/).waitFor({ timeout: 10000 });
   ok(true, 'a job posted 75 days ago is never shown (2-month rule)');
   await p.getByLabel('Search jobs').fill('Unknown Date'); await p.getByText('Unknown Date Engineer').first().waitFor({ timeout: 10000 }); ok(true, 'a job with an unknown date is still listed');
+  await sleep(800); const shownLabels = await p.locator('article').evaluateAll((els) => els.map((e) => e.getAttribute('aria-label')));
+  ok(shownLabels.length > 0 && shownLabels.every((l) => /Unknown Date/.test(l)), `after a search every card shown is a match, not a stale card (${shownLabels.length} shown)`);
   await p.getByLabel('Search jobs').fill(''); await p.locator('article').first().waitFor();
   ok(await p.getByLabel('Search jobs').inputValue() === '', 'search cleared');
   await p.getByRole('button', { name: /^Design(?! &)/ }).click(); await sleep(1200); ok(await p.getByRole('button', { name: /^Design(?! &)/ }).getAttribute('aria-pressed') === 'true', 'category chip toggles');

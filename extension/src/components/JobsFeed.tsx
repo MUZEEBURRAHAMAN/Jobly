@@ -4,6 +4,7 @@ import { Job, Preferences } from '../types';
 import { JobCard } from './JobCard';
 import { EmptyState } from './EmptyState';
 import { ROLES, DEFAULT_ROLE_IDS, EXPERIENCE_LABELS, HUB_LABELS, timeAgo, EMPLOYMENT_LABELS, CATEGORIES, CATEGORY_IDS, CATEGORY_GROUPS } from '../lib/format';
+import { jobKey } from '../lib/userData';
 import { DEFAULT_FILTERS, JobFilters, activeFilterCount, chipCounts, filterJobs } from '../lib/filters';
 
 interface JobsFeedProps {
@@ -104,7 +105,7 @@ export const JobsFeed: React.FC<JobsFeedProps> = ({
     }
     return (
       <>
-        {visible.slice(0, displayLimit).map((job) => <JobCard key={`${job.source_type}-${job.external_id}`} job={job} onToggleSave={onToggleSave} />)}
+        {visible.slice(0, displayLimit).map((job) => <JobCard key={`${job.id}-${jobKey(job)}`} job={job} onToggleSave={onToggleSave} />)}
         {(visible.length > displayLimit || hasMore) && (
           <button
             type="button"

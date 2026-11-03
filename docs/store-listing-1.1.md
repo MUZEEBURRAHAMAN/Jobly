@@ -1,19 +1,28 @@
 # Chrome Web Store: Jobly 1.1.0
 
-Upload `store-assets/jobly-extension-1.1.0.zip` (built by `npm run build` in `extension/`, then zipping `extension/dist`). The name and summary come from the manifest.
+Everything to paste into the Chrome Web Store developer dashboard, tab by tab.
 
-**Summary (from the manifest, 118 of 132 characters)**
-Fresh tech jobs with real posting dates, plus a job tracker, resume builder and autofill you review. Free, no account.
+## Package
 
-## Description
+Upload `store-assets/jobly-extension-1.1.0.zip`. It's built by `npm run build` in `extension/`, then zipping `extension/dist`. It is version 1.1.0, above the 0.1.0 already used.
 
+The name and summary come from the manifest:
+
+| Field | Text |
+| --- | --- |
+| Name | `Jobly — Find jobs. Apply smarter` |
+| Summary (113 of 132 characters) | `Fresh jobs with real posting dates, plus a job tracker, resume builder and autofill you review. Free, no account.` |
+
+## Store listing tab
+
+**Description**
 ```
-Jobly finds fresh tech jobs on company career pages, with the date each one was really posted, and helps you all the way to the interview. Free, no account, and everything stays in your browser.
+Jobly finds fresh jobs on company career pages, with the date each one was really posted, and helps you all the way to the interview. Free, no account, and everything stays in your browser.
 
 FIND JOBS
 • Real posting dates from the employer's own hiring system; nothing older than 60 days
-• Product design, frontend, product management, AI/ML and fullstack roles from 2,000+ companies, including Y Combinator startups
-• More roles: QA, security, data, DevOps, sales, marketing, operations and more
+• Jobs from 2,000+ companies, including Y Combinator startups and 300+ companies hiring in India
+• Product design, frontend, product management, AI/ML and fullstack, plus backend, mobile, DevOps, QA, security, data, sales, marketing and more
 • Filters for location, experience, salary, job type and date posted
 • Dealbreakers: a salary floor and the job types you want
 • Alerts for new matches, and for every new job at companies you follow
@@ -48,11 +57,53 @@ GOOD TO KNOW
 Free. Learn more at https://jobly-88t.pages.dev
 ```
 
+**Category:** Productivity (or Tools if the dashboard offers that and not Productivity).
+
+**Language:** English.
+
+### Graphic assets
+
+| Asset | Size | File |
+| --- | --- | --- |
+| Store icon | 128×128 | `store-assets/screenshots/ready/store-icon-128x128.png` |
+| Screenshots (up to 5) | 1280×800 | `store-assets/screenshots/v1.1/` (version 1.1 screens, demo data); see below |
+| Small promo tile | 440×280 | `store-assets/screenshots/ready/promo-tile-1-440x280.png` or `promo-tile-2-440x280.png` |
+| Marquee promo tile (optional) | 1400×560 | not made yet; text suggestion below |
+
+**Replace the old screenshots in `ready/`.** They show version 0.1.0 (only the job list). Screenshot 1 uses LinkedIn, Indeed and Glassdoor logos, which store review can object to. Screenshot 3 shows the old Netlify address, and screenshot 1 says "100+ jobs".
+
+### Screenshot content
+
+The raw 1.1 screens are in `store-assets/screenshots/v1.1/`. Upload them as they are, or place them in your Figma template with the headline and line below, in this order. All people and data shown are made up (Ananya Rao is a demo profile).
+
+| # | File | Headline | Line under it | What it shows |
+| --- | --- | --- | --- | --- |
+| 1 | `1-jobs.png` | Fresh jobs, real posting dates | Every job comes from the employer's own hiring system, with the date it was posted. Nothing older than 60 days. | The job list "For you", role chips including Design & IT and More roles, match badges, Save, Track and Apply |
+| 2 | `2-tracker.png` | Track every application | A board from Saved to Offer, follow-up reminders and a weekly goal, all in your browser. | The tracker board, weekly goal, response rate, follow-up and interview badges |
+| 3 | `4-resume.png` | A resume in minutes | Four templates from one profile. Save it as PDF or Word. | The resume builder with the Modern template |
+| 4 | `5-profile.png` | Fill applications faster | Keep your answers in a profile, copy any field in one click, or let autofill fill the form after you review it. | A profile with contact details, common questions and skills |
+| 5 | `6-cover-letter.png` | Cover letters that start written | Templates filled from your profile and the job, ready to edit and copy. | The cover letter editor with a filled letter |
+
+Spare shots: `3-interviews.png` (interviews with prep steps), `7-tasks.png` (to-dos and weekly goal) and `popup-400x600.png` (the toolbar popup, for a framed composition).
+
+### Promo tile text
+- **Small tile (440×280), existing:** "Find jobs. Apply smarter" with the Jobly logo. No changes needed.
+- **Marquee (1400×560), if you make one:** headline "Find jobs posted this week. Apply in minutes." Line: "Fresh jobs from 2,000+ company career pages, a tracker, resume builder and autofill. Free, no account." No third-party logos.
+
+### Additional fields
+
+| Field | Value |
+| --- | --- |
+| Official URL | Leave empty (it needs a verified domain you own) |
+| Homepage URL | `https://jobly-88t.pages.dev` |
+| Support URL | `https://jobly-88t.pages.dev/support` |
+| Mature content | No |
+
 ## Privacy practices tab
 
 **Single purpose**
 ```
-Jobly helps people find and apply for tech jobs: it lists recent jobs from company career pages with their real posting dates, alerts the user to new matches, and helps them track and complete applications (tracker, interviews, resume and cover letter tools, and autofill that the user reviews).
+Jobly helps people find and apply for jobs: it lists recent jobs from company career pages with their real posting dates, alerts the user to new matches, and helps them track and complete applications (tracker, interviews, resume and cover letter tools, and autofill that the user reviews).
 ```
 
 **Permission justifications**
@@ -68,9 +119,9 @@ Jobly helps people find and apply for tech jobs: it lists recent jobs from compa
 | Host `https://jobly-data.pages.dev/*` | Reads Jobly's public job list, published as static files. Nothing is sent to it except the request for those files. |
 | Optional host `https://api.hunter.io/*` | Requested only when the user searches for contacts with their own Hunter API key. |
 
-If a later build includes Google Calendar import, it also asks for `identity` (sign in to Google to read upcoming events, read-only) and the optional host `https://www.googleapis.com/*`. The 1.1.0 package doesn't include them.
+The 1.1.0 package has no `identity` permission and no Google API access. A later build with Google Calendar import would add both.
 
-**Remote code:** No.
+**Remote code:** No, I am not using remote code.
 
 **Data usage** (read Google's current wording before ticking)
 - **Personally identifiable information:** yes. The user types their name, email, phone and work history into a profile, stored on their device and used to fill forms when they ask.
@@ -81,19 +132,31 @@ If a later build includes Google Calendar import, it also asks for `identity` (s
 - Usage: app functionality only. Not sold, not used for anything unrelated, not for credit.
 - Tick all three certifications.
 
-**Privacy policy URL:** https://jobly-88t.pages.dev/privacy (live; replace the old address in the dashboard)
+**Privacy policy URL:** `https://jobly-88t.pages.dev/privacy` (replace the old Netlify address)
 
-## Notes for the reviewer
+## Distribution tab
+
+| Field | Value |
+| --- | --- |
+| Payments | Free of charge |
+| Visibility | Public |
+| Regions | All regions |
+
+## Test instructions (for the reviewer)
 ```
 No sign-in is needed. To test:
 1. Open the popup, finish the welcome tour, and jobs appear. Use Track on a job card to add it to the tracker.
 2. Open the dashboard (popup header icon): Tracker, Interviews, Tasks, Profile, Resume, Cover letters, Contacts.
 3. Fill in a Profile, then open any job application page (for example a Greenhouse or Lever posting), open the popup, Apply tab: Save to tracker, see the fit check, press "Autofill this page", review the answers and press Fill. Jobly never submits.
 4. Right-click any job page: "Save this job to Jobly".
-Contact search needs the reviewer's own Hunter API key and is optional. 
+Contact search needs the reviewer's own Hunter API key and is optional. Report this listing and Suggest a company open the reviewer's email app; nothing is sent automatically.
 ```
 
-## Before submitting
-1. In the dashboard, set the privacy policy URL and the homepage to the Cloudflare address above.
-2. Store images are ready in `store-assets/screenshots/ready/` (five 1280x800 screenshots, two 440x280 promo tiles, the 128x128 store icon).
-3. Upload the zip, update the description, the permission justifications (including the new `jobly-data.pages.dev` host) and the data-usage answers above.
+## Checklist
+1. Upload the zip.
+2. Store listing: paste the description, then replace the screenshots with the five above and keep the icon and promo tile.
+3. Additional fields: homepage `https://jobly-88t.pages.dev`, support `https://jobly-88t.pages.dev/support`.
+4. Privacy practices: single purpose, permission justifications, remote code "No", data usage, privacy policy URL.
+5. Distribution: free, public, all regions.
+6. Paste the test instructions, then submit for review.
+7. After approval: delete the old Netlify site and the Render service in those accounts.
