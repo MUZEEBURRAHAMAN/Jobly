@@ -523,3 +523,28 @@ fieldset.profile-card > legend { padding: 0 var(--space-1); }
 .goal-number .muted { font-size: var(--text-base); font-weight: 500; letter-spacing: 0; }
 .goal-note { margin-top: var(--space-2); }
 .reminder-card { flex-direction: row; align-items: center; cursor: pointer; }
+
+/* Saved | Applied switch and the compact rows for jobs saved from pages or applied to */
+.segmented { display: inline-flex; gap: 2px; padding: 3px; border-radius: var(--radius); background: var(--muted); border: 1px solid var(--border); }
+.segmented button { display: inline-flex; align-items: center; gap: var(--space-2); min-height: 30px; padding: 0 var(--space-3); border: 0; border-radius: var(--radius-sm);
+  background: transparent; color: var(--muted-foreground); font: inherit; font-size: var(--text-sm); font-weight: 500; cursor: pointer; }
+.segmented button:hover { color: var(--foreground); }
+.segmented button.active { background: var(--background); color: var(--foreground); box-shadow: 0 1px 2px rgb(0 0 0 / 0.08); }
+.segmented button:focus-visible { outline: 2px solid var(--ring); outline-offset: 1px; }
+.app-rows { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--space-2); }
+.app-row { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2) var(--space-4); padding: var(--space-3) var(--space-4); }
+.app-row-meta { gap: 6px; }
+.app-row .app-title { color: var(--foreground); }
+.app-row-actions { gap: 4px; margin-left: auto; }
+
+/* Dashboard header: bell with an unread count, theme, refresh, settings */
+.top-actions .btn-icon[aria-current="page"] { background: var(--hover); color: var(--foreground); }
+.icon-badge-wrap { position: relative; }
+.icon-badge { position: absolute; top: 2px; right: 2px; min-width: 16px; height: 16px; padding: 0 4px; border-radius: var(--radius-full);
+  background: var(--brand); color: var(--brand-foreground); font-size: 10px; font-weight: 600; line-height: 16px; text-align: center; pointer-events: none; }
+
+/* A job card's confirmation line takes no space until there is something to say */
+.card-note:empty { display: none; }
+/* The 400px popup has no room for "Mark applied": the check alone, with its tooltip, until it's pressed */
+.popup .mark-applied:not([aria-pressed="true"]) .btn-label { display: none; }
+.popup .mark-applied:not([aria-pressed="true"]) { width: 32px; padding: 0; justify-content: center; }

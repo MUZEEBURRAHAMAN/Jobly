@@ -20,7 +20,7 @@ await step('accessibility, both themes', async () => {
     for (const tab of ['Jobs', 'Apply', 'Companies', 'Saved', 'Preferences']) { await p.getByRole('button', { name: new RegExp('^' + tab) }).click(); await sleep(500); await axe(p, `popup/${tab}/${theme}`); }
     await p.getByRole('button', { name: /^Jobs/ }).click(); await p.getByRole('button', { name: /Filters/ }).click(); await axe(p, `popup/filters/${theme}`);
     const d = await open(h, 'options.html', { theme, width: 1280, height: 860 }); await firstCard(d);
-    for (const tab of ['Jobs', 'Companies', 'Saved', 'Tracker', 'Interviews', 'Tasks', 'Profile', 'Resume', 'Cover letters', 'Contacts', 'Alerts', 'Preferences']) { await d.getByRole('button', { name: new RegExp('^' + tab) }).click(); await sleep(500); await axe(d, `dashboard/${tab}/${theme}`); }
+    for (const tab of ['Jobs', 'Companies', 'Saved', 'Profile', 'Resume', 'Cover letters', 'Contacts', 'Alerts', 'Settings']) { await d.getByRole('button', { name: new RegExp('^' + tab) }).click(); await sleep(500); await axe(d, `dashboard/${tab}/${theme}`); }
     await h.ctx.close();
   }
 });
@@ -126,7 +126,7 @@ await step('on-device data: preferences, saved jobs, alerts', async () => {
   await h.sw.evaluate(() => chrome.storage.local.set({ alerts: [], seenAlertKeys: [] }));
   await p.evaluate(() => new Promise((res) => chrome.runtime.sendMessage({ type: 'TRIGGER_BACKGROUND_CHECK' }, res))); await sleep(500); await p.close();
   const dash = await open(h, 'options.html', { width: 1280, height: 860 }); await firstCard(dash);
-  ok(await dash.getByRole('button', { name: /^Alerts/ }).innerText().then((t) => /\d/.test(t)), 'the Alerts tab shows an unread count');
+  ok(await dash.getByRole('button', { name: /^Alerts/ }).innerText().then((t) => /\d/.test(t)), 'the bell in the header shows an unread count');
   await dash.getByRole('button', { name: /^Alerts/ }).click(); await dash.getByText(/\d+ new/).waitFor({ timeout: 5000 }); await axe(dash, 'alerts with items');
   await sleep(800); ok((await h.sw.evaluate(() => chrome.storage.local.get('alerts'))).alerts.every((a) => a.is_read), 'opening Alerts stores them as read (the badge clears)');
   ok(await dash.getByText(/new since your last visit/).count() === 1 && await dash.locator('.badge', { hasText: 'New' }).count() > 0, 'but they stay highlighted as new for this visit');
@@ -219,84 +219,67 @@ await step('production build: https only, no localhost, no CSP errors', async ()
   await h.ctx.close();
 });
 
-await step('tracker: track, details, interviews, tasks, import/export, reminders, "Did you apply?"', async () => {
+await step('focus: tracker hidden, Applied toggle, Saved | Applied, data in Settings, "Did you apply?"', async () => {
   const h = await launch();
   const store = async (k) => (await h.sw.evaluate((key) => chrome.storage.local.get(key), k))[k];
-  const day = (n) => { const d = new Date(Date.now() + n * 86400000); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; };
   const d = await open(h, 'options.html', { width: 1280, height: 860 }); await firstCard(d);
-  // track from a job card
+  // the switched-off pages are gone from the sidebar and their old links open Saved
+  const nav = await d.locator('nav.side').innerText();
+  ok(!/Tracker|Interviews|Tasks|Alerts|Preferences/.test(nav) && /Saved/.test(nav) && /Cover letters/.test(nav), 'the sidebar has no Tracker, Interviews, Tasks, Alerts or Preferences');
+  for (const label of ['Alerts', 'Switch to dark mode', 'Refresh jobs', 'Settings']) ok(await d.locator('header').getByRole('button', { name: new RegExp('^' + label) }).count() === 1, `the header has an icon button: ${label}`);
+  await d.evaluate(() => { window.location.hash = 'tracker'; }); await d.getByText('Nothing saved yet').waitFor({ timeout: 5000 });
+  ok(await d.getByRole('button', { name: /^Saved/ }).getAttribute('aria-current') === 'page', 'an old #tracker link opens Saved');
+  await d.getByRole('button', { name: /^Jobs/ }).click(); await firstCard(d);
+  // mark applied from a job card
   const card = d.locator('article').first(); const label = await card.getAttribute('aria-label'); const company = label.split(' at ').pop();
-  await card.getByRole('combobox', { name: /^Track / }).selectOption('applied'); await sleep(500);
+  ok(await card.getByRole('combobox', { name: /^Track / }).count() === 0, 'job cards have no Track menu');
+  await card.getByRole('button', { name: /^Mark applied:/ }).click(); await sleep(500);
   let apps = await store('applications');
-  ok(apps?.length === 1 && apps[0].status === 'applied' && !!apps[0].applied_at, 'Track → Applied stores the application with today\'s date');
-  ok(await card.locator('.badge', { hasText: 'Applied' }).count() === 1, 'the card says Applied');
+  ok(apps?.length === 1 && apps[0].status === 'applied' && !!apps[0].applied_at, 'Applied on a card stores the job with today\'s date');
+  ok(await card.getByRole('button', { name: /^Applied:/ }).getAttribute('aria-pressed') === 'true', 'the card shows it as applied');
   const sibling = d.locator('article', { hasText: company }).nth(1);
   if (await sibling.count()) ok(await sibling.locator('.badge', { hasText: 'You applied here before' }).count() === 1, 'other jobs at the same company warn "You applied here before"');
-  // board + details
-  await d.getByRole('button', { name: /^Tracker/ }).click(); await d.getByRole('heading', { name: 'Tracker', exact: true }).waitFor({ timeout: 5000 });
-  ok(await d.locator('section[aria-labelledby="col-applied"] .board-card').count() === 1, 'it appears in the Applied column');
-  await d.getByRole('button', { name: /^Details for/ }).first().click(); await d.getByRole('dialog').waitFor();
-  await axe(d, 'application details dialog');
-  await d.getByLabel('Notes').fill('Recruiter: Sam'); await d.getByLabel('Follow up on').fill(day(2));
-  await d.getByRole('button', { name: 'Save changes' }).click(); await sleep(500);
-  apps = await store('applications');
-  ok(apps[0].notes === 'Recruiter: Sam' && !!apps[0].follow_up_at, 'notes and the follow-up date are saved');
-  ok(await d.locator('.board-card .badge', { hasText: /Follow up in 2 days/ }).count() === 1, 'the card shows when to follow up');
-  // interview from the details dialog
-  await d.getByRole('button', { name: /^Details for/ }).first().click();
-  await d.getByRole('button', { name: 'Add interview' }).click(); await d.getByRole('dialog', { name: 'Add interview' }).waitFor();
-  await axe(d, 'interview dialog');
-  await d.getByLabel('Round').fill('Technical'); await d.getByLabel('New checklist item').fill('Review system design'); await d.getByRole('button', { name: 'Add', exact: true }).click();
-  await d.getByRole('radio', { name: '4 of 5' }).click();
-  await d.getByRole('button', { name: 'Save interview' }).click(); await sleep(500);
-  const ivs = await store('interviews');
-  ok(ivs?.length === 1 && ivs[0].round === 'Technical' && ivs[0].checklist.length === 5 && ivs[0].rating === 4, 'the interview is saved with its checklist and rating');
-  ok((await store('applications'))[0].status === 'interview', 'adding an interview moves the application to Interviewing');
-  await d.keyboard.press('Escape'); await sleep(300);
-  await d.getByRole('button', { name: /^Interviews/ }).click(); await d.getByText(/Technical ·/).waitFor({ timeout: 5000 }); ok(true, 'the Interviews page lists it');
-  // tasks + weekly goal
-  await d.getByRole('button', { name: /^Tasks/ }).click(); await d.getByText(/of 10 applications this week/).waitFor({ timeout: 5000 });
-  ok(await d.getByText('1 of 10 applications this week').count() === 1, 'the weekly goal counts this week\'s applications');
-  await d.getByLabel('New task').fill('Send a thank-you note'); await d.getByLabel('Due date').fill(day(1)); await d.getByRole('button', { name: 'Add task' }).click(); await sleep(400);
-  ok((await store('tasks'))?.[0]?.text === 'Send a thank-you note', 'a task is stored');
-  await d.getByRole('checkbox', { name: /Send a thank-you note/ }).click(); await sleep(400); // it moves into the collapsed Done list
-  ok((await store('tasks'))[0].done === true, 'ticking a task marks it done');
-  // add by hand, export CSV, import CSV
-  await d.getByRole('button', { name: /^Tracker/ }).click(); await d.getByRole('button', { name: 'Add application' }).click();
-  await d.getByLabel('Company').fill('Initech'); await d.getByLabel('Role').fill('Staff Designer'); await d.getByRole('button', { name: 'Add to tracker' }).click(); await sleep(500);
-  ok((await store('applications')).some((a) => a.company_name === 'Initech' && a.source === 'manual'), 'a job added by hand is tracked');
-  const [csvDl] = await Promise.all([d.waitForEvent('download'), d.getByRole('button', { name: 'Export CSV' }).click()]);
-  const csv = fs.readFileSync(await csvDl.path(), 'utf8');
-  ok(csv.startsWith('Company,Role,Status,Applied') && csv.includes('Initech') && csv.includes('Recruiter: Sam'), 'Export CSV has a header row and every application');
+  // a job saved from a careers page, as the right-click menu stores it
+  await h.sw.evaluate(() => chrome.storage.local.get('applications').then(({ applications }) => chrome.storage.local.set({ applications: [...applications, { key: 'https://careers.initech.com/jobs/9', title: 'Staff Designer', company_name: 'Initech', location: 'Remote', application_url: 'https://careers.initech.com/jobs/9', source: 'page', status: 'saved', notes: '', applied_at: null, follow_up_at: null, created_at: new Date().toISOString(), updated_at: new Date().toISOString() }] })));
+  await d.getByRole('button', { name: /^Saved/ }).click(); await d.getByRole('heading', { name: 'Saved and applied' }).waitFor({ timeout: 5000 });
+  ok(await d.getByText('Saved from careers pages').count() === 1 && await d.getByText('Staff Designer').count() === 1, 'jobs saved from a careers page are listed under Saved');
+  await axe(d, 'saved with page saves');
+  await d.getByRole('button', { name: 'Mark as applied: Staff Designer at Initech' }).click(); await sleep(400);
+  ok((await store('applications')).find((a) => a.company_name === 'Initech')?.status === 'applied', 'a page save can be moved to Applied');
+  await d.getByRole('tab', { name: /^Applied/ }).click();
+  ok(await d.locator('.app-row').count() === 2 && await d.locator('.app-row', { hasText: 'Initech' }).locator('.badge', { hasText: /^Applied / }).count() === 1, 'Applied lists both jobs with the date');
+  await axe(d, 'applied list');
+  await d.getByRole('button', { name: 'Remove: Staff Designer at Initech' }).click(); await sleep(400);
+  ok(!(await store('applications')).some((a) => a.company_name === 'Initech'), 'removing an applied job deletes it from the device');
+  // import a CSV and export again, from Settings › Your data
+  await d.getByRole('button', { name: 'Settings', exact: true }).click(); await d.getByText('Your data', { exact: true }).waitFor({ timeout: 5000 });
   await d.locator('input[type="file"]').setInputFiles({ name: 'sheet.csv', mimeType: 'text/csv', buffer: Buffer.from('Company,Position,Stage,Date applied,Notes\nGlobex,Product Designer,Phone screen,2026-10-01,"Referral, from Ana"\n"Acme, Inc",PM,Offer,,\n,No company,,,\n') });
   await d.getByText(/Imported 2 applications/).waitFor({ timeout: 5000 });
   apps = await store('applications');
   ok(apps.some((a) => a.company_name === 'Globex' && a.status === 'interview' && a.notes === 'Referral, from Ana') && apps.some((a) => a.company_name === 'Acme, Inc' && a.status === 'offer'), 'CSV import maps columns and statuses, keeps quoted commas, skips rows without a company');
-  // backup round trip
-  const [bkDl] = await Promise.all([d.waitForEvent('download'), d.getByRole('button', { name: 'Backup' }).click()]);
+  const [csvDl] = await Promise.all([d.waitForEvent('download'), d.getByRole('button', { name: 'Export applications (CSV)' }).click()]);
+  const csv = fs.readFileSync(await csvDl.path(), 'utf8');
+  ok(csv.startsWith('Company,Role,Status,Applied') && csv.includes('Globex') && csv.includes('Referral, from Ana'), 'Export CSV has a header row and every application');
+  const [bkDl] = await Promise.all([d.waitForEvent('download'), d.getByRole('button', { name: 'Download a backup' }).click()]);
   const backup = fs.readFileSync(await bkDl.path(), 'utf8');
-  await h.sw.evaluate(() => chrome.storage.local.set({ applications: [], interviews: [], tasks: [] })); await sleep(400);
+  await h.sw.evaluate(() => chrome.storage.local.set({ applications: [] })); await sleep(400);
   await d.locator('input[type="file"]').setInputFiles({ name: 'jobly-backup.json', mimeType: 'application/json', buffer: Buffer.from(backup) });
-  await d.getByText(/Backup restored: 4 applications/).waitFor({ timeout: 5000 });
-  ok((await store('interviews')).length === 1 && (await store('tasks')).length === 1, 'a backup restores applications, interviews and tasks');
+  await d.getByText(/Backup restored: 3 applications/).waitFor({ timeout: 5000 }); ok((await store('applications')).length === 3, 'a backup restores applied jobs');
   await d.locator('input[type="file"]').setInputFiles({ name: 'evil.json', mimeType: 'application/json', buffer: Buffer.from('{"app":"other"}') });
   await d.getByText("That isn't a Jobly backup file.").waitFor({ timeout: 5000 }); ok(true, 'a file that is not a Jobly backup is refused');
-  // reminders, worked out on the device
+  await axe(d, 'settings');
+  // reminders belong to the switched-off pages: none are shown
   await h.sw.evaluate(() => chrome.storage.local.get('applications').then(({ applications }) => chrome.storage.local.set({ applications: applications.map((a, i) => (i === 0 ? { ...a, follow_up_at: new Date(Date.now() - 86400000).toISOString(), follow_up_notified: false } : a)) })));
-  await h.sw.evaluate(() => chrome.storage.local.get('interviews').then(({ interviews }) => chrome.storage.local.set({ interviews: interviews.map((i) => ({ ...i, at: new Date(Date.now() + 30 * 60000).toISOString(), reminded: false })) })));
   await d.evaluate(() => new Promise((res) => chrome.runtime.sendMessage({ type: 'CHECK_REMINDERS' }, res))); await sleep(500);
-  ok((await store('applications'))[0].follow_up_notified === true, 'a due follow-up is announced once');
-  ok((await store('interviews'))[0].reminded === true, 'an interview 30 minutes away gets its reminder');
-  const reminderAlarm = await h.sw.evaluate(async () => (await chrome.alarms.get('jobly-reminders'))?.periodInMinutes);
-  ok(reminderAlarm === 15, `reminders are checked every ${reminderAlarm} minutes, locally`);
+  ok((await store('applications'))[0].follow_up_notified === false, 'no follow-up reminders while the tracker is off');
   await d.close();
   // "Did you apply?" after opening a job
   const p = await open(h); await firstCard(p);
   const fresh = p.locator('article').nth(3); const freshLabel = await fresh.getAttribute('aria-label');
   const [tab] = await Promise.all([h.ctx.waitForEvent('page'), fresh.getByRole('link', { name: /^Apply to/ }).click()]); await tab.close();
   await p.getByRole('region', { name: 'Did you apply?' }).waitFor({ timeout: 5000 }); await axe(p, 'did-you-apply prompt');
-  await p.getByRole('button', { name: 'Yes, track it' }).click(); await sleep(500);
-  ok((await store('applications')).some((a) => freshLabel.startsWith(a.title) && a.status === 'applied'), '"Yes, track it" adds the job as Applied');
+  await p.getByRole('button', { name: 'Yes, I applied' }).click(); await sleep(500);
+  ok((await store('applications')).some((a) => freshLabel.startsWith(a.title) && a.status === 'applied'), '"Yes, I applied" adds the job to Applied');
   ok(await p.getByRole('region', { name: 'Did you apply?' }).count() === 0, 'the prompt goes away once answered');
   await h.ctx.close();
 });
@@ -362,8 +345,8 @@ await step('profile, copy kit, resume, cover letter, backup, sync', async () => 
   ok(letter.includes('Dear Initech hiring team') && letter.includes('Staff Designer') && letter.includes('Ada Lovelace') && letter.includes('led the redesign of checkout'), 'the cover letter fills in the job and the profile');
   await axe(d, 'cover letters');
   // backup carries profiles
-  await d.getByRole('button', { name: /^Tracker/ }).click();
-  const [bk] = await Promise.all([d.waitForEvent('download'), d.getByRole('button', { name: 'Backup' }).click()]);
+  await d.getByRole('button', { name: 'Settings', exact: true }).click();
+  const [bk] = await Promise.all([d.waitForEvent('download'), d.getByRole('button', { name: 'Download a backup' }).click()]);
   ok(JSON.parse(fs.readFileSync(await bk.path(), 'utf8')).data.profiles?.[0]?.first_name === 'Ada', 'the backup includes profiles');
   // copy kit in the popup
   const p = await open(h); await firstCard(p); await p.getByRole('button', { name: /^Apply/ }).click();
@@ -371,7 +354,7 @@ await step('profile, copy kit, resume, cover letter, backup, sync', async () => 
   await p.getByText('Open a job posting, then open Jobly').waitFor({ timeout: 5000 }); ok(true, 'on a non-job page the Apply tab explains how to save a job');
   await axe(p, 'apply kit'); await p.close();
   // sync across Chrome browsers (opt-in)
-  await d.getByRole('button', { name: /^Preferences/ }).click(); await d.getByRole('switch', { name: /Sync across your Chrome browsers/ }).click(); await sleep(1500);
+  await d.getByRole('switch', { name: /Sync across your Chrome browsers/ }).click(); await sleep(1500);
   const meta = await store('jobly_meta', 'sync'); ok(meta?.chunks >= 1, `turning sync on writes a snapshot to Chrome sync (${meta?.chunks} chunk)`);
   const snapshot = JSON.parse((await h.sw.evaluate(async (n) => { const k = Array.from({ length: n }, (_, i) => `jobly_${i}`); const r = await chrome.storage.sync.get(k); return k.map((x) => r[x]).join(''); }, meta.chunks)));
   ok(snapshot.profiles?.[0]?.first_name === 'Ada' && !('savedJobs' in snapshot), 'the snapshot holds the synced data only');
@@ -452,7 +435,7 @@ await step('autofill: scan, propose, fill only approved fields (in a real page)'
   await h.ctx.close();
 });
 
-await step('contacts, outreach drafts, connections, calendar import state', async () => {
+await step('contacts, outreach drafts, connections', async () => {
   const h = await launch(); const store = async (k) => (await h.sw.evaluate((key) => chrome.storage.local.get(key), k))[k];
   await h.sw.evaluate(() => chrome.storage.local.set({ applications: [{ key: 'manual:1', title: 'Staff Designer', company_name: 'Initech', location: null, application_url: 'https://careers.initech.com/jobs/1', source: 'manual', status: 'applied', notes: '', applied_at: new Date().toISOString(), follow_up_at: null, created_at: new Date().toISOString(), updated_at: new Date().toISOString() }],
     profiles: [{ id: 'p1', label: 'Design', first_name: 'Ada', last_name: 'Lovelace', email: 'ada@example.com', phone: '', location: '', headline: 'Senior Product Designer', summary: '', linkedin: '', github: '', portfolio: '', website: '', work_authorization: '', needs_sponsorship: '', years_experience: '6', salary_expectation: '', notice_period: '', skills: '', work: [{ id: 'w1', company: 'Analytical Engines', title: 'Lead Designer', location: '', start: '2022-01', end: '', current: true, bullets: 'Led the checkout redesign' }], education: [], updated_at: new Date().toISOString() }], activeProfileId: 'p1' }));
@@ -471,13 +454,11 @@ await step('contacts, outreach drafts, connections, calendar import state', asyn
   await d.getByLabel('Message', { exact: true }).selectOption('linkedin'); ok(await d.getByText(/\d+\/300 characters/).count() === 1, 'the LinkedIn note shows the 300-character limit');
   await axe(d, 'outreach dialog');
   await d.getByRole('button', { name: 'Mark as contacted' }).click(); await sleep(400); ok(!!(await store('contacts'))[0].contacted_at, 'marking as contacted is remembered');
-  // calendar import state in a build without an OAuth client
-  await d.getByRole('button', { name: /^Interviews/ }).click(); ok(await d.getByRole('button', { name: 'Import from Google Calendar' }).isDisabled(), 'calendar import is shown but off until it is set up');
-  // Hunter key in Preferences, never in a backup
-  await d.getByRole('button', { name: /^Preferences/ }).click(); await d.getByLabel(/Hunter API key/).fill('test-key-123'); await d.getByRole('button', { name: 'Save', exact: true }).click(); await sleep(300);
+  // Hunter key in Settings, never in a backup; Google Calendar (for Interviews) is hidden while the tracker is off
+  await d.getByRole('button', { name: 'Settings', exact: true }).click(); await d.getByLabel(/Hunter API key/).fill('test-key-123'); await d.getByRole('button', { name: 'Save', exact: true }).click(); await sleep(300);
   ok((await store('hunterApiKey')) === 'test-key-123', 'the Hunter key is stored on the device');
-  await d.getByRole('button', { name: /^Tracker/ }).click();
-  const [bk] = await Promise.all([d.waitForEvent('download'), d.getByRole('button', { name: 'Backup' }).click()]);
+  ok(await d.getByText('Google Calendar').count() === 0, 'the calendar connection is hidden while Interviews are switched off');
+  const [bk] = await Promise.all([d.waitForEvent('download'), d.getByRole('button', { name: 'Download a backup' }).click()]);
   const backup = fs.readFileSync(await bk.path(), 'utf8'); ok(!backup.includes('test-key-123') && JSON.parse(backup).data.contacts?.length === 1, 'backups include contacts but never the API key');
   // the Hunter search itself (in a real page, with the service mocked)
   const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');

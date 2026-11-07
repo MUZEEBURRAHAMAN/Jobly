@@ -11,3 +11,11 @@ export const CONNECT_TIMEOUTS_MS = [8000, 15000];
 
 /** Reports and company suggestions open the user's email app addressed here; Jobly itself sends nothing. */
 export const SUPPORT_EMAIL = 'rahamanmuzeeb1108@gmail.com';
+
+/**
+ * Parts of Jobly that are switched off for now. Their code and the user's data stay (backups still include them), so
+ * switching one back on restores everything.
+ * - tracker: the Tracker board, Interviews, Tasks, their reminders and calendar import. Jobs you applied to still
+ *   show under Saved › Applied, which "Did you apply?", "You applied here before" and autofill rely on.
+ */
+export const FEATURES = { tracker: false } as const;

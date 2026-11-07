@@ -7,6 +7,7 @@ import {
 import { FOLLOWED_KEY, MAX_FOLLOWED } from '../lib/follow';
 import { loadApps, loadInterviews, loadTasks, loadTrackerSettings, MAX_APPS, sanitizeApp, storeApps, storeInterviews, storeTasks } from '../lib/tracker';
 import { appFromPageJob, readJobInTab } from '../lib/pageJob';
+import { FEATURES } from '../lib/config';
 import { pullSnapshot, pushSnapshot, SYNC_SETTING, SYNC_STATE, syncEnabled, SYNCED_LOCAL_KEYS, syncState } from '../lib/sync';
 
 const ALARM_NAME = 'jobly-sync';
@@ -107,9 +108,10 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
   if (!app) return;
   const apps = await loadApps();
   const existing = apps.find((a) => a.key === app.key);
-  if (!existing && apps.length >= MAX_APPS) { await remind('saved', 'Your tracker is full', `Remove some of the ${MAX_APPS} applications to save more.`); return; }
+  if (!existing && apps.length >= MAX_APPS) { await remind('saved', FEATURES.tracker ? 'Your tracker is full' : 'Jobly is full', `Remove some of the ${MAX_APPS} saved and applied jobs to save more.`); return; }
   if (!existing) await storeApps([app, ...apps]);
-  await remind('saved', existing ? 'Already in your Jobly tracker' : 'Saved to your Jobly tracker', `${app.title} · ${app.company_name}`);
+  const where = FEATURES.tracker ? 'your Jobly tracker' : 'Jobly';
+  await remind('saved', existing ? `Already saved in ${where}` : `Saved to ${where}`, `${app.title} · ${app.company_name}`);
 });
 
 chrome.alarms.onAlarm.addListener(async (alarm) => {
@@ -195,6 +197,8 @@ async function announce(fresh: Job[]) {
 // Each reminder is shown once (the flag is stored with the item) and only while reminders are on.
 async function checkReminders() {
   try {
+    // Reminders belong to the tracker, Interviews and Tasks, which are switched off for now
+    if (!FEATURES.tracker) return;
     const settings = await loadTrackerSettings();
     if (!settings.reminders) return;
     const now = Date.now();
@@ -243,7 +247,7 @@ async function remind(id: string, title: string, message: string) {
 // Notification Click Handler: reminders open the page they are about; job alerts open Alerts.
 chrome.notifications.onClicked.addListener(async (notificationId) => {
   await chrome.notifications.clear(notificationId);
-  const page = notificationId.startsWith('rem-iv') ? 'interviews' : notificationId.startsWith('rem-') ? 'tasks' : notificationId.startsWith('saved') ? 'tracker' : 'alerts';
+  const page = notificationId.startsWith('rem-iv') ? 'interviews' : notificationId.startsWith('rem-') ? 'tasks' : notificationId.startsWith('saved') ? (FEATURES.tracker ? 'tracker' : 'saved') : 'alerts';
   await chrome.tabs.create({ url: chrome.runtime.getURL(`options.html#${page}`) });
 });
 

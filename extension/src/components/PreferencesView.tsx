@@ -15,9 +15,12 @@ interface PreferencesViewProps {
   onReplayWelcome?: () => void;
   /** Dashboard: lay the groups out in two columns on wide screens. */
   wide?: boolean;
+  /** Dashboard Settings: its heading, and more settings cards (Your data) after Connections. */
+  title?: string;
+  extra?: React.ReactNode;
 }
 
-export const PreferencesView: React.FC<PreferencesViewProps> = ({ preferences, onSave, onReplayWelcome, wide }) => {
+export const PreferencesView: React.FC<PreferencesViewProps> = ({ preferences, onSave, onReplayWelcome, wide, title, extra }) => {
   const [prefs, setPrefs] = useState<Preferences>(preferences);
   const [saving, setSaving] = useState(false);
   const [justSaved, setJustSaved] = useState(false);
@@ -44,8 +47,8 @@ export const PreferencesView: React.FC<PreferencesViewProps> = ({ preferences, o
   return (
     <form className={`section${wide ? ' prefs-wide' : ''}`} onSubmit={submit}>
       <div>
-        <h2>Preferences</h2>
-        <p className="text-sm">Tell Jobly what you're looking for. "For you" in the jobs list uses these.</p>
+        <h2>{title ?? 'Preferences'}</h2>
+        <p className="text-sm">{title ? 'What you\'re looking for, alerts, connections and your data. Everything is saved on this device.' : 'Tell Jobly what you\'re looking for. "For you" in the jobs list uses these.'}</p>
       </div>
 
       <fieldset className="stack" style={{ border: 0 }}>
@@ -132,6 +135,7 @@ export const PreferencesView: React.FC<PreferencesViewProps> = ({ preferences, o
 
       <SyncSetting />
       <ConnectionsSetting />
+      {extra}
 
       <div className="row">
         <button type="submit" className="btn grow" disabled={saving}><Save size={14} aria-hidden="true" /> {saving ? 'Saving…' : 'Save preferences'}</button>

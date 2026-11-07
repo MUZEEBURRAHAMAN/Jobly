@@ -3,6 +3,7 @@ import { Download, Save } from '../lib/icons';
 import { Job } from '../types';
 import { ProfilesStore } from '../lib/useProfiles';
 import { TrackerStore } from '../lib/useTracker';
+import { FEATURES } from '../lib/config';
 import { bulletList, fullName, Profile, skillList } from '../lib/profile';
 import { jobKey } from '../lib/userData';
 import { fileSafe } from '../lib/resume';
@@ -110,7 +111,7 @@ export const CoverLetterView: React.FC<{ profiles: ProfilesStore; tracker: Track
                 <option value="">Type the role and company below</option>
                 {targets.map((t) => <option key={t.key} value={t.key}>{t.role} · {t.company}</option>)}
               </select>
-              <p className="hint">Pick a job from your tracker or saved jobs, or type it below.</p>
+              <p className="hint">{FEATURES.tracker ? 'Pick a job from your tracker or saved jobs, or type it below.' : 'Pick a job you saved or applied to, or type it below.'}</p>
             </div>
             <div><label className="label" htmlFor="cl-role">Role</label><input id="cl-role" className="input" placeholder="e.g. Senior Product Designer" value={role} onChange={(e) => { setRole(e.target.value); setEdited(false); }} /></div>
             <div><label className="label" htmlFor="cl-company">Company</label><input id="cl-company" className="input" placeholder="e.g. Acme" value={company} onChange={(e) => { setCompany(e.target.value); setEdited(false); }} /></div>

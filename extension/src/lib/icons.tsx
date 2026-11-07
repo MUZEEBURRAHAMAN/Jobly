@@ -7,7 +7,7 @@ import {
   Add01Icon, Location01Icon, Flag02Icon, CheckmarkCircle02Icon, BookmarkCheck02Icon, Notification03Icon, ArrowRight01Icon,
   ArrowLeft01Icon, ChromeIcon, KanbanIcon, Calendar03Icon, CheckListIcon, Download04Icon, Upload04Icon, Delete02Icon, StarIcon,
   Clock01Icon, PencilEdit02Icon, Target02Icon, Link01Icon, Copy01Icon, UserAccountIcon, FileEditIcon, Mail01Icon, File02Icon, MagicWand01Icon,
-  ContactBookIcon,
+  ContactBookIcon, Settings02Icon,
 } from '@hugeicons/core-free-icons';
 
 type Node = readonly [string, Readonly<Record<string, string | number>>];
@@ -77,3 +77,4 @@ export const File = make(n(File02Icon), 'File');
 export const Wand = make(n(MagicWand01Icon), 'Wand');
 export const Contacts = make(n(ContactBookIcon), 'Contacts');
 export type IconComponent = ReturnType<typeof make>;
+export const Settings = make(n(Settings02Icon), 'Settings');

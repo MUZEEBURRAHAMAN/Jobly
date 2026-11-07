@@ -210,7 +210,7 @@ export const PopupApp: React.FC = () => {
         {tab === 'apply' && <ApplyKitView profiles={profiles} tracker={tracker} notify={showNotice}
           openDashboard={(hash) => { try { void chrome.tabs.create({ url: chrome.runtime.getURL(`options.html#${hash}`) }); } catch { window.open(`/options.html#${hash}`, '_blank'); } }} />}
         {tab === 'companies' && <CompaniesView companies={companies} mutedCompanyIds={muted} onToggleMuted={toggleMuted} offline={status === 'offline'} loading={status === 'connecting'} />}
-        {tab === 'saved' && <SavedJobsView savedJobs={savedJobs} onToggleSave={handleToggleSave} onBrowseJobs={() => setTab('jobs')} />}
+        {tab === 'saved' && <SavedJobsView savedJobs={savedJobs} onToggleSave={handleToggleSave} onBrowseJobs={() => setTab('jobs')} notify={showNotice} />}
         {tab === 'preferences' && preferences && <PreferencesView preferences={preferences} onSave={handleSavePreferences} onReplayWelcome={resetOnboarding} />}
         {tab === 'preferences' && !preferences && (
           <div className="section" aria-busy="true" aria-label="Loading your preferences">

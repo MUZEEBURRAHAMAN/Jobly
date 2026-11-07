@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Bell, Bookmark, Briefcase, Building2, Calendar, FileText, Kanban, ListChecks, Mail, Moon, RefreshCw, SlidersHorizontal, Sun, User, Contacts } from '../lib/icons';
+import { Bell, Bookmark, Briefcase, Building2, Calendar, FileText, Kanban, ListChecks, Mail, Moon, RefreshCw, Settings, SlidersHorizontal, Sun, User, Contacts } from '../lib/icons';
 import { api, ConnectionStatus } from '../lib/api';
-import { MAX_PAGE_SIZE } from '../lib/config';
+import { FEATURES, MAX_PAGE_SIZE } from '../lib/config';
 import { DEFAULT_FILTERS, JobFilters } from '../lib/filters';
 import { useMutedCompanies } from '../lib/mutedCompanies';
 import { useSavedJobs } from '../lib/useSavedJobs';
@@ -28,6 +28,7 @@ import { ResumeView } from '../components/ResumeView';
 import { CoverLetterView } from '../components/CoverLetterView';
 import { useProfiles } from '../lib/useProfiles';
 import { ContactsView } from '../components/ContactsView';
+import { DataSetting } from '../components/DataSetting';
 import { CalendarImport } from '../components/CalendarImport';
 import { HUNTER_KEY } from '../lib/integrations';
 import { onKeysChanged, readKey } from '../lib/userData';
@@ -36,8 +37,14 @@ import { dueLabel } from '../lib/dates';
 
 type Tab = 'jobs' | 'companies' | 'saved' | 'tracker' | 'interviews' | 'tasks' | 'profile' | 'resume' | 'letters' | 'contacts' | 'alerts' | 'preferences';
 const n = (v: number | undefined) => (v ?? 0).toLocaleString();
+const TRACKER_TABS: Tab[] = ['tracker', 'interviews', 'tasks'];
 const TABS: Tab[] = ['jobs', 'companies', 'saved', 'tracker', 'interviews', 'tasks', 'profile', 'resume', 'letters', 'contacts', 'alerts', 'preferences'];
-const tabFromHash = (): Tab => { const h = window.location.hash.replace('#', ''); return (TABS as string[]).includes(h) ? (h as Tab) : 'jobs'; };
+const tabFromHash = (): Tab => {
+  const h = window.location.hash.replace('#', '');
+  // Links to the switched-off tracker pages (old bookmarks, notifications) open Saved, where applied jobs are listed
+  if (!FEATURES.tracker && (TRACKER_TABS as string[]).includes(h)) return 'saved';
+  return (TABS as string[]).includes(h) ? (h as Tab) : 'jobs';
+};
 
 export const OptionsApp: React.FC = () => {
   const [theme, setTheme] = useState<Theme>(getInitialTheme());
@@ -200,7 +207,7 @@ export const OptionsApp: React.FC = () => {
     if (!(await markAllRead())) showNotice("Couldn't mark alerts as read. Please try again.");
   };
 
-  const tabs: { id: Tab; label: string; icon: React.ElementType; badge?: number }[] = [
+  const allTabs: { id: Tab; label: string; icon: React.ElementType; badge?: number }[] = [
     { id: 'jobs', label: 'Jobs', icon: Briefcase },
     { id: 'companies', label: 'Companies', icon: Building2 },
     { id: 'saved', label: 'Saved', icon: Bookmark, badge: savedJobs.length },
@@ -214,6 +221,13 @@ export const OptionsApp: React.FC = () => {
     { id: 'alerts', label: 'Alerts', icon: Bell, badge: unreadAlerts },
     { id: 'preferences', label: 'Preferences', icon: SlidersHorizontal },
   ];
+  // Alerts and Settings live in the header (bell and gear), not the sidebar
+  const tabs = allTabs.filter((t) => t.id !== 'alerts' && t.id !== 'preferences' && (FEATURES.tracker || !TRACKER_TABS.includes(t.id)));
+
+  const openAlerts = () => {
+    setTab('alerts');
+    if (unreadAlerts > 0) { setNewThisVisit((s) => new Set([...s, ...alerts.filter((a) => !a.is_read).map((a) => a.id)])); void markAlertsRead(); }
+  };
 
   const finishWelcome = async (p: Preferences) => { await handleSavePreferences(p); completeOnboarding(); window.location.hash = ''; };
 
@@ -227,10 +241,28 @@ export const OptionsApp: React.FC = () => {
             <StatusPill status={status} onRetry={() => { connect(); }} />
           </div>
         </div>
-        <div className="row">
-          <button type="button" className="btn btn-outline btn-sm" onClick={toggleTheme}>{theme === 'dark' ? <Sun size={14} aria-hidden="true" /> : <Moon size={14} aria-hidden="true" />}{theme === 'dark' ? 'Light mode' : 'Dark mode'}</button>
-          <button type="button" className="btn btn-sm" onClick={handleSync} disabled={isSyncing}><RefreshCw size={14} className={isSyncing ? 'spin' : ''} aria-hidden="true" />{isSyncing ? 'Refreshing…' : 'Refresh jobs'}</button>
-        </div>
+        {onboarded ? (
+          <div className="row top-actions" style={{ gap: 2 }}>
+            <button type="button" className="btn btn-ghost btn-icon icon-badge-wrap" onClick={openAlerts} aria-current={tab === 'alerts' ? 'page' : undefined}
+              title={unreadAlerts ? `Alerts: ${unreadAlerts} new` : 'Alerts'} aria-label={unreadAlerts ? `Alerts, ${unreadAlerts} new` : 'Alerts'}>
+              <Bell size={18} duo={tab === 'alerts'} aria-hidden="true" />
+              {unreadAlerts > 0 && <span className="icon-badge" aria-hidden="true">{unreadAlerts > 99 ? '99+' : unreadAlerts}</span>}
+            </button>
+            <button type="button" className="btn btn-ghost btn-icon" onClick={toggleTheme} title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`} aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}>
+              {theme === 'dark' ? <Sun size={18} aria-hidden="true" /> : <Moon size={18} aria-hidden="true" />}
+            </button>
+            <button type="button" className="btn btn-ghost btn-icon" onClick={handleSync} disabled={isSyncing} title={isSyncing ? 'Refreshing…' : 'Refresh jobs'} aria-label={isSyncing ? 'Refreshing jobs' : 'Refresh jobs'}>
+              <RefreshCw size={18} className={isSyncing ? 'spin' : ''} aria-hidden="true" />
+            </button>
+            <button type="button" className="btn btn-ghost btn-icon" onClick={() => setTab('preferences')} aria-current={tab === 'preferences' ? 'page' : undefined} title="Settings" aria-label="Settings">
+              <Settings size={18} duo={tab === 'preferences'} aria-hidden="true" />
+            </button>
+          </div>
+        ) : (
+          <button type="button" className="btn btn-ghost btn-icon" onClick={toggleTheme} title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`} aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}>
+            {theme === 'dark' ? <Sun size={18} aria-hidden="true" /> : <Moon size={18} aria-hidden="true" />}
+          </button>
+        )}
       </header>
 
       {onboarded === false ? (
@@ -240,7 +272,7 @@ export const OptionsApp: React.FC = () => {
         <nav className="side" aria-label="Sections">
           {tabs.map(({ id, label, icon: Icon, badge }) => (
             <button key={id} type="button" className="nav-link" aria-current={tab === id ? 'page' : undefined}
-              onClick={() => { setTab(id); if (id === 'alerts' && unreadAlerts > 0) { setNewThisVisit((s) => new Set([...s, ...alerts.filter((a) => !a.is_read).map((a) => a.id)])); void markAlertsRead(); } }}>
+              onClick={() => setTab(id)}>
               <Icon size={16} duo={tab === id} aria-hidden="true" /> {label}
               {badge ? <span className="nav-badge">{badge}</span> : null}
             </button>
@@ -272,17 +304,18 @@ export const OptionsApp: React.FC = () => {
                 </div>
               )}
               {tab === 'companies' && <CompaniesView large companies={companies} mutedCompanyIds={muted} onToggleMuted={toggleMuted} offline={status === 'offline'} loading={status === 'connecting'} />}
-              {tab === 'saved' && <SavedJobsView large savedJobs={savedJobs} onToggleSave={handleToggleSave} onBrowseJobs={() => setTab('jobs')} />}
-              {tab === 'tracker' && <TrackerView store={tracker} savedJobs={savedJobs} notify={showNotice} onBrowseJobs={() => setTab('jobs')} />}
-              {tab === 'interviews' && <InterviewsView store={tracker} onOpenTracker={() => setTab('tracker')} calendarImport={<CalendarImport store={tracker} notify={showNotice} />} />}
-              {tab === 'tasks' && <TasksView store={tracker} notify={showNotice} />}
+              {tab === 'saved' && <SavedJobsView large savedJobs={savedJobs} onToggleSave={handleToggleSave} onBrowseJobs={() => setTab('jobs')} notify={showNotice} />}
+              {FEATURES.tracker && tab === 'tracker' && <TrackerView store={tracker} savedJobs={savedJobs} notify={showNotice} onBrowseJobs={() => setTab('jobs')} />}
+              {FEATURES.tracker && tab === 'interviews' && <InterviewsView store={tracker} onOpenTracker={() => setTab('tracker')} calendarImport={<CalendarImport store={tracker} notify={showNotice} />} />}
+              {FEATURES.tracker && tab === 'tasks' && <TasksView store={tracker} notify={showNotice} />}
               {tab === 'profile' && <ProfileView store={profiles} notify={showNotice} />}
               {tab === 'resume' && <ResumeView store={profiles} onOpenProfile={() => setTab('profile')} />}
               {tab === 'letters' && <CoverLetterView profiles={profiles} tracker={tracker} savedJobs={savedJobs} notify={showNotice} onOpenProfile={() => setTab('profile')} />}
               {tab === 'contacts' && <ContactsView tracker={tracker} profile={profiles.active} notify={showNotice} onOpenPreferences={() => setTab('preferences')} hasHunterKey={hasHunterKey} />}
               {tab === 'alerts' && <AlertsView large alerts={alerts} newIds={newThisVisit} onMarkAllRead={markAlertsRead} />}
-              {tab === 'preferences' && preferences && <PreferencesView wide preferences={preferences} onSave={handleSavePreferences} onReplayWelcome={resetOnboarding} />}
-              {tab === 'preferences' && !preferences && <div className="section" aria-busy="true" aria-label="Loading your preferences">{[0, 1, 2, 3].map((i) => <div key={i} className="skeleton" style={{ height: i ? 56 : 28, width: i ? '100%' : '40%' }} />)}</div>}
+              {tab === 'preferences' && preferences && <PreferencesView wide title="Settings" preferences={preferences} onSave={handleSavePreferences} onReplayWelcome={resetOnboarding}
+                extra={<DataSetting store={tracker} notify={showNotice} />} />}
+              {tab === 'preferences' && !preferences && <div className="section" aria-busy="true" aria-label="Loading your settings">{[0, 1, 2, 3].map((i) => <div key={i} className="skeleton" style={{ height: i ? 56 : 28, width: i ? '100%' : '40%' }} />)}</div>}
             </ErrorBoundary>
           </div>
         </main>

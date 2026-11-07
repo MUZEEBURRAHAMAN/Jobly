@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { calendarConfigured, disconnectGoogle, loadHunterKey, saveHunterKey } from '../lib/integrations';
+import { FEATURES } from '../lib/config';
 
 /** Optional services: the user's own Hunter key for contacts, and Google Calendar for interviews. */
 export const ConnectionsSetting: React.FC<{ onChange?: () => void }> = ({ onChange }) => {
@@ -19,11 +20,11 @@ export const ConnectionsSetting: React.FC<{ onChange?: () => void }> = ({ onChan
         </div>
         <p className="hint">Your own Hunter account, used straight from this browser. Jobly never sees the key or the searches.</p>
       </div>
-      <div className="row" style={{ justifyContent: 'space-between' }}>
+      {FEATURES.tracker && <div className="row" style={{ justifyContent: 'space-between' }}>
         <span><span className="font-medium" style={{ display: 'block' }}>Google Calendar</span>
           <span className="text-xs muted">{calendarConfigured() ? 'Import interviews from the Interviews page. Read-only.' : "Calendar import isn't set up in this version yet."}</span></span>
         {calendarConfigured() && <button type="button" className="btn btn-ghost btn-sm" onClick={() => void disconnectGoogle().then(() => setNote('Google Calendar disconnected.'))}>Disconnect</button>}
-      </div>
+      </div>}
       <p className="hint" role="status">{note}</p>
     </fieldset>
   );

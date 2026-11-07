@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
-import { Bookmark, BookmarkCheck, CheckCircle2, ExternalLink, Flag, MapPin, Share2, Sparkles } from '../lib/icons';
+import { Bookmark, BookmarkCheck, Check, CheckCircle2, ExternalLink, Flag, MapPin, Share2, Sparkles } from '../lib/icons';
 import { ReportModal } from './ReportModal';
 import { Job } from '../types';
 import { getCompanyLogoUrl } from '../lib/companyLogos';
 import { hostOf, safeHttpUrl } from '../lib/url';
 import { BOARD_NAMES, EMPLOYMENT_LABELS, EXPERIENCE_LABELS, timeAgo } from '../lib/format';
 import { useTrackerContext } from '../lib/trackerContext';
-import { AppStatus, STATUSES, statusLabel } from '../lib/tracker';
+import { APPLIED_STATUSES, AppStatus, STATUSES, statusLabel } from '../lib/tracker';
+import { FEATURES } from '../lib/config';
 
 interface JobCardProps {
   job: Job;
@@ -27,6 +28,15 @@ export const JobCard: React.FC<JobCardProps> = ({ job, onToggleSave }) => {
     if (!tracker) return;
     const problem = await tracker.track(job, value ? (value as AppStatus) : null);
     setShareNote(problem ?? (value ? `Tracked as ${statusLabel(value as AppStatus)}` : 'Removed from tracker'));
+    window.setTimeout(() => setShareNote(null), 2500);
+  };
+
+  // With the tracker switched off, one toggle records that you applied (it shows under Saved › Applied)
+  const applied = !!status && APPLIED_STATUSES.includes(status);
+  const toggleApplied = async () => {
+    if (!tracker) return;
+    const problem = await tracker.track(job, applied ? null : 'applied');
+    setShareNote(problem ?? (applied ? 'Removed from Applied' : 'Added to Applied'));
     window.setTimeout(() => setShareNote(null), 2500);
   };
 
@@ -66,7 +76,7 @@ export const JobCard: React.FC<JobCardProps> = ({ job, onToggleSave }) => {
       </div>
 
       <div className="row wrap" style={{ gap: 6 }}>
-        {status && status !== 'saved' && <span className="badge badge-success"><CheckCircle2 size={12} aria-hidden="true" /> {statusLabel(status)}</span>}
+        {FEATURES.tracker && status && status !== 'saved' && <span className="badge badge-success"><CheckCircle2 size={12} aria-hidden="true" /> {statusLabel(status)}</span>}
         {appliedBefore && <span className="badge badge-warning">You applied here before</span>}
         {job.is_match && <span className="badge badge-brand"><Sparkles size={12} duo aria-hidden="true" /> Matches you</span>}
         {job.work_mode === 'remote' && <span className="badge badge-success">Remote</span>}
@@ -94,14 +104,19 @@ export const JobCard: React.FC<JobCardProps> = ({ job, onToggleSave }) => {
           <button type="button" className="btn btn-ghost btn-sm btn-icon" onClick={() => setShowReport(true)} title="Report this listing" aria-label={`Report: ${job.title}`}>
             <Flag size={14} aria-hidden="true" />
           </button>
-          {tracker && (
+          {tracker && !FEATURES.tracker && (
+            <button type="button" className={`btn btn-sm mark-applied ${applied ? 'btn-toggled' : 'btn-ghost'}`} onClick={() => void toggleApplied()} aria-pressed={applied}
+              title={applied ? 'You applied. Click to undo' : 'Mark applied'} aria-label={`${applied ? 'Applied' : 'Mark applied'}: ${job.title} at ${job.company_name}`}>
+              <Check size={14} aria-hidden="true" /> <span className="btn-label">{applied ? 'Applied' : 'Mark applied'}</span>
+            </button>
+          )}
+          {tracker && FEATURES.tracker && (
             <select className="select select-sm track-select" value={status ?? ''} onChange={(e) => void handleTrack(e.target.value)}
               aria-label={`Track ${job.title} at ${job.company_name}`} title="Add to your application tracker">
               <option value="">{status ? 'Stop tracking' : 'Track…'}</option>
               {STATUSES.map((s) => <option key={s.id} value={s.id}>{s.label}</option>)}
             </select>
           )}
-          <span role="status" className="text-xs muted">{shareNote}</span>
         </div>
         {applyUrl ? (
           <a
@@ -119,6 +134,9 @@ export const JobCard: React.FC<JobCardProps> = ({ job, onToggleSave }) => {
           <span className="btn btn-secondary btn-sm" aria-disabled="true">Link unavailable</span>
         )}
       </div>
+
+      {/* Confirmations ("Link copied", "Added to Applied") get their own line so the buttons never get squeezed */}
+      <span role="status" className="text-xs muted card-note">{shareNote}</span>
 
       {showReport && <ReportModal job={job} onClose={() => setShowReport(false)} />}
     </article>

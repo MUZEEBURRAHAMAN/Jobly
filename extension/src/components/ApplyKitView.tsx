@@ -8,10 +8,11 @@ import { CopyButton } from './CopyButton';
 import { fitCheck } from '../lib/fit';
 import { AutofillPanel } from './AutofillPanel';
 import { TRACKER_KEYS } from '../lib/tracker';
+import { FEATURES } from '../lib/config';
 import { writeKey } from '../lib/userData';
 
 /**
- * The popup's Apply tab: save the job on the current page to the tracker, and copy profile answers into its form.
+ * The popup's Apply tab: save the job on the current page (to the tracker, or Saved when the tracker is off), and copy profile answers into its form.
  * Reading the page works only for the tab Jobly was opened on (activeTab), so nothing is read in the background.
  */
 export const ApplyKitView: React.FC<{ profiles: ProfilesStore; tracker: TrackerStore; openDashboard: (hash: string) => void; notify: (m: string, kind?: 'error' | 'info') => void }> = ({ profiles, tracker, openDashboard, notify }) => {
@@ -39,7 +40,7 @@ export const ApplyKitView: React.FC<{ profiles: ProfilesStore; tracker: TrackerS
   const save = async () => {
     if (!page) return;
     const { problem } = await tracker.addApp(appFromPageJob(page));
-    if (problem) notify(problem); else { setSaved(true); notify('Saved to your tracker.', 'info'); }
+    if (problem) notify(problem); else { setSaved(true); notify(FEATURES.tracker ? 'Saved to your tracker.' : 'Saved. Find it in the dashboard under Saved.', 'info'); }
   };
 
   const fields = profiles.active ? answerFields(profiles.active) : [];
@@ -54,10 +55,10 @@ export const ApplyKitView: React.FC<{ profiles: ProfilesStore; tracker: TrackerS
           <p className="font-medium break">{page.title || 'Untitled page'}</p>
           <p className="text-sm break">{[page.company, page.location].filter(Boolean).join(' · ')}</p>
           {already || saved
-            ? <p className="text-sm row" style={{ color: 'var(--success)' }}><BookmarkCheck size={14} aria-hidden="true" /> In your tracker{already ? ` as ${already.status}` : ''}</p>
-            : <button type="button" className="btn btn-brand btn-sm" style={{ alignSelf: 'flex-start' }} onClick={() => void save()}><Plus size={14} aria-hidden="true" /> Save to tracker</button>}
+            ? <p className="text-sm row" style={{ color: 'var(--success)' }}><BookmarkCheck size={14} aria-hidden="true" /> {FEATURES.tracker ? <>In your tracker{already ? ` as ${already.status}` : ''}</> : already && already.status !== 'saved' ? 'You applied to this job' : 'Saved'}</p>
+            : <button type="button" className="btn btn-brand btn-sm" style={{ alignSelf: 'flex-start' }} onClick={() => void save()}><Plus size={14} aria-hidden="true" /> {FEATURES.tracker ? 'Save to tracker' : 'Save this job'}</button>}
         </div>
-      ) : <p className="text-sm">Open a job posting, then open Jobly to save it to your tracker.</p>}
+      ) : <p className="text-sm">Open a job posting, then open Jobly to save it{FEATURES.tracker ? ' to your tracker' : ''} and fill its form.</p>}
 
       {tabId !== null && page !== undefined && (
         <AutofillPanel tabId={tabId} profile={profiles.active} openProfile={() => openDashboard('profile')} onFilled={() => {
