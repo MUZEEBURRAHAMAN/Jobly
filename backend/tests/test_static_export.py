@@ -56,7 +56,10 @@ class TestExport(unittest.IsolatedAsyncioTestCase):
                     "VALUES (1,'Acme','greenhouse',?,?,?,'Remote',?,'https://example.com/j','h',?,?,?,?)",
                     (ext, title, role, desc, now, now, status, posted),
                 )
+            await db.execute("UPDATE jobs SET location = 'Bengaluru, India' WHERE external_id IN ('1', '4')")
+            await db.execute("UPDATE jobs SET location = 'London, UK' WHERE external_id = '2'")
             await db.commit()
+        self.recent = recent
 
     async def asyncTearDown(self):
         self.patch.stop()
@@ -87,7 +90,9 @@ class TestExport(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(stats["total_jobs"], 3)
         # Design & IT: the designer (recent) and the backend engineer (no date); not the account executive
         self.assertEqual((stats["design_it_jobs"], stats["design_it_week"], stats["jobs_week"]), (2, 1, 2))
-        self.assertEqual(json.loads((v1 / "companies.json").read_text())[0]["job_count"], 4)  # API counts all active
+        acme = json.loads((v1 / "companies.json").read_text())[0]
+        # Counted over the published jobs (not the 90-day-old or closed ones), top countries by jobs then name
+        self.assertEqual((acme["job_count"], acme["countries"], acme["latest_posted"]), (3, ["India", "United Kingdom"], self.recent))
         self.assertIn("Access-Control-Allow-Origin: *", (out / "_headers").read_text())
 
 

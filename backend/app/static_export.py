@@ -2,7 +2,7 @@
 
 Layout (all under <out>/v1/):
   meta.json                    generation time, columns, age buckets, categories with counts, file sizes
-  companies.json               same shape as GET /api/companies
+  companies.json               GET /api/companies, with job_count over the published jobs, top 3 countries, latest_posted
   stats.json, geo.json         same shapes as GET /api/stats (without preferences) and GET /api/geo
   jobs/<category>/<bucket>.json  {"rows": [[...], ...]} in meta.columns order, newest first
   desc/<id % DESC_SHARDS>.json   {"<job id>": "<plain-text description>"}
@@ -28,6 +28,7 @@ from typing import Any
 
 from .categories import CATEGORIES, DESIGN_AND_IT, classify_category
 from .config import settings
+from .geo import place_of_job
 
 VERSION = 1
 AGE_BUCKETS = (1, 3, 7, 14, 30, 60)
@@ -124,7 +125,16 @@ async def export(db_path: Path, out: Path, now: datetime | None = None) -> dict[
 
     files: dict[tuple[str, str], list[list[Any]]] = {}
     shards: dict[int, dict[str, str]] = {}
+    # Per company, for the Companies page filters: open jobs, where they are (top countries) and the newest posting
+    per_company: dict[int, dict[str, Any]] = {}
     for r in rows:
+        pc = per_company.setdefault(r["company_id"], {"jobs": 0, "countries": {}, "latest": None})
+        pc["jobs"] += 1
+        country, _hub = place_of_job(r["location"], r["title"])
+        if country:
+            pc["countries"][country] = pc["countries"].get(country, 0) + 1
+        if r["posted_at"] and (pc["latest"] is None or r["posted_at"] > pc["latest"]):
+            pc["latest"] = r["posted_at"]
         cat = classify_category(r["title"], r["normalized_role"])
         files.setdefault((cat, bucket_of(r["posted_at"], now)), []).append([r[c] for c in COLUMNS])
         desc = plain_text(r["description"])
@@ -154,6 +164,12 @@ async def export(db_path: Path, out: Path, now: datetime | None = None) -> dict[
                 counts["design_it_today"] += p >= day
                 counts["design_it_week"] += in_week
     stats = {**stats, **counts}
+    # Counts match what the extension can show (the 60-day window), plus top 3 countries and the newest posting
+    for c in companies:
+        pc = per_company.get(c["id"])
+        c["job_count"] = pc["jobs"] if pc else 0
+        c["countries"] = [k for k, _ in sorted(pc["countries"].items(), key=lambda kv: (-kv[1], kv[0]))[:3]] if pc else []
+        c["latest_posted"] = pc["latest"] if pc else None
     _write(root / "stats.json", stats)
     _write(root / "geo.json", geo)
     _write(root / "companies.json", companies)

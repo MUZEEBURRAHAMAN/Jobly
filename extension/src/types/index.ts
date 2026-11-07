@@ -72,6 +72,10 @@ export interface Company {
   logo_url?: string;
   is_active: boolean;
   job_count: number;
+  /** Top 3 countries of its open jobs, most jobs first (static export; missing in older cached copies). */
+  countries?: string[];
+  /** Newest posting date among its open jobs. */
+  latest_posted?: string | null;
   created_at: string;
   updated_at: string;
 }

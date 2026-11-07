@@ -308,6 +308,19 @@ await step('dealbreakers, job type filter, following companies', async () => {
   const followed = (await h.sw.evaluate(() => chrome.storage.local.get('followedCompanyIds'))).followedCompanyIds;
   ok(followed?.length === 1, 'following a company is stored on the device');
   await axe(d, 'companies with follow');
+  // filters and sorting: the export gives each company its top countries, open jobs and newest posting
+  const companies = readStatic('companies.json');
+  const india = companies.filter((c) => (c.countries ?? []).includes('India')).length;
+  ok(india > 0 && companies.every((c) => Array.isArray(c.countries) && c.countries.length <= 3), `companies.json lists up to 3 countries per company (${india} hire in India)`);
+  await d.getByRole('combobox', { name: 'Country' }).selectOption('India'); await sleep(300);
+  ok(await d.locator('.co-row').count() === india && await d.getByText(`${india} of ${companies.length} companies hiring in India`).count() === 1, 'the country filter keeps the companies hiring there');
+  await d.getByRole('combobox', { name: 'Country' }).selectOption(''); await d.getByRole('combobox', { name: 'Sort companies' }).selectOption('za'); await sleep(300);
+  const names = await d.locator('.co-row .font-medium').allInnerTexts();
+  ok(names.length > 1 && names.every((n, i) => i === 0 || names[i - 1].localeCompare(n, undefined, { sensitivity: 'base' }) >= 0), 'Name Z–A sorts the list backwards');
+  await d.getByRole('combobox', { name: 'Sort companies' }).selectOption('jobs'); await sleep(300);
+  const counts = (await d.locator('.co-row .grow > .text-xs:nth-child(2)').allInnerTexts()).map((t) => Number(t.match(/^(\d+)/)[1]));
+  ok(counts.every((n, i) => i === 0 || counts[i - 1] >= n) && counts.every((n) => n > 0), 'Most open jobs puts the biggest employers first, and "Hiring now" hides companies with none');
+  await axe(d, 'companies filtered');
   // follow a company that has jobs from the last 3 days, so the check has something to find
   const recentCompany = staticJobs().find((j) => j.bucket === '1' || j.bucket === '3').company_id;
   await h.sw.evaluate((id) => chrome.storage.local.set({ followedCompanyIds: [id] }), recentCompany);

@@ -486,8 +486,8 @@ fieldset.profile-card > legend { padding: 0 var(--space-1); }
 .finder-grid .wide { grid-column: auto; }
 .prefs-wide { display: block; columns: 2 460px; column-gap: var(--space-8); }
 .prefs-wide > * { break-inside: avoid; margin-bottom: var(--space-4); }
-.cols .co-row .switch-label { display: none; }
-.cols .co-row .grow { min-width: 0; }
+.co-row .switch-label { display: none; }
+.co-row .grow { min-width: 0; }
 @media (max-width: 1100px) {
   .finder-grid { grid-template-columns: 1fr 1fr; }
   .finder-grid > :first-child { grid-column: 1 / -1; }

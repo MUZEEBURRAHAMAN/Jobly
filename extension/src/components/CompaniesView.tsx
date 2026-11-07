@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Bell, ExternalLink, Plus, Search } from '../lib/icons';
 import { useFollowedCompanies } from '../lib/followedCompanies';
 import { Company } from '../types';
@@ -6,8 +6,17 @@ import { getCompanyLogoUrl } from '../lib/companyLogos';
 import { safeHttpUrl } from '../lib/url';
 import { EmptyState } from './EmptyState';
 import { supportMailto } from '../lib/mail';
+import { timeAgo } from '../lib/format';
 
 const PAGE = 50; // render in pages: 600+ rows at once is slow
+
+type Sort = 'az' | 'za' | 'jobs' | 'newest';
+const SORTS: { id: Sort; label: string }[] = [
+  { id: 'az', label: 'Name A–Z' }, { id: 'za', label: 'Name Z–A' }, { id: 'jobs', label: 'Most open jobs' }, { id: 'newest', label: 'Newest jobs' },
+];
+// Short names keep a row's country list on one line
+const SHORT: Record<string, string> = { 'United States': 'US', 'United Kingdom': 'UK', 'United Arab Emirates': 'UAE' };
+const short = (c: string) => SHORT[c] ?? c;
 
 interface CompaniesViewProps {
   companies: Company[];
@@ -29,7 +38,15 @@ const Row: React.FC<{ company: Company; muted: boolean; onToggle: () => void; fo
       </div>
       <div className="grow">
         <div className="font-medium truncate">{company.name}</div>
-        <div className="text-xs muted truncate" title={company.industry ?? undefined}>{company.job_count} open role{company.job_count === 1 ? '' : 's'}{company.industry ? ` · ${company.industry}` : ''}</div>
+        <div className="text-xs muted truncate">
+          {company.job_count} open role{company.job_count === 1 ? '' : 's'}
+          {company.latest_posted && company.job_count > 0 ? ` · newest ${timeAgo(company.latest_posted).toLowerCase()}` : ''}
+        </div>
+        {(!!company.countries?.length || !!company.industry) && (
+          <div className="text-xs muted truncate" title={company.countries?.length ? company.countries.join(', ') : company.industry ?? undefined}>
+            {company.countries?.length ? company.countries.map(short).join(' · ') : company.industry}
+          </div>
+        )}
       </div>
       {careers && (
         <a className="btn btn-ghost btn-icon btn-sm" href={careers} target="_blank" rel="noopener noreferrer" aria-label={`${company.name} careers page`} title="Careers page"><ExternalLink size={14} aria-hidden="true" /></a>
@@ -52,11 +69,34 @@ export const CompaniesView: React.FC<CompaniesViewProps> = ({ companies, mutedCo
   const [error, setError] = useState<string | null>(null);
   const { followed, toggle: toggleFollow } = useFollowedCompanies();
   const [onlyFollowing, setOnlyFollowing] = useState(false);
+  const [hiringOnly, setHiringOnly] = useState(true);
+  const [country, setCountry] = useState('');
+  const [sort, setSort] = useState<Sort>('az');
   const follow = async (id: number) => { const problem = await toggleFollow(id); if (problem) setError(problem); };
 
-  useEffect(() => setVisible(PAGE), [query]);
+  // Countries to filter by, the ones with the most hiring companies first
+  const countries = useMemo(() => {
+    const n = new Map<string, number>();
+    for (const c of companies) for (const k of c.countries ?? []) n.set(k, (n.get(k) ?? 0) + 1);
+    return [...n.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));
+  }, [companies]);
+
+  useEffect(() => setVisible(PAGE), [query, hiringOnly, country, sort, onlyFollowing]);
   const q = query.trim().toLowerCase();
-  const list = companies.filter((c) => (!onlyFollowing || followed.includes(c.id)) && (!q || c.name.toLowerCase().includes(q) || (c.industry || '').toLowerCase().includes(q)));
+  const list = useMemo(() => {
+    const out = companies.filter((c) => (!onlyFollowing || followed.includes(c.id)) && (!hiringOnly || c.job_count > 0)
+      && (!country || (c.countries ?? []).includes(country))
+      && (!q || c.name.toLowerCase().includes(q) || (c.industry || '').toLowerCase().includes(q)));
+    const byName = (a: Company, b: Company) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base' });
+    const cmp: Record<Sort, (a: Company, b: Company) => number> = {
+      az: byName,
+      za: (a, b) => byName(b, a),
+      jobs: (a, b) => b.job_count - a.job_count || byName(a, b),
+      newest: (a, b) => (b.latest_posted ?? '').localeCompare(a.latest_posted ?? '') || byName(a, b),
+    };
+    return out.sort(cmp[sort]);
+  }, [companies, onlyFollowing, followed, hiringOnly, country, q, sort]);
+  const filtered = onlyFollowing || hiringOnly || !!country;
 
   const suggest = supportMailto('Suggest a company for Jobly', ['Company name:', 'Careers page link:', '']);
 
@@ -76,10 +116,23 @@ export const CompaniesView: React.FC<CompaniesViewProps> = ({ companies, mutedCo
         <Search size={16} aria-hidden="true" />
         <input className="input" type="search" value={query} onChange={(e) => setQuery(e.target.value)} placeholder={`Search ${companies.length} companies…`} aria-label="Search companies" />
       </div>
-      <div className="row wrap">
+      <div className="row wrap co-filters">
+        <button type="button" className="chip" aria-pressed={hiringOnly} onClick={() => setHiringOnly((v) => !v)}>Hiring now</button>
         <button type="button" className="chip" aria-pressed={onlyFollowing} onClick={() => setOnlyFollowing((v) => !v)}>Following <span className="count">{followed.length}</span></button>
-        <span className="text-xs muted">Follow a company to get an alert for every new job there.</span>
+        {countries.length > 0 && (
+          <select className={`chip chip-select${country ? ' active' : ''}`} value={country} onChange={(e) => setCountry(e.target.value)} aria-label="Country">
+            <option value="">Any country</option>
+            {countries.map(([name, n]) => <option key={name} value={name}>{name} ({n})</option>)}
+          </select>
+        )}
+        <select className="chip chip-select" value={sort} onChange={(e) => setSort(e.target.value as Sort)} aria-label="Sort companies">
+          {SORTS.map((o) => <option key={o.id} value={o.id}>{o.label}</option>)}
+        </select>
       </div>
+      <p className="text-xs muted" role="status">
+        {list.length === companies.length ? `${companies.length} companies` : `${list.length} of ${companies.length} companies`}
+        {country ? ` hiring in ${country}` : ''}. Follow a company to get an alert for every new job there.
+      </p>
       {error && <p role="alert" className="text-sm" style={{ color: 'var(--warning)' }}>{error}</p>}
 
       {companies.length === 0 && loading ? (
@@ -89,8 +142,9 @@ export const CompaniesView: React.FC<CompaniesViewProps> = ({ companies, mutedCo
       ) : companies.length === 0 && offline ? (
         <EmptyState art="offline" large={large} title="Can't load companies" description="Jobly can't reach its job list right now. The companies appear as soon as it reconnects." />
       ) : list.length === 0 ? (
-        <EmptyState art="companies" large={large} title={companies.length === 0 ? 'No companies yet' : `No companies match "${query}"`} description={companies.length === 0 ? 'The company list loads when Jobly connects.' : 'Try another name or industry.'}
-          actions={q ? <button type="button" className="btn" onClick={() => setQuery('')}>Clear search</button> : undefined} />
+        <EmptyState art="companies" large={large} title={companies.length === 0 ? 'No companies yet' : q ? `No companies match "${query}"` : 'No companies match these filters'}
+          description={companies.length === 0 ? 'The company list loads when Jobly connects.' : 'Try another name, or clear the filters.'}
+          actions={q || filtered ? <button type="button" className="btn" onClick={() => { setQuery(''); setOnlyFollowing(false); setHiringOnly(false); setCountry(''); }}>Clear search and filters</button> : undefined} />
       ) : (
         <>
           <ul className={large ? 'cols' : 'stack'} style={{ listStyle: 'none', gap: 8 }}>
