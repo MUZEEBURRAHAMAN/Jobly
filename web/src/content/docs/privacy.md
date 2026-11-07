@@ -2,11 +2,11 @@
 title: Privacy policy
 eyebrow: Privacy
 description: What Jobly keeps on your device, what it downloads, and what it never collects. No account, no server, no analytics, no tracking.
-updated: 2026-11-02
+updated: 2026-11-07
 figure: padlock
 ---
 
-> **The short version.** Jobly has no accounts and no analytics. Your preferences, saved jobs, tracker, profiles and contacts stay in your browser. To show you jobs, the extension downloads Jobly's public job files and filters them in your browser. It reads a web page only when you click to save that job, check your fit or autofill its form. Optional connections (Chrome sync, Google Calendar, Hunter) are off until you turn them on, and talk to those services directly. Jobly has no server of its own, so nothing passes through it. We don't build a profile of you, and we don't sell or share data.
+> **The short version.** Jobly has no accounts and no analytics. Your preferences, saved and applied jobs, profiles and contacts stay in your browser. To show you jobs, the extension downloads Jobly's public job files and filters them in your browser. It reads a web page only when you click to save that job, check your fit or autofill its form. Optional connections (Chrome sync, Hunter) are off until you turn them on, and talk to those services directly. Jobly has no server of its own, so nothing passes through it. We don't build a profile of you, and we don't sell or share data.
 
 ## What Jobly is
 
@@ -18,13 +18,13 @@ The extension keeps these in your browser's extension storage. Jobly never uploa
 
 - **Your preferences:** roles, experience levels, remote only, keywords to include or exclude, and whether desktop alerts are on.
 - **Your lists:** jobs you save, new-match alerts found by the background check, companies you mute or follow, and a cached copy of recent results so the extension opens instantly.
-- **Your tracker:** applications and their status, notes, dates and follow-up reminders; interviews with their checklists and ratings; tasks and your weekly goal.
+- **Your applications:** jobs you saved from a careers page or marked as applied, with the date and any notes. (Earlier versions also kept interviews, tasks and follow-up reminders; those features are switched off for now, and anything already kept stays on your device.)
 - **Your profiles:** the details you enter for applications (name, contact details, links, experience, education, skills, answers to common questions), an optional resume file, and the resume template you chose.
 - **Your contacts:** recruiters and hiring managers you save, and whether you contacted them.
 - **Keys you add:** your own Hunter API key, if you add one. It is never included in backups.
 - **Small settings:** your theme and whether you have seen the welcome tour. The theme uses Chrome's sync storage, so Chrome may copy it to your other devices through your Google account.
 
-You can export all of this as a file from the Tracker (Backup) and import it again; the file is created on your computer and goes nowhere else.
+You can export all of this as a file from Settings (Download a backup) and import it again; the file is created on your computer and goes nowhere else.
 
 Uninstalling the extension removes all of this from your device.
 
@@ -50,8 +50,7 @@ This happens in your browser. Nothing read from the page leaves it. Chrome grant
 
 Each is off until you turn it on, and each talks to that service straight from your browser:
 
-- **Chrome sync:** copies your preferences, tracker, interviews, tasks and profiles to Chrome on your other computers through your Google account. Google stores it under Chrome's sync terms; Jobly never sees it.
-- **Google Calendar:** when you click Import, Jobly reads your upcoming calendar events (read-only) to find interviews, and saves the ones you choose. Calendar data is not sent anywhere else and Jobly cannot change your calendar.
+- **Chrome sync:** copies your preferences, saved and applied jobs and profiles to Chrome on your other computers through your Google account. Google stores it under Chrome's sync terms; Jobly never sees it.
 - **Hunter (contacts):** when you search a company's domain, Jobly sends that domain and your own Hunter API key to Hunter, which returns publicly listed work contacts. Hunter's own privacy policy applies to that search.
 
 ## This website
@@ -84,7 +83,7 @@ We delete form messages once we have dealt with them, and at the latest after 12
 | --- | --- | --- |
 | Cloudflare Pages | Hosts this website, Jobly Studio and Jobly's public job files | Short-lived technical logs such as IP address, time and the file requested |
 | Google favicon service (t2.gstatic.com) | Shows company logos in the extension | The company domains your browser asks logos for, and your IP address |
-| Chrome Web Store and your Google account | Installing and updating the extension, Chrome sync if you turn it on, Google Calendar if you connect it | Covered by Google's own policies |
+| Chrome Web Store and your Google account | Installing and updating the extension, Chrome sync if you turn it on | Covered by Google's own policies |
 | Hunter (only if you add your own key) | Finding contacts at a company | The company domain you search and your API key |
 
 ## Where your data goes
@@ -98,20 +97,19 @@ You can ask us what we hold about you, to correct it, or to delete it. Because w
 ## Permissions the extension asks for
 
 - **storage:** keep the items above on your device (and in Chrome sync, if you turn it on).
-- **notifications:** show job alerts and your reminders for follow-ups, tasks and interviews.
-- **alarms:** check for new jobs and due reminders every so often in the background.
+- **notifications:** show job alerts, and confirm when you save a job with the right-click menu.
+- **alarms:** check for new jobs every so often in the background.
 - **activeTab and scripting:** read or fill the page you're on, only when you click Save, Fit check or Autofill.
 - **contextMenus:** the right-click "Save this job to Jobly" item.
-- **identity:** sign in to Google Calendar when you choose to import interviews (only in versions where calendar import is available).
 - **Access to jobly-data.pages.dev:** download Jobly's public job files.
-- **Optional access to Hunter (and Google's API where calendar import is available):** requested the first time you use contact search or calendar import; nothing is requested otherwise.
+- **Optional access to Hunter:** requested the first time you use contact search; nothing is requested otherwise.
 
 The [security page](/security) has the full permission list and how data moves.
 
 ## Your choices
 
 - Turn desktop alerts and reminders off, and remove saved jobs, applications, profiles, contacts or muted companies in the app.
-- Turn Chrome sync off in Preferences, disconnect Google Calendar, or remove your Hunter key in Preferences.
+- Turn Chrome sync off in Settings, or remove your Hunter key in Settings.
 - Uninstall the extension to remove everything it stored on your device.
 - Ask us to see or delete a report or form message you sent: write to the address below.
 

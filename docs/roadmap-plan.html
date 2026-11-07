@@ -1,0 +1,749 @@
+<title>Jobly Roadmap Plan</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=Hanken+Grotesk:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* Plan: a product memo for a co-founder. Ink on a cool paper, Jobly orange as the only accent, green/amber/red only for risk.
+   Layout: one reading column (~720px) that widens for the matrix, tables and two-up cards; a contents list up top. */
+:root {
+  --paper: #f6f6f3;
+  --surface: #ffffff;
+  --ink: #17191c;
+  --muted: #5d636b;
+  --line: #e2e3df;
+  --accent: #c2410c;
+  --accent-soft: #fdeee6;
+  --low: #2f855a;
+  --low-soft: #e5f4ec;
+  --mid: #b7791f;
+  --mid-soft: #fbf1dc;
+  --high: #c53030;
+  --high-soft: #fbe7e7;
+  --on-dot: #ffffff;
+  --font-display: "Bricolage Grotesque", "Avenir Next", "Segoe UI", sans-serif;
+  --font-body: "Hanken Grotesk", "Helvetica Neue", Arial, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #121417; --surface: #1a1d21; --ink: #ecedee; --muted: #a1a7ae; --line: #2c3036;
+    --accent: #fb8a4c; --accent-soft: #3a2316;
+    --low: #68d391; --low-soft: #17301f; --mid: #f6c35b; --mid-soft: #33290f; --high: #fc8181; --high-soft: #3a1a1a;
+    --on-dot: #121417;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #121417; --surface: #1a1d21; --ink: #ecedee; --muted: #a1a7ae; --line: #2c3036;
+  --accent: #fb8a4c; --accent-soft: #3a2316;
+  --low: #68d391; --low-soft: #17301f; --mid: #f6c35b; --mid-soft: #33290f; --high: #fc8181; --high-soft: #3a1a1a;
+  --on-dot: #121417;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--paper); color: var(--ink); font: 16px/1.6 var(--font-body); padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+main { max-width: 980px; margin: 0 auto; padding-block: 48px 80px; display: grid; gap: 56px; }
+.prose { max-width: 720px; }
+h1, h2, h3, h4 { font-family: var(--font-display); line-height: 1.15; text-wrap: balance; margin: 0; }
+h1 { font-size: clamp(2rem, 5vw, 2.9rem); letter-spacing: -0.02em; }
+h2 { font-size: 1.6rem; letter-spacing: -0.01em; }
+h3 { font-size: 1.2rem; }
+h4 { font-size: 1rem; }
+p { margin: 0; }
+section { display: grid; gap: 18px; min-width: 0; }
+.eyebrow { font-size: 0.8rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); }
+.lede { font-size: 1.12rem; color: var(--muted); max-width: 680px; }
+.meta { font-size: 0.88rem; color: var(--muted); }
+header { display: grid; gap: 14px; }
+ul, ol { margin: 0; padding-left: 1.2em; display: grid; gap: 6px; }
+a { color: var(--accent); }
+a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+code { font: 0.86em var(--font-mono); background: var(--paper); border: 1px solid var(--line); border-radius: 4px; padding: 1px 5px; overflow-wrap: anywhere; }
+.callout { background: var(--accent-soft); padding: 16px 18px; border-radius: 10px; display: grid; gap: 8px; }
+.grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px; }
+.grid3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 18px; display: grid; gap: 10px; align-content: start; min-width: 0; }
+.card h3, .card h4 { display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; }
+.tag { font: 600 0.72rem/1 var(--font-body); padding: 5px 8px; border-radius: 99px; letter-spacing: 0.02em; white-space: nowrap; }
+.r-low { background: var(--low-soft); color: var(--low); }
+.r-mid { background: var(--mid-soft); color: var(--mid); }
+.r-high { background: var(--high-soft); color: var(--high); }
+.t-accent { background: var(--accent-soft); color: var(--accent); }
+.letter { display: inline-grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; font: 700 0.75rem/1 var(--font-body); color: var(--on-dot); flex: none; }
+.bg-low { background: var(--low); } .bg-mid { background: var(--mid); } .bg-high { background: var(--high); }
+.table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); }
+table { border-collapse: collapse; width: 100%; min-width: 720px; font-size: 0.92rem; }
+th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-weight: 600; color: var(--muted); font-size: 0.78rem; letter-spacing: 0.04em; text-transform: uppercase; background: var(--paper); }
+tr:last-child td { border-bottom: 0; }
+td.num { font-variant-numeric: tabular-nums; text-align: center; white-space: nowrap; }
+td.right { font-variant-numeric: tabular-nums; text-align: right; white-space: nowrap; }
+.feat { display: flex; gap: 10px; align-items: center; font-weight: 600; }
+.matrix { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(240px, 1fr); gap: 20px; align-items: start; }
+@media (max-width: 760px) { .matrix { grid-template-columns: 1fr; } }
+.chart { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 10px; overflow-x: auto; }
+.chart svg { display: block; width: 100%; min-width: 520px; height: auto; }
+.legend { display: grid; gap: 8px; font-size: 0.9rem; }
+.legend div { display: flex; gap: 10px; align-items: center; }
+.toc { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 18px 20px; display: grid; gap: 10px; }
+.toc ol { columns: 2 260px; column-gap: 28px; display: block; }
+.toc li { margin-bottom: 4px; break-inside: avoid; }
+.dive { display: grid; gap: 16px; padding-top: 8px; border-top: 1px solid var(--line); }
+.dive-head { display: flex; gap: 12px; align-items: baseline; flex-wrap: wrap; justify-content: space-between; }
+.dive-head .tags { display: flex; gap: 6px; flex-wrap: wrap; }
+.kv { display: grid; grid-template-columns: 140px minmax(0, 1fr); gap: 8px 16px; font-size: 0.95rem; }
+.kv dt { color: var(--muted); font-weight: 500; }
+.kv dd { margin: 0; min-width: 0; }
+@media (max-width: 560px) { .kv { grid-template-columns: 1fr; } .kv dt { margin-top: 8px; } }
+.flow { counter-reset: step; list-style: none; padding: 0; display: grid; gap: 8px; }
+.flow li { counter-increment: step; display: grid; grid-template-columns: 30px minmax(0, 1fr); gap: 10px; align-items: start; }
+.flow li::before { content: counter(step); display: grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; background: var(--accent-soft); color: var(--accent); font: 700 0.8rem/1 var(--font-body); }
+.phase { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 20px; display: grid; gap: 12px; }
+.phase-head { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; align-items: baseline; }
+.phase-head .when { font-variant-numeric: tabular-nums; color: var(--muted); font-size: 0.9rem; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { display: inline-flex; gap: 8px; align-items: center; border: 1px solid var(--line); border-radius: 99px; padding: 4px 12px 4px 4px; font-size: 0.88rem; background: var(--paper); }
+.bar { display: grid; grid-template-columns: 150px minmax(0, 1fr) 64px; gap: 10px; align-items: center; font-size: 0.9rem; }
+.bar .track { height: 10px; background: var(--paper); border: 1px solid var(--line); border-radius: 99px; overflow: hidden; }
+.bar .fill { height: 100%; background: var(--accent); }
+.bar .v { text-align: right; font-variant-numeric: tabular-nums; color: var(--muted); }
+.bars { display: grid; gap: 8px; }
+.mock { border: 1px dashed var(--line); border-radius: 10px; padding: 14px; background: var(--paper); display: grid; gap: 8px; font-size: 0.9rem; }
+.mock-row { display: flex; justify-content: space-between; gap: 10px; align-items: center; flex-wrap: wrap; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; }
+.src { font: 500 0.72rem/1 var(--font-body); padding: 4px 7px; border-radius: 99px; white-space: nowrap; }
+.decisions li { padding-left: 4px; }
+footer { color: var(--muted); font-size: 0.88rem; border-top: 1px solid var(--line); padding-top: 18px; }
+@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto; } }
+</style>
+
+<main>
+
+<header>
+  <div class="eyebrow">Product plan · version 2 · 7 November 2026</div>
+  <h1>Jobly roadmap: every feature, how to build it, and in what order</h1>
+  <p class="lede">A deep dive on each of the 19 points we discussed. It draws on what Jobmate, Hira and HireXL do today and on today's live job data, and orders everything by impact, effort and risk.</p>
+  <p class="meta">Live data on 7 Nov: 94,328 open jobs at 2,387 companies; 6,720 jobs at 350 companies in India. Starting point: version 1.1.0 (job list, tracker, profiles, resume builder, cover letters, autofill with review) is built and committed. Effort assumes you plus me working on it full time.</p>
+</header>
+
+<nav class="toc" aria-label="Contents">
+  <h2 style="font-size:1.15rem">Contents</h2>
+  <ol>
+    <li><a href="#research">What the three products teach us</a></li>
+    <li><a href="#data">What today's data says</a></li>
+    <li><a href="#matrix">Impact × effort matrix</a></li>
+    <li><a href="#fix-first">Fix first: four problems found this week</a></li>
+    <li><a href="#login">Login and sign-up</a></li>
+    <li><a href="#onboarding">Onboarding and LinkedIn import</a></li>
+    <li><a href="#profile">Profile progress</a></li>
+    <li><a href="#apply">Apply assist (auto apply)</a></li>
+    <li><a href="#match">Match % on job cards</a></li>
+    <li><a href="#jobs">More jobs</a></li>
+    <li><a href="#companies">Company page filters</a></li>
+    <li><a href="#hide">Hide Tracker, Interviews, Tasks</a></li>
+    <li><a href="#settings">Settings and header icons</a></li>
+    <li><a href="#resume">Resume intelligence</a></li>
+    <li><a href="#letters">Cover letters from a JD</a></li>
+    <li><a href="#people">People finder (Contacts)</a></li>
+    <li><a href="#website">Website update</a></li>
+    <li><a href="#launch">Screenshots, video, store, launch posts</a></li>
+    <li><a href="#b2b">Candidate Intelligence for hiring teams</a></li>
+    <li><a href="#timeline">Release timeline</a></li>
+    <li><a href="#decisions">Decisions I need from you</a></li>
+  </ol>
+</nav>
+
+<section id="research">
+  <div class="prose" style="display:grid;gap:10px">
+    <h2>What the three products teach us</h2>
+    <p>Sources: the Jobmate Chrome Web Store listing, Hira's public site (its app needs an account, which I didn't create), and HireXL's home and pricing pages. All figures are what they publish about themselves.</p>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Product</th><th>What it is</th><th>Account</th><th>How it applies</th><th>Borrow</th><th>Avoid</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><strong>Jobmate</strong><br><span class="meta">Chrome extension, v1.0.7, 380 users, 1 rating</span></td>
+          <td>AI agent: job feed, autofill, auto-apply, recruiter finder, resume tailoring, multiple resume profiles, cover letters, tracker, calendar import, tasks. In-app purchases.</td>
+          <td>Required (free)</td>
+          <td>An agent "moves through the application page by page" while you watch and can stop it. It remembers new answers, works in embedded forms, and detects when you submit.</td>
+          <td>Remembered answers; filling embedded forms; detecting a submission and marking the job applied; answers to "Why do you want to work here?".</td>
+          <td>Sending messages on LinkedIn for the user. Requiring an account before any value.</td>
+        </tr>
+        <tr>
+          <td><strong>Hira</strong><br><span class="meta">Web app with an AI agent</span></td>
+          <td>"Apply to jobs with a single text." A 24/7 agent finds roles and prepares applications. Match % on every role. Free, with a Pro plan.</td>
+          <td>Required: Google or email and password, on one screen</td>
+          <td>Prepares each application, labels every answer as "From your profile" or "Prepared by Hira", then waits: "Ready for your approval. You stay in control."</td>
+          <td>Labelling where each answer came from; one approval step before anything is sent; match % on cards; one combined sign-in and sign-up screen.</td>
+          <td>Unverifiable reach claims (its demo mentions 1,240 job boards). A server agent that applies while you're away needs accounts, servers and trust we don't have yet.</td>
+        </tr>
+        <tr>
+          <td><strong>HireXL</strong><br><span class="meta">Indian AI applicant tracking system</span></td>
+          <td>For agencies and in-house teams: 4 agents (sourcing, job-description extraction, resume screening, workflow), WhatsApp screening and scheduling, candidate briefs, client portal.</td>
+          <td>Company accounts</td>
+          <td>Not applicable: it's the hiring side.</td>
+          <td>Extracting the job description into structured requirements first. One-page candidate briefs. WhatsApp as the channel Indian candidates actually answer.</td>
+          <td>Becoming a full applicant tracking system. Pricing: Free (25 AI runs a month), ₹4,999 a month (200 runs, 3 users), ₹14,999 a month (10 users).</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="callout">
+    <p><strong>Where Jobly wins:</strong> Jobly is the only one of these that's useful with no account. It shows each job's real posting date and has real Indian coverage (350 companies today). You stay in control: Jobly fills the form and you press Submit. Every answer shows where it came from, and AI never invents experience. Jobmate and Hira both make you sign up first.</p>
+  </div>
+</section>
+
+<section id="data">
+  <div class="prose" style="display:grid;gap:10px">
+    <h2>What today's data says</h2>
+    <p>Three numbers shape the plan: which hiring systems carry the jobs, how few postings state a job type, and how thin design and contract roles are.</p>
+  </div>
+  <div class="grid2">
+    <div class="card">
+      <h3>Jobs by hiring system</h3>
+      <p class="meta">Sets the order for apply-assist rules: Workday and Greenhouse alone cover 70% of jobs.</p>
+      <div class="bars" role="list">
+        <div class="bar" role="listitem"><span>Workday</span><span class="track"><span class="fill" style="display:block;width:100%"></span></span><span class="v">45.1%</span></div>
+        <div class="bar" role="listitem"><span>Greenhouse</span><span class="track"><span class="fill" style="display:block;width:56.5%"></span></span><span class="v">25.5%</span></div>
+        <div class="bar" role="listitem"><span>Ashby</span><span class="track"><span class="fill" style="display:block;width:25.5%"></span></span><span class="v">11.5%</span></div>
+        <div class="bar" role="listitem"><span>SmartRecruiters</span><span class="track"><span class="fill" style="display:block;width:14.2%"></span></span><span class="v">6.4%</span></div>
+        <div class="bar" role="listitem"><span>Amazon</span><span class="track"><span class="fill" style="display:block;width:9.3%"></span></span><span class="v">4.2%</span></div>
+        <div class="bar" role="listitem"><span>Lever</span><span class="track"><span class="fill" style="display:block;width:6.9%"></span></span><span class="v">3.1%</span></div>
+        <div class="bar" role="listitem"><span>Oracle</span><span class="track"><span class="fill" style="display:block;width:3.1%"></span></span><span class="v">1.4%</span></div>
+        <div class="bar" role="listitem"><span>All others</span><span class="track"><span class="fill" style="display:block;width:6.2%"></span></span><span class="v">2.8%</span></div>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Job type and role mix</h3>
+      <div class="table-wrap" style="border:0">
+        <table style="min-width:0">
+          <tbody>
+            <tr><td>Job type not stated</td><td class="right">75,543</td><td class="right">80%</td></tr>
+            <tr><td>Full-time</td><td class="right">13,019</td><td class="right">14%</td></tr>
+            <tr><td>Internship</td><td class="right">2,578</td><td class="right">2.7%</td></tr>
+            <tr><td>Part-time</td><td class="right">2,207</td><td class="right">2.3%</td></tr>
+            <tr><td>Contract</td><td class="right">981</td><td class="right">1.0%</td></tr>
+            <tr><td>Design roles (product + visual)</td><td class="right">1,955</td><td class="right">2.1%</td></tr>
+            <tr><td>Jobs in India</td><td class="right">6,720</td><td class="right">7.1%</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="meta">Most postings don't state a type, so "more contract jobs" starts with reading the type from the description, then adding sources.</p>
+    </div>
+  </div>
+</section>
+
+<section id="matrix">
+  <div class="prose" style="display:grid;gap:10px">
+    <h2>Impact × effort matrix</h2>
+    <p>Each feature is scored 1–5 for impact on users and growth, effort to build, and risk (policy, legal, privacy, reliability). Dot colour is risk. Start top left.</p>
+  </div>
+  <div class="matrix">
+    <div class="chart">
+      <svg viewBox="0 0 640 470" role="img" aria-labelledby="mx-title mx-desc">
+        <title id="mx-title">Impact versus effort for 16 features</title>
+        <desc id="mx-desc">Quick wins: bug fixes, match score, launch kit, cover letters. Big bets: onboarding, import, apply assist, resume intelligence, Candidate Intelligence. Rethink: login now, people scraping.</desc>
+        <style>
+          .q { fill: var(--paper); } .qw { fill: var(--low-soft); opacity: .7; } .bb { fill: var(--accent-soft); opacity: .7; }
+          .grid { stroke: var(--line); stroke-width: 1; } .axis { fill: var(--muted); font: 12px var(--font-body); }
+          .qlabel { fill: var(--muted); font: 600 11px var(--font-body); letter-spacing: .06em; text-transform: uppercase; }
+          .pt text { fill: var(--on-dot); font: 700 11px var(--font-body); }
+          .lo { fill: var(--low); } .md { fill: var(--mid); } .hi { fill: var(--high); }
+        </style>
+        <rect class="q" x="80" y="20" width="520" height="400"/>
+        <rect class="qw" x="80" y="20" width="208" height="160"/>
+        <rect class="bb" x="288" y="20" width="312" height="160"/>
+        <g class="grid">
+          <line x1="132" y1="20" x2="132" y2="420"/><line x1="236" y1="20" x2="236" y2="420"/><line x1="340" y1="20" x2="340" y2="420"/><line x1="444" y1="20" x2="444" y2="420"/><line x1="548" y1="20" x2="548" y2="420"/>
+          <line x1="80" y1="60" x2="600" y2="60"/><line x1="80" y1="140" x2="600" y2="140"/><line x1="80" y1="220" x2="600" y2="220"/><line x1="80" y1="300" x2="600" y2="300"/><line x1="80" y1="380" x2="600" y2="380"/>
+        </g>
+        <line x1="288" y1="20" x2="288" y2="420" stroke="var(--muted)" stroke-dasharray="4 4"/>
+        <line x1="80" y1="180" x2="600" y2="180" stroke="var(--muted)" stroke-dasharray="4 4"/>
+        <text class="qlabel" x="88" y="38">Quick wins</text>
+        <text class="qlabel" x="296" y="38">Big bets</text>
+        <text class="qlabel" x="88" y="412">Fill-ins</text>
+        <text class="qlabel" x="508" y="412">Rethink</text>
+        <g class="axis">
+          <text x="132" y="440" text-anchor="middle">1</text><text x="236" y="440" text-anchor="middle">2</text><text x="340" y="440" text-anchor="middle">3</text><text x="444" y="440" text-anchor="middle">4</text><text x="548" y="440" text-anchor="middle">5</text>
+          <text x="340" y="462" text-anchor="middle">Effort →</text>
+          <text x="66" y="64" text-anchor="end">5</text><text x="66" y="144" text-anchor="end">4</text><text x="66" y="224" text-anchor="end">3</text><text x="66" y="304" text-anchor="end">2</text><text x="66" y="384" text-anchor="end">1</text>
+          <text x="20" y="220" text-anchor="middle" transform="rotate(-90 20 220)">Impact →</text>
+        </g>
+        <g class="pt">
+          <circle class="lo" cx="114" cy="220" r="12"/><text x="114" y="224" text-anchor="middle">A</text>
+          <circle class="lo" cx="150" cy="220" r="12"/><text x="150" y="224" text-anchor="middle">C</text>
+          <circle class="lo" cx="132" cy="300" r="12"/><text x="132" y="304" text-anchor="middle">B</text>
+          <circle class="lo" cx="218" cy="124" r="12"/><text x="218" y="128" text-anchor="middle">D</text>
+          <circle class="lo" cx="254" cy="124" r="12"/><text x="254" y="128" text-anchor="middle">G</text>
+          <circle class="lo" cx="218" cy="156" r="12"/><text x="218" y="160" text-anchor="middle">O</text>
+          <circle class="md" cx="254" cy="156" r="12"/><text x="254" y="160" text-anchor="middle">J</text>
+          <circle class="lo" cx="236" cy="220" r="12"/><text x="236" y="224" text-anchor="middle">N</text>
+          <circle class="lo" cx="322" cy="60" r="12"/><text x="322" y="64" text-anchor="middle">E</text>
+          <circle class="md" cx="358" cy="60" r="12"/><text x="358" y="64" text-anchor="middle">F</text>
+          <circle class="md" cx="340" cy="140" r="12"/><text x="340" y="144" text-anchor="middle">K</text>
+          <circle class="hi" cx="340" cy="220" r="12"/><text x="340" y="224" text-anchor="middle">L</text>
+          <circle class="md" cx="426" cy="60" r="12"/><text x="426" y="64" text-anchor="middle">H</text>
+          <circle class="md" cx="462" cy="60" r="12"/><text x="462" y="64" text-anchor="middle">I</text>
+          <circle class="hi" cx="444" cy="220" r="12"/><text x="444" y="224" text-anchor="middle">M</text>
+          <circle class="hi" cx="548" cy="60" r="12"/><text x="548" y="64" text-anchor="middle">P</text>
+        </g>
+      </svg>
+    </div>
+    <div class="legend" aria-label="Feature key">
+      <div><span class="letter bg-low">A</span>Settings and header icons</div>
+      <div><span class="letter bg-low">B</span>Hide Tracker, Interviews, Tasks</div>
+      <div><span class="letter bg-low">C</span>Company filters and sorting</div>
+      <div><span class="letter bg-low">D</span>Fix the four problems found this week</div>
+      <div><span class="letter bg-low">E</span>Onboarding and profile progress</div>
+      <div><span class="letter bg-mid">F</span>LinkedIn PDF and resume import</div>
+      <div><span class="letter bg-low">G</span>Match % on job cards</div>
+      <div><span class="letter bg-mid">H</span>Apply assist</div>
+      <div><span class="letter bg-mid">I</span>Resume intelligence</div>
+      <div><span class="letter bg-mid">J</span>Cover letters from a JD</div>
+      <div><span class="letter bg-mid">K</span>More jobs</div>
+      <div><span class="letter bg-high">L</span>Login and sign-up, now</div>
+      <div><span class="letter bg-high">M</span>People finder by scraping</div>
+      <div><span class="letter bg-low">N</span>Website update</div>
+      <div><span class="letter bg-low">O</span>Launch kit</div>
+      <div><span class="letter bg-high">P</span>Candidate Intelligence (B2B)</div>
+      <p class="meta" style="margin-top:6px">Score = 2 × impact − effort − risk. Risk: <span class="tag r-low">Low</span> <span class="tag r-mid">Medium</span> <span class="tag r-high">High</span></p>
+    </div>
+  </div>
+</section>
+
+<section id="fix-first" class="dive">
+  <div class="dive-head"><h2>Fix first: four problems found this week</h2><div class="tags"><span class="tag r-low">Low risk</span><span class="tag t-accent">1.2</span></div></div>
+  <div class="grid2">
+    <div class="card"><h4>Darwinbox jobs never arrive</h4><p>Darwinbox's protection answers <code>403 Forbidden</code> to every request from GitHub's servers, so the 22 Darwinbox employers added on 2 November show no live jobs (the same requests worked from your Mac). We won't work around a site's block. <strong>Do:</strong> turn those 22 off in the crawl, ask Darwinbox for a partner feed, and later consider reading them in the user's own browser for companies they follow.</p></div>
+    <div class="card"><h4>Search matches category names</h4><p>"product designer" matches every job in the product design category, because search also looks at the category field. <strong>Do:</strong> search title, company and location only, keep the city aliases (Bengaluru/Bangalore), and rank exact title matches first.</p></div>
+    <div class="card"><h4>Chip design counted as product design</h4><p>Jobs such as "CPU Layout Design Engineer" and "IC Design Engineer" land in Product design. <strong>Do:</strong> send hardware words (IC, ASIC, RTL, layout, silicon, verification) to Engineering before the design rules run, with tests for each.</p></div>
+    <div class="card"><h4>"New today" overstates</h4><p>It counts jobs Jobly first saw in the last 24 hours (7,104 today), which jumps whenever we add companies. <strong>Do:</strong> count jobs posted in the last 24 hours (6,598 today) and say so. The job-card fix from 3 November (stale cards after a search) is done and committed.</p></div>
+  </div>
+</section>
+
+<section id="login" class="dive">
+  <div class="dive-head"><h2>Login and sign-up</h2><div class="tags"><span class="tag r-high">High risk</span><span class="tag t-accent">2.0, or 1.3 if you decide</span></div></div>
+  <p class="prose">Jobmate and Hira both require an account, which makes this a fair question to reopen. Here are the three options side by side.</p>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Option</th><th>For users</th><th>For us</th><th>My view</th></tr></thead>
+      <tbody>
+        <tr><td><strong>No account</strong> (today)</td><td>Install and it works. Nothing leaves the browser.</td><td>No server, no breach risk. No way to sync to the website or charge for hosted AI.</td><td>Keep as the default experience.</td></tr>
+        <tr><td><strong>Optional account</strong></td><td>"Sign in to back up your profile, use it on the website and unlock hosted AI." Skippable.</td><td>Server, database, password resets, account deletion, new privacy policy and store answers.</td><td><strong>Recommended</strong>, when hosted AI or payments arrive.</td></tr>
+        <tr><td><strong>Required account</strong> (Jobmate, Hira)</td><td>A wall before any value. Some leave.</td><td>Everything above, plus losing "Free, no account", our clearest difference.</td><td>Not recommended.</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <dl class="kv">
+    <dt>The screen</dt><dd>One screen for both sign-in and sign-up, like Hira's: "Continue with Google", then "or continue with email" (email and password, with show/hide and a strength hint). An unknown email creates the account and goes straight into onboarding; a known one signs in. A "Skip for now" link keeps the no-account path.</dd>
+    <dt>How we build it</dt><dd>Supabase Auth (Google and email/password, email confirmation, password reset) with a free tier. Google sign-in through <code>chrome.identity.launchWebAuthFlow</code>. Tokens in extension storage, refreshed in the background. Postgres with row-level security, so each user can only read their own row. Reset-password and verify-email pages on the website. We never store passwords ourselves.</dd>
+    <dt>What syncs</dt><dd>The profile, answer bank and resume versions, encrypted. Saved jobs and preferences can stay local or ride along. Account deletion removes everything within 30 days, and export gives one file.</dd>
+    <dt>Store and policy</dt><dd>New data answers ("Authentication information" and "Personally identifiable information" now leave the device), a privacy policy section on accounts, and a deletion route the store asks for.</dd>
+    <dt>Effort</dt><dd>2–3 weeks, plus ongoing security work.</dd>
+  </dl>
+</section>
+
+<section id="onboarding" class="dive">
+  <div class="dive-head"><h2>Onboarding and LinkedIn import</h2><div class="tags"><span class="tag r-low">Low risk</span><span class="tag t-accent">1.3</span></div></div>
+  <p class="prose">Goal: a complete profile in the first session, because apply assist, match % and resume tailoring all read from it. Target: half of new users at 80% or more on day one.</p>
+  <div class="grid2">
+    <div class="card">
+      <h4>The flow</h4>
+      <ol class="flow">
+        <li><span><strong>Choose a start:</strong> Import from LinkedIn (recommended), Upload my resume (PDF or Word), or Fill it in myself.</span></li>
+        <li><span><strong>LinkedIn guide</strong> (a small window with three pictures): open your LinkedIn profile, click Resources and then Save to PDF, and drop the downloaded file here. Jobly reads only that file, on your computer.</span></li>
+        <li><span><strong>Review what we found</strong>, section by section. Anything uncertain is marked "Check this".</span></li>
+        <li><span><strong>Fill the gaps</strong> in short steps: personal, contact, professional, experience, education, skills and links, application answers, resume file.</span></li>
+        <li><span><strong>Finish:</strong> "Your profile is 92% complete. 2 things left" with links, and a first look at jobs ranked by match.</span></li>
+      </ol>
+    </div>
+    <div class="card">
+      <h4>Fields, including what Indian forms ask</h4>
+      <ul>
+        <li><strong>Personal:</strong> first and last name, preferred name, pronouns (optional).</li>
+        <li><strong>Contact:</strong> email, phone with country code, city, state, country, PIN code, full address (optional; some forms ask).</li>
+        <li><strong>Professional:</strong> current title and company, total experience, current CTC and expected CTC (fixed and variable), notice period and last working day, work authorisation by country, sponsorship, relocation, preferred cities, work mode, job types.</li>
+        <li><strong>Experience:</strong> title, company, location, dates, current role, bullets.</li>
+        <li><strong>Education:</strong> degree, field, institution, dates, CGPA or percentage, with 10th and 12th marks optional (common on Indian forms).</li>
+        <li><strong>Skills and links:</strong> skills, languages, LinkedIn, portfolio, GitHub, Behance, Dribbble.</li>
+        <li><strong>Sensitive, optional:</strong> gender, disability, veteran status. Default "Prefer not to say", and never answered unless you chose an answer. We never ask for PAN, Aadhaar or passport numbers.</li>
+      </ul>
+    </div>
+  </div>
+  <dl class="kv">
+    <dt>How we build it</dt><dd>pdf.js bundled in the extension; Studio already parses PDFs this way. The LinkedIn PDF has a fixed layout: a left column (Contact, Top Skills, Languages, Certifications) and a right column (name, headline, location, Summary, Experience, Education). We rebuild the columns from text positions and split on those headings, with date ranges like "Jan 2022 - Present (2 years 10 months)". Word files go through mammoth.js. Other resumes use rules first, and AI when it's available (see Resume intelligence).</dd>
+    <dt>Files</dt><dd>New <code>lib/import/linkedinPdf.ts</code>, <code>lib/import/resumeParse.ts</code>, <code>components/onboarding/*</code>. The profile schema in <code>lib/profile.ts</code> gains the new fields with migration of existing profiles. Tests use made-up LinkedIn PDFs.</dd>
+    <dt>Privacy</dt><dd>No LinkedIn login, no scraping, no upload. The file is read in the browser and only the extracted fields are kept.</dd>
+    <dt>Done when</dt><dd>A LinkedIn PDF fills at least 80% of name, headline, experience, education and skills correctly on 10 test files.</dd>
+  </dl>
+</section>
+
+<section id="profile" class="dive">
+  <div class="dive-head"><h2>Profile progress</h2><div class="tags"><span class="tag r-low">Low risk</span><span class="tag t-accent">1.3</span></div></div>
+  <div class="grid2">
+    <div class="card">
+      <h4>How completeness is counted</h4>
+      <div class="table-wrap" style="border:0">
+        <table style="min-width:0">
+          <thead><tr><th>Section</th><th>Weight</th><th>Counts as done when</th></tr></thead>
+          <tbody>
+            <tr><td>Experience</td><td class="num">25</td><td>At least one role with dates and two bullets</td></tr>
+            <tr><td>Contact</td><td class="num">15</td><td>Email, phone and city</td></tr>
+            <tr><td>Professional</td><td class="num">15</td><td>Title, years, notice period, expected salary, work authorisation</td></tr>
+            <tr><td>Personal</td><td class="num">10</td><td>First and last name</td></tr>
+            <tr><td>Education</td><td class="num">10</td><td>One entry with degree and institution</td></tr>
+            <tr><td>Skills</td><td class="num">10</td><td>At least 5 skills</td></tr>
+            <tr><td>Resume file</td><td class="num">10</td><td>A PDF or Word file attached</td></tr>
+            <tr><td>Links</td><td class="num">5</td><td>LinkedIn or a portfolio</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="card">
+      <h4>The redesigned Profile page</h4>
+      <ul>
+        <li>A progress ring in the header ("Profile 80%") on every page, linking to what's missing.</li>
+        <li>Section list on the left with a tick, a part-filled ring or an empty ring for each section.</li>
+        <li>A "3 things left" panel with one-click jumps: "Add notice period", "Add 2 more skills".</li>
+        <li>Applies to each of your profiles (up to five); the one used for applying is marked.</li>
+        <li>A short explanation of why each item helps: "Most Indian forms ask for notice period".</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section id="apply" class="dive">
+  <div class="dive-head"><h2>Apply assist (auto apply)</h2><div class="tags"><span class="tag r-mid">Medium risk</span><span class="tag t-accent">1.4</span></div></div>
+  <div class="callout"><p><strong>The rule:</strong> Jobly opens the form, fills it, walks through multi-step forms, and stops before the final Submit. You check it and press Submit. That's Hira's approval step, made concrete. It keeps employer accounts safe, keeps applications good, and keeps us inside Chrome Web Store policy.</p></div>
+  <div class="grid2">
+    <div class="card">
+      <h4>The flow</h4>
+      <ol class="flow">
+        <li><span>On a job card, <strong>Apply with Jobly</strong>. Below 60% profile it says "Finish your profile to apply faster" instead.</span></li>
+        <li><span>The listing opens in a tab, and Jobly's side panel opens beside it: "Applying to Senior Product Designer at Zenoti".</span></li>
+        <li><span>Jobly recognises the hiring system and fills the form, resume file included.</span></li>
+        <li><span>The panel groups every question: filled from your profile, written by AI (check it), <strong>Action required</strong>, and skipped on purpose (demographic questions).</span></li>
+        <li><span>You answer the Action-required items in the panel, ticking "Remember for next time"; Jobly puts them in the form.</span></li>
+        <li><span>On multi-step forms, <strong>Next step</strong> moves on after you've looked at each step. The last step says "Review and press Submit on the page".</span></li>
+        <li><span>Jobly notices the confirmation page and marks the job Applied, with the date and the answers used.</span></li>
+      </ol>
+    </div>
+    <div class="card">
+      <h4>Side panel, example</h4>
+      <div class="mock" aria-label="Example of the apply side panel">
+        <div class="mock-row"><span>First name · Ananya</span><span class="src r-low">From your profile</span></div>
+        <div class="mock-row"><span>Notice period · 30 days</span><span class="src r-low">From your profile</span></div>
+        <div class="mock-row"><span>Why this company? · 3 sentences</span><span class="src r-mid">Written by AI, check it</span></div>
+        <div class="mock-row"><span>Do you have a portfolio password?</span><span class="src r-high">Action required</span></div>
+        <div class="mock-row"><span>Gender</span><span class="src t-accent">Skipped: you chose not to answer</span></div>
+      </div>
+      <p class="meta">Example only. Every answer shows where it came from, as Hira does.</p>
+    </div>
+  </div>
+  <dl class="kv">
+    <dt>Fill rules, in order</dt><dd>By share of Jobly's jobs: Workday (45%; multi-step, stable <code>data-automation-id</code> fields; many employers need you to sign in first), Greenhouse (26%; also embedded on company sites in a frame), Ashby (12%), SmartRecruiters (6%), Lever (3%), then Oracle, Keka and Workable. Everything else uses today's generic autofill. Amazon's portal needs its own account, so Apply just opens it.</dd>
+    <dt>Answer bank</dt><dd>Questions are normalised (lower case, no punctuation, synonyms such as "notice period" and "how soon can you join") and matched by word overlap, with no AI needed. Answers can be edited and deleted in Settings.</dd>
+    <dt>AI</dt><dd>Only for open questions ("Why do you want to work here?"), always labelled, drafted from your profile and the job, and never sent without you seeing it.</dd>
+    <dt>Permissions</dt><dd>Adds <code>sidePanel</code>. Filling a tab Jobly opened needs access to that hiring system's domain, so ask for each one as an optional permission the first time (for example <code>*.myworkdayjobs.com</code>, <code>boards.greenhouse.io</code>, <code>jobs.ashbyhq.com</code>). Any other site works from the popup with today's click-to-allow access.</dd>
+    <dt>Never</dt><dd>Press Submit, create accounts or type passwords, solve CAPTCHAs, answer demographic questions you didn't answer yourself, or apply in bulk in the background.</dd>
+    <dt>Quality</dt><dd>No analytics (privacy promise), so each form gets a "This form didn't fill well" button that opens an email with the page address. Every fill rule gets a test page shaped like the real form.</dd>
+    <dt>Done when</dt><dd>On 20 real postings per system, at least 85% of fields fill correctly and no form gets submitted by Jobly.</dd>
+  </dl>
+</section>
+
+<section id="match" class="dive">
+  <div class="dive-head"><h2>Match % on job cards</h2><div class="tags"><span class="tag r-low">Low risk</span><span class="tag t-accent">1.3</span></div></div>
+  <div class="grid2">
+    <div class="card">
+      <h4>How it's scored (no AI)</h4>
+      <div class="table-wrap" style="border:0">
+        <table style="min-width:0">
+          <thead><tr><th>Part</th><th>Weight</th><th>Compares</th></tr></thead>
+          <tbody>
+            <tr><td>Skills</td><td class="num">40</td><td>Skills named in the posting against your skills</td></tr>
+            <tr><td>Role</td><td class="num">20</td><td>The job's category and title against your target roles</td></tr>
+            <tr><td>Seniority</td><td class="num">15</td><td>Years and level asked against yours</td></tr>
+            <tr><td>Location</td><td class="num">15</td><td>City, remote and relocation preferences</td></tr>
+            <tr><td>Dealbreakers</td><td class="num">10</td><td>Job type and salary floor</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="card">
+      <h4>What you see</h4>
+      <ul>
+        <li>A pill on each card: 80% and above "Strong match", 60–79% "Good match", below 60% shown plain.</li>
+        <li>Tap it for the reasons: "Matched 6 of 8 skills · missing Kubernetes, GraphQL · remote fits".</li>
+        <li>A link from there: "Tailor my resume for this job".</li>
+        <li>Sort by match, and a "Strong matches only" filter.</li>
+        <li>The wording: "A guide based on your profile and the posting, not a verdict."</li>
+      </ul>
+    </div>
+  </div>
+  <dl class="kv">
+    <dt>How we build it</dt><dd>The job list doesn't carry descriptions, so the export (<code>backend/app/static_export.py</code>) adds each job's top 12 skill tags, found with a dictionary of about 800 skills and synonyms. That adds roughly 10% to the data files. Scoring runs in the browser in <code>shared/jobdata.ts</code>, so it's instant and private.</dd>
+  </dl>
+</section>
+
+<section id="jobs" class="dive">
+  <div class="dive-head"><h2>More jobs: companies, countries, design, development, contract, freelance</h2><div class="tags"><span class="tag r-mid">Medium risk</span><span class="tag t-accent">Every week</span></div></div>
+  <div class="grid3">
+    <div class="card"><h4>Countries</h4><p>Today: United States 49,908, India 6,720, UK 4,493, Germany 2,531, Canada 2,284, Singapore 2,039. Add candidate lists for the UK, Germany, Canada, Singapore, UAE, Australia and the Netherlands, tested with the <code>--country</code> check built this week.</p></div>
+    <div class="card"><h4>India</h4><p>Today: 350 companies. Next: Workday career sites of global capability centres in Bengaluru, Hyderabad and Pune, more Keka startups, Oracle sites of Indian enterprises, and a Darwinbox partner request.</p></div>
+    <div class="card"><h4>Design (2.1% of jobs)</h4><p>Add design-led companies, product studios and agencies (most use Ashby, Greenhouse or Workable), fix the chip-design mix-up, and add UX research, content design and DesignOps title rules.</p></div>
+    <div class="card"><h4>Development</h4><p>Already the largest group. Add Indian tech employers and capability centres, and give backend, mobile, DevOps, QA and security their own pages and filters.</p></div>
+    <div class="card"><h4>Contract</h4><p>Only 1% are marked contract, and 80% of postings state no type. Read the type from the description ("contract", "6-month", India's "contract to hire" and "C2H"), then add staffing firms that publish public boards.</p></div>
+    <div class="card"><h4>Freelance</h4><p>Upwork, Fiverr and Toptal don't allow reuse of their listings, so we won't copy them. Add remote boards whose terms allow it, with attribution, and a Freelance page linking out to the marketplaces.</p></div>
+  </div>
+  <dl class="kv">
+    <dt>New hiring systems</dt><dd>Zoho Recruit (careers pages carry structured job data; check each site's robots.txt), Freshteam (job pages allowed, but no posting dates, so they're shown as "Found on"), SuccessFactors sites whose robots.txt allows the job pages, iCIMS and Phenom (research first).</dd>
+    <dt>Rules we keep</dt><dd>Respect robots.txt and blocks, identify our crawler honestly, read each source at most once per crawl, and drop anything older than 60 days.</dd>
+    <dt>Targets by end of March</dt><dd>150,000 jobs, 600 companies hiring in India, 3,000 design jobs, 3,000 jobs marked contract.</dd>
+  </dl>
+</section>
+
+<section id="companies" class="dive">
+  <div class="dive-head"><h2>Company page filters</h2><div class="tags"><span class="tag r-low">Low risk</span><span class="tag t-accent">1.2</span></div></div>
+  <dl class="kv">
+    <dt>Filters</dt><dd>Country (from where each company's jobs are), industry, hiring system, "Hiring in my roles", "Following".</dd>
+    <dt>Sort</dt><dd>A–Z, Z–A, most open jobs, newest jobs.</dd>
+    <dt>Each company</dt><dd>Name, top countries ("India · US · UK"), open jobs, newest posting date, Follow, careers link. Tapping it opens the company's jobs.</dd>
+    <dt>How we build it</dt><dd>The export adds <code>countries</code> (top 3 by jobs) and <code>latest_posted</code> to <code>companies.json</code>. Filtering runs in the browser over all 2,387 companies, with the existing paging.</dd>
+  </dl>
+</section>
+
+<section id="hide" class="dive">
+  <div class="dive-head"><h2>Hide Tracker, Interviews and Tasks</h2><div class="tags"><span class="tag r-low">Low risk</span><span class="tag t-accent">1.2</span></div></div>
+  <dl class="kv">
+    <dt>What changes</dt><dd>A feature switch hides the three pages, their dialogs and their reminders. Navigation becomes Jobs, Companies, Saved, Profile, Resume, Cover letters, People.</dd>
+    <dt>What stays</dt><dd>The data and the code, so nothing is lost and they come back in a later update. A small "Applied" list stays under Saved (Saved | Applied), because apply assist needs to record where you applied and "You applied here before" uses it.</dd>
+    <dt>Also update</dt><dd>Store screenshots and description (the tracker screenshot goes), website pages that mention the tracker, and backups (they keep including the hidden data).</dd>
+  </dl>
+</section>
+
+<section id="settings" class="dive">
+  <div class="dive-head"><h2>Settings and header icons</h2><div class="tags"><span class="tag r-low">Low risk</span><span class="tag t-accent">1.2</span></div></div>
+  <div class="grid2">
+    <div class="card"><h4>Header, top right</h4><ul><li><strong>Bell</strong> with an unread count, opening the alerts list.</li><li><strong>Theme</strong> icon, switching light and dark.</li><li><strong>Refresh</strong> icon that spins while refreshing.</li><li><strong>Gear</strong> opening Settings.</li><li>Every icon has a tooltip and a screen-reader label.</li></ul></div>
+    <div class="card"><h4>Settings sections</h4><ul><li>Job preferences</li><li>Alerts: notifications, how often, followed companies</li><li>Profiles and autofill: default profile, remembered answers</li><li>AI: provider, your own key, on-device status</li><li>Connections: Hunter, Apollo, Google Calendar</li><li>Data and privacy: backup, restore, sync, delete everything</li><li>Appearance, Help and About</li></ul></div>
+  </div>
+</section>
+
+<section id="resume" class="dive">
+  <div class="dive-head"><h2>Resume intelligence</h2><div class="tags"><span class="tag r-mid">Medium risk</span><span class="tag t-accent">1.5</span></div></div>
+  <div class="grid2">
+    <div class="card">
+      <h4>The flow</h4>
+      <ol class="flow">
+        <li><span><strong>Import</strong> a PDF or Word resume, or start from your profile. Jobly turns it into structured data (the open JSON Resume format), which you can also download and re-import.</span></li>
+        <li><span><strong>Pick a job</strong> or paste a job description. Jobly lists what it asks for: must-have skills, nice-to-haves, years, keywords.</span></li>
+        <li><span><strong>See the fit:</strong> each requirement as covered or missing, with the line from your resume that covers it, and a keyword coverage score.</span></li>
+        <li><span><strong>Review suggestions</strong> as a before-and-after: a rewritten summary, reordered skills, sharpened bullets. Accept or reject each line.</span></li>
+        <li><span><strong>Choose a template</strong>, save as PDF or Word, and keep the version linked to that job ("Coverage 62% → 84%").</span></li>
+      </ol>
+    </div>
+    <div class="card">
+      <h4>Rules that keep it honest</h4>
+      <ul>
+        <li>Every suggested line must point to a fact in your profile; Studio's fact check (<code>guard.ts</code>) removes any that don't.</li>
+        <li>No new employers, titles, dates or numbers. A number not in your profile is flagged.</li>
+        <li>Missing skills are shown as gaps to work on, never added.</li>
+        <li>Nothing changes until you accept it.</li>
+      </ul>
+      <h4 style="margin-top:6px">Useful even without AI</h4>
+      <ul><li>Job-description keyword extraction (dictionary), coverage score, skills reordering, missing-keyword list and templates all work offline.</li></ul>
+    </div>
+  </div>
+  <dl class="kv">
+    <dt>AI providers</dt><dd>One interface with interchangeable providers: Chrome's built-in on-device model where the computer supports it (free, private; availability is checked at run time), your own key (OpenAI-compatible, Anthropic, Gemini), "Claude by hand" (copy a prompt, paste the answer back, as in Studio), and hosted Jobly credits in 2.0. Answers come back as structured JSON.</dd>
+    <dt>Code</dt><dd>Move Studio's <code>lib/ai/*</code>, <code>guard.ts</code> and <code>facts.ts</code> into <code>shared/</code> so the extension and Studio use one engine. Add more ATS-safe templates (single column, plain headings) to the current four.</dd>
+    <dt>Done when</dt><dd>Across 20 sample job descriptions, no tailored resume contains a claim missing from the profile, and keyword coverage rises on average.</dd>
+  </dl>
+</section>
+
+<section id="letters" class="dive">
+  <div class="dive-head"><h2>Cover letters from a job description</h2><div class="tags"><span class="tag r-mid">Medium risk</span><span class="tag t-accent">1.5</span></div></div>
+  <dl class="kv">
+    <dt>Flow</dt><dd>Pick a job or paste a description, choose a tone (formal, warm, concise) and a length, then get a letter that uses the job's own requirements and your real achievements, each sentence traceable to your profile. Edit it, copy it, or save it as Word, linked to the job.</dd>
+    <dt>Reuse</dt><dd>Uses the same description analysis and fact check as resume tailoring, so it costs little once that exists. Today's templates stay as the no-AI option.</dd>
+    <dt>In apply assist</dt><dd>When a form asks for a cover letter, the panel offers the saved letter for that job, or drafts one.</dd>
+  </dl>
+</section>
+
+<section id="people" class="dive">
+  <div class="dive-head"><h2>People finder (Contacts become People)</h2><div class="tags"><span class="tag r-high">Changed from the request</span><span class="tag t-accent">1.5</span></div></div>
+  <div class="callout"><p><strong>Why not an agent that scrapes LinkedIn, Behance, Dribbble and X:</strong> LinkedIn's terms forbid automated collection, browser extensions included, and it acts against tools that do it. Building a store of other people's profiles and emails makes us responsible for their data under India's DPDP Act and GDPR. It's also the kind of data collection the Chrome Web Store reviews closely. Jobmate's "send it on LinkedIn" carries the same risk.</p></div>
+  <div class="grid2">
+    <div class="card">
+      <h4>The safe version</h4>
+      <ol class="flow">
+        <li><span>On a job or company: <strong>Find people at Google</strong>.</span></li>
+        <li><span>Role-aware searches that open in your own browser: LinkedIn people search ("Product Designer" at Google), a Google search of LinkedIn profiles, Dribbble and Behance search for design roles, GitHub for engineering, X search.</span></li>
+        <li><span>You add the people you choose: name, title, links. Work emails come from Hunter (built in) or Apollo, with your own key.</span></li>
+        <li><span>Each person becomes a card with links, email, status (to contact, contacted, replied) and a referral or outreach draft.</span></li>
+      </ol>
+    </div>
+    <div class="card">
+      <h4>Person card, example</h4>
+      <div class="mock" aria-label="Example person card">
+        <div class="mock-row"><strong>Aman Gupta</strong><span class="meta">Product Designer · Google</span></div>
+        <div class="mock-row"><span>LinkedIn · Dribbble · Behance · X</span><span class="src r-low">Added by you</span></div>
+        <div class="mock-row"><span>aman@… (from Hunter, 92%)</span><span class="src t-accent">Draft referral request</span></div>
+      </div>
+      <p class="meta">Made-up example. Jobly never collects people on its own.</p>
+    </div>
+  </div>
+</section>
+
+<section id="website" class="dive">
+  <div class="dive-head"><h2>Website update</h2><div class="tags"><span class="tag r-low">Low risk</span><span class="tag t-accent">Before launch</span></div></div>
+  <dl class="kv">
+    <dt>New pages</dt><dd>Apply assist, resume tailoring, cover letters from a job description, and profile import. Each has a short demo clip and a "how it works" section.</dd>
+    <dt>Home page</dt><dd>Three new sections: "Your profile in two minutes", "Apply in one click, you press Submit", "Tailor your resume to any job".</dd>
+    <dt>Comparisons</dt><dd>Fair, factual pages for Jobmate and Hira next to the existing Simplify one: account or not, who presses Submit, posting dates, privacy, price.</dd>
+    <dt>FAQ and policies</dt><dd>"Does Jobly submit for me?", "Is my resume sent to AI?", "Why no account?". The privacy policy gains a section on AI providers chosen by the user, and on accounts if 2.0 ships.</dd>
+  </dl>
+</section>
+
+<section id="launch" class="dive">
+  <div class="dive-head"><h2>Screenshots, intro video, store content and launch posts</h2><div class="tags"><span class="tag r-low">Low risk</span><span class="tag t-accent">Weeks 13–14</span></div></div>
+  <div class="grid2">
+    <div class="card">
+      <h4>Five store screenshots (1280×800)</h4>
+      <ol>
+        <li>"Jobs that match you": job list with match %.</li>
+        <li>"Your profile in two minutes": LinkedIn import and 100%.</li>
+        <li>"Apply in one click": side panel with Action required.</li>
+        <li>"Tailor your resume to any job": before-and-after with coverage.</li>
+        <li>"Cover letters from the job description".</li>
+      </ol>
+      <p class="meta">Made with <code>e2e/store-screenshots.mjs</code> (demo profile, real jobs). New promo tiles carry the same message.</p>
+    </div>
+    <div class="card">
+      <h4>Intro video, 60 seconds</h4>
+      <div class="table-wrap" style="border:0">
+        <table style="min-width:0">
+          <tbody>
+            <tr><td class="num">0–6s</td><td>"Applying shouldn't take your whole evening."</td></tr>
+            <tr><td class="num">6–16s</td><td>Fresh jobs with real posting dates, match % on each.</td></tr>
+            <tr><td class="num">16–26s</td><td>LinkedIn PDF dropped in, profile to 100%.</td></tr>
+            <tr><td class="num">26–42s</td><td>Apply with Jobly: form fills, Action required, you press Submit.</td></tr>
+            <tr><td class="num">42–54s</td><td>Paste a job description, resume tailored, coverage rises.</td></tr>
+            <tr><td class="num">54–60s</td><td>"Free. No account. Add to Chrome."</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="meta">Three sizes: 16:9 for the store (it needs a YouTube link) and YouTube, 9:16 for Reels, Shorts and X, 1:1 for LinkedIn. Captions burned in. I can render it from code with real screen captures.</p>
+    </div>
+  </div>
+  <dl class="kv">
+    <dt>Store content</dt><dd>New summary and description for apply assist and resume tailoring. Permission justifications for <code>sidePanel</code> and the optional hiring-system domains. Data answers: if you use your own AI key, page content and profile data go to the AI provider you chose, at your request; that must be disclosed. If accounts ship, more answers change.</dd>
+    <dt>X</dt><dd>A six-post thread: the problem (stale postings, retyping the same answers), three features with clips, privacy, and the link.</dd>
+    <dt>LinkedIn</dt><dd>A founder post: why you built it, the India angle (350 Indian companies, real posting dates), a 60-second clip.</dd>
+    <dt>Reddit</dt><dd>Lead with something useful, such as what Jobly learned about how old most job postings are, in r/SideProject and r/chrome_extensions. Post in Indian career subreddits only where the rules allow self-promotion.</dd>
+    <dt>Product Hunt</dt><dd>Tagline within 60 characters ("Fresh jobs and one-click applications, no account"). Description, maker comment, 5 images and the video. Launch at 12:01 am Pacific, Tuesday to Thursday. Tell supporters it's live, but don't ask for upvotes; the site's rules forbid it.</dd>
+    <dt>TinyLaunch</dt><dd>I read "Tiny Self" as TinyLaunch; tell me if you meant another site. Post the same week as Product Hunt.</dd>
+  </dl>
+</section>
+
+<section id="b2b" class="dive">
+  <div class="dive-head"><h2>Candidate Intelligence for hiring teams</h2><div class="tags"><span class="tag r-high">High risk</span><span class="tag t-accent">Validate in weeks 1–8</span></div></div>
+  <div class="callout"><p><strong>Verdict: validate now, build only if pilots pay.</strong> HireXL shows Indian agencies already pay ₹4,999–14,999 a month for AI screening inside an applicant tracking system, so "AI resume screening" alone isn't a gap. Our opening is narrower and better: <strong>evidence-backed shortlists plus useful feedback for rejected candidates, working beside whatever system a company already uses</strong>, priced per job.</p></div>
+  <div class="grid2">
+    <div class="card">
+      <h4>The first product</h4>
+      <ol class="flow">
+        <li><span>Upload a job description and resumes (ZIP, CSV export or forwarded emails).</span></li>
+        <li><span>Jobly extracts the must-haves from the description; the recruiter edits them.</span></li>
+        <li><span>Screening runs in stages: fixed rules, then similarity search, then a careful AI evaluation for the top candidates only.</span></li>
+        <li><span>Each candidate gets an evaluation card: requirements met with the resume lines that prove them, gaps, open questions, confidence, and suggested interview questions.</span></li>
+        <li><span>A ranked shortlist with reasons; the recruiter decides, and nothing is rejected automatically.</span></li>
+        <li><span>Feedback drafts for candidates not selected, reviewed by the recruiter before sending.</span></li>
+      </ol>
+    </div>
+    <div class="card">
+      <h4>How it fits with Jobly</h4>
+      <ul>
+        <li>Same engine: job-description extraction, resume parsing and fact checks are shared code.</li>
+        <li>Two-sided: with consent, a rejected candidate's feedback can appear in Jobly with "Improve this" links to profile and resume tools.</li>
+        <li>Separate product and brand ("Jobly Hire" as a working name), with separate data storage.</li>
+      </ul>
+      <h4 style="margin-top:6px">Build, if pilots pay</h4>
+      <ul>
+        <li>Web app with Postgres and pgvector, encrypted file storage, a job queue, an audit log and isolation per company.</li>
+        <li>A model router: a low-cost model for extraction, a stronger one for evaluation, and the option to self-host open-weight models (Qwen, Gemma, Llama) for personal data.</li>
+        <li>Default retention 90 days, deletion on request, and a data processing agreement.</li>
+      </ul>
+    </div>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Pricing to test</th><th>What's included</th><th>Note</th></tr></thead>
+      <tbody>
+        <tr><td>Free</td><td>100 candidates, 1 job</td><td>Lets an agency try it on a live role</td></tr>
+        <tr><td>Per job · ₹1,499 (about $18–20)</td><td>Up to 1,000 candidates, 50 detailed evaluations</td><td>Your $20 per 1,000 idea, with the costly part capped</td></tr>
+        <tr><td>Agency · ₹4,999 a month</td><td>5,000 candidates a month, 3 users</td><td>Same price as HireXL Starter, many more candidates</td></tr>
+        <tr><td>Custom</td><td>Volume, integrations, single sign-on</td><td>After the first integrations</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <dl class="kv">
+    <dt>Unit cost</dt><dd>The earlier estimate (about $3.52 of AI per 1,000 candidates with low-cost models) is an assumption. Measure it on real pilot data before fixing prices.</dd>
+    <dt>Payments</dt><dd>Razorpay first for Indian customers (UPI and cards, about 2% plus GST domestic). Stripe later for international cards: Stripe India is invite-only, and about 7.4% of a $20 international payment goes to fees, conversion and GST.</dd>
+    <dt>Data and models</dt><dd>Candidate resumes are personal data. Before sending them to any provider, check retention, training and data-location terms. Enterprise buyers will ask, and a provider based in China (such as DeepSeek's API) may be ruled out by some customers.</dd>
+    <dt>Law</dt><dd>India's DPDP Act (consent, purpose, deletion rights). The EU AI Act treats candidate screening as high-risk if we serve EU employers (check current dates). New York City requires bias audits for automated hiring tools. Keep a human decision on every candidate, test for unfair patterns, and log the reasons behind every ranking.</dd>
+    <dt>Rejection feedback</dt><dd>Companies often avoid detailed rejection reasons for legal reasons, so keep it opt-in, based only on what was actually assessed, reviewed by a recruiter, never revealing other candidates, and with a way for the candidate to flag mistakes.</dd>
+    <dt>Validation</dt><dd>Weeks 1–3: 15 interviews (8 agency recruiters, 7 in-house). Weeks 3–6: 3 concierge pilots on consented exports for one role each, comparing our shortlist with the recruiter's picks. Weeks 6–8: put a price in front of them. Go only if 2 of 3 want to pay and agreement with recruiters is at least 70% with no unfair rejections found.</dd>
+    <dt>Check first</dt><dd>The survey numbers and LinkedIn Hiring Assistant 2 details in the earlier chat aren't verified; confirm them from the original sources before using them in a pitch. HireXL's results ("8 hours saved per recruiter each week", "45 to 15 days to fill") are its own median claims.</dd>
+  </dl>
+</section>
+
+<section id="timeline">
+  <h2>Release timeline</h2>
+  <div class="phase">
+    <div class="phase-head"><h3>1.2 Focus <span class="tag t-accent">publish to the store</span></h3><span class="when">Weeks 1–2 · by 21 Nov</span></div>
+    <div class="chips"><span class="chip"><span class="letter bg-low">D</span>Four fixes</span><span class="chip"><span class="letter bg-low">A</span>Settings and icons</span><span class="chip"><span class="letter bg-low">C</span>Company filters</span><span class="chip"><span class="letter bg-low">B</span>Hide tracker</span></div>
+    <ul><li>Week 1: Darwinbox off, search and category fixes with tests, "New today" fixed, feature switch, header icons, Settings page.</li><li>Week 2: company export fields and filters, store screenshots and copy, then submit 1.2 for review.</li></ul>
+  </div>
+  <div class="phase">
+    <div class="phase-head"><h3>1.3 Profile</h3><span class="when">Weeks 3–5</span></div>
+    <div class="chips"><span class="chip"><span class="letter bg-low">E</span>Onboarding</span><span class="chip"><span class="letter bg-mid">F</span>Import</span><span class="chip"><span class="letter bg-low">G</span>Match %</span></div>
+    <ul><li>Week 3: profile schema with Indian fields, onboarding steps, progress ring.</li><li>Week 4: LinkedIn PDF and resume parsing with test files, review screen.</li><li>Week 5: skill tags in the export, match scoring and breakdown, sort and filter.</li></ul>
+  </div>
+  <div class="phase">
+    <div class="phase-head"><h3>1.4 Apply assist</h3><span class="when">Weeks 6–9</span></div>
+    <div class="chips"><span class="chip"><span class="letter bg-mid">H</span>Apply assist</span></div>
+    <ul><li>Week 6: side panel, answer bank, Greenhouse and Lever rules.</li><li>Week 7: Workday multi-step and submission detection.</li><li>Week 8: Ashby, SmartRecruiters, Oracle, Keka, Workable.</li><li>Week 9: test pages per system, the 20-posting check, permissions and store answers.</li></ul>
+  </div>
+  <div class="phase">
+    <div class="phase-head"><h3>1.5 Resume and letters</h3><span class="when">Weeks 10–12</span></div>
+    <div class="chips"><span class="chip"><span class="letter bg-mid">I</span>Resume intelligence</span><span class="chip"><span class="letter bg-mid">J</span>Cover letters</span><span class="chip"><span class="letter bg-low">M</span>People finder</span></div>
+    <ul><li>Week 10: shared AI engine moved from Studio, providers, description analysis.</li><li>Week 11: tailoring with before-and-after, templates, versions per job.</li><li>Week 12: cover letters from a description, People page and person cards.</li></ul>
+  </div>
+  <div class="phase">
+    <div class="phase-head"><h3>Launch</h3><span class="when">Weeks 13–14</span></div>
+    <div class="chips"><span class="chip"><span class="letter bg-low">N</span>Website</span><span class="chip"><span class="letter bg-low">O</span>Screenshots, video, store, posts</span></div>
+  </div>
+  <div class="phase">
+    <div class="phase-head"><h3>2.0 Accounts and Pro</h3><span class="when">From week 15, if 1,000 weekly users and AI is used</span></div>
+    <div class="chips"><span class="chip"><span class="letter bg-high">L</span>Optional login</span><span class="chip">Hosted AI credits</span><span class="chip">Razorpay, then Stripe</span></div>
+  </div>
+  <p class="meta">In parallel: more jobs every week, and Candidate Intelligence validation in weeks 1–8 with a go or no-go at week 8.</p>
+</section>
+
+<section id="decisions" class="prose">
+  <h2>Decisions I need from you</h2>
+  <ol class="decisions">
+    <li>Publish <strong>1.2 Focus</strong> in about two weeks instead of uploading 1.1 now?</li>
+    <li>Does apply assist mean <strong>Jobly fills and walks through the form, and you press Submit</strong>?</li>
+    <li>Login: keep it <strong>optional and in 2.0</strong>, or pull it into 1.3 now that you've seen Jobmate and Hira require it? (Adds 2–3 weeks.)</li>
+    <li>AI for resumes and letters: <strong>on-device first, your own key as fallback</strong>, hosted credits later?</li>
+    <li>Replace the scraping agent with the <strong>safe people finder</strong>?</li>
+    <li>Turn the <strong>22 Darwinbox employers off</strong> in the crawl and ask Darwinbox for a feed?</li>
+    <li>Start the <strong>Candidate Intelligence interviews</strong> this month? I can write the interview script and pilot outline next.</li>
+  </ol>
+</section>
+
+<footer>Jobly · plan for versions 1.2 to 2.0 · version 2, 7 November 2026. Scores and estimates are judgment calls to argue with, not measurements. Competitor details are what each product publishes about itself.</footer>
+</main>

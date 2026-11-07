@@ -39,7 +39,7 @@ const Row: React.FC<{ company: Company; muted: boolean; onToggle: () => void; fo
       <div className="grow">
         <div className="font-medium truncate">{company.name}</div>
         <div className="text-xs muted truncate">
-          {company.job_count} open role{company.job_count === 1 ? '' : 's'}
+          {company.job_count.toLocaleString()} open role{company.job_count === 1 ? '' : 's'}
           {company.latest_posted && company.job_count > 0 ? ` · newest ${timeAgo(company.latest_posted).toLowerCase()}` : ''}
         </div>
         {(!!company.countries?.length || !!company.industry) && (
@@ -105,7 +105,7 @@ export const CompaniesView: React.FC<CompaniesViewProps> = ({ companies, mutedCo
       <div className="row" style={{ justifyContent: 'space-between', alignItems: 'flex-start' }}>
         <div>
           <h2>Companies</h2>
-          <p className="text-sm">Jobly checks {companies.length} employers. Turn a company off to hide its jobs from your list.</p>
+          <p className="text-sm">Jobly checks {companies.length.toLocaleString()} employers. Turn a company off to hide its jobs from your list.</p>
         </div>
         <a className="btn btn-outline btn-sm" href={suggest} target="_blank" rel="noopener" title="Opens your email app"><Plus size={14} aria-hidden="true" /> Suggest a company</a>
       </div>
@@ -114,7 +114,7 @@ export const CompaniesView: React.FC<CompaniesViewProps> = ({ companies, mutedCo
 
       <div className="search">
         <Search size={16} aria-hidden="true" />
-        <input className="input" type="search" value={query} onChange={(e) => setQuery(e.target.value)} placeholder={`Search ${companies.length} companies…`} aria-label="Search companies" />
+        <input className="input" type="search" value={query} onChange={(e) => setQuery(e.target.value)} placeholder={`Search ${companies.length.toLocaleString()} companies…`} aria-label="Search companies" />
       </div>
       <div className="row wrap co-filters">
         <button type="button" className="chip" aria-pressed={hiringOnly} onClick={() => setHiringOnly((v) => !v)}>Hiring now</button>
@@ -130,7 +130,7 @@ export const CompaniesView: React.FC<CompaniesViewProps> = ({ companies, mutedCo
         </select>
       </div>
       <p className="text-xs muted" role="status">
-        {list.length === companies.length ? `${companies.length} companies` : `${list.length} of ${companies.length} companies`}
+        {list.length === companies.length ? `${companies.length.toLocaleString()} companies` : `${list.length.toLocaleString()} of ${companies.length.toLocaleString()} companies`}
         {country ? ` hiring in ${country}` : ''}. Follow a company to get an alert for every new job there.
       </p>
       {error && <p role="alert" className="text-sm" style={{ color: 'var(--warning)' }}>{error}</p>}

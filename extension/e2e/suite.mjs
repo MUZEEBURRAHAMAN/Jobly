@@ -17,7 +17,7 @@ await step('accessibility, both themes', async () => {
   for (const theme of ['light', 'dark']) {
     const h = await launch({ colorScheme: theme });
     const p = await open(h, 'popup.html', { theme }); await firstCard(p);
-    for (const tab of ['Jobs', 'Apply', 'Companies', 'Saved', 'Preferences']) { await p.getByRole('button', { name: new RegExp('^' + tab) }).click(); await sleep(500); await axe(p, `popup/${tab}/${theme}`); }
+    for (const tab of ['Jobs', 'Apply', 'Companies', 'Saved', 'Settings']) { await p.getByRole('button', { name: new RegExp('^' + tab) }).click(); await sleep(500); await axe(p, `popup/${tab}/${theme}`); }
     await p.getByRole('button', { name: /^Jobs/ }).click(); await p.getByRole('button', { name: /Filters/ }).click(); await axe(p, `popup/filters/${theme}`);
     const d = await open(h, 'options.html', { theme, width: 1280, height: 860 }); await firstCard(d);
     for (const tab of ['Jobs', 'Companies', 'Saved', 'Profile', 'Resume', 'Cover letters', 'Contacts', 'Alerts', 'Settings']) { await d.getByRole('button', { name: new RegExp('^' + tab) }).click(); await sleep(500); await axe(d, `dashboard/${tab}/${theme}`); }
@@ -33,8 +33,8 @@ await step('welcome tour', async () => {
   await p.getByRole('button', { name: 'Next' }).click(); await axe(p, 'welcome 3');
   await p.getByRole('button', { name: /Start exploring/ }).click(); await firstCard(p); ok(true, 'finishing lands on the jobs list');
   const p2 = await open(h); await firstCard(p2); ok(await p2.getByRole('heading', { name: 'Welcome to Jobly' }).count() === 0, 'welcome does not come back');
-  await p2.getByRole('button', { name: /^Preferences/ }).click(); await p2.getByRole('button', { name: /welcome tour again/ }).click();
-  await p2.getByRole('heading', { name: 'Welcome to Jobly' }).waitFor({ timeout: 5000 }); ok(true, 'tour can be replayed from Preferences');
+  await p2.getByRole('button', { name: /^Settings/ }).click(); await p2.getByRole('button', { name: /welcome tour again/ }).click();
+  await p2.getByRole('heading', { name: 'Welcome to Jobly' }).waitFor({ timeout: 5000 }); ok(true, 'tour can be replayed from Settings');
   ok((await h.ctx.pages()).some((x) => x.url().endsWith('options.html#welcome')), 'installing opens the welcome page in a tab');
   await h.ctx.close();
   const g = await launch({ onboarded: false }); const q = await open(g); await q.getByRole('button', { name: 'Skip for now' }).click(); await firstCard(q); ok(true, '"Skip for now" goes to the jobs list'); await g.ctx.close();
@@ -107,7 +107,7 @@ await step('on-device data: preferences, saved jobs, alerts', async () => {
   ok((await h.sw.evaluate(() => chrome.storage.local.get('savedJobs'))).savedJobs?.length === 0, 'removing it clears the device copy'); await d.close();
   await goOnline(h.ctx);
   // preferences
-  p = await open(h); await firstCard(p); await p.getByRole('button', { name: /^Preferences/ }).click(); await sleep(600);
+  p = await open(h); await firstCard(p); await p.getByRole('button', { name: /^Settings/ }).click(); await sleep(600);
   await p.getByRole('checkbox', { name: /Product design/ }).click(); await p.getByRole('button', { name: 'Save preferences' }).click(); await p.getByText('Saved on this device.').waitFor({ timeout: 5000 });
   const stored = (await h.sw.evaluate(() => chrome.storage.local.get('userPreferences'))).userPreferences; ok(stored && !stored.roles.includes('product_design'), 'preferences are stored on the device');
   await p.getByRole('button', { name: /^Jobs/ }).click(); await sleep(1500);
@@ -150,7 +150,7 @@ await step('states: offline, 429, 500, empty, hidden', async () => {
   ok(await art(p) === 1, 'offline: plug illustration'); await axe(p, 'offline');
   await p.getByRole('button', { name: /^Companies/ }).click(); ok(await p.getByText("Can't load companies").count() === 1, 'offline: companies');
   await p.getByRole('button', { name: /^Saved/ }).click(); ok(await p.getByText('Nothing saved yet').count() === 1, 'offline: saved jobs live on the device, so the page still works');
-  await p.getByRole('button', { name: /^Preferences/ }).click(); await sleep(800); ok(await p.getByRole('button', { name: 'Save preferences' }).count() === 1, 'offline: preferences still usable');
+  await p.getByRole('button', { name: /^Settings/ }).click(); await sleep(800); ok(await p.getByRole('button', { name: 'Save preferences' }).count() === 1, 'offline: preferences still usable');
   await h.ctx.close();
   // offline with cache
   h = await launch(); p = await open(h); await firstCard(p); await sleep(1500); await p.close(); await goOffline(h.ctx);
@@ -272,6 +272,7 @@ await step('focus: tracker hidden, Applied toggle, Saved | Applied, data in Sett
   await h.sw.evaluate(() => chrome.storage.local.get('applications').then(({ applications }) => chrome.storage.local.set({ applications: applications.map((a, i) => (i === 0 ? { ...a, follow_up_at: new Date(Date.now() - 86400000).toISOString(), follow_up_notified: false } : a)) })));
   await d.evaluate(() => new Promise((res) => chrome.runtime.sendMessage({ type: 'CHECK_REMINDERS' }, res))); await sleep(500);
   ok((await store('applications'))[0].follow_up_notified === false, 'no follow-up reminders while the tracker is off');
+  ok(!(await h.sw.evaluate(() => chrome.alarms.get('jobly-reminders'))), 'and no reminder check is scheduled');
   await d.close();
   // "Did you apply?" after opening a job
   const p = await open(h); await firstCard(p);
@@ -288,7 +289,7 @@ await step('dealbreakers, job type filter, following companies', async () => {
   const h = await launch(); const urls = [];
   h.ctx.on('request', (r) => urls.push(r.url()));
   const p = await open(h); await firstCard(p);
-  await p.getByRole('button', { name: /^Preferences/ }).click(); await sleep(500);
+  await p.getByRole('button', { name: /^Settings/ }).click(); await sleep(500);
   await p.getByRole('button', { name: 'Contract' }).click(); await p.getByLabel('Lowest yearly salary').fill('150000');
   await p.getByRole('button', { name: 'Save preferences' }).click(); await p.getByText('Saved on this device.').waitFor({ timeout: 5000 });
   const prefs = (await h.sw.evaluate(() => chrome.storage.local.get('userPreferences'))).userPreferences;

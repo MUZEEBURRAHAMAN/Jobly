@@ -85,6 +85,9 @@ describe('JobData.query', () => {
     expect((await data.query({ search: 'product_design' })).items).toHaveLength(0);
     expect((await data.query({ search: 'globex' })).items.map((j) => j.id)).toEqual([3]);
     expect((await data.query({ search: 'berlin designer' })).items.map((j) => j.id)).toEqual([2]);
+    // words match from their start: "erlin" is inside Berlin, not the start of a word
+    expect((await data.query({ search: 'erlin' })).items).toHaveLength(0);
+    expect((await data.query({ search: 'design' })).items.map((j) => j.id).sort()).toEqual([1, 2, 3]);
   });
 
   it('lists jobs with every search word in the title first', async () => {

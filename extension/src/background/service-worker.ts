@@ -45,7 +45,9 @@ async function fetchJobs(query: JobQuery): Promise<Job[] | null> {
 // Chrome may drop alarms when the browser restarts (it only guarantees they survive until an update), so
 // re-create the alarm every time the worker starts, not only in onInstalled.
 async function ensureAlarm() {
-  if (!(await chrome.alarms.get(REMINDER_ALARM))) await chrome.alarms.create(REMINDER_ALARM, { delayInMinutes: 1, periodInMinutes: REMINDER_MINUTES });
+  // Reminders belong to the tracker; while it is switched off there is nothing to check
+  if (!FEATURES.tracker) await chrome.alarms.clear(REMINDER_ALARM);
+  else if (!(await chrome.alarms.get(REMINDER_ALARM))) await chrome.alarms.create(REMINDER_ALARM, { delayInMinutes: 1, periodInMinutes: REMINDER_MINUTES });
   if (await chrome.alarms.get(ALARM_NAME)) return;
   const period = POLL_MIN_MINUTES + Math.floor(Math.random() * POLL_SPREAD_MINUTES);
   await chrome.alarms.create(ALARM_NAME, { delayInMinutes: 1, periodInMinutes: period });

@@ -2,11 +2,11 @@
 title: Security
 eyebrow: Security
 description: The permissions Jobly asks for, when it reads a page, the services it talks to, how data moves, and how to report a security problem.
-updated: 2026-11-02
+updated: 2026-11-07
 figure: vault
 ---
 
-> **The short version.** Jobly has no server: it downloads public job files and filters them in your browser. It reads the page you're on only when you click Save, Fit check or Autofill, and only that tab. Optional services (Google Calendar, Hunter) are asked for the first time you use them. Everything personal stays in your browser.
+> **The short version.** Jobly has no server: it downloads public job files and filters them in your browser. It reads the page you're on only when you click Save, Fit check or Autofill, and only that tab. The optional Hunter contact search is asked for the first time you use it. Everything personal stays in your browser.
 
 ## Permissions
 
@@ -14,14 +14,13 @@ These are all the permissions in Jobly's manifest. Chrome shows them when you in
 
 | Permission | Why Jobly needs it | What it can't do |
 | --- | --- | --- |
-| `storage` | Keep your preferences, saved jobs, tracker, profiles and contacts in your browser (and Chrome sync if you turn it on) | Read anything outside Jobly's own storage |
-| `notifications` | Show job alerts and your follow-up, task and interview reminders | Show anything you turned off |
+| `storage` | Keep your preferences, saved and applied jobs, profiles and contacts in your browser (and Chrome sync if you turn it on) | Read anything outside Jobly's own storage |
+| `notifications` | Show job alerts, and confirm a job saved with the right-click menu | Show anything you turned off |
 | `alarms` | Check for new jobs every 60 to 90 minutes and due reminders every 15 minutes | Run code on websites |
 | `activeTab` + `scripting` | Read or fill the tab you're on when you click Save, Fit check or Autofill | Touch any other tab, or any page you didn't click on |
 | `contextMenus` | Add "Save this job to Jobly" to the right-click menu | Do anything until you choose it |
-| `identity` (versions with calendar import) | Sign in to Google Calendar when you import interviews | Read any Google data without that sign-in |
 | `https://jobly-data.pages.dev/*` | Download Jobly's public job files | Reach any other website |
-| Optional: `https://api.hunter.io/*` (and `https://www.googleapis.com/*` with calendar import) | Contact search and calendar import, asked for the first time you use them | Anything before you allow it |
+| Optional: `https://api.hunter.io/*` | Contact search, asked for the first time you use it | Anything before you allow it |
 
 Jobly does **not** ask for `tabs`, `history`, `cookies`, `webRequest` or access to "all sites", and it has no content scripts that run on pages by themselves. Autofill never presses Submit and never touches password fields.
 
@@ -36,7 +35,7 @@ There is no Jobly server, so there is nothing that receives your searches, prefe
 
 ## Built-in protections
 
-- **Content Security Policy.** The extension only runs its own scripts and only connects to Jobly's job files and the optional services you turn on: `default-src 'self'; script-src 'self'; connect-src https://jobly-data.pages.dev https://api.hunter.io` (plus Google's API addresses in versions with calendar import).
+- **Content Security Policy.** The extension only runs its own scripts and only connects to Jobly's job files and the optional services you turn on: `default-src 'self'; script-src 'self'; connect-src https://jobly-data.pages.dev https://api.hunter.io`.
 - **Links that don't leak.** Apply links open the job's original page in a new tab with `noopener noreferrer`, so that site can't see or control the page you came from.
 - **Nothing to attack on our side.** With no server, there is no database of users, no login and no API that accepts input. The job files are read-only.
 - **No secrets in the extension.** The extension ships with no API keys or tokens. If you add your own Hunter key, it stays in your browser and is left out of backups.

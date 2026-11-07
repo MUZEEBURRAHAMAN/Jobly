@@ -2,9 +2,9 @@
   "manifest_version": 3,
   "name": "Jobly — Find jobs. Apply smarter",
   "short_name": "Jobly",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "minimum_chrome_version": "116",
-  "description": "Fresh jobs with real posting dates, plus a job tracker, resume builder and autofill you review. Free, no account.",
+  "description": "Fresh jobs with real posting dates from company career pages, a resume builder and autofill you review. Free, no account.",
   "homepage_url": "https://jobly-88t.pages.dev",
   "permissions": [
     "storage",

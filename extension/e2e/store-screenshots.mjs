@@ -1,16 +1,18 @@
 // 1280x800 Chrome Web Store screenshots (and a 400x600 popup) with a made-up demo profile, written to
-// store-assets/screenshots/v1.1/. With the test fixture: `bash e2e/run.sh store-screenshots`. With real job data (better):
+// store-assets/screenshots/v1.2/. With the test fixture: `bash e2e/run.sh store-screenshots`. With real job data (better):
 //   python -m backend.app.static_export /tmp/jobly-data   (DATABASE_PATH = a downloaded "snapshot" release database)
 //   npx vite build --mode development --outDir /tmp/jobly-dev
 //   EXT_DIST=/tmp/jobly-dev STATIC_DIR=/tmp/jobly-data node e2e/store-screenshots.mjs
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { launch, open, sleep, staticJobs } from './lib.mjs';
-const OUT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..', 'store-assets', 'screenshots', 'v1.1');
+const OUT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..', 'store-assets', 'screenshots', 'v1.2');
+import fs from 'fs';
+fs.mkdirSync(OUT, { recursive: true });
 const h = await launch();
 await h.ctx.route(/t2\.gstatic\.com/, (r) => r.abort());
 const iso = (d, hr = 10) => { const x = new Date(Date.now() + d * 86400000); x.setHours(hr, 0, 0, 0); return x.toISOString(); };
-// The tracker shows a made-up person's applications, so they go to made-up companies (the job list itself is real).
+// Saved › Applied shows a made-up person's applications, so they go to made-up companies (the job list itself is real).
 const fake = [['Senior Product Designer', 'Copperfield AI', 'Bengaluru, India'], ['Product Designer', 'Skylark', 'Remote'], ['Lead Product Designer', 'Tidewater', 'Pune, India'],
   ['UX Designer', 'Lumen Works', 'Hyderabad, India'], ['Design Systems Lead', 'Brightloop', 'Remote'], ['Senior Product Designer', 'Redwood Pay', 'Mumbai, India'],
   ['Product Design Manager', 'Harbor & Co', 'Gurugram, India'], ['Staff Product Designer', 'Mosaic Health', 'Bengaluru, India'], ['UX Researcher', 'Fernhill', 'Chennai, India']];
@@ -45,7 +47,7 @@ await h.sw.evaluate(async (d) => chrome.storage.local.set(d), {
     work, education: [{ id: 'e1', school: 'National Institute of Design', degree: 'B.Des', field: 'Interaction Design', start: '2015-07', end: '2019-05' }], updated_at: iso(0) }],
   activeProfileId: 'p1',
   userPreferences: { roles: ['product_design', 'product_management'], seniorities: ['mid', 'senior', 'lead'], locations: [], remote_only: false, custom_keywords: '', excluded_keywords: '', min_salary: 0, employment_types: [], notify_enabled: true, sync_interval_mins: 30 },
-  seenAlertKeys: staticJobs().map((j) => j.application_url),
+  seenAlertKeys: staticJobs().filter((j) => ['1', '3', '7'].includes(j.bucket)).map((j) => j.application_url),  // alerts look at the last 3 days only
 });
 const d = await open(h, 'options.html', { width: 1280, height: 800 });
 await d.locator('article').first().waitFor({ timeout: 30000 });
@@ -56,14 +58,19 @@ for (let i = 0; i < 40 && (await d.locator('article').first().getAttribute('aria
 await d.evaluate(() => document.activeElement.blur()); await sleep(800);
 await snap(null, '1-jobs.png');
 await d.getByLabel('Search jobs').fill(''); await sleep(800);
-await snap('tracker', '2-tracker.png');
-await snap('interviews', '3-interviews.png');
+// Companies hiring in India, the biggest employers first
+await d.goto(`chrome-extension://${h.id}/options.html#companies`); await sleep(1200);
+await d.getByRole('combobox', { name: 'Country' }).selectOption('India');
+await d.getByRole('combobox', { name: 'Sort companies' }).selectOption('jobs');
+await snap(null, '2-companies.png');
+await d.goto(`chrome-extension://${h.id}/options.html#saved`); await sleep(1000);
+await d.getByRole('tab', { name: /^Applied/ }).click();
+await snap(null, '3-saved.png');
 await snap('resume', '4-resume.png');
 await snap('profile', '5-profile.png');
 await d.goto(`chrome-extension://${h.id}/options.html#letters`); await sleep(800);
 await d.locator('#cl-target').selectOption({ index: 6 });
 await snap(null, '6-cover-letter.png');
-await snap('tasks', '7-tasks.png');
 const p = await open(h, 'popup.html', { width: 400, height: 600 }); await p.locator('article').first().waitFor({ timeout: 30000 }); await sleep(800);
 await p.screenshot({ path: path.join(OUT, 'popup-400x600.png') }); console.log('wrote popup-400x600.png');
 await h.ctx.close();

@@ -48,7 +48,7 @@ export const PreferencesView: React.FC<PreferencesViewProps> = ({ preferences, o
     <form className={`section${wide ? ' prefs-wide' : ''}`} onSubmit={submit}>
       <div>
         <h2>{title ?? 'Preferences'}</h2>
-        <p className="text-sm">{title ? 'What you\'re looking for, alerts, connections and your data. Everything is saved on this device.' : 'Tell Jobly what you\'re looking for. "For you" in the jobs list uses these.'}</p>
+        <p className="text-sm">{title ? 'What you\'re looking for, alerts and connections. Everything is saved on this device.' : 'Tell Jobly what you\'re looking for. "For you" in the jobs list uses these.'}</p>
       </div>
 
       <fieldset className="stack" style={{ border: 0 }}>

@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Bookmark, Briefcase, Building2, SlidersHorizontal, Wand } from '../lib/icons';
+import { Bookmark, Briefcase, Building2, Settings, Wand } from '../lib/icons';
 import { api, ConnectionStatus } from '../lib/api';
 import { DEFAULT_FILTERS, JobFilters } from '../lib/filters';
 import { useMutedCompanies } from '../lib/mutedCompanies';
@@ -174,7 +174,7 @@ export const PopupApp: React.FC = () => {
     { id: 'apply', label: 'Apply', icon: Wand },
     { id: 'companies', label: 'Companies', icon: Building2 },
     { id: 'saved', label: 'Saved', icon: Bookmark, badge: savedJobs.length },
-    { id: 'preferences', label: 'Preferences', icon: SlidersHorizontal },
+    { id: 'preferences', label: 'Settings', icon: Settings },
   ];
 
   const finishWelcome = async (p: Preferences) => { await handleSavePreferences(p); completeOnboarding(); };
@@ -211,7 +211,7 @@ export const PopupApp: React.FC = () => {
           openDashboard={(hash) => { try { void chrome.tabs.create({ url: chrome.runtime.getURL(`options.html#${hash}`) }); } catch { window.open(`/options.html#${hash}`, '_blank'); } }} />}
         {tab === 'companies' && <CompaniesView companies={companies} mutedCompanyIds={muted} onToggleMuted={toggleMuted} offline={status === 'offline'} loading={status === 'connecting'} />}
         {tab === 'saved' && <SavedJobsView savedJobs={savedJobs} onToggleSave={handleToggleSave} onBrowseJobs={() => setTab('jobs')} notify={showNotice} />}
-        {tab === 'preferences' && preferences && <PreferencesView preferences={preferences} onSave={handleSavePreferences} onReplayWelcome={resetOnboarding} />}
+        {tab === 'preferences' && preferences && <PreferencesView title="Settings" preferences={preferences} onSave={handleSavePreferences} onReplayWelcome={resetOnboarding} />}
         {tab === 'preferences' && !preferences && (
           <div className="section" aria-busy="true" aria-label="Loading your preferences">
             {[0, 1, 2, 3].map((i) => <div key={i} className="skeleton" style={{ height: i ? 56 : 28, width: i ? '100%' : '40%' }} />)}

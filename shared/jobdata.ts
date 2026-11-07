@@ -131,13 +131,21 @@ export function matchesPreferences(job: DataJob, prefs: Prefs, skipRoles = false
  *  would match every job filed under product design. */
 function searchMatches(job: DataJob, tokens: string[]): boolean {
   const fields = [job.title, job.company_name, job.location, job.geo_hub].map(lower);
-  return tokens.every((t) => (ALIASES[t] ?? [t]).some((a) => fields.some((f) => f.includes(a))));
+  return tokens.every((t) => (ALIASES[t] ?? [t]).some((a) => fields.some((f) => startsWord(f, a))));
 }
 
 /** True when every word of the search is in the title: those jobs are listed first. */
 function titleMatches(job: DataJob, tokens: string[]): boolean {
   const title = lower(job.title);
-  return tokens.every((t) => (ALIASES[t] ?? [t]).some((a) => title.includes(a)));
+  return tokens.every((t) => (ALIASES[t] ?? [t]).some((a) => startsWord(title, a)));
+}
+
+/** `word` starts a word in `text`: "ux" finds "UX Designer" and "design" finds "Designer", but "ux" doesn't find "Luxor". */
+function startsWord(text: string, word: string): boolean {
+  for (let i = text.indexOf(word); i !== -1; i = text.indexOf(word, i + 1)) {
+    if (i === 0 || !/[\p{L}\p{N}]/u.test(text[i - 1])) return true;
+  }
+  return false;
 }
 
 /** Categories a query reads. */

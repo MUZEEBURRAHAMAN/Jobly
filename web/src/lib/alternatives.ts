@@ -75,14 +75,14 @@ export const ALTERNATIVES: Alternative[] = [
   {
     slug: 'simplify', name: 'Simplify', kind: 'Application autofill and tracker', figure: 'format', checked: CHECKED,
     title: 'Jobly vs Simplify',
-    description: 'Jobly and Simplify Copilot both track applications and fill forms; Jobly starts from finding new jobs early, free and without an account. How they compare and what each costs.',
-    summary: 'Both now track applications and fill in forms. Simplify Copilot is built around autofill and AI writing, with an account. Jobly is built around finding new jobs on career pages early, and keeps everything in your browser with no account.',
+    description: 'Jobly and Simplify Copilot both keep the jobs you applied to and fill forms; Jobly starts from finding new jobs early, free and without an account. How they compare and what each costs.',
+    summary: 'Both keep a list of your applications and fill in forms. Simplify Copilot is built around autofill and AI writing, with an account. Jobly is built around finding new jobs on career pages early, and keeps everything in your browser with no account.',
     chooseThem: ['You want AI to write and tailor resumes and answers', 'You want autofill on as many hiring systems as possible', 'You’re happy to create an account'],
     chooseJobly: ['Your problem is finding good jobs early', 'You want autofill that shows every answer first and only reads the tab you click on', 'You want no account and everything kept in your browser'],
     rows: [
       { label: 'Main job', jobly: ['yes', 'Finds new jobs on career pages'], them: ['yes', 'Fills in applications'] },
       { label: 'Autofill', jobly: ['part', 'The form on the tab you’re on, after you review each answer'], them: ['yes', 'Greenhouse, Lever, Ashby, Workday and more'] },
-      { label: 'Application tracker', jobly: ['yes', 'Statuses, notes, interviews, tasks and reminders'], them: ['yes', 'Tracks your applications'] },
+      { label: 'Application tracker', jobly: ['part', 'A list of saved and applied jobs; a full board is coming back later'], them: ['yes', 'Tracks your applications'] },
       { label: 'AI writing', jobly: ['part', 'Jobly Studio: tailored resume and cover letter from your profile, with your own AI or Claude'], them: ['yes', 'Resumes, cover letters and answers (paid)'] },
       { label: 'Job alerts from career pages', jobly: ['yes', 'Every 60 to 90 minutes'], them: ['part', 'Job matches, not its focus'] },
       { label: 'Account', jobly: ['yes', 'None needed'], them: ['part', 'Account needed'] },
@@ -91,9 +91,9 @@ export const ALTERNATIVES: Alternative[] = [
     ],
     better: [
       { title: 'Where Simplify is better', text: 'AI writing and the widest autofill. Simplify tailors resumes and drafts answers with AI, and fills forms on more hiring systems.' },
-      { title: 'Where Jobly is better', text: 'Finding, and privacy. Jobly watches 1,600+ career pages and tells you when a new job matches, with its real posting date. Its tracker, profiles and autofill work without an account and keep everything in your browser.' },
+      { title: 'Where Jobly is better', text: 'Finding, and privacy. Jobly watches 1,600+ career pages and tells you when a new job matches, with its real posting date. Its saved and applied lists, profiles and autofill work without an account and keep everything in your browser.' },
     ],
-    together: 'Let Jobly tell you about a new job and track it; use Simplify’s AI if you want help writing. They don’t get in each other’s way.',
+    together: 'Let Jobly tell you about a new job and keep your applied list; use Simplify’s AI if you want help writing. They don’t get in each other’s way.',
     sources: [
       { label: 'Simplify Copilot', href: 'https://simplify.jobs/copilot' },
       { label: 'Jobright: Simplify Copilot review 2026', href: 'https://jobright.ai/blog/simplify-copilot-review-2026-features-pricing-and-top-alternatives/' },

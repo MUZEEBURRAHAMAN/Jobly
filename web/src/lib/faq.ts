@@ -24,9 +24,9 @@ export const FAQ_GROUPS: { id: string; title: string; items: Faq[] }[] = [
   {
     id: 'alerts', title: 'Alerts and saved jobs', items: [
       { q: 'How do alerts work?', a: 'Every 60 to 90 minutes your browser reads Jobly’s public job files, picks the jobs that match your preferences and compares them with what it has already seen. New ones show up as a badge on the toolbar icon and, if you turn it on, as a desktop notification.' },
-      { q: 'I’m not getting desktop notifications.', a: 'Turn alerts on in Jobly’s Preferences, then check that Chrome is allowed to show notifications in your computer’s system settings. Focus or Do Not Disturb modes can also hide them.' },
-      { q: 'Are my saved jobs backed up?', a: 'They live in this browser. Turn on sync in Preferences to copy your preferences, tracker and profiles to Chrome on your other computers, or use Backup in the Tracker to save everything as a file.' },
-      { q: 'Does Jobly track my applications?', a: 'Yes. Mark any job as Applied, Interviewing, Offer or Rejected, add notes, follow-up reminders and interviews with prep checklists, and see your weekly progress. You can also import a spreadsheet of applications you kept elsewhere.' },
+      { q: 'I’m not getting desktop notifications.', a: 'Turn on Desktop alerts in Jobly’s Settings, then check that Chrome is allowed to show notifications in your computer’s system settings. Focus or Do Not Disturb modes can also hide them.' },
+      { q: 'Are my saved jobs backed up?', a: 'They live in this browser. Turn on sync in Settings to copy your preferences, saved and applied jobs and profiles to Chrome on your other computers, or use Download a backup in Settings to save everything as a file.' },
+      { q: 'Does Jobly track my applications?', a: 'It keeps a list of the jobs you applied to: mark applied on any job card, or answer “Did you apply?” after you open a job, and find them under Saved › Applied. You can also import a spreadsheet of applications from Settings. The full tracker board, interviews and tasks are switched off for now and will come back in a later version.' },
     ],
   },
   {

@@ -9,7 +9,15 @@ import { SITE } from '../lib/site';
 type Group = { h: string; items: string[] };
 type Release = { v: string; tag: 'next' | 'upcoming'; title: string; lead: string; groups: Group[] };
 const releases: Release[] = [
-  { v: 'v1.1', tag: 'next', title: 'Every role, with design and IT sorted by area', lead: 'Built and tested; waiting for Chrome Web Store review.', groups: [
+  { v: 'v1.2', tag: 'next', title: 'Every role, and a simpler Jobly', lead: 'Built and tested; going to Chrome Web Store review next.', groups: [
+    { h: 'Focus', items: [
+      'Jobs, companies and applying come first. The tracker board, interviews and tasks are switched off for now; anything you kept in them stays on your device and comes back with them.',
+      'Saved has two lists, Saved and Applied. Mark applied on any job card, or answer “Did you apply?” after you open a job.',
+      'Alerts, theme, refresh and Settings sit as icons at the top of the dashboard. Backup, restore and CSV import are in Settings.',
+      'Companies can be filtered by country and sorted A–Z, Z–A, by open jobs or by newest job.',
+      'Search looks at job titles, companies and places, so “product designer” finds product designers.',
+      'Chip, RF, mechanical and other engineering “design engineer” jobs are no longer listed as product design.',
+    ] },
     { h: 'Jobs', items: [
       'Every job from the career pages Jobly reads, not only five tech roles: sales, marketing, finance, operations and more under More roles.',
       'A Design & IT list, and its own list for each area: backend, mobile, DevOps and cloud, QA, cybersecurity, IT and support, enterprise apps, data and creative design.',
@@ -21,17 +29,23 @@ const releases: Release[] = [
       'Pick development, IT and design areas in Preferences, and alerts cover them too.',
     ] },
   ] },
-  { v: 'v1.2', tag: 'upcoming', title: 'Wider autofill', lead: 'Fill more of each application without retyping.', groups: [
-    { h: 'Autofill', items: [
-      'Better handling of Workday’s multi-step forms and of custom questions.',
-      'Answers you type once remembered for the next form that asks the same question.',
+  { v: 'v1.3', tag: 'upcoming', title: 'A profile in minutes', lead: 'Fill your profile from your LinkedIn PDF and see what is still missing.', groups: [
+    { h: 'Profile', items: [
+      'Import the PDF LinkedIn makes of your profile, check what Jobly read, and keep what is right.',
+      'Contact, experience, education and skills in clear steps, with a completeness bar that says what to add next.',
     ] },
-    { h: 'Tracker', items: ['Automatic status when a hiring system emails you, if you connect your inbox (optional).'] },
   ] },
-  { v: 'v1.3', tag: 'upcoming', title: 'Jobly Studio in the extension', lead: 'The tailored resume and cover letter from Jobly Studio, one click from any job.', groups: [
+  { v: 'v1.4', tag: 'upcoming', title: 'Apply assist', lead: 'Jobly fills the application with you, step by step. You always press Submit.', groups: [
+    { h: 'Applying', items: [
+      'Each answer shows where it came from, your profile or a suggestion, and questions Jobly can’t answer are marked for you.',
+      'Answers you type once are remembered for the next form that asks the same question.',
+      'Workday and Greenhouse first, then Ashby, SmartRecruiters and Lever.',
+    ] },
+  ] },
+  { v: 'v1.5', tag: 'upcoming', title: 'Resume and cover letter for each job', lead: 'Paste a job description and see what it asks for against your resume.', groups: [
     { h: 'Writing', items: [
-      'Send a job from the extension to Jobly Studio, which writes a tailored resume and cover letter from your profile.',
-      'Uses your own AI key or your Claude plan, so Jobly stays free. Nothing goes to an AI service unless you set it up.',
+      'Requirements found in the job description, marked as covered or missing, with suggested changes you accept one by one.',
+      'A cover letter for that job from your profile. Uses AI built into Chrome where available, or your own AI key; nothing goes to an AI service unless you set it up.',
     ] },
   ] },
 ];
@@ -44,7 +58,7 @@ const later = [
 const wont = [
   { t: 'AI that Jobly pays for', d: 'Every AI request costs money, and Jobly is free. Jobly Studio’s AI help uses your own key or your Claude plan.' },
   { t: 'Autofill that runs by itself', d: 'Jobly’s autofill works only on the tab you click on, shows every answer first, and never presses Submit. An agent that applies for you is not planned.' },
-  { t: 'Accounts', d: 'Your data stays in your browser, so there is nothing to sign in to.' },
+  { t: 'An account you must create', d: 'Jobly works without one. An optional account to back up your profile may come later; it will never be required.' },
 ];
 const TAGS = { next: 'Next', upcoming: 'Upcoming' } as const;
 const changelog = [
