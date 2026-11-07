@@ -8,6 +8,8 @@ from __future__ import annotations
 
 import re
 
+from .matching import is_engineering_design
+
 TECH_ROLES = ("product_design", "frontend_engineering", "fullstack_engineering", "product_management", "ai_ml")
 
 # (id, label, title pattern). Order matters: the first match wins, so narrow families come before wide ones.
@@ -96,6 +98,9 @@ def classify_category(title: str | None, normalized_role: str | None) -> str:
     if normalized_role in TECH_LABELS:
         return normalized_role
     t = (title or "").lower()
+    # "SRAM Design Lead" or "HVAC Design Manager" is engineering, not Design & Creative
+    if is_engineering_design(t) and re.search(r"\bdesign", t):
+        return "engineering"
     for cid, _label, rx in _COMPILED:
         if rx.search(t):
             return cid

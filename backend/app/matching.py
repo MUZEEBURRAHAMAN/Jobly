@@ -163,8 +163,45 @@ def classify_role(title: str, hint: str | None = None) -> str | None:
     return None
 
 
+# Chip, memory, RF, PCB, mechanical, aerospace and building design jobs say "Design Engineer", "Design Lead" or "Design
+# Manager" too. They go to Engineering unless the title also names product design work ("Digital Product Designer",
+# "Senior Manager (IC), Product Designer", "Design Engineer - Design System & Platform UI").
+ENGINEERING_DESIGN = re.compile(
+    r"\b(?:ic|asic|rtl|rtl2gds|soc|chip|cpu|gpu|vlsi|semiconductor|silicon|dram|sram|nand|hbm|lpddr|ddr\d?|tcam|memory|"
+    r"circuits?|layout|mask|analog|mixed[\s-]?signal|dft|sta|synthesis|timing|pcba?|ecad|firmware|embedded|rf|rfic|mmic|"
+    r"microwave|antenna|optical|optoelectronic|photonics|packag(?:e|ing)|serdes|pcie|i/o|io|ip|ssd|datapath|logic(?:al)?|"
+    r"emulation|palladium|board|electronics?|electronic|electromechanical|electromagnetic|emc|electrical|hardware|"
+    r"verification|mechanical|thermal|turbines?|hydro|hvac|mep|piping|chiller|fire|suppression|plumbing|"
+    r"propulsion|aerostructures?|structur(?:al|es?)|airframe|aviation|aerospace|vehicles?|engines?|combustion|fuel|"
+    r"nuclear|cryogenics?|hypersonic|flowpath|bearing|satellites?|launch|transformer|switchgear|voltage|hvdc|scada|bms|"
+    r"controls?|motor|tool(?:ing)?|harness|wire|cabl(?:e|ing)|composites?|cad|catia|softgoods|manufacturing|factory|"
+    r"plant|process|rack|facilities|data\s+center|white\s+space|elv|ict|network|infrastructure|repair|test)\b"
+    r"|\bdesign\s+engineering\b|\bengineering\s+design\b"
+    r"|\bdigital\s+(?:circuit\s+)?design\s+(?:engineer|lead|manager)\b")
+PRODUCT_DESIGN_WORK = re.compile(
+    r"\bproduct\s+design(?:er)?\b(?!\s+engineer)|\bux\b|\bui\b|\buser\s+(?:experience|interface|research)|\binteraction\b|"
+    r"\bvisual\s+design|\bbrand\s+design|\bdesign\s+systems?\b|\bweb\s+design")
+
+
+# Physical spaces, objects and other fields: Design & Creative, not product design (unless the title names UX/product work)
+OTHER_DESIGN = re.compile(
+    r"\b(?:industrial|retail|interior|fashion|lounge|cafes?|store|restaurant|hotel|exhibition|set|costume|jewel(?:le)?ry|"
+    r"furniture|ffe|drug|medicinal|clinical|learning|curriculum|deal|game|level|sound|lighting)\b")
+
+
+def is_other_design(title: str) -> bool:
+    t = title.lower()
+    return bool(OTHER_DESIGN.search(t)) and not PRODUCT_DESIGN_WORK.search(t)
+
+
+def is_engineering_design(title: str) -> bool:
+    t = title.lower()
+    return bool(ENGINEERING_DESIGN.search(t)) and not PRODUCT_DESIGN_WORK.search(t)
+
+
 def detect_role(title: str) -> str | None:
     title_lower = title.lower()
+    hardware = is_engineering_design(title_lower)
     
     # Priority order: specialized roles first before general fullstack/software engineer
     priority_order = [
@@ -177,6 +214,11 @@ def detect_role(title: str) -> str | None:
 
     for role_id in priority_order:
         rules = ROLE_TAXONOMY[role_id]
+        # "RF Front End Design Engineer" is hardware too, not frontend
+        if role_id == "product_design" and is_other_design(title_lower):
+            continue
+        if hardware and (role_id == "product_design" or (role_id == "frontend_engineering" and "design" in title_lower)):
+            continue
         
         # Check exclusions first
         excluded = False

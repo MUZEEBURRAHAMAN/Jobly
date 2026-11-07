@@ -127,9 +127,17 @@ export function matchesPreferences(job: DataJob, prefs: Prefs, skipRoles = false
   return true;
 }
 
+/** Search reads what a person sees on the card: title, company and place. Not the role category, or "product designer"
+ *  would match every job filed under product design. */
 function searchMatches(job: DataJob, tokens: string[]): boolean {
-  const fields = [job.title, job.company_name, job.location, job.normalized_role, job.geo_hub, job.category].map(lower);
+  const fields = [job.title, job.company_name, job.location, job.geo_hub].map(lower);
   return tokens.every((t) => (ALIASES[t] ?? [t]).some((a) => fields.some((f) => f.includes(a))));
+}
+
+/** True when every word of the search is in the title: those jobs are listed first. */
+function titleMatches(job: DataJob, tokens: string[]): boolean {
+  const title = lower(job.title);
+  return tokens.every((t) => (ALIASES[t] ?? [t]).some((a) => title.includes(a)));
 }
 
 /** Categories a query reads. */
@@ -252,7 +260,12 @@ export class JobData {
       scannedRows += rows.length;
       // Within a bucket: newest posting first, then newest id (the API's ORDER BY)
       rows.sort((a, b) => (a.posted_at === b.posted_at ? b.id - a.id : (b.posted_at ?? '') > (a.posted_at ?? '') ? 1 : -1));
-      for (const j of rows) if (keep(j)) matched.push(j);
+      const kept = rows.filter(keep);
+      // With a search, jobs whose title has every word come first within each age group (newest groups still lead)
+      if (tokens.length) {
+        const inTitle = kept.filter((j) => titleMatches(j, tokens));
+        matched.push(...inTitle, ...kept.filter((j) => !inTitle.includes(j)));
+      } else matched.push(...kept);
       if (matched.length >= offset + limit && i < buckets.length - 1) { complete = false; break; }
     }
     const total = complete || !scannedRows

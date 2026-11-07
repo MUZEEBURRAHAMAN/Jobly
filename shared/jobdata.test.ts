@@ -78,6 +78,30 @@ describe('JobData.query', () => {
     expect(plain.items.every((j) => !j.is_match)).toBe(true);
   });
 
+  it('searches title, company and place, not the role category', async () => {
+    const data = new JobData('https://data.test/v1', fakeFetch([]));
+    // "sales" is a category name; only the job with Sales in its title matches
+    expect((await data.query({ search: 'sales' })).items.map((j) => j.id)).toEqual([5]);
+    expect((await data.query({ search: 'product_design' })).items).toHaveLength(0);
+    expect((await data.query({ search: 'globex' })).items.map((j) => j.id)).toEqual([3]);
+    expect((await data.query({ search: 'berlin designer' })).items.map((j) => j.id)).toEqual([2]);
+  });
+
+  it('lists jobs with every search word in the title first', async () => {
+    const extra: Record<string, unknown[][]> = {
+      'product_design/1': [row(1, 'Engineer', 'product_design', ago(0.1), { company_name: 'Designer Labs' }), row(2, 'Product Designer', 'product_design', ago(0.5))],
+    };
+    const fetcher = (async (url: string) => {
+      const path = String(url).replace('https://data.test/v1/', '');
+      if (path === 'meta.json') return new Response(JSON.stringify({ ...meta, files: { product_design: { 1: { jobs: 2, bytes: 1 } } } }));
+      const key = path.replace('jobs/', '').replace('.json', '');
+      return new Response(JSON.stringify({ rows: extra[key] ?? [] }));
+    }) as unknown as typeof fetch;
+    const data = new JobData('https://data.test/v1', fetcher);
+    // Job 1 is newer but matches only by company name, so the title match leads
+    expect((await data.query({ search: 'designer' })).items.map((j) => j.id)).toEqual([2, 1]);
+  });
+
   it('counts from file sizes and finds descriptions by shard', async () => {
     const data = new JobData('https://data.test/v1', fakeFetch([]));
     expect(await data.count({ role: 'tech', freshness_days: 1 })).toBe(2);

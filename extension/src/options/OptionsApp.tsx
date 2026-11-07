@@ -252,7 +252,7 @@ export const OptionsApp: React.FC = () => {
             <ApplyPrompt onProblem={(m) => showNotice(m)} />
             {tab === 'jobs' && stats && (
               <div className="stats">
-                {[['For you', stats.matched_jobs], ['Open jobs', stats.total_jobs], ['Companies', stats.active_companies], ['New today', stats.new_jobs_today]].map(([label, value]) => (
+                {[['For you', stats.matched_jobs], ['Open jobs', stats.total_jobs], ['Companies', stats.active_companies], ['Posted in 24 hours', stats.new_jobs_today]].map(([label, value]) => (
                   <div key={label as string} className="card stat"><div className="text-sm muted">{label}</div><div className="value">{n(value as number)}</div></div>
                 ))}
               </div>

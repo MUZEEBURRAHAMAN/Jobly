@@ -53,6 +53,25 @@ class TestBootstrap(unittest.IsolatedAsyncioTestCase):
                 await runner.sync_all_sources(include_aggregators=False)
             self.assertEqual(sorted(seen), expected, profile)
 
+    async def test_paused_sources_are_not_read(self):
+        from backend.app.ingestion import runner
+        now = get_utc_now()
+        async with get_db_connection() as db:
+            for name, src in [("Blocked Co", "darwinbox"), ("Open Co", "keka")]:
+                await db.execute("INSERT INTO companies (name, slug, careers_url, source_type, source_identifier, is_active, created_at, updated_at) VALUES (?,?,?,?,?,1,?,?)",
+                                 (name, name.lower().replace(" ", "-"), "https://example.com", src, "x", now, now))
+            await db.commit()
+        for paused, expected in [("darwinbox", ["Open Co"]), ("", ["Blocked Co", "Open Co"])]:
+            seen = []
+
+            async def fake(company, client, seen=seen):
+                seen.append(company["name"]); return company, [], None
+
+            with patch.object(settings, "CRAWL_PROFILE", "full"), patch.object(settings, "PAUSED_SOURCES", paused), \
+                    patch.object(runner, "fetch_company_jobs", AsyncMock(side_effect=fake)):
+                await runner.sync_all_sources(include_aggregators=False)
+            self.assertEqual(sorted(seen), expected, paused or "nothing paused")
+
     async def test_retired_boards_and_sources_are_removed_with_their_jobs(self):
         now = get_utc_now()
         async with get_db_connection() as db:

@@ -4,6 +4,7 @@ import unittest
 import aiosqlite
 
 from backend.app.ingestion.runner import reclassify_roles
+from backend.app.categories import classify_category
 from backend.app.matching import classify_role, detect_role
 
 
@@ -17,6 +18,27 @@ class TestRoleRules(unittest.TestCase):
     def test_design_titles_still_match(self):
         for title in ["Product Designer", "Design Systems Designer", "Design Engineer", "UX Designer",
                       "Senior UI Designer", "Web Designer", "UX Researcher", "Staff Product Designer, Design Systems"]:
+            self.assertEqual(detect_role(title), "product_design", title)
+
+    def test_engineering_design_jobs_are_not_product_design(self):
+        # All seen in the live data on 7 Nov 2026, filed under Product design
+        for title in ["IC Design Engineer", "CPU Layout Design Engineer", "Senior Memory Circuit Design Engineer", "SRAM Design Lead",
+                      "Principal RF Design Engineer", "Senior PCB Design Engineer", "Optical Design Engineer II", "Staff Digital Design Engineer",
+                      "Propulsion Design Engineer (Raptor Engine Systems)", "HVAC Design Manager", "Tooling Design Engineer, Air Vehicles",
+                      "Sr. Thermal Design Engineer, Amazon LEO", "Principal Antenna/RF Front End Design Engineer",
+                      "Senior Engineer, Product Design Engineering (Master’s New Graduate | 0-2 Years Experience)"]:
+            self.assertIsNone(detect_role(title), title)
+            self.assertEqual(classify_category(title, detect_role(title)), "engineering", title)
+
+    def test_physical_space_design_is_design_not_product_design(self):
+        for title in ["Industrial Design Lead", "Airport Lounge Design Manager", "(Junior) Design Manager (all genders) - Retail Design"]:
+            self.assertIsNone(detect_role(title), title)
+            self.assertEqual(classify_category(title, None), "design", title)
+
+    def test_product_designers_in_hardware_or_retail_areas_stay(self):
+        for title in ["Senior Manager (IC), Product Designer", "Lead, Digital Product Designer, Marketplace Partners", "Digital UX Designer",
+                      "Senior Digital Designer, Design Systems", "Staff Product Designer (Retail)", "Senior Product Designer - Store layout (f/m/d)",
+                      "Senior Design Engineer - Design System & Platform UI", "Founding Design Engineer | CodeSpeak"]:
             self.assertEqual(detect_role(title), "product_design", title)
 
     def test_board_category_cannot_label_unrelated_jobs(self):

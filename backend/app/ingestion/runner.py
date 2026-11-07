@@ -369,6 +369,7 @@ async def sync_all_sources(company_id_filter: int | None = None, include_aggrega
         # 1. Company ATS Sync in controlled batches of 10
         # Workday costs about ten requests per employer; on the free server those come from the restored snapshot instead.
         heavy = ("workday",) if settings.CRAWL_PROFILE != "full" else ()
+        heavy += tuple(t.strip() for t in settings.PAUSED_SOURCES.split(",") if t.strip())
         sources = [t for t in ('greenhouse', 'lever', 'ashby', 'workday', 'amazon', 'custom',
                                'smartrecruiters', 'workable', 'recruitee', 'teamtailor', 'personio', 'keka', 'darwinbox', 'oracle') if t not in heavy]
         query = f"""

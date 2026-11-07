@@ -20,6 +20,9 @@ class Settings(BaseSettings):
     # "full" (the scheduled snapshot job on GitHub Actions, which costs the server nothing): read everything. The server restores
     # that snapshot whenever it starts, so heavy sources stay fresh without the server crawling them.
     CRAWL_PROFILE: str = "light"
+    # Hiring systems the crawl skips. Darwinbox answers 403 to every request from GitHub's servers (seen 7 Nov 2026), so its
+    # employers stay in the list but aren't read until Darwinbox offers a feed. Comma-separated; set to "" to read them again.
+    PAUSED_SOURCES: str = "darwinbox"
     # Job boards read at once. 5 suits the 512 MB server; the scheduled crawl on GitHub Actions runs with more.
     CRAWL_CONCURRENCY: int = 5
     # Full crawl only: pages of 20 read per Workday employer (125 pages = up to 2,500 jobs of a big employer; at 60, many
