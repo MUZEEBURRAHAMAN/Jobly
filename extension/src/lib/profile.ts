@@ -1,4 +1,8 @@
 import { readKey, writeKey } from './userData';
+
+/** A resume file kept for autofill, one per profile. */
+export interface ResumeFile { name: string; type: string; size: number; data: string }
+export const MAX_RESUME_BYTES = 1_000_000;
 import { safeHttpUrl } from './url';
 
 /**
@@ -120,4 +124,16 @@ export function answerFields(p: Profile): { id: string; label: string; value: st
     { id: 'summary', label: 'Summary', value: p.summary },
     { id: 'skills', label: 'Skills', value: skillList(p).join(', ') },
   ].filter((f) => f.value);
+}
+
+/** Keeps a PDF or Word file as a profile's resume (autofill attaches it). Resolves a problem for the user, or null. */
+export async function saveResumeFile(profileId: string, file: File): Promise<{ problem: string | null; entry: ResumeFile | null }> {
+  if (file.size > MAX_RESUME_BYTES) return { problem: 'Keep the resume file under 1 MB.', entry: null };
+  if (!/pdf|msword|officedocument/.test(file.type) && !/\.(pdf|docx?)$/i.test(file.name)) return { problem: 'Use a PDF or Word file.', entry: null };
+  const data = await new Promise<string>((res, rej) => { const r = new FileReader(); r.onload = () => res(String(r.result)); r.onerror = rej; r.readAsDataURL(file); });
+  const entry: ResumeFile = { name: file.name.slice(0, 120), type: file.type || 'application/pdf', size: file.size, data };
+  const map = (await readKey<Record<string, ResumeFile>>(PROFILE_KEYS.resume)) ?? {};
+  return (await writeKey(PROFILE_KEYS.resume, { ...map, [profileId]: entry }))
+    ? { problem: null, entry }
+    : { problem: "Couldn't store the file. Your browser storage may be full.", entry: null };
 }

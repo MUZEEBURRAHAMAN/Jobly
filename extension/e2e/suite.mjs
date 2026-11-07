@@ -332,10 +332,62 @@ await step('dealbreakers, job type filter, following companies', async () => {
   await h.ctx.close();
 });
 
+await step('onboarding: LinkedIn PDF and resume import, completeness, reminder', async () => {
+  const h = await launch(); const store = async (k) => (await h.sw.evaluate((key) => chrome.storage.local.get(key), k))[k];
+  const fixtures = path.resolve(path.dirname(fileURLToPath(import.meta.url)), 'fixtures');
+  const d = await open(h, 'options.html', { width: 1280, height: 900 }); await firstCard(d);
+  ok(await d.getByText('Profile 0% complete').count() === 1 && /0%/.test(await d.getByRole('button', { name: /^Profile/ }).innerText()), 'with no profile, the jobs list and the sidebar show 0%');
+  await d.getByRole('button', { name: 'Complete your profile' }).click(); await d.getByRole('heading', { name: 'Set up your profile' }).waitFor({ timeout: 5000 });
+  await axe(d, 'profile setup: import');
+  await d.locator('input[type="file"]').setInputFiles({ name: 'notes.pdf', mimeType: 'application/pdf', buffer: Buffer.from('not really a pdf') });
+  await d.getByRole('alert').waitFor({ timeout: 10000 }); ok(/Couldn.t read that PDF/.test(await d.getByRole('alert').innerText()), 'a broken PDF gets a clear message');
+  await d.locator('input[type="file"]').setInputFiles(path.join(fixtures, 'linkedin.pdf'));
+  await d.getByText(/LinkedIn profile read/).waitFor({ timeout: 20000 });
+  ok(/3 roles/.test(await d.getByText(/^Found /).innerText()) && /1 school/.test(await d.getByText(/^Found /).innerText()), 'the LinkedIn export is recognised: 3 roles and 1 school found');
+  await axe(d, 'profile setup: import result');
+  await d.getByRole('button', { name: /Use these details/ }).click(); await d.getByLabel('First name').waitFor();
+  ok(await d.getByLabel('First name').inputValue() === 'Ananya' && await d.getByLabel('LinkedIn').inputValue() === 'www.linkedin.com/in/ananya-rao-1a2b3c' && await d.getByLabel('Portfolio').inputValue() === 'ananyarao.design',
+    'contact details come from the left column, including a LinkedIn link split over two lines');
+  await axe(d, 'profile setup: contact');
+  await d.getByRole('button', { name: /Save and continue/ }).click();
+  await d.getByLabel('Work authorization').fill('Indian citizen'); await d.getByLabel('Need visa sponsorship?').selectOption('no');
+  await d.getByRole('button', { name: /Save and continue/ }).click(); await d.getByText(/Newest role first/).waitFor();
+  const titles = await d.locator('input[id^="w-title-"]').evaluateAll((els) => els.map((e) => e.value));
+  ok(titles.join('|') === 'Senior Product Designer|Product Designer|UX Designer', `roles in order: ${titles.join(', ')}`);
+  await axe(d, 'profile setup: experience');
+  await d.getByRole('button', { name: /Save and continue/ }).click(); await d.getByRole('button', { name: /Save and review/ }).click();
+  await d.getByRole('button', { name: 'Finish' }).click(); await d.getByRole('heading', { name: 'Profile', exact: true }).waitFor({ timeout: 5000 });
+  const p1 = (await store('profiles'))[0];
+  ok(p1.first_name === 'Ananya' && p1.last_name === 'Rao' && p1.email === 'ananya.rao@example.com' && p1.phone === '+91 98765 43210' && p1.location === 'Bengaluru, Karnataka, India', 'name, email, phone and place are saved');
+  ok(p1.work.length === 3 && p1.work[1].company === 'Northwind Labs' && p1.work[0].current && p1.work[1].start === '2020-07' && p1.work[1].end === '2022-03' && p1.work[2].location === 'Pune, Maharashtra, India',
+    'roles keep their company (two under one), dates and place');
+  ok(p1.work[0].bullets.split('\n').length === 2 && p1.education[0].school === 'National Institute of Design' && p1.education[0].field === 'Interaction Design' && p1.skills === 'Figma, Design Systems, User Research',
+    'points, education and top skills are saved');
+  ok(p1.work_authorization === 'Indian citizen' && p1.needs_sponsorship === 'no' && Number(p1.years_experience) >= 7, 'answers typed in the steps are saved, and years of experience are worked out');
+  ok(/9[0-9]% complete/.test(await d.locator('.profile-progress').innerText()), `the Profile page shows the new score (${(await d.locator('.profile-progress').innerText()).split('\n')[0]})`);
+  await d.getByRole('button', { name: /^Jobs/ }).click(); await firstCard(d);
+  ok(await d.locator('.profile-nudge').count() === 0, 'the reminder on the jobs list goes away once the profile is mostly done');
+  // a resume into the same profile: fills what's empty, replaces roles only when asked, keeps the file
+  await d.getByRole('button', { name: /^Profile/ }).click(); await d.getByRole('button', { name: 'Import a PDF' }).click();
+  await d.locator('input[type="file"]').setInputFiles(path.join(fixtures, 'resume.pdf'));
+  await d.getByText(/Resume read/).waitFor({ timeout: 20000 });
+  await d.getByRole('checkbox', { name: /Replace your 3 saved roles/ }).check();
+  ok(await d.getByRole('checkbox', { name: /Attach this PDF as my resume/ }).isChecked(), 'for a resume, attaching it for autofill is on by default');
+  await d.getByRole('button', { name: /Use these details/ }).click(); await d.getByLabel('First name').waitFor(); await sleep(500);
+  const p2 = (await store('profiles'))[0];
+  ok(p2.first_name === 'Ananya' && p2.github === 'github.com/rahulmehta' && p2.work[0].company === 'Lumen Works' && p2.work[0].title === 'Senior Frontend Engineer' && p2.work.length === 2,
+    'a second import keeps saved details, fills empty ones and replaces roles when ticked');
+  ok((await store('resumeFile'))?.[p2.id]?.name === 'resume.pdf', 'the resume PDF is kept for autofill');
+  await d.close();
+  const p = await open(h); await firstCard(p); await p.getByRole('button', { name: /^Apply/ }).click();
+  await p.getByText(/Profile \d+% complete/).waitFor({ timeout: 5000 }); ok(true, 'the popup Apply tab shows the profile score');
+  await h.ctx.close();
+});
+
 await step('profile, copy kit, resume, cover letter, backup, sync', async () => {
   const h = await launch(); const store = async (k, area = 'local') => (await h.sw.evaluate(([key, a]) => chrome.storage[a].get(key), [k, area]))[k];
   const d = await open(h, 'options.html', { width: 1280, height: 900 }); await firstCard(d);
-  await d.getByRole('button', { name: /^Profile/ }).click(); await d.getByRole('button', { name: 'Create profile' }).click(); await sleep(400);
+  await d.getByRole('button', { name: /^Profile/ }).click(); await d.getByRole('button', { name: 'Start with an empty profile' }).click(); await sleep(400);
   await d.getByLabel('First name', { exact: true }).fill('Ada'); await d.getByLabel('Last name', { exact: true }).fill('Lovelace'); await d.getByLabel('Email', { exact: true }).fill('ada@example.com');
   await d.getByLabel('Headline', { exact: true }).fill('Senior Product Designer'); await d.getByLabel('Years of experience', { exact: true }).fill('6');
   await d.getByLabel('Skills', { exact: true }).fill('Figma, Design systems, React, User research');

@@ -1,13 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import { Copy, File as FileIcon, Plus, Save, Trash } from '../lib/icons';
-import { EduItem, MAX_PROFILES, newProfileId, Profile, PROFILE_KEYS, WorkItem } from '../lib/profile';
+import { MAX_PROFILES, Profile, PROFILE_KEYS, ResumeFile, saveResumeFile } from '../lib/profile';
 import { ProfilesStore } from '../lib/useProfiles';
 import { readKey, writeKey } from '../lib/userData';
 import { CopyButton } from './CopyButton';
+import { EduEditor, WorkEditor } from './ProfileEditors';
+import { ProfileSetup } from './ProfileSetup';
+import { CompletenessBar } from './CompletenessBar';
+import { useCompleteness } from '../lib/useCompleteness';
+import { SetupStep } from '../lib/completeness';
+import { Upload } from '../lib/icons';
 
-/** A resume file kept for autofill, one per profile. */
-export interface ResumeFile { name: string; type: string; size: number; data: string }
-const MAX_RESUME_BYTES = 1_000_000;
+export type { ResumeFile } from '../lib/profile';
 
 type Field = keyof Pick<Profile, 'first_name' | 'last_name' | 'email' | 'phone' | 'location' | 'headline' | 'linkedin' | 'github' | 'portfolio' | 'website' |
   'work_authorization' | 'years_experience' | 'salary_expectation' | 'notice_period'>;
@@ -24,8 +28,10 @@ const WORK_FACTS: [Field, string, string, string?][] = [
   ['salary_expectation', 'Salary expectation', 'text', 'e.g. $150,000'], ['notice_period', 'Notice period', 'text', 'e.g. 2 weeks'],
 ];
 
-export const ProfileView: React.FC<{ store: ProfilesStore; notify: (m: string, kind?: 'error' | 'info') => void }> = ({ store, notify }) => {
+export const ProfileView: React.FC<{ store: ProfilesStore; notify: (m: string, kind?: 'error' | 'info') => void; openSetup?: boolean }> = ({ store, notify, openSetup }) => {
   const [draft, setDraft] = useState<Profile | null>(store.active);
+  const [setup, setSetup] = useState<SetupStep | null>(openSetup ? 'import' : null);
+  const completeness = useCompleteness(store.active);
   const [dirty, setDirty] = useState(false);
   const [resume, setResume] = useState<ResumeFile | null>(null);
   const [confirmDelete, setConfirmDelete] = useState(false);
@@ -37,21 +43,23 @@ export const ProfileView: React.FC<{ store: ProfilesStore; notify: (m: string, k
   }, [store.active]);
 
   if (!store.ready) return <div className="section" aria-busy="true" />;
+  if (setup) return <ProfileSetup store={store} notify={notify} startAt={setup} onClose={() => { setSetup(null); setDirty(false); }} />;
   if (!draft) {
     return (
       <div className="section">
         <div><h2>Profile</h2><p className="text-sm">The answers applications ask for, kept on this device.</p></div>
         <div className="card empty"><p className="empty-title">Create your first profile</p>
-          <p className="empty-desc">Add your contact details, links, experience and skills once. Then copy them into any application, build a resume, and write cover letters faster.</p>
-          <div className="empty-actions"><button type="button" className="btn" onClick={() => void store.create().then((r) => r.problem && notify(r.problem))}><Plus size={14} aria-hidden="true" /> Create profile</button></div>
+          <p className="empty-desc">Import your LinkedIn PDF or resume, or fill in a few short steps. Then autofill fills applications for you, and your resume and cover letters start written.</p>
+          <div className="empty-actions">
+            <button type="button" className="btn" onClick={() => setSetup('import')}><Upload size={14} aria-hidden="true" /> Set up your profile</button>
+            <button type="button" className="btn btn-ghost" onClick={() => void store.create().then((r) => r.problem && notify(r.problem))}><Plus size={14} aria-hidden="true" /> Start with an empty profile</button>
+          </div>
         </div>
       </div>
     );
   }
 
   const set = (patch: Partial<Profile>) => { setDirty(true); setDraft((d) => (d ? { ...d, ...patch } : d)); };
-  const setWork = (id: string, patch: Partial<WorkItem>) => set({ work: draft.work.map((w) => (w.id === id ? { ...w, ...patch } : w)) });
-  const setEdu = (id: string, patch: Partial<EduItem>) => set({ education: draft.education.map((e) => (e.id === id ? { ...e, ...patch } : e)) });
 
   const save = async () => {
     const problem = await store.save(draft);
@@ -60,13 +68,8 @@ export const ProfileView: React.FC<{ store: ProfilesStore; notify: (m: string, k
 
   const pickResume = async (file: File | undefined) => {
     if (!file) return;
-    if (file.size > MAX_RESUME_BYTES) { notify('Keep the resume file under 1 MB.'); return; }
-    if (!/pdf|msword|officedocument/.test(file.type) && !/\.(pdf|docx?)$/i.test(file.name)) { notify('Use a PDF or Word file.'); return; }
-    const data = await new Promise<string>((res, rej) => { const r = new FileReader(); r.onload = () => res(String(r.result)); r.onerror = rej; r.readAsDataURL(file); });
-    const entry: ResumeFile = { name: file.name.slice(0, 120), type: file.type || 'application/pdf', size: file.size, data };
-    const map = (await readKey<Record<string, ResumeFile>>(PROFILE_KEYS.resume)) ?? {};
-    if (await writeKey(PROFILE_KEYS.resume, { ...map, [draft.id]: entry })) { setResume(entry); notify('Resume file saved. Autofill can attach it.', 'info'); }
-    else notify("Couldn't store the file. Your browser storage may be full.");
+    const { problem, entry } = await saveResumeFile(draft.id, file);
+    if (problem) notify(problem); else { setResume(entry); notify('Resume file saved. Autofill can attach it.', 'info'); }
   };
   const removeResume = async () => {
     const map = (await readKey<Record<string, ResumeFile>>(PROFILE_KEYS.resume)) ?? {};
@@ -98,6 +101,15 @@ export const ProfileView: React.FC<{ store: ProfilesStore; notify: (m: string, k
           <button type="button" className="btn btn-outline btn-sm" disabled={store.profiles.length >= MAX_PROFILES || dirty}
             onClick={() => void store.create().then((r) => r.problem && notify(r.problem))}><Plus size={14} aria-hidden="true" /> New</button>
         </div>
+      </div>
+
+      <div className="card profile-progress">
+        <CompletenessBar completeness={completeness} action={
+          <div className="row" style={{ gap: 4 }}>
+            <button type="button" className="btn btn-ghost btn-sm" disabled={dirty} title={dirty ? 'Save or discard changes first' : undefined} onClick={() => setSetup('import')}><Upload size={14} aria-hidden="true" /> Import a PDF</button>
+            {completeness.missing.length > 0 && <button type="button" className="btn btn-outline btn-sm" disabled={dirty} title={dirty ? 'Save or discard changes first' : undefined}
+              onClick={() => setSetup(completeness.missing.find((m) => m.step !== 'done')?.step ?? 'done')}>Continue setup</button>}
+          </div>} />
       </div>
 
       <div className="profile-grid">
@@ -145,48 +157,11 @@ export const ProfileView: React.FC<{ store: ProfilesStore; notify: (m: string, k
       </fieldset>
 
       <fieldset className="card profile-card span-all"><legend className="label">Experience</legend>
-        <div className="stack">
-          {draft.work.map((w, i) => (
-            <div key={w.id} className="sub-card">
-              <div className="form-grid">
-                <div><label className="label" htmlFor={`w-title-${w.id}`}>Title</label><input id={`w-title-${w.id}`} className="input" value={w.title} onChange={(e) => setWork(w.id, { title: e.target.value })} /></div>
-                <div><label className="label" htmlFor={`w-co-${w.id}`}>Company</label><input id={`w-co-${w.id}`} className="input" value={w.company} onChange={(e) => setWork(w.id, { company: e.target.value })} /></div>
-                <div><label className="label" htmlFor={`w-start-${w.id}`}>Start</label><input id={`w-start-${w.id}`} type="month" className="input" value={w.start} onChange={(e) => setWork(w.id, { start: e.target.value })} /></div>
-                <div><label className="label" htmlFor={`w-end-${w.id}`}>End</label>{w.current ? <input id={`w-end-${w.id}`} className="input" value="Present" disabled /> : <input id={`w-end-${w.id}`} type="month" className="input" value={w.end} onChange={(e) => setWork(w.id, { end: e.target.value })} />}
-                  <label className="row text-xs" style={{ marginTop: 6 }}><input type="checkbox" checked={w.current} onChange={(e) => setWork(w.id, { current: e.target.checked, end: e.target.checked ? '' : w.end })} /> I work here now</label></div>
-                <div className="wide"><label className="label" htmlFor={`w-loc-${w.id}`}>Location</label><input id={`w-loc-${w.id}`} className="input" value={w.location} onChange={(e) => setWork(w.id, { location: e.target.value })} /></div>
-                <div className="wide"><div className="row" style={{ justifyContent: 'space-between' }}><label className="label" htmlFor={`w-b-${w.id}`}>What you did (one point per line)</label><CopyButton value={w.bullets} label={`points for ${w.title || 'this role'}`} /></div>
-                  <textarea id={`w-b-${w.id}`} className="textarea" rows={4} value={w.bullets} onChange={(e) => setWork(w.id, { bullets: e.target.value })} placeholder={'Led the redesign of checkout, lifting conversion 12%\nBuilt the design system used by 40 engineers'} /></div>
-              </div>
-              <div className="row" style={{ justifyContent: 'flex-end', marginTop: 8 }}>
-                {i > 0 && <button type="button" className="btn btn-ghost btn-sm" onClick={() => { const list = [...draft.work]; [list[i - 1], list[i]] = [list[i], list[i - 1]]; set({ work: list }); }}>Move up</button>}
-                <button type="button" className="btn btn-ghost btn-sm" onClick={() => set({ work: draft.work.filter((x) => x.id !== w.id) })}><Trash size={14} aria-hidden="true" /> Remove</button>
-              </div>
-            </div>
-          ))}
-          <button type="button" className="btn btn-outline btn-sm" style={{ alignSelf: 'flex-start' }} disabled={draft.work.length >= 15}
-            onClick={() => set({ work: [...draft.work, { id: newProfileId(), company: '', title: '', location: '', start: '', end: '', current: draft.work.length === 0, bullets: '' }] })}>
-            <Plus size={14} aria-hidden="true" /> Add a role</button>
-        </div>
+        <WorkEditor work={draft.work} onChange={(work) => set({ work })} />
       </fieldset>
 
       <fieldset className="card profile-card span-all"><legend className="label">Education</legend>
-        <div className="stack">
-          {draft.education.map((e) => (
-            <div key={e.id} className="sub-card">
-              <div className="form-grid">
-                <div className="wide"><label className="label" htmlFor={`e-s-${e.id}`}>School</label><input id={`e-s-${e.id}`} className="input" value={e.school} onChange={(ev) => setEdu(e.id, { school: ev.target.value })} /></div>
-                <div><label className="label" htmlFor={`e-d-${e.id}`}>Degree</label><input id={`e-d-${e.id}`} className="input" value={e.degree} onChange={(ev) => setEdu(e.id, { degree: ev.target.value })} placeholder="e.g. BSc" /></div>
-                <div><label className="label" htmlFor={`e-f-${e.id}`}>Field of study</label><input id={`e-f-${e.id}`} className="input" value={e.field} onChange={(ev) => setEdu(e.id, { field: ev.target.value })} /></div>
-                <div><label className="label" htmlFor={`e-st-${e.id}`}>Start</label><input id={`e-st-${e.id}`} type="month" className="input" value={e.start} onChange={(ev) => setEdu(e.id, { start: ev.target.value })} /></div>
-                <div><label className="label" htmlFor={`e-en-${e.id}`}>End</label><input id={`e-en-${e.id}`} type="month" className="input" value={e.end} onChange={(ev) => setEdu(e.id, { end: ev.target.value })} /></div>
-              </div>
-              <div className="row" style={{ justifyContent: 'flex-end', marginTop: 8 }}><button type="button" className="btn btn-ghost btn-sm" onClick={() => set({ education: draft.education.filter((x) => x.id !== e.id) })}><Trash size={14} aria-hidden="true" /> Remove</button></div>
-            </div>
-          ))}
-          <button type="button" className="btn btn-outline btn-sm" style={{ alignSelf: 'flex-start' }} disabled={draft.education.length >= 8}
-            onClick={() => set({ education: [...draft.education, { id: newProfileId(), school: '', degree: '', field: '', start: '', end: '' }] })}><Plus size={14} aria-hidden="true" /> Add education</button>
-        </div>
+        <EduEditor education={draft.education} onChange={(education) => set({ education })} />
       </fieldset>
 
 

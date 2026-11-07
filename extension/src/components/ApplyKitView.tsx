@@ -9,6 +9,8 @@ import { fitCheck } from '../lib/fit';
 import { AutofillPanel } from './AutofillPanel';
 import { TRACKER_KEYS } from '../lib/tracker';
 import { FEATURES } from '../lib/config';
+import { useCompleteness } from '../lib/useCompleteness';
+import { CompletenessBar } from './CompletenessBar';
 import { writeKey } from '../lib/userData';
 
 /**
@@ -44,6 +46,7 @@ export const ApplyKitView: React.FC<{ profiles: ProfilesStore; tracker: TrackerS
   };
 
   const fields = profiles.active ? answerFields(profiles.active) : [];
+  const completeness = useCompleteness(profiles.active);
   const fit = page?.found ? fitCheck(profiles.active, page.description) : null;
   const FIT_LABEL = { strong: 'Strong fit', good: 'Partial fit', low: 'Low fit', unknown: 'Fit check' } as const;
 
@@ -88,6 +91,12 @@ export const ApplyKitView: React.FC<{ profiles: ProfilesStore; tracker: TrackerS
         </div>
       )}
 
+      {completeness.percent < 100 && (
+        <div className="card" style={{ padding: 12 }}>
+          <CompletenessBar completeness={completeness} action={<button type="button" className="btn btn-outline btn-sm" onClick={() => openDashboard('profile-setup')}>Complete</button>} />
+        </div>
+      )}
+
       <div className="row" style={{ justifyContent: 'space-between' }}>
         <h2>Copy kit</h2>
         {profiles.profiles.length > 1 && (
@@ -99,8 +108,8 @@ export const ApplyKitView: React.FC<{ profiles: ProfilesStore; tracker: TrackerS
       </div>
       {fields.length === 0 ? (
         <div className="card empty" style={{ padding: 16 }}>
-          <p className="empty-desc">Add your details once in your profile, then copy them into any application form from here.</p>
-          <div className="empty-actions"><button type="button" className="btn btn-sm" onClick={() => openDashboard('profile')}><User size={14} aria-hidden="true" /> Set up profile</button></div>
+          <p className="empty-desc">Import your LinkedIn PDF or resume once, then autofill and copy your details into any application form from here.</p>
+          <div className="empty-actions"><button type="button" className="btn btn-sm" onClick={() => openDashboard('profile-setup')}><User size={14} aria-hidden="true" /> Set up profile</button></div>
         </div>
       ) : (
         <ul className="kit-list">

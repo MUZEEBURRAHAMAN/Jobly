@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Bell, Bookmark, Briefcase, Building2, Calendar, FileText, Kanban, ListChecks, Mail, Moon, RefreshCw, Settings, SlidersHorizontal, Sun, User, Contacts } from '../lib/icons';
+import { Bell, Bookmark, Briefcase, Building2, Calendar, FileText, Kanban, ListChecks, Mail, Moon, RefreshCw, Settings, SlidersHorizontal, Sun, User, Contacts, X } from '../lib/icons';
 import { api, ConnectionStatus } from '../lib/api';
 import { FEATURES, MAX_PAGE_SIZE } from '../lib/config';
 import { DEFAULT_FILTERS, JobFilters } from '../lib/filters';
@@ -31,9 +31,11 @@ import { ContactsView } from '../components/ContactsView';
 import { DataSetting } from '../components/DataSetting';
 import { CalendarImport } from '../components/CalendarImport';
 import { HUNTER_KEY } from '../lib/integrations';
-import { onKeysChanged, readKey } from '../lib/userData';
+import { onKeysChanged, readKey, writeKey } from '../lib/userData';
 import { useTrackerContext } from '../lib/trackerContext';
 import { dueLabel } from '../lib/dates';
+import { useCompleteness } from '../lib/useCompleteness';
+import { CompletenessBar } from '../components/CompletenessBar';
 
 type Tab = 'jobs' | 'companies' | 'saved' | 'tracker' | 'interviews' | 'tasks' | 'profile' | 'resume' | 'letters' | 'contacts' | 'alerts' | 'preferences';
 const n = (v: number | undefined) => (v ?? 0).toLocaleString();
@@ -43,6 +45,7 @@ const tabFromHash = (): Tab => {
   const h = window.location.hash.replace('#', '');
   // Links to the switched-off tracker pages (old bookmarks, notifications) open Saved, where applied jobs are listed
   if (!FEATURES.tracker && (TRACKER_TABS as string[]).includes(h)) return 'saved';
+  if (h === 'profile-setup') return 'profile';
   return (TABS as string[]).includes(h) ? (h as Tab) : 'jobs';
 };
 
@@ -80,6 +83,14 @@ export const OptionsApp: React.FC = () => {
   useEffect(() => { const onHash = () => setTab(tabFromHash()); window.addEventListener('hashchange', onHash); return () => window.removeEventListener('hashchange', onHash); }, []);
   useEffect(() => { if (onboardedRef.current && window.location.hash.replace('#', '') !== tab) history.replaceState(null, '', tab === 'jobs' ? window.location.pathname : `#${tab}`); }, [tab]);
   const profiles = useProfiles();
+  const completeness = useCompleteness(profiles.active);
+  // Opened from "Complete your profile" in the popup or the jobs list: start the setup steps
+  const [setupOnOpen, setSetupOnOpen] = useState(() => window.location.hash === '#profile-setup');
+  useEffect(() => { if (tab !== 'profile') setSetupOnOpen(false); }, [tab]);
+  const NUDGE_KEY = 'profileNudgeHiddenUntil';
+  const [nudgeHidden, setNudgeHidden] = useState(true);
+  useEffect(() => { void readKey<number>(NUDGE_KEY).then((t) => setNudgeHidden(!!t && t > Date.now())); }, []);
+  const hideNudge = () => { setNudgeHidden(true); void writeKey(NUDGE_KEY, Date.now() + 7 * 86400000); };
   const [hasHunterKey, setHasHunterKey] = useState(false);
   useEffect(() => { const load = () => void readKey<string>(HUNTER_KEY).then((k) => setHasHunterKey(!!k)); load(); return onKeysChanged([HUNTER_KEY], load); }, []);
   // Follow-ups and tasks that are due today or overdue, for the Tasks badge.
@@ -207,14 +218,14 @@ export const OptionsApp: React.FC = () => {
     if (!(await markAllRead())) showNotice("Couldn't mark alerts as read. Please try again.");
   };
 
-  const allTabs: { id: Tab; label: string; icon: React.ElementType; badge?: number }[] = [
+  const allTabs: { id: Tab; label: string; icon: React.ElementType; badge?: number; badgeText?: string }[] = [
     { id: 'jobs', label: 'Jobs', icon: Briefcase },
     { id: 'companies', label: 'Companies', icon: Building2 },
     { id: 'saved', label: 'Saved', icon: Bookmark, badge: savedJobs.length },
     { id: 'tracker', label: 'Tracker', icon: Kanban, badge: tracker.apps.length },
     { id: 'interviews', label: 'Interviews', icon: Calendar, badge: upcomingInterviews },
     { id: 'tasks', label: 'Tasks', icon: ListChecks, badge: dueCount },
-    { id: 'profile', label: 'Profile', icon: User },
+    { id: 'profile', label: 'Profile', icon: User, badgeText: profiles.ready && completeness.percent < 100 ? `${completeness.percent}%` : undefined },
     { id: 'resume', label: 'Resume', icon: FileText },
     { id: 'letters', label: 'Cover letters', icon: Mail },
     { id: 'contacts', label: 'Contacts', icon: Contacts },
@@ -270,11 +281,11 @@ export const OptionsApp: React.FC = () => {
       ) : onboarded === null ? <div className="dash-body" aria-busy="true" /> : (
       <div className="dash-body">
         <nav className="side" aria-label="Sections">
-          {tabs.map(({ id, label, icon: Icon, badge }) => (
+          {tabs.map(({ id, label, icon: Icon, badge, badgeText }) => (
             <button key={id} type="button" className="nav-link" aria-current={tab === id ? 'page' : undefined}
               onClick={() => setTab(id)}>
               <Icon size={16} duo={tab === id} aria-hidden="true" /> {label}
-              {badge ? <span className="nav-badge">{badge}</span> : null}
+              {badge ? <span className="nav-badge">{badge}</span> : badgeText ? <span className="nav-badge muted-badge">{badgeText}</span> : null}
             </button>
           ))}
         </nav>
@@ -287,6 +298,16 @@ export const OptionsApp: React.FC = () => {
                 {[['For you', stats.matched_jobs], ['Open jobs', stats.total_jobs], ['Companies', stats.active_companies], ['Posted in 24 hours', stats.new_jobs_today]].map(([label, value]) => (
                   <div key={label as string} className="card stat"><div className="text-sm muted">{label}</div><div className="value">{n(value as number)}</div></div>
                 ))}
+              </div>
+            )}
+            {tab === 'jobs' && profiles.ready && completeness.percent < 80 && !nudgeHidden && (
+              <div className="card profile-nudge">
+                <CompletenessBar completeness={completeness} action={
+                  <div className="row" style={{ gap: 4 }}>
+                    <button type="button" className="btn btn-sm" onClick={() => { setSetupOnOpen(true); setTab('profile'); }}>Complete your profile</button>
+                    <button type="button" className="btn btn-ghost btn-sm btn-icon" onClick={hideNudge} aria-label="Hide for a week" title="Hide for a week"><X size={14} aria-hidden="true" /></button>
+                  </div>} />
+                <p className="text-xs muted">Autofill can only fill in what's in your profile. Import your LinkedIn PDF to finish in a minute.</p>
               </div>
             )}
             <ErrorBoundary>
@@ -308,7 +329,7 @@ export const OptionsApp: React.FC = () => {
               {FEATURES.tracker && tab === 'tracker' && <TrackerView store={tracker} savedJobs={savedJobs} notify={showNotice} onBrowseJobs={() => setTab('jobs')} />}
               {FEATURES.tracker && tab === 'interviews' && <InterviewsView store={tracker} onOpenTracker={() => setTab('tracker')} calendarImport={<CalendarImport store={tracker} notify={showNotice} />} />}
               {FEATURES.tracker && tab === 'tasks' && <TasksView store={tracker} notify={showNotice} />}
-              {tab === 'profile' && <ProfileView store={profiles} notify={showNotice} />}
+              {tab === 'profile' && <ProfileView store={profiles} notify={showNotice} openSetup={setupOnOpen} />}
               {tab === 'resume' && <ResumeView store={profiles} onOpenProfile={() => setTab('profile')} />}
               {tab === 'letters' && <CoverLetterView profiles={profiles} tracker={tracker} savedJobs={savedJobs} notify={showNotice} onOpenProfile={() => setTab('profile')} />}
               {tab === 'contacts' && <ContactsView tracker={tracker} profile={profiles.active} notify={showNotice} onOpenPreferences={() => setTab('preferences')} hasHunterKey={hasHunterKey} />}
