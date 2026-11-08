@@ -27,12 +27,14 @@ export const FAQ_GROUPS: { id: string; title: string; items: Faq[] }[] = [
       { q: 'I’m not getting desktop notifications.', a: 'Turn on Desktop alerts in Jobly’s Settings, then check that Chrome is allowed to show notifications in your computer’s system settings. Focus or Do Not Disturb modes can also hide them.' },
       { q: 'Are my saved jobs backed up?', a: 'They live in this browser. Turn on sync in Settings to copy your preferences, saved and applied jobs and profiles to Chrome on your other computers, or use Download a backup in Settings to save everything as a file.' },
       { q: 'Does Jobly track my applications?', a: 'It keeps a list of the jobs you applied to: mark applied on any job card, or answer “Did you apply?” after you open a job, and find them under Saved › Applied. You can also import a spreadsheet of applications from Settings. The full tracker board, interviews and tasks are switched off for now and will come back in a later version.' },
+      { q: 'Can I import my LinkedIn profile?', a: 'Yes. On LinkedIn, open your profile, choose Resources (or More) and then Save to PDF. In Jobly, open Profile and choose that file. Jobly reads it in your browser, fills your contact details, roles, education and skills, and you check each step before it is saved. A resume PDF works too.' },
+      { q: 'Does Jobly apply to jobs for me?', a: 'It helps you apply, and you stay in control. On an application page, open Jobly and press Start apply assist: a panel fills each step from your profile after you approve the answers, shows where each answer came from, and marks the questions only you can answer. Jobly never presses Next or Submit; you do.' },
     ],
   },
   {
     id: 'privacy', title: 'Privacy', items: [
       { top: true, q: 'What do you store about me?', a: 'Nothing in a database. Your preferences, saved jobs and alerts stay in your browser. Jobly downloads its public job files and filters them in your browser, so your preferences never leave it. Jobly has no server, so there is nowhere for them to go.' },
-      { q: 'Can Jobly see the pages I visit?', a: 'Only the tab you click on, and only when you ask: Save, Fit check or Autofill. It never reads your history or other tabs, and the only Jobly address it talks to is its public job files.' },
+      { q: 'Can Jobly see the pages I visit?', a: 'Only the tab you click on, and only when you ask: Save, Fit check or Start apply assist. It never reads your history or other tabs, and the only Jobly address it talks to is its public job files.' },
       { q: 'Why does the extension need notifications and alarms?', a: 'Alarms let it check for new jobs in the background every 60 to 90 minutes. Notifications let it tell you about a new match, only if you turn alerts on.' },
     ],
   },

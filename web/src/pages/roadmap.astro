@@ -9,7 +9,16 @@ import { SITE } from '../lib/site';
 type Group = { h: string; items: string[] };
 type Release = { v: string; tag: 'next' | 'upcoming'; title: string; lead: string; groups: Group[] };
 const releases: Release[] = [
-  { v: 'v1.2', tag: 'next', title: 'Every role, and a simpler Jobly', lead: 'Built and tested; going to Chrome Web Store review next.', groups: [
+  { v: 'v1.3', tag: 'next', title: 'Profile in a minute, apply assist, and a simpler Jobly', lead: 'Built and tested; going to Chrome Web Store review next.', groups: [
+    { h: 'Profile', items: [
+      'Import the PDF LinkedIn makes of your profile, or your resume. Jobly reads it in your browser and fills your profile; you check each step.',
+      'A completeness score that says what to add next.',
+    ] },
+    { h: 'Apply assist', items: [
+      'A Jobly panel on the application page fills each step from your profile after you approve the answers. You always press Submit.',
+      'Each answer says where it came from: your profile, an answer you saved, or a suggestion to check. Questions only you can answer are marked.',
+      'Answers you type once are remembered for the next form (never questions about gender, ethnicity, disability or ID numbers).',
+    ] },
     { h: 'Focus', items: [
       'Jobs, companies and applying come first. The tracker board, interviews and tasks are switched off for now; anything you kept in them stays on your device and comes back with them.',
       'Saved has two lists, Saved and Applied. Mark applied on any job card, or answer “Did you apply?” after you open a job.',
@@ -29,20 +38,7 @@ const releases: Release[] = [
       'Pick development, IT and design areas in Preferences, and alerts cover them too.',
     ] },
   ] },
-  { v: 'v1.3', tag: 'upcoming', title: 'A profile in minutes', lead: 'Fill your profile from your LinkedIn PDF and see what is still missing.', groups: [
-    { h: 'Profile', items: [
-      'Import the PDF LinkedIn makes of your profile, check what Jobly read, and keep what is right.',
-      'Contact, experience, education and skills in clear steps, with a completeness bar that says what to add next.',
-    ] },
-  ] },
-  { v: 'v1.4', tag: 'upcoming', title: 'Apply assist', lead: 'Jobly fills the application with you, step by step. You always press Submit.', groups: [
-    { h: 'Applying', items: [
-      'Each answer shows where it came from, your profile or a suggestion, and questions Jobly can’t answer are marked for you.',
-      'Answers you type once are remembered for the next form that asks the same question.',
-      'Workday and Greenhouse first, then Ashby, SmartRecruiters and Lever.',
-    ] },
-  ] },
-  { v: 'v1.5', tag: 'upcoming', title: 'Resume and cover letter for each job', lead: 'Paste a job description and see what it asks for against your resume.', groups: [
+  { v: 'v1.4', tag: 'upcoming', title: 'Resume and cover letter for each job', lead: 'Paste a job description and see what it asks for against your resume.', groups: [
     { h: 'Writing', items: [
       'Requirements found in the job description, marked as covered or missing, with suggested changes you accept one by one.',
       'A cover letter for that job from your profile. Uses AI built into Chrome where available, or your own AI key; nothing goes to an AI service unless you set it up.',

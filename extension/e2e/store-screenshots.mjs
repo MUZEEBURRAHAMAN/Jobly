@@ -1,12 +1,12 @@
 // 1280x800 Chrome Web Store screenshots (and a 400x600 popup) with a made-up demo profile, written to
-// store-assets/screenshots/v1.2/. With the test fixture: `bash e2e/run.sh store-screenshots`. With real job data (better):
+// store-assets/screenshots/v1.3/. With the test fixture: `bash e2e/run.sh store-screenshots`. With real job data (better):
 //   python -m backend.app.static_export /tmp/jobly-data   (DATABASE_PATH = a downloaded "snapshot" release database)
 //   npx vite build --mode development --outDir /tmp/jobly-dev
 //   EXT_DIST=/tmp/jobly-dev STATIC_DIR=/tmp/jobly-data node e2e/store-screenshots.mjs
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { launch, open, sleep, staticJobs } from './lib.mjs';
-const OUT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..', 'store-assets', 'screenshots', 'v1.2');
+const OUT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..', 'store-assets', 'screenshots', 'v1.3');
 import fs from 'fs';
 fs.mkdirSync(OUT, { recursive: true });
 const h = await launch();
@@ -58,19 +58,36 @@ for (let i = 0; i < 40 && (await d.locator('article').first().getAttribute('aria
 await d.evaluate(() => document.activeElement.blur()); await sleep(800);
 await snap(null, '1-jobs.png');
 await d.getByLabel('Search jobs').fill(''); await sleep(800);
+// Apply assist on a made-up company's application form (a demo page served by the test)
+await h.sw.evaluate((d) => chrome.storage.local.set(d), { resumeFile: { p1: { name: 'Ananya-Rao-resume.pdf', type: 'application/pdf', size: 20, data: 'data:application/pdf;base64,JVBERi0xLjQK' } },
+  savedAnswers: [{ question: 'How did you hear about us?', key: 'how did hear about us', value: 'LinkedIn', kind: 'text', used_at: iso(-3), uses: 2 }] });
+const form = await h.ctx.newPage(); await form.setViewportSize({ width: 1280, height: 800 });
+await form.route('https://apply.example.test/**', (r) => r.fulfill({ contentType: 'text/html', body: fs.readFileSync(path.join(path.dirname(fileURLToPath(import.meta.url)), 'fixtures', 'apply-store.html'), 'utf8') }));
+await form.goto('https://apply.example.test/northwind/senior-product-designer');
+await h.sw.evaluate(async () => { const [t] = await chrome.tabs.query({ url: 'https://apply.example.test/*' }); await chrome.scripting.executeScript({ target: { tabId: t.id }, files: ['assist.js'] }); });
+await form.getByRole('dialog', { name: 'Jobly apply assist' }).getByText('Ready for your approval').waitFor({ timeout: 10000 });
+await sleep(600);
+await form.screenshot({ path: path.join(OUT, '2-apply-assist.png') }); console.log('wrote 2-apply-assist.png'); await form.close();
+// Profile setup after importing a LinkedIn PDF (the test fixture, a made-up person)
+await d.goto(`chrome-extension://${h.id}/options.html#profile`); await sleep(1000);
+await d.getByRole('button', { name: 'Import a PDF' }).click();
+await d.locator('input[type="file"]').setInputFiles(path.join(path.dirname(fileURLToPath(import.meta.url)), 'fixtures', 'linkedin.pdf'));
+await d.getByText(/LinkedIn profile read/).waitFor({ timeout: 20000 });
+await snap(null, '3-profile-setup.png');
+await d.getByRole('button', { name: 'Close' }).click();
 // Companies hiring in India, the biggest employers first
 await d.goto(`chrome-extension://${h.id}/options.html#companies`); await sleep(1200);
 await d.getByRole('combobox', { name: 'Country' }).selectOption('India');
 await d.getByRole('combobox', { name: 'Sort companies' }).selectOption('jobs');
-await snap(null, '2-companies.png');
+await snap(null, '4-companies.png');
 await d.goto(`chrome-extension://${h.id}/options.html#saved`); await sleep(1000);
 await d.getByRole('tab', { name: /^Applied/ }).click();
-await snap(null, '3-saved.png');
-await snap('resume', '4-resume.png');
-await snap('profile', '5-profile.png');
+await snap(null, '5-saved.png');
+await snap('resume', '6-resume.png');
+await snap('profile', '7-profile.png');
 await d.goto(`chrome-extension://${h.id}/options.html#letters`); await sleep(800);
 await d.locator('#cl-target').selectOption({ index: 6 });
-await snap(null, '6-cover-letter.png');
+await snap(null, '8-cover-letter.png');
 const p = await open(h, 'popup.html', { width: 400, height: 600 }); await p.locator('article').first().waitFor({ timeout: 30000 }); await sleep(800);
 await p.screenshot({ path: path.join(OUT, 'popup-400x600.png') }); console.log('wrote popup-400x600.png');
 await h.ctx.close();
