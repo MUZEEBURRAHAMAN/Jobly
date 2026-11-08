@@ -6,6 +6,7 @@ import { readKey, writeKey } from '../lib/userData';
 import { CopyButton } from './CopyButton';
 import { EduEditor, WorkEditor } from './ProfileEditors';
 import { ProfileSetup } from './ProfileSetup';
+import { SavedAnswers } from './SavedAnswers';
 import { CompletenessBar } from './CompletenessBar';
 import { useCompleteness } from '../lib/useCompleteness';
 import { SetupStep } from '../lib/completeness';
@@ -163,6 +164,8 @@ export const ProfileView: React.FC<{ store: ProfilesStore; notify: (m: string, k
       <fieldset className="card profile-card span-all"><legend className="label">Education</legend>
         <EduEditor education={draft.education} onChange={(education) => set({ education })} />
       </fieldset>
+
+      <SavedAnswers />
 
 
       </div>

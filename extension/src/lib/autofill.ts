@@ -11,7 +11,8 @@ import { answerFields, Profile } from './profile';
 export interface ScannedField {
   id: string;            // data-jobly-field on the element
   label: string;
-  kind: 'text' | 'textarea' | 'select' | 'radio' | 'file' | 'checkbox';
+  /** 'custom': a dropdown built from buttons and lists (Workday and others); listed for the user to answer, never filled. */
+  kind: 'text' | 'textarea' | 'select' | 'radio' | 'file' | 'checkbox' | 'custom';
   type: string;          // input type
   options: string[];     // select options or radio labels
   required: boolean;
@@ -39,6 +40,12 @@ export function scanForm(): ScanResult {
     }
     return clean(el.getAttribute('placeholder') || el.getAttribute('name') || '');
   };
+  // A star in the visible label marks a required question even when the field itself doesn't say so
+  const starred = (el: HTMLElement) => {
+    const id = el.getAttribute('id');
+    const l = (id && document.querySelector(`label[for="${CSS.escape(id)}"]`)) || el.closest('label') || el.closest('fieldset')?.querySelector('legend');
+    return !!l && /[*✱]/.test(l.textContent ?? '');
+  };
   const out: ScannedField[] = [];
   const seenRadio = new Set<string>();
   let n = 0;
@@ -51,14 +58,22 @@ export function scanForm(): ScanResult {
       const group = Array.from(document.querySelectorAll<HTMLInputElement>(`input[type="radio"][name="${CSS.escape(name)}"]`));
       const legend = el.closest('fieldset')?.querySelector('legend')?.textContent;
       const id = `jf${n++}`; group.forEach((r) => r.setAttribute('data-jobly-field', id));
-      out.push({ id, label: clean(legend) || labelOf(el.closest('fieldset') as HTMLElement ?? el), kind: 'radio', type, options: group.map((r) => labelOf(r)), required: group.some((r) => r.required), filled: group.some((r) => r.checked) });
+      out.push({ id, label: clean(legend) || labelOf(el.closest('fieldset') as HTMLElement ?? el), kind: 'radio', type, options: group.map((r) => labelOf(r)), required: group.some((r) => r.required) || starred(el), filled: group.some((r) => r.checked) });
       return;
     }
     const id = `jf${n++}`;
     el.setAttribute('data-jobly-field', id);
     const kind: ScannedField['kind'] = el.tagName === 'TEXTAREA' ? 'textarea' : el.tagName === 'SELECT' ? 'select' : type === 'file' ? 'file' : type === 'checkbox' ? 'checkbox' : 'text';
     const options = kind === 'select' ? Array.from((el as unknown as HTMLSelectElement).options).map((o) => clean(o.textContent)).filter(Boolean) : [];
-    out.push({ id, label: labelOf(el), kind, type, options, required: el.required || el.getAttribute('aria-required') === 'true', filled: kind === 'file' ? !!el.files?.length : kind === 'checkbox' ? el.checked : !!el.value });
+    out.push({ id, label: labelOf(el), kind, type, options, required: el.required || el.getAttribute('aria-required') === 'true' || starred(el), filled: kind === 'file' ? !!el.files?.length : kind === 'checkbox' ? el.checked : !!el.value });
+  });
+  // Dropdowns built from a button and a list can't be set reliably from outside; list them so the user answers them
+  document.querySelectorAll<HTMLElement>('[aria-haspopup="listbox"], [role="combobox"]:not(input):not(select)').forEach((el) => {
+    if (!visible(el) || el.closest('[data-jobly-field]') || el.querySelector('input, select')) return;
+    const id = `jf${n++}`;
+    el.setAttribute('data-jobly-field', id);
+    const text = clean(el.textContent);
+    out.push({ id, label: labelOf(el), kind: 'custom', type: 'custom', options: [], required: el.getAttribute('aria-required') === 'true' || starred(el), filled: !!text && !/^(select|choose|--|please)/i.test(text) });
   });
   // Many career sites embed the real form from a hiring system in a frame Chrome won't let Jobly read; offer to open it.
   const frames = Array.from(document.querySelectorAll('iframe')).map((f) => f.src)
@@ -146,7 +161,7 @@ export function proposeAnswers(fields: ScannedField[], profile: Profile, hasResu
       const isResume = /resume|cv|curriculum/.test(label) || !/cover/.test(label);
       return { field, answerId: isResume && hasResume ? 'resume' : null, value: isResume && hasResume ? 'Your resume file' : '', include: isResume && hasResume && !field.filled };
     }
-    if (field.kind === 'checkbox') return { field, answerId: null, value: '', include: false }; // consent boxes stay the user's call
+    if (field.kind === 'checkbox' || field.kind === 'custom') return { field, answerId: null, value: '', include: false }; // consent boxes and custom dropdowns stay the user's call
     const rule = RULES.find(([re]) => re.test(label));
     let id = rule?.[1] ?? null;
     let value = id ? answers.get(id) ?? '' : '';

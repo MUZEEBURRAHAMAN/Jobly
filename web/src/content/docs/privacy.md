@@ -20,6 +20,8 @@ The extension keeps these in your browser's extension storage. Jobly never uploa
 - **Your lists:** jobs you save, new-match alerts found by the background check, companies you mute or follow, and a cached copy of recent results so the extension opens instantly.
 - **Your applications:** jobs you saved from a careers page or marked as applied, with the date and any notes. (Earlier versions also kept interviews, tasks and follow-up reminders; those features are switched off for now, and anything already kept stays on your device.)
 - **Your profiles:** the details you enter for applications (name, contact details, links, experience, education, skills, answers to common questions), an optional resume file, and the resume template you chose.
+- **Your saved answers:** what you typed into application questions your profile doesn't cover, so apply assist can fill them next time. Questions about gender, ethnicity, disability, veteran status, date of birth or ID numbers are never saved. You can delete each one on the Profile page.
+- **Imported PDFs:** when you import your LinkedIn PDF or resume, it is read inside the extension and the details go into your profile. The file is kept only if you choose to attach it as your resume.
 - **Your contacts:** recruiters and hiring managers you save, and whether you contacted them.
 - **Keys you add:** your own Hunter API key, if you add one. It is never included in backups.
 - **Small settings:** your theme and whether you have seen the welcome tour. The theme uses Chrome's sync storage, so Chrome may copy it to your other devices through your Google account.
@@ -99,7 +101,7 @@ You can ask us what we hold about you, to correct it, or to delete it. Because w
 - **storage:** keep the items above on your device (and in Chrome sync, if you turn it on).
 - **notifications:** show job alerts, and confirm when you save a job with the right-click menu.
 - **alarms:** check for new jobs every so often in the background.
-- **activeTab and scripting:** read or fill the page you're on, only when you click Save, Fit check or Autofill.
+- **activeTab and scripting:** read the page you're on when you click Save or Fit check, and open the apply assist panel on it when you click Start apply assist. The panel fills only the answers you approve and never presses Submit.
 - **contextMenus:** the right-click "Save this job to Jobly" item.
 - **Access to jobly-data.pages.dev:** download Jobly's public job files.
 - **Optional access to Hunter:** requested the first time you use contact search; nothing is requested otherwise.

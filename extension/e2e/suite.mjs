@@ -501,6 +501,75 @@ await step('autofill: scan, propose, fill only approved fields (in a real page)'
   await h.ctx.close();
 });
 
+await step('apply assist: panel on the page, sources, action required, steps, saved answers, submit', async () => {
+  const h = await launch(); const store = async (k) => (await h.sw.evaluate((key) => chrome.storage.local.get(key), k))[k];
+  const fixtures = path.resolve(path.dirname(fileURLToPath(import.meta.url)), 'fixtures');
+  const now = new Date().toISOString();
+  await h.sw.evaluate((d) => chrome.storage.local.set(d), {
+    profiles: [{ id: 'p1', label: 'Design', first_name: 'Ada', last_name: 'Lovelace', email: 'ada@example.com', phone: '+1 555 0100', location: 'Remote', headline: 'Senior Product Designer',
+      summary: 'Product designer with eight years of experience shipping design systems and consumer apps.', linkedin: 'linkedin.com/in/ada', github: '', portfolio: 'ada.design', website: '',
+      work_authorization: 'US citizen', needs_sponsorship: 'no', years_experience: '8', salary_expectation: '', notice_period: '', skills: 'Figma, Research, Prototyping', work: [], education: [], updated_at: now }],
+    activeProfileId: 'p1', resumeFile: { p1: { name: 'ada.pdf', type: 'application/pdf', size: 20, data: 'data:application/pdf;base64,JVBERi0xLjQK' } },
+    savedAnswers: [{ question: 'How did you hear about us?', key: 'how did hear about us', value: 'LinkedIn', kind: 'text', used_at: now, uses: 0 }],
+  });
+  const page = await h.ctx.newPage();
+  await page.route('https://apply.example.test/**', (r) => r.fulfill({ contentType: 'text/html', body: fs.readFileSync(path.join(fixtures, 'apply-form.html'), 'utf8') }));
+  await page.goto('https://apply.example.test/jobs/42');
+  const startAssist = () => h.sw.evaluate(async () => { const [t] = await chrome.tabs.query({ url: 'https://apply.example.test/*' }); await chrome.scripting.executeScript({ target: { tabId: t.id }, files: ['assist.js'] }); });
+  await startAssist();
+  const panel = page.getByRole('dialog', { name: 'Jobly apply assist' });
+  await panel.getByText('Ready for your approval').waitFor({ timeout: 10000 });
+  await axe(page, 'apply assist panel');
+  const rows = async (heading) => panel.locator('h4', { hasText: heading }).locator('xpath=following-sibling::ul[1]/li').allInnerTexts();
+  const ready = await rows('Ready for your approval');
+  const row = (q) => ready.find((t) => t.startsWith(q)) ?? '';
+  ok(/Ada/.test(row('First name')) && /From your profile/.test(row('First name')) && /From your profile/.test(row('Resume/CV')), 'profile answers are labelled "From your profile", the resume file included');
+  ok(/LinkedIn/.test(row('How did you hear')) && /Saved answer/.test(row('How did you hear')), 'a question answered on an earlier form gets the saved answer');
+  ok(/Suggested: check it/.test(row('Why do you want')) && !(await panel.getByRole('checkbox', { name: /Fill: Why do you want/ }).isChecked()), 'an open question gets a suggestion that stays unticked until you choose it');
+  const need = (await rows('Action required')).join(' | ');
+  ok(/Earliest start date/.test(need) && /Country.*choose on the page/.test(need) && !/Gender/.test(need), `required questions Jobly can't answer are action required (${need.replace(/\n/g, ' ')})`);
+  ok(await page.locator('#start').evaluate((e) => e.style.outlineStyle) === 'dashed', 'and they are outlined on the page');
+  ok(await page.evaluate(() => document.querySelector('jobly-assist').shadowRoot !== null), 'the test build opens the panel for the tests (the store build keeps it closed)');
+  await panel.getByRole('button', { name: /^Fill \d+ answers/ }).click();
+  await panel.getByText(/^Filled \d+ fields/).waitFor({ timeout: 5000 });
+  ok(await page.inputValue('#fn') === 'Ada' && await page.inputValue('#em') === 'ada@example.com' && await page.inputValue('#heard') === 'LinkedIn' && await page.inputValue('#why') === '', 'approved answers are filled; the unticked suggestion is not');
+  ok(await page.evaluate(() => document.querySelector('#cv').files[0]?.name) === 'ada.pdf', 'the resume file is attached');
+  ok(await page.evaluate(() => !document.body.dataset.submitted), 'nothing is submitted');
+  // the user answers what's left, picks a gender (never saved), and goes to the next step
+  await page.fill('#start', 'In 30 days'); await page.selectOption('#gender', 'Woman');
+  await page.click('#next');
+  await panel.getByText(/^Step 2/).waitFor({ timeout: 10000 });
+  const saved = await store('savedAnswers');
+  ok(saved.some((a) => a.question.startsWith('Earliest start date') && a.value === 'In 30 days') && !saved.some((a) => /gender/i.test(a.question)), 'a new answer is saved for next time; the gender question is not');
+  const ready2 = (await rows('Ready for your approval')).join(' | ');
+  ok(/Years of experience[^|]*8/.test(ready2) && /visa sponsorship[^|]*No/.test(ready2) && /ada\.design/.test(ready2), `the next step is read by itself (${ready2.replace(/\n/g, ' ')})`);
+  await panel.getByRole('button', { name: /^Fill \d+ answers/ }).click(); await sleep(300);
+  ok(await page.inputValue('#yrs') === '8' && await page.$eval('#sp', (e) => e.options[e.selectedIndex].text) === 'No', 'step 2 is filled after approval');
+  // the user presses the site's Submit; Jobly offers to add the job to Applied
+  await page.click('button[type="submit"]');
+  await panel.getByText('Did you submit this application?').waitFor({ timeout: 5000 });
+  ok(!!(await store('pendingApply'))?.job?.application_url?.startsWith('https://apply.example.test/'), 'pressing Submit leaves a "Did you apply?" prompt for when Jobly opens, in case the page moves on');
+  await panel.getByRole('button', { name: 'Yes, add to Applied' }).click(); await sleep(400);
+  const app = (await store('applications'))?.find((a) => a.key.startsWith('https://apply.example.test/'));
+  ok(app?.status === 'applied' && app.title === 'Staff Product Designer' && app.company_name === 'Initech' && !(await store('pendingApply')), 'Yes adds the job to Applied with its title and company');
+  // saved answers are listed on the Profile page and can be deleted
+  const d = await open(h, 'options.html', { width: 1280, height: 900 });
+  await d.getByRole('button', { name: /^Profile/ }).click(); await d.getByText('In 30 days').waitFor({ timeout: 5000 });
+  await d.getByRole('button', { name: /Delete the saved answer to: Earliest start date/ }).click(); await sleep(300);
+  ok(!(await store('savedAnswers')).some((a) => a.value === 'In 30 days'), 'a saved answer can be deleted from the Profile page'); await d.close();
+  // starting it twice reuses the panel; closing removes it
+  await startAssist(); ok(await page.locator('jobly-assist').count() === 1, 'starting again reuses the panel');
+  await panel.getByRole('button', { name: 'Close apply assist' }).click(); ok(await page.locator('jobly-assist').count() === 0, 'Close removes the panel');
+  // without a profile, the panel says how to set one up
+  await h.sw.evaluate(() => chrome.storage.local.remove(['profiles', 'activeProfileId']));
+  await page.reload(); await startAssist();
+  await panel.getByRole('button', { name: 'Set up my profile' }).waitFor({ timeout: 5000 }); ok(true, 'with no profile, the panel offers profile setup');
+  // the store build keeps the panel's shadow root closed, so the page's scripts can't read the answers
+  const prod = fs.readFileSync(path.join(process.env.EXT_PROD, 'assist.js'), 'utf8');
+  ok(/mode:"closed"/.test(prod) && !/mode:"open"/.test(prod), 'the store build opens the panel in a closed shadow root');
+  await h.ctx.close();
+});
+
 await step('contacts, outreach drafts, connections', async () => {
   const h = await launch(); const store = async (k) => (await h.sw.evaluate((key) => chrome.storage.local.get(key), k))[k];
   await h.sw.evaluate(() => chrome.storage.local.set({ applications: [{ key: 'manual:1', title: 'Staff Designer', company_name: 'Initech', location: null, application_url: 'https://careers.initech.com/jobs/1', source: 'manual', status: 'applied', notes: '', applied_at: new Date().toISOString(), follow_up_at: null, created_at: new Date().toISOString(), updated_at: new Date().toISOString() }],

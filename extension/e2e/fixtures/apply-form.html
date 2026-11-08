@@ -1,0 +1,32 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><title>Staff Product Designer - Initech</title>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"JobPosting","title":"Staff Product Designer","hiringOrganization":{"@type":"Organization","name":"Initech"},"jobLocation":{"@type":"Place","address":{"addressLocality":"Remote"}},"datePosted":"2026-11-01","description":"Design things."}</script>
+<style>body{font-family:sans-serif;max-width:640px;margin:24px auto} label{display:block;margin-top:12px} .q{margin-top:12px}</style>
+<h1>Apply: Staff Product Designer</h1>
+<form id="app">
+  <div id="step1">
+    <label for="fn">First name *</label><input id="fn" required>
+    <label for="ln">Last name *</label><input id="ln" required>
+    <label for="em">Email *</label><input id="em" type="email" required>
+    <label for="ph">Phone</label><input id="ph" type="tel">
+    <label for="li">LinkedIn profile</label><input id="li">
+    <label for="cv">Resume/CV *</label><input id="cv" type="file" required>
+    <label for="heard">How did you hear about us? *</label><input id="heard" required>
+    <label for="why">Why do you want to work at Initech?</label><textarea id="why"></textarea>
+    <label for="start">Earliest start date *</label><input id="start" required>
+    <div class="q"><span id="country-l">Country *</span> <button type="button" id="country-b" aria-haspopup="listbox" aria-labelledby="country-l country-b">Select One</button></div>
+    <label for="gender">Gender</label><select id="gender"><option value="">Choose</option><option>Woman</option><option>Man</option><option>Prefer not to say</option></select>
+    <p><button type="button" id="next">Next</button></p>
+  </div>
+</form>
+<script>
+document.getElementById('next').addEventListener('click', () => {
+  document.getElementById('step1').remove();
+  const s2 = document.createElement('div'); s2.id = 'step2';
+  s2.innerHTML = '<label for="yrs">Years of experience *</label><input id="yrs" required>' +
+    '<label for="sp">Will you require visa sponsorship? *</label><select id="sp" required><option value="">Select</option><option>Yes</option><option>No</option></select>' +
+    '<label for="portfolio">Portfolio link</label><input id="portfolio">' +
+    '<p><button type="submit">Submit application</button></p>';
+  document.getElementById('app').appendChild(s2);
+});
+document.getElementById('app').addEventListener('submit', (e) => { e.preventDefault(); document.body.dataset.submitted = 'yes'; });
+</script>

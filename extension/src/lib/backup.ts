@@ -7,7 +7,7 @@ import { cleanProfile, MAX_PROFILES, Profile } from './profile';
  * what spreadsheets, Notion and Google Sheets export, so applications kept elsewhere can be brought in.
  */
 
-const BACKUP_KEYS = [STORAGE_KEYS.preferences, STORAGE_KEYS.saved, TRACKER_KEYS.apps, TRACKER_KEYS.interviews, TRACKER_KEYS.tasks, TRACKER_KEYS.settings, 'mutedCompanyIds', 'followedCompanyIds', 'profiles', 'activeProfileId', 'resumeFile', 'resumeTemplate', 'contacts'];  // never the Hunter key
+const BACKUP_KEYS = [STORAGE_KEYS.preferences, STORAGE_KEYS.saved, TRACKER_KEYS.apps, TRACKER_KEYS.interviews, TRACKER_KEYS.tasks, TRACKER_KEYS.settings, 'mutedCompanyIds', 'followedCompanyIds', 'profiles', 'activeProfileId', 'resumeFile', 'resumeTemplate', 'contacts', 'savedAnswers'];  // never the Hunter key
 const MAX_FILE_BYTES = 5_000_000;
 
 function download(name: string, type: string, body: string) {
@@ -121,7 +121,7 @@ export async function importFile(file: File): Promise<ImportResult> {
       if (k === TRACKER_KEYS.apps) {
         value = (Array.isArray(value) ? value : []).map((a) => sanitizeApp(a as Partial<Application>)).filter(Boolean);
         apps = (value as unknown[]).length;
-      } else if (['savedJobs', TRACKER_KEYS.interviews, TRACKER_KEYS.tasks, 'mutedCompanyIds', 'followedCompanyIds', 'contacts'].includes(k)) {
+      } else if (['savedJobs', TRACKER_KEYS.interviews, TRACKER_KEYS.tasks, 'mutedCompanyIds', 'followedCompanyIds', 'contacts', 'savedAnswers'].includes(k)) {
         if (!Array.isArray(value)) continue;
         const arr: unknown[] = value;
         const ok = (o: unknown, fields: string[]) => !!o && typeof o === 'object' && fields.every((f) => typeof (o as Record<string, unknown>)[f] === 'string');

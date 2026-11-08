@@ -2,12 +2,19 @@ import { jobData, toJob } from '../lib/api';
 import type { JobQuery } from '../../../shared/jobdata';
 import { AlertItem, Job } from '../types';
 import {
-  jobKey, loadAlerts, loadPreferences, loadSeenKeys, readKey, storeAlerts, storeSeenKeys,
+  jobKey, loadAlerts, loadPreferences, loadSeenKeys, readKey, storeAlerts, storeSeenKeys, writeKey,
 } from '../lib/userData';
 import { FOLLOWED_KEY, MAX_FOLLOWED } from '../lib/follow';
 import { loadApps, loadInterviews, loadTasks, loadTrackerSettings, MAX_APPS, sanitizeApp, storeApps, storeInterviews, storeTasks } from '../lib/tracker';
 import { appFromPageJob, readJobInTab } from '../lib/pageJob';
 import { FEATURES } from '../lib/config';
+import type { PageJob } from '../lib/pageJob';
+import type { ScannedField } from '../lib/autofill';
+import { assistAnswers } from '../lib/assistLogic';
+import { loadAnswers, markUsed, rememberAnswers } from '../lib/answerBank';
+import { loadActiveProfileId, loadProfiles, PROFILE_KEYS, ResumeFile } from '../lib/profile';
+import { safeHttpUrl } from '../lib/url';
+import { TRACKER_KEYS } from '../lib/tracker';
 import { pullSnapshot, pushSnapshot, SYNC_SETTING, SYNC_STATE, syncEnabled, SYNCED_LOCAL_KEYS, syncState } from '../lib/sync';
 
 const ALARM_NAME = 'jobly-sync';
@@ -270,6 +277,11 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     return true;
   }
 
+  if (typeof message?.type === 'string' && message.type.startsWith('ASSIST_')) {
+    void handleAssist(message, sender).then(sendResponse, () => sendResponse(null));
+    return true;
+  }
+
   if (message?.type === 'CLEAR_BADGE') {
     (async () => {
       await chrome.action.setBadgeText({ text: '' });
@@ -278,3 +290,68 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     return true;
   }
 });
+
+// ---------- Apply assist (the panel on an application page) ----------
+// The panel runs in the page's tab, so everything it sends is checked here: it gets answers only for the active
+// profile, and never writes anything but saved answers and the job's Applied entry.
+const str = (v: unknown, n: number) => (typeof v === 'string' ? v.slice(0, n) : '');
+function pageJobFrom(v: unknown): PageJob | null {
+  if (!v || typeof v !== 'object') return null;
+  const j = v as Record<string, unknown>;
+  const url = safeHttpUrl(str(j.url, 2000));
+  if (!url) return null;
+  return { found: !!j.found, title: str(j.title, 200) || 'Untitled job', company: str(j.company, 160), location: str(j.location, 160), datePosted: str(j.datePosted, 40),
+    employmentType: str(j.employmentType, 40), salary: str(j.salary, 120), url, description: '' };
+}
+
+async function handleAssist(message: Record<string, unknown>, sender: chrome.runtime.MessageSender): Promise<unknown> {
+  if (!sender.tab?.id) return null; // only the panel in a page sends these
+  switch (message.type) {
+    case 'ASSIST_PROPOSE': {
+      const [profiles, activeId, saved, resumes] = await Promise.all([loadProfiles(), loadActiveProfileId(), loadAnswers(), readKey<Record<string, unknown>>(PROFILE_KEYS.resume)]);
+      const profile = profiles.find((p) => p.id === activeId) ?? profiles[0];
+      if (!profile) return { error: 'no-profile' };
+      const fields = (Array.isArray(message.fields) ? message.fields : []).slice(0, 150) as ScannedField[];
+      return { profileLabel: profile.label, answers: assistAnswers(fields, profile, saved, !!resumes?.[profile.id]) };
+    }
+    case 'ASSIST_RESUME': {
+      const [profiles, activeId, resumes] = await Promise.all([loadProfiles(), loadActiveProfileId(), readKey<Record<string, ResumeFile>>(PROFILE_KEYS.resume)]);
+      const profile = profiles.find((p) => p.id === activeId) ?? profiles[0];
+      const r = profile ? resumes?.[profile.id] : undefined;
+      return { resume: r ? { name: r.name, type: r.type, data: r.data } : null };
+    }
+    case 'ASSIST_REMEMBER': {
+      const items = (Array.isArray(message.items) ? message.items : []).slice(0, 50)
+        .map((i) => ({ question: str((i as Record<string, unknown>)?.question, 300), value: str((i as Record<string, unknown>)?.value, 3000), kind: str((i as Record<string, unknown>)?.kind, 20) }));
+      return { saved: await rememberAnswers(items) };
+    }
+    case 'ASSIST_USED':
+      await markUsed((Array.isArray(message.keys) ? message.keys : []).filter((k): k is string => typeof k === 'string').slice(0, 50));
+      return { ok: true };
+    case 'ASSIST_SUBMITTED': {
+      // Pressing Submit on the page: ask "Did you apply?" next time Jobly opens, in case the page moves on
+      const job = pageJobFrom(message.job);
+      if (!job) return null;
+      const apps = await loadApps();
+      if (apps.some((a) => a.key === job.url.split('#')[0] && a.status !== 'saved')) return { ok: true };
+      await writeKey(TRACKER_KEYS.pending, { at: Date.now(), job: { id: 0, company_id: 0, company_name: job.company, source_type: 'page', external_id: job.url, title: job.title, normalized_role: null, seniority: null, work_mode: null, location: job.location || null, description: null, application_url: job.url, first_seen_at: '', last_seen_at: '', status: 'active', is_saved: false, is_match: false } });
+      return { ok: true };
+    }
+    case 'ASSIST_APPLIED': {
+      const job = pageJobFrom(message.job);
+      if (!job) return null;
+      const app = sanitizeApp({ ...appFromPageJob(job), status: 'applied', applied_at: new Date().toISOString() });
+      if (!app) return null;
+      const apps = await loadApps();
+      const existing = apps.find((a) => a.key === app.key);
+      await storeApps([existing ? { ...existing, status: 'applied' as const, applied_at: existing.applied_at ?? app.applied_at, updated_at: new Date().toISOString() } : app, ...apps.filter((a) => a.key !== app.key)].slice(0, MAX_APPS));
+      await writeKey(TRACKER_KEYS.pending, null);
+      return { ok: true };
+    }
+    case 'ASSIST_OPEN_PROFILE':
+      await chrome.tabs.create({ url: chrome.runtime.getURL('options.html#profile-setup') });
+      return { ok: true };
+    default:
+      return null;
+  }
+}

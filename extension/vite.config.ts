@@ -2,6 +2,7 @@ import { defineConfig, Plugin } from 'vite';
 import react from '@vitejs/plugin-react';
 import { resolve } from 'path';
 import { readFileSync, writeFileSync } from 'fs';
+import { build as esbuild } from 'esbuild';
 
 // `vite build --mode development` (npm run build:dev) marks the name "(DEV)" and, when VITE_JOBLY_DATA points at a local
 // export of the job data, allows that address too. Such a build must never ship to the Web Store.
@@ -22,6 +23,8 @@ function devBuild(): Plugin {
           /connect-src ([^;]*)/, (_m: string, list: string) => `connect-src ${list} ${origin}`
         );
       }
+      // The browser tests start apply assist on a test application page from the service worker
+      manifest.host_permissions.push('https://apply.example.test/*');
       manifest.name += ' (DEV)';
       writeFileSync(file, JSON.stringify(manifest, null, 2) + '\n');
     },
@@ -52,8 +55,25 @@ function googleOAuth(): Plugin {
   };
 }
 
+// Apply assist runs inside the application page (chrome.scripting.executeScript with `files`), which needs one classic
+// script, not ES modules with chunks: built on its own with esbuild. Development builds open its shadow root for tests.
+function assistScript(dev: boolean): Plugin {
+  let outDir = 'dist';
+  return {
+    name: 'jobly-assist-script',
+    apply: 'build',
+    configResolved(config) { outDir = config.build.outDir; },
+    async closeBundle() {
+      await esbuild({
+        entryPoints: [resolve(__dirname, 'src/assist/main.ts')], bundle: true, format: 'iife', target: 'es2022', minify: !dev,
+        outfile: resolve(outDir, 'assist.js'), define: { __JOBLY_TEST__: dev ? 'true' : 'false' }, logLevel: 'error',
+      });
+    },
+  };
+}
+
 export default defineConfig(({ mode }) => ({
-  plugins: [react(), googleOAuth(), ...(mode === 'development' ? [devBuild()] : [])],
+  plugins: [react(), googleOAuth(), assistScript(mode === 'development'), ...(mode === 'development' ? [devBuild()] : [])],
   build: {
     outDir: mode === 'development' ? 'dist-dev' : 'dist',
     emptyOutDir: true,
