@@ -9,7 +9,13 @@ import { SITE } from '../lib/site';
 type Group = { h: string; items: string[] };
 type Release = { v: string; tag: 'next' | 'upcoming'; title: string; lead: string; groups: Group[] };
 const releases: Release[] = [
-  { v: 'v1.3', tag: 'next', title: 'Profile in a minute, apply assist, and a simpler Jobly', lead: 'Built and tested; going to Chrome Web Store review next.', groups: [
+  { v: 'v1.4', tag: 'next', title: 'A resume for each job, apply assist, and your profile in a minute', lead: 'Built and tested; going to Chrome Web Store review next.', groups: [
+    { h: 'Resume and cover letter for each job', items: [
+      'Paste a job description: Jobly lists what it asks for, marks each requirement covered, partly covered or missing, and shows the line of your resume that covers it.',
+      'Suggested changes you accept one by one, a coverage score before and after, and a tailored resume saved for that job.',
+      'A cover letter that answers what the posting asks for with your own experience.',
+      'Optional AI to reword: Chrome’s built-in model on your computer, or Claude with your own key. Every line is checked against your profile, and lines that add numbers or skills you don’t have are left out.',
+    ] },
     { h: 'Profile', items: [
       'Import the PDF LinkedIn makes of your profile, or your resume. Jobly reads it in your browser and fills your profile; you check each step.',
       'A completeness score that says what to add next.',
@@ -38,12 +44,6 @@ const releases: Release[] = [
       'Pick development, IT and design areas in Preferences, and alerts cover them too.',
     ] },
   ] },
-  { v: 'v1.4', tag: 'upcoming', title: 'Resume and cover letter for each job', lead: 'Paste a job description and see what it asks for against your resume.', groups: [
-    { h: 'Writing', items: [
-      'Requirements found in the job description, marked as covered or missing, with suggested changes you accept one by one.',
-      'A cover letter for that job from your profile. Uses AI built into Chrome where available, or your own AI key; nothing goes to an AI service unless you set it up.',
-    ] },
-  ] },
 ];
 const later = [
   { t: 'More companies every week', d: 'Jobly now tests new employers weekly and adds the ones with live job boards. Suggest one through the support page.' },
@@ -52,7 +52,7 @@ const later = [
   { t: 'Other browsers', d: 'Listing Jobly in the Edge and Firefox add-on stores.' },
 ];
 const wont = [
-  { t: 'AI that Jobly pays for', d: 'Every AI request costs money, and Jobly is free. Jobly Studio’s AI help uses your own key or your Claude plan.' },
+  { t: 'AI that Jobly pays for', d: 'Every AI request costs money, and Jobly is free. Jobly’s AI help uses Chrome’s built-in model on your computer or your own key, and tailoring works without any AI.' },
   { t: 'Autofill that runs by itself', d: 'Jobly’s autofill works only on the tab you click on, shows every answer first, and never presses Submit. An agent that applies for you is not planned.' },
   { t: 'An account you must create', d: 'Jobly works without one. An optional account to back up your profile may come later; it will never be required.' },
 ];

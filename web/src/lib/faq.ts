@@ -7,6 +7,7 @@ export const FAQ_GROUPS: { id: string; title: string; items: Faq[] }[] = [
       { top: true, q: 'Is it really free?', a: 'Yes. Jobly is free, has no premium tier and shows no ads.' },
       { q: 'Do I need an account?', a: 'No. There is no sign-up, no login and no email. You pick your roles in the extension and that’s it.' },
       { top: true, q: 'Which browsers does it work in?', a: 'Chrome on desktop. Chromium browsers that install extensions from the Chrome Web Store, such as Edge and Brave, should work too, but we test on Chrome.' },
+      { q: 'Can Jobly tailor my resume to a job?', a: 'Yes. Open Tailor for a job, paste the job description (or pick a saved job), and Jobly shows what the job asks for, which requirements your resume covers and with which line, and a coverage score. You accept suggested changes one by one and save a tailored resume for that job, then write a cover letter from the same description. It works without AI; if you want rewording, choose Chrome’s built-in AI or Claude with your own key in Settings, and every line is checked against your profile.' },
       { q: 'Does Jobly apply to jobs for me?', a: 'No. Jobly can fill an application form on the tab you’re on, from your profile, but it shows you every answer first and never presses Submit. You check the form and send it yourself.' },
     ],
   },
