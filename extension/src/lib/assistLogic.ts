@@ -18,8 +18,9 @@ export function assistAnswers(fields: ScannedField[], profile: Profile, saved: S
     let value = p.value; let source: Source | null = p.answerId ? (p.answerId === 'summary' ? 'suggested' : 'profile') : null;
     let savedKey: string | undefined;
     // A saved answer beats a suggestion (the user wrote it for this kind of question), never a profile fact
-    if ((source === null || source === 'suggested') && f.kind !== 'file' && f.kind !== 'checkbox' && f.kind !== 'custom') {
+    if ((source === null || source === 'suggested') && f.kind !== 'file' && f.kind !== 'checkbox') {
       const hit = findSaved(saved, f.label);
+      // a custom dropdown's options are only known once it is open, so a saved choice is tried there and checked
       const fits = hit && (f.kind === 'select' || f.kind === 'radio' ? f.options.find((o) => o.toLowerCase() === hit.value.toLowerCase()) : hit.value);
       if (hit && fits) { value = typeof fits === 'string' ? fits : hit.value; source = 'saved'; savedKey = hit.key; }
     }

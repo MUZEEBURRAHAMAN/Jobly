@@ -598,20 +598,24 @@ await step('apply assist: panel on the page, sources, action required, steps, sa
   ok(/LinkedIn/.test(row('How did you hear')) && /Saved answer/.test(row('How did you hear')), 'a question answered on an earlier form gets the saved answer');
   ok(/Suggested: check it/.test(row('Why do you want')) && !(await panel.getByRole('checkbox', { name: /Fill: Why do you want/ }).isChecked()), 'an open question gets a suggestion that stays unticked until you choose it');
   const need = (await rows('Action required')).join(' | ');
-  ok(/Earliest start date/.test(need) && /Country.*choose on the page/.test(need) && !/Gender/.test(need), `required questions Jobly can't answer are action required (${need.replace(/\n/g, ' ')})`);
+  ok(/Earliest start date/.test(need) && /Country.*choose on the page/.test(need) && !/Gender/.test(need) && !/legally authorized/.test(need), `required questions Jobly can't answer are action required (${need.replace(/\n/g, ' ')})`);
+  ok(/legally authorized.*picked from its list[\s\S]*Yes[\s\S]*From your profile/.test(row('Are you legally authorized')), 'a yes/no custom dropdown the profile answers is ready to fill');
   ok(await page.locator('#start').evaluate((e) => e.style.outlineStyle) === 'dashed', 'and they are outlined on the page');
   ok(await page.evaluate(() => document.querySelector('jobly-assist').shadowRoot !== null), 'the test build opens the panel for the tests (the store build keeps it closed)');
   await panel.getByRole('button', { name: /^Fill \d+ answers/ }).click();
   await panel.getByText(/^Filled \d+ fields/).waitFor({ timeout: 5000 });
   ok(await page.inputValue('#fn') === 'Ada' && await page.inputValue('#em') === 'ada@example.com' && await page.inputValue('#heard') === 'LinkedIn' && await page.inputValue('#why') === '', 'approved answers are filled; the unticked suggestion is not');
   ok(await page.evaluate(() => document.querySelector('#cv').files[0]?.name) === 'ada.pdf', 'the resume file is attached');
+  ok((await page.textContent('#auth-b')).trim() === 'Yes', 'the custom dropdown is opened and its option picked, like a person would');
   ok(await page.evaluate(() => !document.body.dataset.submitted), 'nothing is submitted');
   // the user answers what's left, picks a gender (never saved), and goes to the next step
   await page.fill('#start', 'In 30 days'); await page.selectOption('#gender', 'Woman');
+  await page.click('#country-b'); await page.click('#country-list [role=option]:has-text("India")'); await sleep(200);
   await page.click('#next');
   await panel.getByText(/^Step 2/).waitFor({ timeout: 10000 });
   const saved = await store('savedAnswers');
   ok(saved.some((a) => a.question.startsWith('Earliest start date') && a.value === 'In 30 days') && !saved.some((a) => /gender/i.test(a.question)), 'a new answer is saved for next time; the gender question is not');
+  ok(saved.some((a) => /^Country/.test(a.question) && a.value === 'India'), 'a choice made in a custom dropdown is saved too');
   const ready2 = (await rows('Ready for your approval')).join(' | ');
   ok(/Years of experience[^|]*8/.test(ready2) && /visa sponsorship[^|]*No/.test(ready2) && /ada\.design/.test(ready2), `the next step is read by itself (${ready2.replace(/\n/g, ' ')})`);
   await panel.getByRole('button', { name: /^Fill \d+ answers/ }).click(); await sleep(300);

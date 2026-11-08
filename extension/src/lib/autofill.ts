@@ -84,7 +84,7 @@ export function scanForm(): ScanResult {
 export interface FillItem { id: string; kind: ScannedField['kind']; value: string }
 export interface ResumePayload { name: string; type: string; data: string }
 
-export function fillForm(items: FillItem[], resume: ResumePayload | null): { filled: number; failed: string[] } {
+export async function fillForm(items: FillItem[], resume: ResumePayload | null): Promise<{ filled: number; failed: string[] }> {
   let filled = 0; const failed: string[] = [];
   const setNative = (el: HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement, value: string) => {
     // Sites built with React ignore plain .value writes; the prototype setter plus input/change events reach them.
@@ -95,6 +95,25 @@ export function fillForm(items: FillItem[], resume: ResumePayload | null): { fil
     el.dispatchEvent(new Event('blur', { bubbles: true }));
   };
   const norm = (s: string) => s.toLowerCase().replace(/\s+/g, ' ').trim();
+  const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
+  // A dropdown built from a button and a list (Workday and others): open it, click the matching option, check it took
+  const pickCustom = async (button: HTMLElement, value: string): Promise<boolean> => {
+    const want = norm(value);
+    button.click();
+    for (let i = 0; i < 15; i++) {
+      await wait(80);
+      const id = button.getAttribute('aria-controls') || button.getAttribute('aria-owns');
+      const scope: ParentNode = (id && document.getElementById(id)) || document;
+      const options = Array.from(scope.querySelectorAll<HTMLElement>('[role="option"]')).filter((o) => o.offsetParent !== null);
+      if (!options.length) continue;
+      const match = options.find((o) => norm(o.textContent ?? '') === want) ?? options.find((o) => norm(o.textContent ?? '').startsWith(want));
+      if (!match) { button.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })); document.body.click(); return false; }
+      match.click();
+      await wait(60);
+      return norm(button.textContent ?? '').includes(want) || match.getAttribute('aria-selected') === 'true';
+    }
+    return false;
+  };
   for (const item of items) {
     const els = Array.from(document.querySelectorAll<HTMLInputElement>(`[data-jobly-field="${item.id}"]`));
     const el = els[0];
@@ -116,6 +135,8 @@ export function fillForm(items: FillItem[], resume: ResumePayload | null): { fil
         const radio = els.find((r) => { const id = r.id; const l = id ? document.querySelector(`label[for="${CSS.escape(id)}"]`)?.textContent : r.closest('label')?.textContent; return norm(l ?? r.value) === want || norm(r.value) === want; });
         if (!radio) { failed.push(item.id); continue; }
         radio.click();
+      } else if (item.kind === 'custom') {
+        if (!(await pickCustom(el as unknown as HTMLElement, item.value))) { failed.push(item.id); continue; }
       } else if (item.kind === 'checkbox') {
         if ((item.value === 'yes') !== el.checked) el.click();
       } else {
@@ -161,7 +182,13 @@ export function proposeAnswers(fields: ScannedField[], profile: Profile, hasResu
       const isResume = /resume|cv|curriculum/.test(label) || !/cover/.test(label);
       return { field, answerId: isResume && hasResume ? 'resume' : null, value: isResume && hasResume ? 'Your resume file' : '', include: isResume && hasResume && !field.filled };
     }
-    if (field.kind === 'checkbox' || field.kind === 'custom') return { field, answerId: null, value: '', include: false }; // consent boxes and custom dropdowns stay the user's call
+    if (field.kind === 'checkbox') return { field, answerId: null, value: '', include: false }; // consent boxes stay the user's call
+    if (field.kind === 'custom') {
+      // Its options can't be read before opening it, so only yes/no questions the profile answers are proposed
+      if (/sponsor/.test(label) && profile.needs_sponsorship) return { field, answerId: 'needs_sponsorship', value: profile.needs_sponsorship === 'yes' ? 'Yes' : 'No', include: !field.filled };
+      if (/authori[sz]|legally|right\s*to\s*work|eligible\s*to\s*work/.test(label) && profile.work_authorization) return { field, answerId: 'work_authorization', value: 'Yes', include: !field.filled };
+      return { field, answerId: null, value: '', include: false };
+    }
     const rule = RULES.find(([re]) => re.test(label));
     let id = rule?.[1] ?? null;
     let value = id ? answers.get(id) ?? '' : '';

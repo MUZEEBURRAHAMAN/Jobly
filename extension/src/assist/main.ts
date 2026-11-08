@@ -100,6 +100,9 @@ function start() {
   };
   document.addEventListener('input', record, true);
   document.addEventListener('change', record, true);
+  // A choice made in a custom dropdown changes the button's text, not a value: read it just after the click
+  const recordCustom = () => window.setTimeout(() => { for (const a of answers) if (a.kind === 'custom') { const v = currentValue(a); if (v) typed.set(a.id, v); } }, 120);
+  document.addEventListener('click', recordCustom, true);
 
   /** What the user has put in a field (to remember it). Radios give the chosen option's label. */
   const currentValue = (a: AssistAnswer): string => {
@@ -113,12 +116,13 @@ function start() {
     }
     if (a.kind === 'select') { const s = first as unknown as HTMLSelectElement; return s.selectedIndex > 0 ? (s.options[s.selectedIndex]?.textContent ?? '').trim() : ''; }
     if (a.kind === 'text' || a.kind === 'textarea') return first.value.trim();
+    if (a.kind === 'custom') { const t = (first.textContent ?? '').replace(/\s+/g, ' ').trim(); return /^(select|choose|--|please)/i.test(t) ? '' : t; }
     return '';
   };
 
   /** Remember what the user typed into questions Jobly couldn't answer (never sensitive ones; the extension checks). */
   const remember = async () => {
-    const items = answers.filter((a) => !a.source && ['text', 'textarea', 'select', 'radio'].includes(a.kind) && !/e-?mail|phone|name/i.test(a.label))
+    const items = answers.filter((a) => !a.source && ['text', 'textarea', 'select', 'radio', 'custom'].includes(a.kind) && !/e-?mail|phone|name/i.test(a.label))
       .map((a) => ({ question: a.label, value: currentValue(a), kind: a.kind })).filter((x) => x.question && x.value);
     if (!items.length) return 0;
     const r = await send<{ saved: number }>({ type: 'ASSIST_REMEMBER', items });
@@ -157,7 +161,7 @@ function start() {
     let resume: ResumePayload | null = null;
     if (chosen.some((a) => a.kind === 'file')) resume = (await send<{ resume: ResumePayload | null }>({ type: 'ASSIST_RESUME' }))?.resume ?? null;
     const items: FillItem[] = chosen.map((a) => ({ id: a.id, kind: a.kind as FillItem['kind'], value: a.value }));
-    const out = fillForm(items, resume);
+    const out = await fillForm(items, resume);
     void send({ type: 'ASSIST_USED', keys: chosen.map((a) => a.savedKey).filter(Boolean) });
     busy = false;
     for (const a of chosen) if (!out.failed.includes(a.id)) { a.filled = true; a.include = false; }
@@ -169,7 +173,7 @@ function start() {
   const render = (state?: 'no-profile') => {
     panel.replaceChildren();
     const minimize = el('button', { class: 'icon', type: 'button', title: 'Minimise', ariaLabel: 'Minimise apply assist', textContent: '–', onclick: () => panel.classList.toggle('min') });
-    const close = el('button', { class: 'icon', type: 'button', title: 'Close', ariaLabel: 'Close apply assist', textContent: '×', onclick: () => { observer.disconnect(); document.removeEventListener('input', record, true); document.removeEventListener('change', record, true); host.remove(); delete w.__joblyAssist; } });
+    const close = el('button', { class: 'icon', type: 'button', title: 'Close', ariaLabel: 'Close apply assist', textContent: '×', onclick: () => { observer.disconnect(); document.removeEventListener('input', record, true); document.removeEventListener('change', record, true); document.removeEventListener('click', recordCustom, true); host.remove(); delete w.__joblyAssist; } });
     panel.append(el('div', { class: 'head' }, el('span', { class: 'mark', ariaHidden: 'true', textContent: 'J' }),
       el('div', { class: 'title' }, 'Apply assist', el('small', { textContent: profileLabel ? `Profile: ${profileLabel}${job.company ? ` · ${job.company}` : ''}` : 'Jobly' })), minimize, close));
     const body = el('div', { class: 'body' });
@@ -201,7 +205,7 @@ function start() {
       for (const a of ready) {
         const box = el('input', { type: 'checkbox', checked: a.include, ariaLabel: `Fill: ${a.label || 'unlabelled field'}`, onchange: (e: Event) => { a.include = (e.target as HTMLInputElement).checked; render(); } });
         list.append(el('li', {}, box, el('div', { class: 'cell' },
-          el('span', { class: 'q', textContent: `${a.label || 'Unlabelled field'}${a.required ? ' *' : ''}` }),
+          el('span', { class: 'q', textContent: `${a.label || 'Unlabelled field'}${a.required ? ' *' : ''}${a.kind === 'custom' ? ' · picked from its list' : ''}` }),
           el('span', { class: 'a', textContent: a.kind === 'file' ? 'Your resume file' : a.value }),
           a.source ? el('span', { class: `src ${a.source}`, textContent: SOURCE_LABEL[a.source] }) : null)));
       }

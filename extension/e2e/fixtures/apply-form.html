@@ -13,12 +13,21 @@
     <label for="heard">How did you hear about us? *</label><input id="heard" required>
     <label for="why">Why do you want to work at Initech?</label><textarea id="why"></textarea>
     <label for="start">Earliest start date *</label><input id="start" required>
-    <div class="q"><span id="country-l">Country *</span> <button type="button" id="country-b" aria-haspopup="listbox" aria-labelledby="country-l country-b">Select One</button></div>
+    <div class="q"><span id="country-l">Country *</span> <button type="button" id="country-b" class="dd" aria-haspopup="listbox" aria-controls="country-list" aria-labelledby="country-l country-b">Select One</button>
+      <ul role="listbox" id="country-list" hidden><li role="option">India</li><li role="option">United States</li></ul></div>
+    <div class="q"><span id="auth-l">Are you legally authorized to work in this country? *</span> <button type="button" id="auth-b" class="dd" aria-haspopup="listbox" aria-controls="auth-list" aria-labelledby="auth-l auth-b">Select One</button>
+      <ul role="listbox" id="auth-list" hidden><li role="option">Yes</li><li role="option">No</li></ul></div>
     <label for="gender">Gender</label><select id="gender"><option value="">Choose</option><option>Woman</option><option>Man</option><option>Prefer not to say</option></select>
     <p><button type="button" id="next">Next</button></p>
   </div>
 </form>
 <script>
+// Custom dropdowns like Workday's: a button opens a list; picking an option sets the button's text
+document.querySelectorAll('button.dd').forEach((b) => {
+  const list = document.getElementById(b.getAttribute('aria-controls'));
+  b.addEventListener('click', () => { list.hidden = !list.hidden; });
+  list.querySelectorAll('[role=option]').forEach((o) => o.addEventListener('click', () => { b.textContent = o.textContent; o.setAttribute('aria-selected', 'true'); list.hidden = true; }));
+});
 document.getElementById('next').addEventListener('click', () => {
   document.getElementById('step1').remove();
   const s2 = document.createElement('div'); s2.id = 'step2';
