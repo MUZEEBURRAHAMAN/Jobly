@@ -48,7 +48,7 @@ READERS = {
 COMPANIES = ROOT / "backend" / "app" / "data" / "companies.json"
 CANDIDATES = ROOT / "scripts" / "employer_candidates.csv"
 TRIED = ROOT / "scripts" / "employer_tried.txt"
-ANYWHERE = {"us", "yc"}   # regions whose role jobs count wherever they are
+ANYWHERE = {"us", "yc", "design"}   # regions whose role jobs count wherever they are ("design": design-led companies)
 USER_AGENT = "HiringRadar/1.0 (job discovery; +https://jobly-88t.pages.dev)"
 
 

@@ -13129,5 +13129,14 @@
     "source_identifier": "hcbt.fa.em2.oraclecloud.com/CX",
     "industry": "Financial Services & Insurance",
     "region": "in"
+  },
+  {
+    "name": "Mural",
+    "slug": "mural",
+    "careers_url": "https://jobs.ashbyhq.com/mural",
+    "source_type": "ashby",
+    "source_identifier": "mural",
+    "industry": null,
+    "region": "design"
   }
 ]
