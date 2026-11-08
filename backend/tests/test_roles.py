@@ -5,7 +5,7 @@ import aiosqlite
 
 from backend.app.ingestion.runner import reclassify_roles
 from backend.app.categories import classify_category
-from backend.app.matching import classify_role, detect_role
+from backend.app.matching import classify_employment, classify_role, detect_role, employment_from_description
 
 
 class TestRoleRules(unittest.TestCase):
@@ -75,7 +75,7 @@ class TestReclassify(unittest.IsolatedAsyncioTestCase):
     async def test_fixes_stored_roles_and_is_stable(self):
         async with aiosqlite.connect(":memory:") as db:
             db.row_factory = aiosqlite.Row
-            await db.execute("CREATE TABLE jobs (id INTEGER PRIMARY KEY, title TEXT, normalized_role TEXT, status TEXT, employment_type TEXT)")
+            await db.execute("CREATE TABLE jobs (id INTEGER PRIMARY KEY, title TEXT, normalized_role TEXT, status TEXT, employment_type TEXT, description TEXT)")
             await db.executemany("INSERT INTO jobs (title, normalized_role, status) VALUES (?, ?, ?)", [
                 ("Enterprise Account Director", "product_design", "active"),
                 ("Staff Software Engineer, Android Design System", "product_design", "active"),
@@ -111,3 +111,26 @@ class TestEmploymentType(unittest.TestCase):
         self.assertEqual(c("Part time UX Writer"), "part_time")
         self.assertIsNone(c("Product Manager"))
         self.assertIsNone(c("Internal Tools Engineer"))   # "internal" is not an internship
+
+
+class TestEmploymentType(unittest.TestCase):
+    def test_board_fields(self):
+        self.assertEqual(classify_employment("Designer", {"employment_type": "Contract"}), "contract")      # SmartRecruiters label
+        self.assertEqual(classify_employment("Designer", {"employment_type": "Part-time"}), "part_time")
+        self.assertEqual(classify_employment("Designer", {"employment_type": "freelance"}), "contract")     # Personio
+        self.assertEqual(classify_employment("Designer", {"employment_type": "intern"}), "internship")
+        self.assertEqual(classify_employment("Designer", {"employment_type": "full-time"}), "full_time")
+
+    def test_plain_statements_in_descriptions(self):
+        for text, kind in [("This is a 12 month fixed term contract opportunity.", "contract"), ("**This is a 6-month contract role**", "contract"),
+                           ("Job Type: Contractor (~15 hours per week)", "contract"), ("We are hiring on a contract-to-hire basis.", "contract"),
+                           ("work on a freelance basis", "contract"), ("Position Type: Part-time | 20 hours per week", "part_time"),
+                           ("Employment type: Internship", "internship")]:
+            self.assertEqual(employment_from_description(text), kind, text)
+
+    def test_mentions_that_are_not_the_job_type(self):
+        for text in ["You will manage contracts with our vendors.", "Work closely with contractors and agencies.",
+                     "Experience in contract negotiation is a plus.", "We offer full-time and part-time roles across the company."]:
+            self.assertIsNone(employment_from_description(text), text)
+        self.assertEqual(classify_employment("Product Designer", None, "Employment type: Contract"), "contract")
+        self.assertIsNone(classify_employment("Product Designer", None, None))

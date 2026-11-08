@@ -103,7 +103,8 @@ async def fetch_smartrecruiters_jobs(company_id: str, company_name: str, client:
                 location=clean_text(loc.get("fullLocation")) or _place(loc.get("city"), loc.get("region"), (loc.get("country") or "").upper()) or None,
                 work_mode=_mode(loc.get("remote"), loc.get("hybrid")),
                 source_updated_at=item.get("releasedDate"),
-                raw_data={"board_name": (item.get("company") or {}).get("name"), "department": (item.get("function") or {}).get("label")},
+                raw_data={"board_name": (item.get("company") or {}).get("name"), "department": (item.get("function") or {}).get("label"),
+                          "employment_type": (item.get("typeOfEmployment") or {}).get("label")},
             ))
         offset += SMARTRECRUITERS_PAGE
         if not page or offset >= int(data.get("totalFound") or 0):
@@ -127,7 +128,7 @@ async def fetch_workable_jobs(slug: str, company_name: str, client: httpx.AsyncC
             location=_place(item.get("city"), item.get("state"), item.get("country")),
             work_mode="remote" if item.get("telecommuting") else None,
             source_updated_at=item.get("published_on") or item.get("created_at"),
-            raw_data={"board_name": data.get("name"), "department": item.get("department")},
+            raw_data={"board_name": data.get("name"), "department": item.get("department"), "employment_type": item.get("employment_type")},
         ))
     return jobs
 
@@ -154,7 +155,7 @@ async def fetch_recruitee_jobs(slug: str, company_name: str, client: httpx.Async
             location=clean_text(item.get("location")) or _place(item.get("city"), item.get("country")),
             work_mode=_mode(item.get("remote"), item.get("hybrid")),
             source_updated_at=_recruitee_date(item.get("published_at") or item.get("created_at")),
-            raw_data={"board_name": item.get("company_name"), "department": item.get("department")},
+            raw_data={"board_name": item.get("company_name"), "department": item.get("department"), "employment_type": item.get("employment_type_code")},
         ))
     return jobs
 
@@ -215,7 +216,9 @@ async def fetch_personio_jobs(slug: str, company_name: str, client: httpx.AsyncC
             company_name=company_name, source_type="personio", external_id=ident, title=title,
             application_url=f"https://{slug}.jobs.personio.de/job/{ident}", location=_place(*offices[:2]),
             source_updated_at=field("createdAt") or None,
-            raw_data={"board_name": None, "department": field("department")},
+            # employmentType: permanent / intern / trainee / freelance; schedule: full-time / part-time
+            raw_data={"board_name": None, "department": field("department"),
+                      "employment_type": ("intern" if field("employmentType") in ("intern", "trainee") else field("employmentType") if field("employmentType") == "freelance" else field("schedule")) or None},
         ))
     return jobs
 
@@ -368,7 +371,8 @@ async def fetch_oracle_jobs(ident: str, company_name: str, client: httpx.AsyncCl
                 location=" / ".join(dict.fromkeys(p for p in [clean_text(item.get("PrimaryLocation")), *others[:3]] if p)) or None,
                 work_mode="remote" if "remote" in mode else "hybrid" if "hybrid" in mode else None,
                 source_updated_at=item.get("PostedDate"),
-                raw_data={"board_name": None, "department": clean_text(item.get("Organization")) or None},
+                raw_data={"board_name": None, "department": clean_text(item.get("Organization")) or None,
+                          "employment_type": clean_text(item.get("ContractType") or item.get("JobSchedule")) or None},
             ))
         offset += ORACLE_PAGE
         if len(batch) < ORACLE_PAGE or offset >= int(found.get("TotalJobsCount") or 0):

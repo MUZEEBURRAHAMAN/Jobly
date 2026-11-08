@@ -260,9 +260,34 @@ EMPLOYMENT_TYPES = ("full_time", "part_time", "contract", "internship")
 _ASHBY_EMPLOYMENT = {"fulltime": "full_time", "parttime": "part_time", "intern": "internship", "contract": "contract", "temporary": "contract"}
 
 
-def classify_employment(title: str | None, raw: dict[str, Any] | None = None) -> str | None:
-    """full_time, part_time, contract or internship, from the board's own field when it has one, else the title.
-    None means the posting doesn't say (filters treat that as full time, which almost all such postings are)."""
+# Clear statements in a job description: "This is a 6-month contract role", "Employment type: Freelance",
+# "contract-to-hire". Not "work with contractors" or "contract negotiation".
+_DESC_TYPE = [
+    ("internship", re.compile(r"\b(?:employment|job|position|work|contract)\s*type\s*[:\-]?\s*intern", re.I)),
+    ("contract", re.compile(r"\b(?:employment|job|position|work)\s*type\s*[:\-]?\s*(?:contract|contractor|freelance|temporary|temp|fixed[- ]term)\b", re.I)),
+    ("contract", re.compile(r"\bcontract[- ]to[- ](?:hire|perm)\b", re.I)),
+    ("contract", re.compile(r"\b(?:this\s+(?:is|will\s+be)\s+an?|an?)\s+(?:\d{1,2}[- ]?(?:month|week)s?\s+|short[- ]term\s+|long[- ]term\s+|paid\s+)?(?:contract|freelance|fixed[- ]term|temporary)\s+(?:role|position|job|opportunity|engagement|assignment|basis|contract)\b", re.I)),
+    ("contract", re.compile(r"\b\d{1,2}[- ]?(?:month|week)s?\s+(?:contract|engagement|assignment)\b", re.I)),
+    ("contract", re.compile(r"\b(?:on\s+a\s+)?freelance\s+basis\b", re.I)),
+    ("part_time", re.compile(r"\b(?:employment|job|position|work)\s*type\s*[:\-]?\s*part[- ]?time\b", re.I)),
+    ("part_time", re.compile(r"\bthis\s+(?:is|will\s+be)\s+a\s+part[- ]time\s+(?:role|position|job)\b", re.I)),
+]
+
+
+def employment_from_description(text: str | None) -> str | None:
+    """The job type a description states plainly, or None. Reads the first 6,000 characters (where it is said)."""
+    if not text:
+        return None
+    head = re.sub(r"<[^>]+>", " ", text[:12000])[:6000]
+    for kind, rx in _DESC_TYPE:
+        if rx.search(head):
+            return kind
+    return None
+
+
+def classify_employment(title: str | None, raw: dict[str, Any] | None = None, description: str | None = None) -> str | None:
+    """full_time, part_time, contract or internship, from the board's own field when it has one, else the title,
+    else a plain statement in the description. None means the posting doesn't say (treated as full time)."""
     raw = raw or {}
     board = str(raw.get("employmentType") or raw.get("commitment") or raw.get("employment_type") or "").lower().replace("-", "").replace(" ", "")
     if board:
@@ -283,7 +308,7 @@ def classify_employment(title: str | None, raw: dict[str, Any] | None = None) ->
         return "contract"
     if re.search(r"\bpart[- ]time\b", t):
         return "part_time"
-    return None
+    return employment_from_description(description)
 
 
 def matches_preferences(job: dict[str, Any], preferences: dict[str, Any]) -> bool:

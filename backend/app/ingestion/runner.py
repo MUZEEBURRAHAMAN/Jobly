@@ -154,7 +154,7 @@ async def upsert_job_record(
     work_mode = job.work_mode or detect_work_mode(job.location, job.title)
     geo_hub = detect_geo_hub(job.location, job.title)
     experience_tier = detect_experience_tier(seniority, job.title)
-    employment = classify_employment(job.title, job.raw_data)
+    employment = classify_employment(job.title, job.raw_data, job.description)
     content_hash = calculate_content_hash(
         comp_name, job.title, job.location, job.application_url
     )
@@ -499,12 +499,12 @@ async def sync_all_sources(company_id_filter: int | None = None, include_aggrega
 async def reclassify_roles(db) -> int:
     """Apply the current role rules to every active job. The stored role doubles as the category hint,
     which keeps this stable from one run to the next. Returns how many jobs changed role."""
-    cur = await db.execute("SELECT id, title, normalized_role, employment_type FROM jobs WHERE status = 'active'")
+    cur = await db.execute("SELECT id, title, normalized_role, employment_type, substr(description, 1, 12000) AS description FROM jobs WHERE status = 'active'")
     rows = await cur.fetchall()
     changes = [(new, row["id"]) for row in rows
                if (new := classify_role(row["title"], row["normalized_role"])) != row["normalized_role"]]
     # Jobs stored before employment types existed get one from their title (boards that say so set it on the next change).
-    kinds = [(kind, row["id"]) for row in rows if row["employment_type"] is None and (kind := classify_employment(row["title"]))]
+    kinds = [(kind, row["id"]) for row in rows if row["employment_type"] is None and (kind := classify_employment(row["title"], None, row["description"]))]
     if changes:
         await db.executemany("UPDATE jobs SET normalized_role = ? WHERE id = ?", changes)
     if kinds:
