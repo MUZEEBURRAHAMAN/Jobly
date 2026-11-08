@@ -12,10 +12,18 @@ export interface Contact {
   company: string;
   app_key: string | null;
   source: 'hunter' | 'manual';
+  /** How the user knows them, or what they could do: recruiter, hiring manager, team, referral, reference. */
+  relation: Relation;
   notes: string;
   contacted_at: string | null;
   created_at: string;
 }
+
+export type Relation = 'recruiter' | 'hiring_manager' | 'team' | 'referral' | 'reference' | 'other';
+export const RELATIONS: { id: Relation; label: string }[] = [
+  { id: 'recruiter', label: 'Recruiter' }, { id: 'hiring_manager', label: 'Hiring manager' }, { id: 'team', label: 'On the team' },
+  { id: 'referral', label: 'Could refer me' }, { id: 'reference', label: 'Reference' }, { id: 'other', label: 'Other' },
+];
 
 export const CONTACTS_KEY = 'contacts';
 export const MAX_CONTACTS = 500;
@@ -27,7 +35,8 @@ export function cleanContact(c: Partial<Contact>): Contact | null {
   return {
     id: clip(c.id, 80) || crypto.randomUUID(), name: name || email, position: clip(c.position, 160), email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ? email : '',
     linkedin: c.linkedin ? safeHttpUrl(/^https?:/i.test(c.linkedin) ? c.linkedin : `https://${c.linkedin}`) ?? '' : '', company: clip(c.company, 120),
-    app_key: c.app_key ? clip(c.app_key, 600) : null, source: c.source === 'hunter' ? 'hunter' : 'manual', notes: clip(c.notes, 2000),
+    app_key: c.app_key ? clip(c.app_key, 600) : null, source: c.source === 'hunter' ? 'hunter' : 'manual',
+    relation: RELATIONS.some((r) => r.id === c.relation) ? c.relation as Relation : 'other', notes: clip(c.notes, 2000),
     contacted_at: c.contacted_at && !Number.isNaN(Date.parse(c.contacted_at)) ? c.contacted_at : null, created_at: c.created_at ?? new Date().toISOString(),
   };
 }
@@ -37,7 +46,8 @@ export function useContacts() {
   const ref = useRef(contacts); ref.current = contacts;
   useEffect(() => {
     let alive = true;
-    const load = async () => { const v = await readKey<Contact[]>(CONTACTS_KEY); if (alive) setContacts(Array.isArray(v) ? v : []); };
+    // Older saved contacts have no relation; cleaning gives them 'other'
+    const load = async () => { const v = await readKey<Contact[]>(CONTACTS_KEY); if (alive) setContacts(Array.isArray(v) ? v.map(cleanContact).filter((c): c is Contact => !!c) : []); };
     void load();
     const off = onKeysChanged([CONTACTS_KEY], () => void load());
     return () => { alive = false; off(); };

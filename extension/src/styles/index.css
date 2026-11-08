@@ -244,7 +244,7 @@ a { color: inherit; }
   transition: background-color var(--t-fast), color var(--t-fast), border-color var(--t-fast);
 }
 .chip:hover { background: var(--hover); color: var(--foreground); }
-.chip[aria-pressed="true"] { background: var(--foreground); color: var(--background); border-color: var(--foreground); }
+.chip[aria-pressed="true"], .chip[role="radio"][aria-checked="true"] { background: var(--foreground); color: var(--background); border-color: var(--foreground); }
 .chip .count { font-size: var(--text-xs); opacity: 0.8; }
 /* "More roles": a dropdown dressed as a chip; filled like a pressed chip while one of its roles is picked */
 .chip-select { appearance: none; padding-right: var(--space-3); font-family: inherit; }
@@ -595,3 +595,8 @@ fieldset.profile-card > legend { padding: 0 var(--space-1); }
 /* Match % on job cards: strong matches in the brand colour, middling ones softer */
 .badge.match-badge { cursor: help; font-variant-numeric: tabular-nums; }
 .badge.match-mid { background: color-mix(in srgb, var(--brand) 8%, transparent); color: var(--foreground); border-color: color-mix(in srgb, var(--brand) 25%, var(--border)); }
+
+/* People finder */
+.people-finder { padding: var(--space-4); display: grid; gap: var(--space-3); }
+.people-links { gap: var(--space-2); }
+.people-add { display: grid; gap: var(--space-3); }

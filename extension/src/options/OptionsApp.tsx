@@ -237,7 +237,7 @@ export const OptionsApp: React.FC = () => {
     { id: 'tailor', label: 'Tailor for a job', icon: Target },
     { id: 'resume', label: 'Resume', icon: FileText },
     { id: 'letters', label: 'Cover letters', icon: Mail },
-    { id: 'contacts', label: 'Contacts', icon: Contacts },
+    { id: 'contacts', label: 'People', icon: Contacts },
     { id: 'alerts', label: 'Alerts', icon: Bell, badge: unreadAlerts },
     { id: 'preferences', label: 'Preferences', icon: SlidersHorizontal },
   ];

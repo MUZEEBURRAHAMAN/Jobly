@@ -20,7 +20,7 @@ await step('accessibility, both themes', async () => {
     for (const tab of ['Jobs', 'Apply', 'Companies', 'Saved', 'Settings']) { await p.getByRole('button', { name: new RegExp('^' + tab) }).click(); await sleep(500); await axe(p, `popup/${tab}/${theme}`); }
     await p.getByRole('button', { name: /^Jobs/ }).click(); await p.getByRole('button', { name: /Filters/ }).click(); await axe(p, `popup/filters/${theme}`);
     const d = await open(h, 'options.html', { theme, width: 1280, height: 860 }); await firstCard(d);
-    for (const tab of ['Jobs', 'Companies', 'Saved', 'Profile', 'Resume', 'Cover letters', 'Contacts', 'Alerts', 'Settings']) { await d.getByRole('button', { name: new RegExp('^' + tab) }).click(); await sleep(500); await axe(d, `dashboard/${tab}/${theme}`); }
+    for (const tab of ['Jobs', 'Companies', 'Saved', 'Profile', 'Resume', 'Cover letters', 'People', 'Alerts', 'Settings']) { await d.getByRole('button', { name: new RegExp('^' + tab) }).click(); await sleep(500); await axe(d, `dashboard/${tab}/${theme}`); }
     await h.ctx.close();
   }
 });
@@ -669,15 +669,32 @@ await step('contacts, outreach drafts, connections', async () => {
   await h.sw.evaluate(() => chrome.storage.local.set({ applications: [{ key: 'manual:1', title: 'Staff Designer', company_name: 'Initech', location: null, application_url: 'https://careers.initech.com/jobs/1', source: 'manual', status: 'applied', notes: '', applied_at: new Date().toISOString(), follow_up_at: null, created_at: new Date().toISOString(), updated_at: new Date().toISOString() }],
     profiles: [{ id: 'p1', label: 'Design', first_name: 'Ada', last_name: 'Lovelace', email: 'ada@example.com', phone: '', location: '', headline: 'Senior Product Designer', summary: '', linkedin: '', github: '', portfolio: '', website: '', work_authorization: '', needs_sponsorship: '', years_experience: '6', salary_expectation: '', notice_period: '', skills: '', work: [{ id: 'w1', company: 'Analytical Engines', title: 'Lead Designer', location: '', start: '2022-01', end: '', current: true, bullets: 'Led the checkout redesign' }], education: [], updated_at: new Date().toISOString() }], activeProfileId: 'p1' }));
   const d = await open(h, 'options.html', { width: 1280, height: 900 }); await firstCard(d);
-  await d.getByRole('button', { name: /^Contacts/ }).click(); await d.getByText('Finding contacts uses your own Hunter account').waitFor({ timeout: 5000 });
+  await d.getByRole('button', { name: /^People/ }).click(); await d.getByText('Finding contacts uses your own Hunter account').waitFor({ timeout: 5000 });
   ok(await d.getByRole('button', { name: 'Find contacts' }).isDisabled(), 'without a Hunter key, searching is off and the page says how to add one');
+  // the safe people finder: searches open on public sites; nothing is fetched by Jobly
+  await d.getByLabel('Job', { exact: true }).selectOption('manual:1');
+  ok(await d.getByLabel('Company', { exact: true }).inputValue() === 'Initech' && await d.getByLabel('Role', { exact: true }).inputValue() === 'Staff Designer', 'picking a job fills the company and role');
+  const hrefs = await d.locator('.people-links a').evaluateAll((els) => els.map((e) => [e.textContent.trim(), e.href, e.target]));
+  ok(hrefs.some(([t, u]) => t.startsWith('LinkedIn') && u.startsWith('https://www.linkedin.com/search/results/people/?keywords=Initech%20recruiter'))
+    && hrefs.some(([t]) => t.startsWith('Behance')) && hrefs.every(([, , target]) => target === '_blank'), `recruiter searches open on LinkedIn, Google, Behance, Dribbble and X (${hrefs.map((x) => x[0]).join(', ')})`);
+  await d.getByRole('radio', { name: 'Hiring manager' }).click();
+  ok(decodeURIComponent(await d.locator('.people-links a', { hasText: 'Google' }).getAttribute('href')).includes('site:linkedin.com/in "Initech" "design manager" OR "head of design"'), 'the hiring manager search looks for design managers for a design role');
+  ok(await d.getByRole('radio', { name: 'Worked at Analytical Engines' }).count() === 1, 'past employers from the profile become a search for former colleagues');
+  await d.getByLabel('Name', { exact: true }).fill('Ada Byron'); await d.getByLabel('Position', { exact: true }).fill('Design Manager'); await d.getByLabel('Profile link').fill('linkedin.com/in/adabyron');
+  await d.getByRole('button', { name: 'Save person' }).click(); await sleep(300);
+  const ada = (await store('contacts')).find((c) => c.name === 'Ada Byron');
+  ok(ada?.relation === 'hiring_manager' && ada.company === 'Initech' && ada.linkedin === 'https://linkedin.com/in/adabyron' && ada.app_key === 'manual:1', 'someone found is saved with how you know them, the company and the job');
+  await axe(d, 'people finder');
   await d.getByLabel('For application').selectOption('manual:1'); ok((await d.getByLabel('Company domain').inputValue()) === 'initech.com', "the company's domain is taken from the application link");
   await axe(d, 'contacts');
   // a contact by hand, then an outreach draft
-  await d.getByRole('button', { name: 'Add a contact' }).click(); const dlg = d.getByRole('dialog'); await dlg.getByLabel('Name').fill('Grace Hopper'); await dlg.getByLabel('Position').fill('Head of Talent'); await dlg.getByLabel('Email').fill('grace@initech.com');
-  await d.getByRole('dialog').getByLabel('Application', { exact: true }).selectOption('manual:1'); await d.getByRole('button', { name: 'Save contact' }).click(); await sleep(400);
-  ok((await store('contacts'))?.[0]?.company === 'Initech', 'a contact is saved with its application');
-  await d.getByRole('button', { name: 'Draft message' }).click(); await d.getByRole('dialog').waitFor();
+  await d.getByRole('button', { name: 'Add a person' }).click(); const dlg = d.getByRole('dialog'); await dlg.getByLabel('Name').fill('Grace Hopper'); await dlg.getByLabel('Position').fill('Head of Talent'); await dlg.getByLabel('Email').fill('grace@initech.com');
+  await d.getByRole('dialog').getByLabel('Application', { exact: true }).selectOption('manual:1'); await d.getByRole('dialog').getByRole('button', { name: 'Save person' }).click(); await sleep(400);
+  ok((await store('contacts'))?.some((c) => c.name === 'Grace Hopper' && c.company === 'Initech'), 'a contact is saved with its application');
+  await d.getByRole('button', { name: /^Hiring manager/ }).click();
+  ok(await d.locator('.card-grid li').count() === 1 && /Ada Byron/.test(await d.locator('.card-grid').innerText()), 'saved people can be filtered by how you know them');
+  await d.getByRole('button', { name: /^All/ }).click();
+  await d.locator('.card-grid li', { hasText: 'Grace Hopper' }).getByRole('button', { name: 'Draft message' }).click(); await d.getByRole('dialog').waitFor();
   const msg = await d.getByLabel('Text', { exact: true }).inputValue();
   ok(msg.startsWith('Hi Grace,') && msg.includes('Staff Designer role at Initech') && msg.includes('Ada Lovelace') && msg.includes('led the checkout redesign'), 'the outreach draft is filled from the contact, the job and the profile');
   await d.getByLabel('Message', { exact: true }).selectOption('linkedin'); ok(await d.getByText(/\d+\/300 characters/).count() === 1, 'the LinkedIn note shows the 300-character limit');
@@ -688,7 +705,7 @@ await step('contacts, outreach drafts, connections', async () => {
   ok((await store('hunterApiKey')) === 'test-key-123', 'the Hunter key is stored on the device');
   ok(await d.getByText('Google Calendar').count() === 0, 'the calendar connection is hidden while Interviews are switched off');
   const [bk] = await Promise.all([d.waitForEvent('download'), d.getByRole('button', { name: 'Download a backup' }).click()]);
-  const backup = fs.readFileSync(await bk.path(), 'utf8'); ok(!backup.includes('test-key-123') && JSON.parse(backup).data.contacts?.length === 1, 'backups include contacts but never the API key');
+  const backup = fs.readFileSync(await bk.path(), 'utf8'); ok(!backup.includes('test-key-123') && JSON.parse(backup).data.contacts?.length === 2, 'backups include contacts but never the API key');
   // the Hunter search itself (in a real page, with the service mocked)
   const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
   const bundle = await esbuild({ entryPoints: [path.join(root, 'src/e2e-units.ts')], bundle: true, write: false, format: 'iife', globalName: 'units', platform: 'browser' });
