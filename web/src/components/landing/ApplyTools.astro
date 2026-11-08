@@ -1,0 +1,173 @@
+---
+import SectionHead from '../SectionHead.astro';
+import Icon from '../Icon.astro';
+
+// Demo content uses the same fictional people and companies as the extension's screenshots.
+const answers = [
+  { q: 'First name', a: 'Ananya', src: 'profile', label: 'From your profile' },
+  { q: 'How did you hear about us?', a: 'LinkedIn', src: 'saved', label: 'Saved answer' },
+  { q: 'Why Northwind Labs?', a: 'Product designer with seven years of experience…', src: 'suggested', label: 'Suggested: check it' },
+];
+const found = ['Name', 'Email', 'LinkedIn', '3 roles', '1 school', '12 skills'];
+const reqs = [
+  { s: 'covered', t: 'Covered', r: '5+ years in product design' },
+  { s: 'covered', t: 'Covered', r: 'Building design systems' },
+  { s: 'partial', t: 'Partly', r: 'Figma and prototyping' },
+  { s: 'missing', t: 'Missing', r: 'Familiarity with React' },
+];
+---
+<section class="shell apply-wrap" id="apply" aria-labelledby="apply-title">
+  <div class="panel panel-pad">
+    <div class="container inner">
+      <SectionHead eyebrow="Apply faster" id="apply-title" title="From profile to submitted, without retyping."
+        lead="Import your profile once, tailor your resume for each job, and let Jobly fill the application with you. You always press Submit." />
+
+      <div class="bento" data-stagger>
+        <!-- 1. Apply assist -->
+        <article class="tile t-assist" data-reveal data-play>
+          <div class="visual">
+            <div class="mock panel-mock" aria-hidden="true">
+              <div class="p-head"><span class="j">J</span><span class="p-title"><b>Apply assist</b><small>Profile: Product design · Northwind Labs</small></span></div>
+              <p class="p-status"><b>Step 1</b> · 3 answers ready · 1 needs you</p>
+              <ul class="answers">
+                {answers.map((x, i) => (
+                  <li style={`--i:${i}`}>
+                    <span class:list={['tick', { off: x.src === 'suggested' }]}><Icon name="check" size={11} /></span>
+                    <span class="qa"><small>{x.q}</small><b>{x.a}</b><span class:list={['src', x.src]}>{x.label}</span></span>
+                  </li>
+                ))}
+                <li class="need"><span class="qa"><small>Earliest start date *</small><b>Action required</b></span><span class="go">Go to field</span></li>
+              </ul>
+              <div class="p-foot"><span class="fill">Fill 2 answers</span><span class="never">You press Submit. Jobly never does.</span></div>
+            </div>
+          </div>
+          <h3>Apply assist fills it with you</h3>
+          <p>Open Jobly on any application. A panel fills each step from your profile after you approve the answers, shows where every answer came from, and marks the questions only you can answer. Answers you type once are remembered for the next form.</p>
+        </article>
+
+        <!-- 2. Profile import -->
+        <article class="tile t-import" data-reveal data-play>
+          <div class="visual">
+            <div class="mock import" aria-hidden="true">
+              <span class="file"><Icon name="file" size={16} /> linkedin.pdf</span>
+              <div class="found">{found.map((f, i) => <span style={`--i:${i}`}>{f}</span>)}</div>
+              <div class="meter-wrap"><span class="m-label">Profile 93% complete</span><span class="meter"><span></span></span></div>
+            </div>
+          </div>
+          <h3>Your profile in a minute</h3>
+          <p>Import the PDF LinkedIn makes of your profile, or your resume. Jobly reads it in your browser, never uploads it, and you check each step.</p>
+        </article>
+
+        <!-- 3. Tailor -->
+        <article class="tile t-tailor" data-reveal data-play>
+          <div class="visual">
+            <div class="mock tailor" aria-hidden="true">
+              <div class="score"><span class="big">68%</span><Icon name="arrow-right" size={16} /><span class="big after">82%</span><small>coverage, before and after your changes</small></div>
+              <ul class="reqs">{reqs.map((x) => <li><span class:list={['chip', x.s]}>{x.t}</span><span>{x.r}</span></li>)}</ul>
+            </div>
+          </div>
+          <h3>A resume for each job</h3>
+          <p>Paste a job description. Jobly lists what it asks for, shows which line of your resume covers each requirement, and suggests changes you accept one by one. Save the tailored version for that job.</p>
+        </article>
+
+        <!-- 4. Cover letters -->
+        <article class="tile t-letter" data-reveal>
+          <div class="visual">
+            <div class="mock letter" aria-hidden="true">
+              <p>Dear Acme hiring team,</p>
+              <p>Your posting asks for <mark>design systems</mark>, <mark>user research</mark> and <mark>5+ years in product design</mark>, which is the work I've been doing for 7 years.</p>
+              <p>At Northwind Labs, I built the design system used by six product teams.</p>
+              <span class="guard"><Icon name="shield" size={13} /> Checked against your profile</span>
+            </div>
+          </div>
+          <h3>Cover letters that answer the job</h3>
+          <p>The letter quotes what the posting asks for and answers with your own experience. Optional AI rewording uses Chrome's built-in model or your own Claude key, and every line is checked against your profile.</p>
+        </article>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .bento { display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px; margin-top: 48px; }
+  .tile { background: var(--card); border: 1px solid var(--border); border-radius: 18px; padding: 6px 6px 24px; display: flex; flex-direction: column; min-width: 0; }
+  .t-assist { grid-column: span 4; } .t-import { grid-column: span 2; }
+  .t-tailor, .t-letter { grid-column: span 3; }
+  .visual { position: relative; height: 360px; flex: none; border-radius: 13px; background: var(--panel); display: grid; place-items: center; overflow: hidden; padding: 20px; }
+  h3 { margin: 22px 18px 0; font-size: 1.1875rem; font-weight: 500; letter-spacing: -0.015em; color: var(--fg); }
+  .tile > p { margin: 8px 18px 0; font-size: var(--text-md); line-height: 1.6; color: var(--muted); }
+  .mock { width: 100%; min-width: 0; max-width: 100%; font-size: 13px; color: var(--fg); }
+  .j { width: 24px; height: 24px; flex: none; display: grid; place-items: center; border-radius: 7px; background: var(--brand); color: var(--on-brand); font-size: 12px; font-weight: 700; }
+
+  /* 1. apply assist panel: answers tick in one after another */
+  .panel-mock { width: min(400px, 100%); background: var(--card); border: 1px solid var(--border); border-radius: 14px; box-shadow: var(--shadow-md); overflow: hidden; }
+  .p-head { display: flex; gap: 10px; align-items: center; padding: 10px 12px; border-bottom: 1px solid var(--border); }
+  .p-title { display: flex; flex-direction: column; line-height: 1.3; min-width: 0; }
+  .p-title small { font-size: 11px; color: var(--subtle); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .p-status { margin: 0; padding: 8px 12px 0; font-size: 12px; color: var(--subtle); }
+  .p-status b { color: var(--fg); font-weight: 600; }
+  .answers { list-style: none; margin: 0; padding: 6px 12px; display: grid; grid-template-columns: minmax(0, 1fr); gap: 5px; }
+  .answers li { display: flex; gap: 8px; align-items: flex-start; border: 1px solid var(--border); border-radius: 9px; padding: 5px 8px; }
+  .answers li.need { justify-content: space-between; align-items: center; background: color-mix(in srgb, var(--warning, #d97706) 12%, var(--card)); border-color: transparent; }
+  .tick { width: 16px; height: 16px; flex: none; margin-top: 2px; border-radius: 4px; display: grid; place-items: center; background: var(--brand); color: var(--on-brand); }
+  .tick.off { background: var(--card); border: 1px solid var(--border-strong); color: transparent; }
+  .qa { display: flex; flex-direction: column; min-width: 0; flex: 1; line-height: 1.3; }
+  .qa small { font-size: 11px; color: var(--subtle); }
+  .qa b { font-weight: 500; font-size: 12.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .src { align-self: flex-start; margin-top: 2px; font-size: 10.5px; font-weight: 600; padding: 1px 6px; border-radius: 5px; }
+  .src.profile { background: color-mix(in srgb, var(--success) 14%, var(--card)); color: var(--success); }
+  .src.saved { background: var(--panel); color: var(--fg); }
+  .src.suggested { background: var(--brand-soft); color: var(--brand); }
+  .go { font-size: 11px; border: 1px solid var(--border-strong); background: var(--card); border-radius: 6px; padding: 3px 8px; white-space: nowrap; }
+  .p-foot { display: flex; align-items: center; gap: 10px; padding: 8px 12px 12px; border-top: 1px solid var(--border); }
+  .fill { font-size: 12px; font-weight: 600; background: var(--ink); color: var(--on-ink); border-radius: 7px; padding: 5px 10px; white-space: nowrap; }
+  .never { font-size: 11px; color: var(--subtle); }
+  [data-playing] .answers li:not(.need) { animation: answer-in 6s var(--ease-out) infinite; animation-delay: calc(var(--i) * 0.25s); }
+  @keyframes answer-in { 0% { opacity: 0; transform: translateY(6px); } 8%, 88% { opacity: 1; transform: none; } 96%, 100% { opacity: 0; } }
+
+  /* 2. import: the file is read, found details pop in, the bar fills */
+  .import { display: grid; gap: 14px; max-width: 280px; }
+  .file { justify-self: start; display: inline-flex; align-items: center; gap: 8px; background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 8px 12px; font-weight: 500; }
+  .found { display: flex; flex-wrap: wrap; gap: 6px; }
+  .found span { font-size: 12px; padding: 3px 9px; border-radius: 999px; background: color-mix(in srgb, var(--success) 12%, var(--card)); color: var(--success); }
+  .meter-wrap { display: grid; gap: 6px; }
+  .m-label { font-size: 13px; font-weight: 500; }
+  .meter { height: 6px; border-radius: 999px; background: var(--border); overflow: hidden; }
+  .meter span { display: block; height: 100%; width: 93%; background: var(--brand); border-radius: inherit; }
+  [data-playing] .found span { animation: chip-in 6s var(--ease-out) infinite; animation-delay: calc(0.3s + var(--i) * 0.2s); }
+  [data-playing] .meter span { animation: fill 6s var(--ease-out) infinite; }
+  @keyframes chip-in { 0% { opacity: 0; transform: scale(0.85); } 6%, 88% { opacity: 1; transform: none; } 96%, 100% { opacity: 0; } }
+  @keyframes fill { 0%, 25% { width: 0; } 55%, 92% { width: 93%; } 100% { width: 0; } }
+
+  /* 3. tailor: score before and after, requirements with their status */
+  .tailor { display: grid; gap: 14px; max-width: 360px; }
+  .score { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; }
+  .score small { flex-basis: 100%; font-size: 12px; color: var(--subtle); }
+  .big { font-size: 30px; font-weight: 700; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+  .big.after { color: var(--brand); }
+  .reqs { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: minmax(0, 1fr); gap: 6px; }
+  .reqs li { display: flex; align-items: center; gap: 10px; background: var(--card); border: 1px solid var(--border); border-radius: 9px; padding: 7px 10px; }
+  .chip { flex: none; min-width: 62px; text-align: center; font-size: 11px; font-weight: 600; padding: 2px 6px; border-radius: 6px; }
+  .chip.covered { background: color-mix(in srgb, var(--success) 14%, var(--card)); color: var(--success); }
+  .chip.partial { background: color-mix(in srgb, var(--warning, #d97706) 16%, var(--card)); color: var(--warning, #b45309); }
+  .chip.missing { background: var(--panel); color: var(--subtle); }
+  [data-playing] .big.after { animation: after-in 5s var(--ease-out) infinite; }
+  @keyframes after-in { 0%, 30% { opacity: 0; transform: translateX(-6px); } 40%, 90% { opacity: 1; transform: none; } 100% { opacity: 0; } }
+
+  /* 4. letter */
+  .letter { max-width: 360px; background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; display: grid; gap: 8px; line-height: 1.5; }
+  .letter p { margin: 0; font-size: 12.5px; color: var(--fg); }
+  .letter mark { background: var(--brand-soft); color: var(--brand); border-radius: 4px; padding: 0 3px; }
+  .guard { justify-self: start; display: inline-flex; align-items: center; gap: 6px; font-size: 11.5px; color: var(--success); background: color-mix(in srgb, var(--success) 12%, var(--card)); border-radius: 999px; padding: 3px 9px; }
+
+  @media (max-width: 1000px) {
+    .bento { grid-template-columns: repeat(2, 1fr); }
+    .t-assist { grid-column: span 2; }
+    .t-import, .t-tailor, .t-letter { grid-column: span 1; }
+  }
+  @media (max-width: 640px) {
+    .bento { grid-template-columns: 1fr; }
+    .tile { grid-column: auto !important; }
+    .visual { height: auto; min-height: 280px; }
+  }
+</style>

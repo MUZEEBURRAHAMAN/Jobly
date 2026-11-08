@@ -81,7 +81,7 @@ export const OTHERS: Role[] = [
 export const EVERY: Role = {
   slug: 'all', id: 'all', name: 'All', plural: 'jobs', figure: 'riffle',
   titles: [...ROLES, ...AREAS, ...OTHERS].map((r) => r.name),
-  lead: 'Every job Jobly lists, from all 1,600+ employers and job boards, in one list: design, development, IT and every other role. Newest first, each with the date the employer posted it.',
+  lead: 'Every job Jobly lists, from all 2,000+ employers and job boards, in one list: design, development, IT and every other role. Newest first, each with the date the employer posted it.',
 };
 
 /** Every role and area with its own page. */

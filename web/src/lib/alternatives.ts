@@ -19,7 +19,7 @@ export const ALTERNATIVES: Alternative[] = [
     slug: 'linkedin-jobs', name: 'LinkedIn Jobs', kind: 'Job site and professional network', figure: 'hub', checked: CHECKED,
     title: 'Jobly vs LinkedIn Jobs',
     description: 'How Jobly compares with LinkedIn Jobs for finding new design, development and IT jobs: posting dates, promoted jobs, alerts without an account, and where LinkedIn is better.',
-    summary: 'LinkedIn has far more jobs and the network to go with them. Jobly is narrower: new jobs from 1,600+ company career pages with their original date, design, development and IT sorted by area, no promoted listings and no account.',
+    summary: 'LinkedIn has far more jobs and the network to go with them. Jobly is narrower: new jobs from 2,000+ company career pages with their original date, design, development and IT sorted by area, no promoted listings and no account.',
     chooseThem: ['You want jobs in every industry and country', 'Your network and recruiters are a big part of your search', 'You like applying with Easy Apply'],
     chooseJobly: ['You want to see new design, development and IT jobs within hours, sorted by real date', 'You’re tired of promoted and reposted listings', 'You want alerts without an account or email'],
     rows: [
@@ -29,7 +29,7 @@ export const ALTERNATIVES: Alternative[] = [
       { label: 'Paid placement', jobly: ['yes', 'None'], them: ['no', 'Promoted jobs'] },
       { label: 'Alerts', jobly: ['yes', 'No account needed'], them: ['part', 'Account needed'] },
       { label: 'Applying', jobly: ['yes', 'On the original listing'], them: ['part', 'Easy Apply or the employer’s site'] },
-      { label: 'Coverage', jobly: ['part', 'Every role from 1,600+ career pages; design, dev & IT by area'], them: ['yes', 'Every industry'] },
+      { label: 'Coverage', jobly: ['part', 'Every role from 2,000+ career pages; design, dev & IT by area'], them: ['yes', 'Every industry'] },
       { label: 'Networking', jobly: ['no', 'None'], them: ['yes', 'Profiles, messages, referrals'] },
       { label: 'Price', jobly: ['yes', 'Free'], them: ['yes', 'Free; Premium is paid'] },
     ],
@@ -48,7 +48,7 @@ export const ALTERNATIVES: Alternative[] = [
     slug: 'indeed', name: 'Indeed', kind: 'Job search engine', figure: 'sieve', checked: CHECKED,
     title: 'Jobly vs Indeed',
     description: 'How Jobly compares with Indeed for design, development and IT job searches: real posting dates vs "30+ days", sponsored jobs, alerts without an account, and where Indeed is better.',
-    summary: 'Indeed covers nearly every job and industry. Jobly covers far fewer: jobs from 1,600+ company career pages, each with its original posting date, no sponsored jobs and no account.',
+    summary: 'Indeed covers nearly every job and industry. Jobly covers far fewer: jobs from 2,000+ company career pages, each with its original posting date, no sponsored jobs and no account.',
     chooseThem: ['You want jobs from small local employers too', 'You want company reviews and salary data in the same place', 'You like applying with your Indeed résumé'],
     chooseJobly: ['You want the exact age of every job, not “30+ days”', 'You don’t want sponsored jobs above newer ones', 'You want alerts without an account'],
     rows: [
@@ -58,7 +58,7 @@ export const ALTERNATIVES: Alternative[] = [
       { label: 'Paid placement', jobly: ['yes', 'None'], them: ['no', 'Sponsored jobs'] },
       { label: 'Alerts', jobly: ['yes', 'No account needed'], them: ['part', 'Account needed'] },
       { label: 'Applying', jobly: ['yes', 'On the original listing'], them: ['part', 'Indeed Apply or the employer’s site'] },
-      { label: 'Coverage', jobly: ['part', 'Every role from 1,600+ career pages; design, dev & IT by area'], them: ['yes', 'Every industry'] },
+      { label: 'Coverage', jobly: ['part', 'Every role from 2,000+ career pages; design, dev & IT by area'], them: ['yes', 'Every industry'] },
       { label: 'Price', jobly: ['yes', 'Free'], them: ['yes', 'Free'] },
     ],
     better: [
@@ -91,7 +91,7 @@ export const ALTERNATIVES: Alternative[] = [
     ],
     better: [
       { title: 'Where Simplify is better', text: 'AI writing and the widest autofill. Simplify tailors resumes and drafts answers with AI, and fills forms on more hiring systems.' },
-      { title: 'Where Jobly is better', text: 'Finding, and privacy. Jobly watches 1,600+ career pages and tells you when a new job matches, with its real posting date. Its saved and applied lists, profiles and autofill work without an account and keep everything in your browser.' },
+      { title: 'Where Jobly is better', text: 'Finding, and privacy. Jobly watches 2,000+ career pages and tells you when a new job matches, with its real posting date. Its saved and applied lists, profiles and autofill work without an account and keep everything in your browser.' },
     ],
     together: 'Let Jobly tell you about a new job and keep your applied list; use Simplify’s AI if you want help writing. They don’t get in each other’s way.',
     sources: [
@@ -112,7 +112,7 @@ export const ALTERNATIVES: Alternative[] = [
       { label: 'How often it refreshes', jobly: ['yes', 'Every 4 hours'], them: ['yes', 'Several times a day'] },
       { label: 'Format', jobly: ['yes', 'Chrome extension'], them: ['yes', 'Website'] },
       { label: 'Alerts in your browser', jobly: ['yes', 'Badge and desktop alert'], them: ['part', 'Not its format'] },
-      { label: 'Coverage', jobly: ['part', 'Every role from 1,600+ career pages; design, dev & IT by area'], them: ['yes', 'Many industries'] },
+      { label: 'Coverage', jobly: ['part', 'Every role from 2,000+ career pages; design, dev & IT by area'], them: ['yes', 'Many industries'] },
       { label: 'Applying', jobly: ['yes', 'On the original listing'], them: ['yes', 'On the employer’s site'] },
       { label: 'How it makes money', jobly: ['yes', 'It doesn’t'], them: ['part', 'From employers'] },
       { label: 'Price for job seekers', jobly: ['yes', 'Free'], them: ['yes', 'Free'] },
