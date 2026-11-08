@@ -70,7 +70,7 @@ await sleep(600);
 await form.screenshot({ path: path.join(OUT, '2-apply-assist.png') }); console.log('wrote 2-apply-assist.png'); await form.close();
 // Profile setup after importing a LinkedIn PDF (the test fixture, a made-up person)
 await d.goto(`chrome-extension://${h.id}/options.html#profile`); await sleep(1000);
-await d.getByRole('button', { name: 'Import a PDF' }).click();
+await d.getByRole('button', { name: 'Import a file' }).click();
 await d.locator('input[type="file"]').setInputFiles(path.join(path.dirname(fileURLToPath(import.meta.url)), 'fixtures', 'linkedin.pdf'));
 await d.getByText(/LinkedIn profile read/).waitFor({ timeout: 20000 });
 await snap(null, '4-profile-setup.png');

@@ -2,7 +2,7 @@ import React, { useRef, useState } from 'react';
 import { ArrowLeft, ArrowRight, Check, FileText, Upload, X } from '../lib/icons';
 import { cleanProfile, emptyProfile, Profile, saveResumeFile } from '../lib/profile';
 import { ProfilesStore } from '../lib/useProfiles';
-import { importPdf, ImportResult, mergeImport } from '../lib/resumeImport';
+import { importFile, ImportResult, mergeImport } from '../lib/resumeImport';
 import { SetupStep } from '../lib/completeness';
 import { useCompleteness } from '../lib/useCompleteness';
 import { EduEditor, WorkEditor } from './ProfileEditors';
@@ -77,7 +77,7 @@ export const ProfileSetup: React.FC<{ store: ProfilesStore; notify: (m: string, 
     if (!file) return;
     setReading(true); setError(null);
     try {
-      const r = await importPdf(file);
+      const r = await importFile(file);
       if (!r.found.length) { setError("Jobly couldn't find profile details in that PDF. Fill in the steps by hand."); return; }
       setResult({ ...r, file });
       // Saved roles and schools are kept unless you tick Replace
@@ -135,15 +135,15 @@ export const ProfileSetup: React.FC<{ store: ProfilesStore; notify: (m: string, 
               </div>
               <div className="sub-card stack">
                 <p className="font-medium">From your resume</p>
-                <p className="text-sm">A PDF resume works too. Jobly looks for your contact details, experience, education and skills.</p>
+                <p className="text-sm">A resume works too: PDF, Word (.docx) or a JSON Resume file. Jobly looks for your contact details, experience, education and skills.</p>
               </div>
             </div>
             <div className="row wrap">
               <button type="button" className="btn" onClick={() => fileRef.current?.click()} disabled={reading} aria-busy={reading}>
-                <Upload size={14} aria-hidden="true" /> {reading ? 'Reading…' : 'Choose a PDF'}
+                <Upload size={14} aria-hidden="true" /> {reading ? 'Reading…' : 'Choose a file'}
               </button>
               <button type="button" className="btn btn-ghost" onClick={() => void go('contact')}>Fill in by hand</button>
-              <input ref={fileRef} type="file" accept=".pdf,application/pdf" className="sr-only" aria-label="Choose a LinkedIn or resume PDF" onChange={(e) => void onFile(e.target.files?.[0])} />
+              <input ref={fileRef} type="file" accept=".pdf,.docx,.json,application/pdf,application/json,application/vnd.openxmlformats-officedocument.wordprocessingml.document" className="sr-only" aria-label="Choose a LinkedIn PDF, or a resume (PDF, Word or JSON Resume)" onChange={(e) => void onFile(e.target.files?.[0])} />
             </div>
             {error && <p role="alert" className="text-sm" style={{ color: 'var(--warning)' }}>{error}</p>}
             {result && (
@@ -228,7 +228,7 @@ export const ProfileSetup: React.FC<{ store: ProfilesStore; notify: (m: string, 
         <span className="grow" />
         {step !== 'done'
           ? <button type="button" className="btn" onClick={() => void go(STEPS[index + 1].id)} disabled={reading || (step === 'import' && !result)}
-              title={step === 'import' && !result ? 'Choose a PDF, or fill in by hand' : undefined}>
+              title={step === 'import' && !result ? 'Choose a file, or fill in by hand' : undefined}>
               {step === 'import' ? 'Use these details' : step === 'education' ? 'Save and review' : 'Save and continue'} <ArrowRight size={14} aria-hidden="true" />
             </button>
           : <button type="button" className="btn" onClick={() => { void persist(draft).then((ok) => { if (ok) { notify('Profile saved on this device.', 'info'); onClose(); } }); }}>Finish</button>}

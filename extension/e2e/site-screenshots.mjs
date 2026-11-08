@@ -64,7 +64,7 @@ for (const theme of ['light', 'dark']) {
   await shot(d, 'tailor');
   // Profile setup after a LinkedIn PDF import (the made-up person in the test fixture)
   await d.goto(`chrome-extension://${h.id}/options.html#profile`); await sleep(1000);
-  await d.getByRole('button', { name: 'Import a PDF' }).click();
+  await d.getByRole('button', { name: 'Import a file' }).click();
   await d.locator('input[type="file"]').setInputFiles(path.join(here, 'fixtures', 'linkedin.pdf'));
   await d.getByText(/LinkedIn profile read/).waitFor({ timeout: 20000 }); await sleep(500);
   await shot(d, 'profile');

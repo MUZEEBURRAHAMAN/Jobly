@@ -10,7 +10,15 @@ import { SavedAnswers } from './SavedAnswers';
 import { CompletenessBar } from './CompletenessBar';
 import { useCompleteness } from '../lib/useCompleteness';
 import { SetupStep } from '../lib/completeness';
-import { Upload } from '../lib/icons';
+import { Download, Upload } from '../lib/icons';
+import { toJsonResume } from '../lib/resumeImport';
+import { fileSafe } from '../lib/resume';
+
+function downloadJsonResume(p: Profile) {
+  const url = URL.createObjectURL(new Blob([JSON.stringify(toJsonResume(p), null, 2)], { type: 'application/json' }));
+  const a = Object.assign(document.createElement('a'), { href: url, download: `${fileSafe([p.first_name, p.last_name].filter(Boolean).join(' ') || 'resume')}.resume.json` });
+  document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
 
 export type { ResumeFile } from '../lib/profile';
 
@@ -107,7 +115,8 @@ export const ProfileView: React.FC<{ store: ProfilesStore; notify: (m: string, k
       <div className="card profile-progress">
         <CompletenessBar completeness={completeness} action={
           <div className="row" style={{ gap: 4 }}>
-            <button type="button" className="btn btn-ghost btn-sm" disabled={dirty} title={dirty ? 'Save or discard changes first' : undefined} onClick={() => setSetup('import')}><Upload size={14} aria-hidden="true" /> Import a PDF</button>
+            <button type="button" className="btn btn-ghost btn-sm" disabled={dirty} title={dirty ? 'Save or discard changes first' : undefined} onClick={() => setSetup('import')}><Upload size={14} aria-hidden="true" /> Import a file</button>
+            <button type="button" className="btn btn-ghost btn-sm" onClick={() => downloadJsonResume(draft)} title="A JSON Resume file other resume tools can read"><Download size={14} aria-hidden="true" /> JSON Resume</button>
             {completeness.missing.length > 0 && <button type="button" className="btn btn-outline btn-sm" disabled={dirty} title={dirty ? 'Save or discard changes first' : undefined}
               onClick={() => setSetup(completeness.missing.find((m) => m.step !== 'done')?.step ?? 'done')}>Continue setup</button>}
           </div>} />

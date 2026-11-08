@@ -341,3 +341,117 @@ export function mergeImport(base: Profile, imported: Partial<Profile>, replaceLi
   if (imported.education?.length && (replaceLists.education || !out.education.length)) out.education = imported.education;
   return out;
 }
+
+// ---------- Word (.docx) ----------
+
+/** Paragraphs of a Word file as lines, with a size so headings and the name stand out (read in the browser). */
+export async function docxLines(data: ArrayBuffer): Promise<PdfLine[]> {
+  const { unzipSync, strFromU8 } = await import('fflate');
+  const files = unzipSync(new Uint8Array(data), { filter: (f) => f.name === 'word/document.xml' });
+  const xml = files['word/document.xml'];
+  if (!xml) throw new Error('not a docx');
+  const doc = new DOMParser().parseFromString(strFromU8(xml), 'application/xml');
+  const W = 'http://schemas.openxmlformats.org/wordprocessingml/2006/main';
+  const lines: PdfLine[] = [];
+  let y = 100000;
+  for (const p of Array.from(doc.getElementsByTagNameNS(W, 'p'))) {
+    const runs = Array.from(p.getElementsByTagNameNS(W, 'r'));
+    let text = '';
+    let size = 0;
+    for (const r of runs) {
+      for (const node of Array.from(r.childNodes)) {
+        const el = node as Element;
+        if (el.localName === 't') text += el.textContent ?? '';
+        else if (el.localName === 'tab') text += ' ';
+        else if (el.localName === 'br') text += ' ';
+      }
+      const sz = r.getElementsByTagNameNS(W, 'sz')[0]?.getAttributeNS(W, 'val');
+      if (sz) size = Math.max(size, Number(sz) / 2);
+    }
+    text = text.replace(/\s+/g, ' ').trim();
+    if (!text) continue;
+    // Styles without a run size: titles and headings count as bigger text
+    const style = p.getElementsByTagNameNS(W, 'pStyle')[0]?.getAttributeNS(W, 'val') ?? '';
+    if (!size) size = /^title$/i.test(style) ? 24 : /heading1/i.test(style) ? 16 : /heading/i.test(style) ? 13 : 11;
+    const bullet = p.getElementsByTagNameNS(W, 'numPr').length > 0;
+    lines.push({ text: bullet ? `• ${text}` : text, size, x: 0, y: y--, page: 1, side: false });
+  }
+  return lines;
+}
+
+// ---------- JSON Resume (jsonresume.org) ----------
+
+interface JsonResume {
+  basics?: { name?: string; label?: string; email?: string; phone?: string; url?: string; summary?: string; location?: { city?: string; region?: string; countryCode?: string };
+    profiles?: { network?: string; url?: string; username?: string }[] };
+  work?: { name?: string; company?: string; position?: string; location?: string; startDate?: string; endDate?: string; summary?: string; highlights?: string[] }[];
+  education?: { institution?: string; area?: string; studyType?: string; startDate?: string; endDate?: string }[];
+  skills?: { name?: string; keywords?: string[] }[];
+}
+
+const ym = (d?: string) => (d && /^\d{4}(-\d{2})?/.test(d) ? (d.length >= 7 ? d.slice(0, 7) : `${d.slice(0, 4)}-01`) : '');
+
+export function fromJsonResume(j: JsonResume): ImportResult {
+  const b = j.basics ?? {};
+  const found: string[] = [];
+  const p: Partial<Profile> = {};
+  if (b.name) { const parts = b.name.trim().split(/\s+/); p.first_name = parts.slice(0, -1).join(' ') || parts[0]; p.last_name = parts.length > 1 ? parts[parts.length - 1] : ''; found.push('Name'); }
+  if (b.label) { p.headline = b.label; found.push('Headline'); }
+  if (b.email) { p.email = b.email; found.push('Email'); }
+  if (b.phone) { p.phone = b.phone; found.push('Phone'); }
+  if (b.summary) { p.summary = b.summary; found.push('Summary'); }
+  const loc = [b.location?.city, b.location?.region, b.location?.countryCode].filter(Boolean).join(', ');
+  if (loc) { p.location = loc; found.push('Location'); }
+  for (const prof of b.profiles ?? []) {
+    const url = (prof.url ?? '').replace(/^https?:\/\//, '');
+    if (/linkedin/i.test(prof.network ?? url)) p.linkedin = url;
+    else if (/github/i.test(prof.network ?? url)) p.github = url;
+    else if (/behance|dribbble/i.test(prof.network ?? url)) p.portfolio = url;
+  }
+  if (b.url) p.website = b.url.replace(/^https?:\/\//, '');
+  const work: WorkItem[] = (j.work ?? []).slice(0, 15).map((w) => ({
+    id: newProfileId(), company: w.name ?? w.company ?? '', title: w.position ?? '', location: w.location ?? '', start: ym(w.startDate), end: ym(w.endDate), current: !w.endDate,
+    bullets: [w.summary, ...(w.highlights ?? [])].filter(Boolean).join('\n').slice(0, 2500),
+  }));
+  if (work.length) { p.work = work; found.push(`${work.length} role${work.length === 1 ? '' : 's'}`); }
+  const education: EduItem[] = (j.education ?? []).slice(0, 8).map((e) => ({ id: newProfileId(), school: e.institution ?? '', degree: e.studyType ?? '', field: e.area ?? '', start: ym(e.startDate), end: ym(e.endDate) }));
+  if (education.length) { p.education = education; found.push(`${education.length} school${education.length === 1 ? '' : 's'}`); }
+  const skills = (j.skills ?? []).flatMap((s) => [s.name, ...(s.keywords ?? [])]).filter((s): s is string => !!s && s.length < 60);
+  if (skills.length) { p.skills = [...new Set(skills)].slice(0, 40).join(', '); found.push(`${Math.min(skills.length, 40)} skills`); }
+  return { source: 'resume', profile: p, found };
+}
+
+/** The profile as a JSON Resume file (jsonresume.org), which other resume tools can read. */
+export function toJsonResume(p: Profile): JsonResume & { $schema: string } {
+  const profiles = [['LinkedIn', p.linkedin], ['GitHub', p.github], ['Portfolio', p.portfolio]].filter(([, u]) => u)
+    .map(([network, u]) => ({ network, url: /^https?:/.test(u) ? u : `https://${u}` }));
+  return {
+    $schema: 'https://raw.githubusercontent.com/jsonresume/resume-schema/v1.0.0/schema.json',
+    basics: { name: [p.first_name, p.last_name].filter(Boolean).join(' '), label: p.headline, email: p.email, phone: p.phone, summary: p.summary,
+      url: p.website ? (/^https?:/.test(p.website) ? p.website : `https://${p.website}`) : undefined, location: p.location ? { city: p.location } : undefined, profiles },
+    work: p.work.map((w) => ({ name: w.company, position: w.title, location: w.location, startDate: w.start, endDate: w.current ? undefined : w.end || undefined,
+      highlights: w.bullets.split('\n').map((x) => x.replace(/^[-•*]\s*/, '').trim()).filter(Boolean) })),
+    education: p.education.map((e) => ({ institution: e.school, area: e.field, studyType: e.degree, startDate: e.start, endDate: e.end })),
+    skills: p.skills ? [{ name: 'Skills', keywords: p.skills.split(',').map((x) => x.trim()).filter(Boolean) }] : [],
+  };
+}
+
+/** Reads a PDF, Word or JSON Resume file. Throws a message for the user when it can't be read. */
+export async function importFile(file: File): Promise<ImportResult> {
+  const name = file.name.toLowerCase();
+  if (file.size > MAX_IMPORT_BYTES) throw new Error('That file is over 5 MB. Use the PDF LinkedIn makes, or a smaller resume.');
+  if (name.endsWith('.json') || file.type === 'application/json') {
+    let data: unknown;
+    try { data = JSON.parse(await file.text()); } catch { throw new Error("That JSON file couldn't be read."); }
+    if (!data || typeof data !== 'object' || !('basics' in data || 'work' in data)) throw new Error("That JSON file isn't a JSON Resume (it needs basics or work).");
+    return fromJsonResume(data as JsonResume);
+  }
+  if (name.endsWith('.docx') || /officedocument\.wordprocessingml/.test(file.type)) {
+    let lines: PdfLine[];
+    try { lines = await docxLines(await file.arrayBuffer()); } catch { throw new Error("Couldn't read that Word file. Save it again as .docx, or use a PDF."); }
+    if (lines.length < 3) throw new Error('That Word file has almost no text. Fill in the steps by hand.');
+    return parseResume(lines);
+  }
+  if (name.endsWith('.doc')) throw new Error('Old .doc files can’t be read. Save it as .docx or PDF and try again.');
+  return importPdf(file);
+}

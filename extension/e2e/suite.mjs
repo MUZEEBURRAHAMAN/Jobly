@@ -410,7 +410,7 @@ await step('onboarding: LinkedIn PDF and resume import, completeness, reminder',
   await d.getByRole('button', { name: /^Jobs/ }).click(); await firstCard(d);
   ok(await d.locator('.profile-nudge').count() === 0, 'the reminder on the jobs list goes away once the profile is mostly done');
   // a resume into the same profile: fills what's empty, replaces roles only when asked, keeps the file
-  await d.getByRole('button', { name: /^Profile/ }).click(); await d.getByRole('button', { name: 'Import a PDF' }).click();
+  await d.getByRole('button', { name: /^Profile/ }).click(); await d.getByRole('button', { name: 'Import a file' }).click();
   await d.locator('input[type="file"]').setInputFiles(path.join(fixtures, 'resume.pdf'));
   await d.getByText(/Resume read/).waitFor({ timeout: 20000 });
   await d.getByRole('checkbox', { name: /Replace your 3 saved roles/ }).check();
@@ -423,6 +423,35 @@ await step('onboarding: LinkedIn PDF and resume import, completeness, reminder',
   await d.close();
   const p = await open(h); await firstCard(p); await p.getByRole('button', { name: /^Apply/ }).click();
   await p.getByText(/Profile \d+% complete/).waitFor({ timeout: 5000 }); ok(true, 'the popup Apply tab shows the profile score');
+  await h.ctx.close();
+});
+
+await step('resume files: Word import, JSON Resume download and import', async () => {
+  const h = await launch(); const store = async (k) => (await h.sw.evaluate((key) => chrome.storage.local.get(key), k))[k];
+  const fixtures = path.resolve(path.dirname(fileURLToPath(import.meta.url)), 'fixtures');
+  const d = await open(h, 'options.html', { width: 1280, height: 900 }); await firstCard(d);
+  await d.getByRole('button', { name: /^Profile/ }).click(); await d.getByRole('button', { name: 'Set up your profile' }).click();
+  await d.locator('input[type="file"]').setInputFiles(path.join(fixtures, 'resume.docx'));
+  await d.getByText(/Resume read/).waitFor({ timeout: 10000 });
+  ok(/2 roles/.test(await d.getByText(/^Found /).innerText()), 'a Word resume is read in the browser');
+  await d.getByRole('button', { name: /Use these details/ }).click(); await d.getByLabel('First name').waitFor(); await sleep(400);
+  const p = (await store('profiles'))[0];
+  ok(p.first_name === 'Meera' && p.last_name === 'Iyer' && p.email === 'meera.iyer@example.com' && p.location === 'Chennai, India', 'name, email and place come from the Word file');
+  ok(p.work[0].company === 'Fernbank' && p.work[0].title === 'Senior UX Designer' && p.work[0].current && p.work[0].start === '2021-03' && p.work[0].bullets.split('\n').length === 2
+    && p.work[1].company === 'Harbor & Co' && p.education[0].school === 'Anna University' && /Figma/.test(p.skills), 'roles with their points, education and skills come from the Word file');
+  await d.getByRole('button', { name: 'Close' }).click();
+  const [dl] = await Promise.all([d.waitForEvent('download'), d.getByRole('button', { name: 'JSON Resume' }).click()]);
+  const json = JSON.parse(fs.readFileSync(await dl.path(), 'utf8'));
+  ok(dl.suggestedFilename() === 'Meera-Iyer.resume.json' && json.basics.name === 'Meera Iyer' && json.work[0].name === 'Fernbank' && json.work[0].highlights.length === 2 && !json.work[0].endDate,
+    'the profile downloads as a JSON Resume file');
+  await h.sw.evaluate(() => chrome.storage.local.remove(['profiles', 'activeProfileId'])); await d.reload(); await d.getByRole('button', { name: /^Profile/ }).click();
+  await d.getByRole('button', { name: 'Set up your profile' }).click();
+  await d.locator('input[type="file"]').setInputFiles({ name: 'meera.resume.json', mimeType: 'application/json', buffer: Buffer.from(JSON.stringify(json)) });
+  await d.getByText(/Resume read/).waitFor({ timeout: 10000 });
+  await d.getByRole('button', { name: /Use these details/ }).click(); await d.getByLabel('First name').waitFor(); await sleep(400);
+  const back = (await store('profiles'))[0];
+  ok(back.first_name === 'Meera' && back.work.length === 2 && back.work[0].bullets === p.work[0].bullets && back.education[0].school === 'Anna University', 'a JSON Resume file imports back into a profile');
+  await d.locator('input[type="file"]').count();
   await h.ctx.close();
 });
 
