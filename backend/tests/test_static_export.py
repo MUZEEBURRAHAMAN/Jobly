@@ -93,6 +93,7 @@ class TestExport(unittest.IsolatedAsyncioTestCase):
         acme = json.loads((v1 / "companies.json").read_text())[0]
         # Counted over the published jobs (not the 90-day-old or closed ones), top countries by jobs then name
         self.assertEqual((acme["job_count"], acme["countries"], acme["latest_posted"]), (3, ["India", "United Kingdom"], self.recent))
+        self.assertEqual(sorted(acme["roles"]), ["backend", "product_design", "sales"])
         self.assertIn("Access-Control-Allow-Origin: *", (out / "_headers").read_text())
 
 

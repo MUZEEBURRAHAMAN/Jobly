@@ -600,3 +600,4 @@ fieldset.profile-card > legend { padding: 0 var(--space-1); }
 .people-finder { padding: var(--space-4); display: grid; gap: var(--space-3); }
 .people-links { gap: var(--space-2); }
 .people-add { display: grid; gap: var(--space-3); }
+.company-filter { display: flex; align-items: center; gap: var(--space-3); margin-bottom: var(--space-4); }

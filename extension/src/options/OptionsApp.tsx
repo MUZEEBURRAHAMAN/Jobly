@@ -152,12 +152,16 @@ export const OptionsApp: React.FC = () => {
     return () => window.clearInterval(id);
   }, [status, connect]);
 
-  const jobQuery = useCallback(() => ({
-    role: roleFilter !== 'all_matching' && roleFilter !== 'all' ? roleFilter : undefined,
-    only_matching: roleFilter === 'all_matching',
-    search: filters.search.trim() || undefined,
-    freshness_days: filters.freshnessDays || undefined,
-  }), [roleFilter, filters.search, filters.freshnessDays]);
+  // From Companies › View jobs: every job at one company, whatever the role chip says
+  const [companyFilter, setCompanyFilter] = useState<{ id: number; name: string } | null>(null);
+  const jobQuery = useCallback(() => (companyFilter
+    ? { company_id: companyFilter.id, only_matching: false, search: filters.search.trim() || undefined, freshness_days: filters.freshnessDays || undefined }
+    : {
+      role: roleFilter !== 'all_matching' && roleFilter !== 'all' ? roleFilter : undefined,
+      only_matching: roleFilter === 'all_matching',
+      search: filters.search.trim() || undefined,
+      freshness_days: filters.freshnessDays || undefined,
+    }), [roleFilter, filters.search, filters.freshnessDays, companyFilter]);
 
   const fetchJobs = useCallback(async () => {
     const seq = ++jobsSeq.current;
@@ -320,6 +324,12 @@ export const OptionsApp: React.FC = () => {
                 <p className="text-xs muted">Autofill can only fill in what's in your profile. Import your LinkedIn PDF to finish in a minute.</p>
               </div>
             )}
+            {tab === 'jobs' && companyFilter && (
+              <div className="banner company-filter" role="status">
+                <span className="grow">Showing every job at <span className="font-medium">{companyFilter.name}</span>.</span>
+                <button type="button" className="btn btn-outline btn-sm" onClick={() => setCompanyFilter(null)}>Show all jobs</button>
+              </div>
+            )}
             <ErrorBoundary>
               {tab === 'jobs' && (
                 <div className="card" style={{ overflow: 'clip' }}>
@@ -334,7 +344,8 @@ export const OptionsApp: React.FC = () => {
                   />
                 </div>
               )}
-              {tab === 'companies' && <CompaniesView large companies={companies} mutedCompanyIds={muted} onToggleMuted={toggleMuted} offline={status === 'offline'} loading={status === 'connecting'} />}
+              {tab === 'companies' && <CompaniesView large companies={companies} mutedCompanyIds={muted} onToggleMuted={toggleMuted} offline={status === 'offline'} loading={status === 'connecting'}
+                myRoles={preferences?.roles ?? []} onOpenCompany={(c) => { setCompanyFilter({ id: c.id, name: c.name }); setTab('jobs'); }} />}
               {tab === 'saved' && <SavedJobsView large savedJobs={savedJobs} onToggleSave={handleToggleSave} onBrowseJobs={() => setTab('jobs')} notify={showNotice} />}
               {FEATURES.tracker && tab === 'tracker' && <TrackerView store={tracker} savedJobs={savedJobs} notify={showNotice} onBrowseJobs={() => setTab('jobs')} />}
               {FEATURES.tracker && tab === 'interviews' && <InterviewsView store={tracker} onOpenTracker={() => setTab('tracker')} calendarImport={<CalendarImport store={tracker} notify={showNotice} />} />}

@@ -76,6 +76,8 @@ export interface Company {
   countries?: string[];
   /** Newest posting date among its open jobs. */
   latest_posted?: string | null;
+  /** Job categories it hires for, most jobs first (static export). */
+  roles?: string[];
   created_at: string;
   updated_at: string;
 }

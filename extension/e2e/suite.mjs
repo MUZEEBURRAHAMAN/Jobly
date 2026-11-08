@@ -342,6 +342,28 @@ await step('dealbreakers, job type filter, following companies', async () => {
   const counts = (await d.locator('.co-row .grow > .text-xs:nth-child(2)').allInnerTexts()).map((t) => Number(t.match(/^(\d+)/)[1]));
   ok(counts.every((n, i) => i === 0 || counts[i - 1] >= n) && counts.every((n) => n > 0), 'Most open jobs puts the biggest employers first, and "Hiring now" hides companies with none');
   await axe(d, 'companies filtered');
+  // hiring system, "Hiring in my roles", and View jobs
+  await d.getByRole('combobox', { name: 'Sort companies' }).selectOption('az');
+  const systemsInData = new Set(companies.map((c) => c.source_type));
+  if (systemsInData.size > 1) {
+    const sys = companies.find((c) => c.job_count > 0).source_type;
+    await d.getByRole('combobox', { name: 'Hiring system' }).selectOption(sys); await sleep(300);
+    const bySystem = companies.filter((c) => c.source_type === sys && c.job_count > 0).length;
+    ok(await d.locator('.co-row').count() === bySystem, `the hiring-system filter keeps ${bySystem} companies on ${sys}`);
+    await d.getByRole('combobox', { name: 'Hiring system' }).selectOption('');
+  } else ok(await d.getByRole('combobox', { name: 'Hiring system' }).count() === 0, 'with one hiring system in the list, its filter is hidden');
+  if (await d.getByRole('button', { name: 'Hiring in my roles' }).count()) {
+    await d.getByRole('button', { name: 'Hiring in my roles' }).click(); await sleep(300);
+    ok(await d.locator('.co-row').count() > 0 && companies.every((c) => Array.isArray(c.roles)), 'Hiring in my roles keeps companies hiring for your roles');
+    await d.getByRole('button', { name: 'Hiring in my roles' }).click();
+  }
+  const target = companies.filter((c) => c.job_count > 0).sort((a, b) => a.name.localeCompare(b.name))[0];
+  await d.getByRole('button', { name: `View jobs at ${target.name} (${target.job_count})` }).click();
+  await d.getByText(`Showing every job at ${target.name}.`).waitFor({ timeout: 5000 }); await firstCard(d); await sleep(500);
+  const labels = await d.locator('article').evaluateAll((els) => els.map((e) => e.getAttribute('aria-label')));
+  ok(labels.length > 0 && labels.every((l) => l.endsWith(` at ${target.name}`)), `View jobs lists only ${target.name}'s jobs (${labels.length})`);
+  await d.getByRole('button', { name: 'Show all jobs' }).click(); await sleep(800);
+  ok(await d.getByText(/Showing every job at/).count() === 0, 'Show all jobs clears it');
   // follow a company that has jobs from the last 3 days, so the check has something to find
   const recentCompany = staticJobs().find((j) => j.bucket === '1' || j.bucket === '3').company_id;
   await h.sw.evaluate((id) => chrome.storage.local.set({ followedCompanyIds: [id] }), recentCompany);

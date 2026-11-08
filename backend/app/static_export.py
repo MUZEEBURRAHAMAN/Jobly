@@ -2,7 +2,7 @@
 
 Layout (all under <out>/v1/):
   meta.json                    generation time, columns, age buckets, categories with counts, file sizes
-  companies.json               GET /api/companies, with job_count over the published jobs, top 3 countries, latest_posted
+  companies.json               GET /api/companies, with job_count over the published jobs, top 3 countries, latest_posted, roles (top 8 categories)
   stats.json, geo.json         same shapes as GET /api/stats (without preferences) and GET /api/geo
   jobs/<category>/<bucket>.json  {"rows": [[...], ...]} in meta.columns order, newest first
   desc/<id % DESC_SHARDS>.json   {"<job id>": "<plain-text description>"}
@@ -128,8 +128,10 @@ async def export(db_path: Path, out: Path, now: datetime | None = None) -> dict[
     # Per company, for the Companies page filters: open jobs, where they are (top countries) and the newest posting
     per_company: dict[int, dict[str, Any]] = {}
     for r in rows:
-        pc = per_company.setdefault(r["company_id"], {"jobs": 0, "countries": {}, "latest": None})
+        pc = per_company.setdefault(r["company_id"], {"jobs": 0, "countries": {}, "latest": None, "roles": {}})
         pc["jobs"] += 1
+        role_cat = classify_category(r["title"], r["normalized_role"])
+        pc["roles"][role_cat] = pc["roles"].get(role_cat, 0) + 1
         country, _hub = place_of_job(r["location"], r["title"])
         if country:
             pc["countries"][country] = pc["countries"].get(country, 0) + 1
@@ -170,6 +172,8 @@ async def export(db_path: Path, out: Path, now: datetime | None = None) -> dict[
         c["job_count"] = pc["jobs"] if pc else 0
         c["countries"] = [k for k, _ in sorted(pc["countries"].items(), key=lambda kv: (-kv[1], kv[0]))[:3]] if pc else []
         c["latest_posted"] = pc["latest"] if pc else None
+        # The job categories it hires for, most jobs first (for "Hiring in my roles")
+        c["roles"] = [k for k, _ in sorted(pc["roles"].items(), key=lambda kv: (-kv[1], kv[0]))[:8]] if pc else []
     _write(root / "stats.json", stats)
     _write(root / "geo.json", geo)
     _write(root / "companies.json", companies)
