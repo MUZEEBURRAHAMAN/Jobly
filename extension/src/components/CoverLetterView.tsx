@@ -8,6 +8,12 @@ import { bulletList, fullName, Profile, skillList } from '../lib/profile';
 import { jobKey } from '../lib/userData';
 import { fileSafe } from '../lib/resume';
 import { CopyButton } from './CopyButton';
+import { Wand } from '../lib/icons';
+import { analyzeJob, coverage, relevantBullets } from '../lib/tailor';
+import { AiError, AiSettings, loadAi, runAi, AI_KEY } from '../lib/ai';
+import { guardLetter, letterTask } from '../lib/aiGuard';
+import { onKeysChanged } from '../lib/userData';
+import type { LetterContext } from './TailorView';
 
 // Fill-in templates (no AI): every {field} comes from the profile or the chosen job, and the result stays editable.
 const TEMPLATES = [
@@ -48,6 +54,45 @@ Sincerely,
 {email}` },
 ];
 
+const MATCHED = { id: 'matched', label: 'Matches the job description', body: '' };
+const lowerFirst = (s: string) => (s ? s.charAt(0).toLowerCase() + s.slice(1).replace(/[.;]$/, '') : '');
+
+/** A letter built from the job description: what it asks for, and the profile's own lines that show each. */
+function matchedLetter(p: Profile | null, role: string, company: string, description: string): string {
+  if (!p) return fill(TEMPLATES[0].body, p, role, company);
+  const job = analyzeJob(description, skillList(p));
+  const cov = coverage(p, job);
+  const shown = cov.matches.filter((m) => m.status !== 'missing' && m.evidence);
+  const asks = shown.slice(0, 3).map((m) => lowerFirst(m.requirement.text));
+  const list = asks.length > 1 ? `${asks.slice(0, -1).join(', ')} and ${asks[asks.length - 1]}` : asks[0];
+  const proof: string[] = [];
+  for (const m of shown) {
+    const w = p.work.find((x) => bulletList(x.bullets).includes(m.evidence!.text));
+    if (!w || proof.some((x) => x.includes(m.evidence!.text.slice(0, 30)))) continue;
+    const at = `${w.current ? 'At' : 'Earlier, at'} ${w.company || 'my last company'}`;
+    const verb = /^(\w+ed|built|ran|led|cut|grew|made|won|wrote|drove|set|took|began|brought|taught|kept|sold|spent|held|met)\b/i.test(m.evidence!.text);
+    proof.push(verb ? `${at}, I ${lowerFirst(m.evidence!.text)}.` : `${at}: ${m.evidence!.text.replace(/[.;]$/, '')}.`);
+    if (proof.length === 3) break;
+  }
+  // Not enough requirement-specific lines: add the bullets most relevant to the job
+  for (const r of relevantBullets(p, job, 4)) {
+    if (proof.length >= 2) break;
+    if (proof.some((x) => x.includes(lowerFirst(r.text).slice(0, 30)) || x.includes(r.text.slice(0, 30)))) continue;
+    const at = `${r.work.current ? 'At' : 'Earlier, at'} ${r.work.company || 'my last company'}`;
+    const verb = /^(\w+ed|built|ran|led|cut|grew|made|won|wrote|drove|set|took|began|brought|taught|kept|sold|spent|held|met)\b/i.test(r.text);
+    proof.push(verb ? `${at}, I ${lowerFirst(r.text)}.` : `${at}: ${r.text.replace(/[.;]$/, '')}.`);
+  }
+  const skills = cov.keywordsFound.slice(0, 4).join(', ');
+  return [
+    `Dear ${company || '[company]'} hiring team,`, '',
+    `I'm applying for the ${role || '[role]'} role.${list ? ` Your posting asks for ${list}, which is the work I've been doing${p.years_experience ? ` for ${p.years_experience} years` : ''}.` : ''}`, '',
+    proof.length ? proof.join(' ') : `In my current work I ${lowerFirst(bulletList(p.work[0]?.bullets ?? '')[0] ?? '[an achievement]')}.`,
+    ...(skills ? ['', `I work every day with ${skills}, and I'd bring that to ${company || '[company]'} from the first week.`] : []), '',
+    `I'd welcome the chance to talk about the role. Thank you for your time.`, '',
+    'Best regards,', fullName(p) || '[name]', [p.email, p.phone].filter(Boolean).join(' · '),
+  ].join('\n').trim();
+}
+
 function fill(body: string, p: Profile | null, role: string, company: string): string {
   const latest = p?.work[0];
   const bullets = latest ? bulletList(latest.bullets) : [];
@@ -61,7 +106,7 @@ function fill(body: string, p: Profile | null, role: string, company: string): s
   return body.replace(/\{(\w+)\}/g, (_, k: string) => values[k] || `[${k.replace(/_/g, ' ')}]`);
 }
 
-export const CoverLetterView: React.FC<{ profiles: ProfilesStore; tracker: TrackerStore; savedJobs: Job[]; notify: (m: string, kind?: 'error' | 'info') => void; onOpenProfile: () => void }> = ({ profiles, tracker, savedJobs, notify, onOpenProfile }) => {
+export const CoverLetterView: React.FC<{ profiles: ProfilesStore; tracker: TrackerStore; savedJobs: Job[]; notify: (m: string, kind?: 'error' | 'info') => void; onOpenProfile: () => void; context?: LetterContext | null }> = ({ profiles, tracker, savedJobs, notify, onOpenProfile, context }) => {
   const targets = useMemo(() => {
     const seen = new Set<string>();
     const list: { key: string; role: string; company: string; tracked: boolean }[] = [];
@@ -75,11 +120,33 @@ export const CoverLetterView: React.FC<{ profiles: ProfilesStore; tracker: Track
   const [company, setCompany] = useState('');
   const [text, setText] = useState('');
   const [edited, setEdited] = useState(false);
+  const [description, setDescription] = useState('');
+  const [ai, setAi] = useState<AiSettings | null>(null);
+  const [writing, setWriting] = useState(false);
+  const [issues, setIssues] = useState<string[]>([]);
+  useEffect(() => { const load = () => void loadAi().then(setAi); load(); return onKeysChanged([AI_KEY], load); }, []);
+  // From Tailor: the job and its description, with the letter built from it
+  useEffect(() => { if (context) { setRole(context.role); setCompany(context.company); setDescription(context.description); setTemplate('matched'); setEdited(false); } }, [context]);
+  const build = (t: string) => (t === 'matched' && description.trim().length > 80 ? matchedLetter(profiles.active, role, company, description) : fill((TEMPLATES.find((x) => x.id === t) ?? TEMPLATES[0]).body, profiles.active, role || '[role]', company || '[company]'));
+  const writeWithAi = async () => {
+    if (!ai || !profiles.active) return;
+    setWriting(true); setIssues([]);
+    try {
+      const p = profiles.active;
+      const job = analyzeJob(description, skillList(p));
+      const out = await runAi<{ paragraphs?: unknown }>(letterTask(p, job, role, company, description), ai);
+      const paras = (Array.isArray(out.paragraphs) ? out.paragraphs : []).map((x) => String(x).trim()).filter(Boolean).slice(0, 6);
+      if (!paras.length) { notify('The AI returned no letter. Try again.'); return; }
+      const letter = [`Dear ${company || '[company]'} hiring team,`, '', paras.join('\n\n'), '', 'Best regards,', fullName(p) || '[name]', [p.email, p.phone].filter(Boolean).join(' · ')].join('\n').trim();
+      setText(letter); setEdited(true); setIssues(guardLetter(p, job, paras.join(' ')));
+    } catch (e) { notify(e instanceof AiError ? e.message : 'Something went wrong. Try again.'); }
+    finally { setWriting(false); }
+  };
 
   useEffect(() => { const t = targets.find((x) => x.key === target); if (t) { setRole(t.role); setCompany(t.company); } }, [target, targets]);
-  useEffect(() => { if (!edited) setText(fill(TEMPLATES.find((t) => t.id === template)!.body, profiles.active, role || '[role]', company || '[company]')); }, [template, role, company, profiles.active, edited]);
+  useEffect(() => { if (!edited) setText(build(template)); }, [template, role, company, profiles.active, edited, description]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const regenerate = () => { setEdited(false); setText(fill(TEMPLATES.find((t) => t.id === template)!.body, profiles.active, role || '[role]', company || '[company]')); };
+  const regenerate = () => { setEdited(false); setIssues([]); setText(build(template)); };
   const tracked = targets.find((x) => x.key === target && x.tracked);
   const saveToNotes = async () => {
     if (!tracked) return;
@@ -116,11 +183,22 @@ export const CoverLetterView: React.FC<{ profiles: ProfilesStore; tracker: Track
             <div><label className="label" htmlFor="cl-role">Role</label><input id="cl-role" className="input" placeholder="e.g. Senior Product Designer" value={role} onChange={(e) => { setRole(e.target.value); setEdited(false); }} /></div>
             <div><label className="label" htmlFor="cl-company">Company</label><input id="cl-company" className="input" placeholder="e.g. Acme" value={company} onChange={(e) => { setCompany(e.target.value); setEdited(false); }} /></div>
             <div>
+              <label className="label" htmlFor="cl-desc">Job description (optional)</label>
+              <textarea id="cl-desc" className="textarea" rows={4} maxLength={20000} value={description} placeholder="Paste it to write a letter that answers what the job asks for"
+                onChange={(e) => { const v = e.target.value; setDescription(v); if (v.trim().length > 80 && template !== 'matched' && !edited) setTemplate('matched'); }} />
+            </div>
+            <div>
               <label className="label" htmlFor="cl-template">Template</label>
-              <select id="cl-template" className="select" value={template} onChange={(e) => { setTemplate(e.target.value); setEdited(false); }}>
-                {TEMPLATES.map((t) => <option key={t.id} value={t.id}>{t.label}</option>)}
+              <select id="cl-template" className="select" value={template} onChange={(e) => { setTemplate(e.target.value); setEdited(false); setIssues([]); }}>
+                {[MATCHED, ...TEMPLATES].map((t) => <option key={t.id} value={t.id} disabled={t.id === 'matched' && description.trim().length <= 80}>{t.label}{t.id === 'matched' && description.trim().length <= 80 ? ' (paste the job description)' : ''}</option>)}
               </select>
             </div>
+            {ai && ai.provider !== 'off' && (
+              <button type="button" className="btn btn-brand btn-sm" style={{ alignSelf: 'flex-start' }} onClick={() => void writeWithAi()} disabled={writing || description.trim().length <= 80 || !profiles.active}
+                title={description.trim().length <= 80 ? 'Paste the job description first' : undefined}>
+                <Wand size={14} aria-hidden="true" /> {writing ? 'Writing…' : 'Write with AI'}
+              </button>
+            )}
           </div>
         </section>
 
@@ -137,6 +215,7 @@ export const CoverLetterView: React.FC<{ profiles: ProfilesStore; tracker: Track
               <CopyButton value={text} label="cover letter" text />
             </div>
           </div>
+          {issues.length > 0 && <div className="banner" role="alert"><p className="font-medium">Check before sending:</p><ul className="tailor-ol">{issues.map((i) => <li key={i}>{i}</li>)}</ul></div>}
           <textarea id="cl-text" className="textarea letter" rows={18} value={text} onChange={(e) => { setText(e.target.value); setEdited(true); }} />
           {missing > 0 && (
             <p className="panel-foot text-xs muted">

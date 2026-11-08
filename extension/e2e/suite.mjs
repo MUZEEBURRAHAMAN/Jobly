@@ -570,6 +570,80 @@ await step('apply assist: panel on the page, sources, action required, steps, sa
   await h.ctx.close();
 });
 
+await step('tailor for a job: requirements, coverage, suggestions, AI with fact check, versions, matched letter', async () => {
+  const h = await launch(); const store = async (k) => (await h.sw.evaluate((key) => chrome.storage.local.get(key), k))[k];
+  const now = new Date().toISOString();
+  await h.sw.evaluate((d) => chrome.storage.local.set(d), {
+    profiles: [{ id: 'p1', label: 'Design', first_name: 'Ananya', last_name: 'Rao', email: 'ananya@example.com', phone: '', location: '', headline: 'Senior Product Designer',
+      summary: 'Product designer with seven years of experience shipping consumer and fintech products.', linkedin: '', github: '', portfolio: '', website: '', work_authorization: '', needs_sponsorship: '',
+      years_experience: '7', salary_expectation: '', notice_period: '', skills: 'Accessibility, Figma, User Research, Design Systems',
+      work: [{ id: 'w1', company: 'Northwind Labs', title: 'Senior Product Designer', location: '', start: '2022-04', end: '', current: true, bullets: 'Ran weekly customer interviews.\nBuilt the design system used by six product teams.\nLed the redesign of checkout, lifting conversion by 18%.' }],
+      education: [], updated_at: now }], activeProfileId: 'p1',
+    aiSettings: { provider: 'anthropic', model: 'claude-opus-5-5' }, anthropicApiKey: 'sk-ant-test',
+  });
+  // A stand-in for Anthropic's API: answers in its streaming format; one good line, one with an invented number, one naming React
+  const asked = [];
+  const sse = (json) => ['message_start', 'content_block_start', 'content_block_delta', 'content_block_stop', 'message_delta', 'message_stop'].map((type) => {
+    const data = { message_start: { type, message: { id: 'msg_1', type: 'message', role: 'assistant', model: 'claude-opus-5-5', content: [], stop_reason: null, stop_sequence: null, usage: { input_tokens: 10, output_tokens: 1 } } },
+      content_block_start: { type, index: 0, content_block: { type: 'text', text: '' } }, content_block_delta: { type, index: 0, delta: { type: 'text_delta', text: JSON.stringify(json) } },
+      content_block_stop: { type, index: 0 }, message_delta: { type, delta: { stop_reason: 'end_turn', stop_sequence: null }, usage: { output_tokens: 50 } }, message_stop: { type } }[type];
+    return `event: ${type}\ndata: ${JSON.stringify(data)}\n\n`; }).join('');
+  await h.ctx.route('https://api.anthropic.com/**', async (r) => {
+    const req = r.request();
+    if (req.method() === 'OPTIONS') return r.fulfill({ status: 204, headers: { 'access-control-allow-origin': '*', 'access-control-allow-headers': '*', 'access-control-allow-methods': 'POST' } });
+    const body = JSON.parse(req.postData() || '{}'); { const hd = await req.allHeaders(); asked.push({ body, key: hd['x-api-key'] ?? (hd.authorization ?? '').replace(/^Bearer /i, ''), direct: hd['anthropic-dangerous-direct-browser-access'] }); }
+    const letter = /cover letter/i.test(body.messages?.[0]?.content ?? '');
+    const answer = letter
+      ? { paragraphs: ['Acme is building the payments app I would want to use.', 'At Northwind Labs I led the checkout redesign, lifting conversion by 40%.'] }
+      : { summary: 'Senior product designer with seven years of fintech and consumer work, leading design systems and checkout.', bullets: [
+          { id: 'w0b1', text: 'Built and maintained the design system used by six product teams.' },
+          { id: 'w0b2', text: 'Led the checkout redesign, lifting conversion by 25%.' },
+          { id: 'w0b0', text: 'Ran weekly customer interviews and built React prototypes.' }] };
+    r.fulfill({ status: 200, headers: { 'content-type': 'text/event-stream', 'access-control-allow-origin': '*' }, body: sse(answer) });
+  });
+  const d = await open(h, 'options.html', { width: 1280, height: 1000 });
+  await d.getByRole('button', { name: /^Tailor for a job/ }).click();
+  await d.getByLabel('Role').fill('Senior Product Designer'); await d.getByLabel('Company').fill('Acme');
+  await d.getByLabel('Job description').fill(['Senior Product Designer at Acme', "What you'll do", '- Lead design for checkout and onboarding', 'Requirements', '- 5+ years of experience in product design',
+    '- Expert in Figma and prototyping', '- Experience building and maintaining design systems', '- Strong user research skills', 'Nice to have', '- Experience with fintech products', '- Familiarity with React'].join('\n'));
+  await d.getByRole('button', { name: 'Check my resume' }).click(); await d.getByText('What the job asks for').waitFor({ timeout: 5000 });
+  await axe(d, 'tailor results');
+  const reqs = await d.locator('section[aria-labelledby="tl-req"] li').allInnerTexts();
+  ok(reqs.length === 6 && !reqs.some((t) => /Lead design for checkout/.test(t)), 'requirements come from the Requirements and Nice to have lists, not from what the role does');
+  const req = (q) => reqs.find((t) => t.includes(q)) ?? '';
+  ok(/^Covered/.test(req('5+ years')) && /7 years of experience/.test(req('5+ years')), 'years asked are checked against the profile');
+  ok(/^Partly/.test(req('Figma and prototyping')) && /^Missing/.test(req('React')) && /Nice to have/.test(req('React')), 'a requirement half shown is Partly; one not shown is Missing');
+  ok(await d.getByRole('checkbox', { name: /Put the skills this job asks for first/ }).isChecked() && !(await d.getByRole('checkbox', { name: /Add “Prototyping”/ }).isChecked()), 'reordering is on by default; adding a skill is left to you');
+  await d.getByRole('checkbox', { name: /Add “Prototyping”/ }).check();
+  ok(await d.getByText('with your changes').count() === 1, 'the score with your changes is shown');
+  // AI rewording through the fact check
+  await d.getByRole('button', { name: 'Reword with AI' }).click(); await d.getByText('Reworded summary for this job').waitFor({ timeout: 10000 });
+  ok(asked[0]?.key === 'sk-ant-test' && asked[0].direct === 'true' && asked[0].body.model === 'claude-opus-5-5' && asked[0].body.output_config?.format?.type === 'json_schema', `Claude is called from the browser with your key, the chosen model and a JSON schema (${asked.length} calls, key ${asked[0]?.key}, ${JSON.stringify(asked[0]?.body?.output_config)?.slice(0, 120)}, model ${asked[0]?.body?.model})`);
+  ok(await d.getByText(/^Reworded point at/).count() === 1, 'only the reworded line that passes the fact check is offered');
+  const left = await d.locator('.ai-box').innerText();
+  ok(/adds 25%/.test(left) && /names React/.test(left), 'a line with an invented number and one naming a skill you lack are left out, with the reason');
+  await d.getByRole('button', { name: 'Save tailored resume' }).click(); await d.getByRole('button', { name: 'Open in Resume' }).waitFor({ timeout: 5000 });
+  const v = (await store('resumeVersions'))?.[0];
+  ok(v?.job.title === 'Senior Product Designer' && v.job.company === 'Acme' && v.after > v.before && v.profile.skills.startsWith('Prototyping') && /fintech and consumer work/.test(v.profile.summary)
+    && v.profile.work[0].bullets.includes('Built and maintained the design system'), `the tailored version is saved with the job (coverage ${v?.before}% → ${v?.after}%)`);
+  ok((await store('profiles'))[0].skills === 'Accessibility, Figma, User Research, Design Systems', 'your profile itself is unchanged');
+  await d.getByRole('button', { name: 'Open in Resume' }).click(); await d.locator('.resume h1').waitFor({ timeout: 5000 });
+  ok(/Tailored: Senior Product Designer at Acme/.test(await d.getByLabel('Version').locator('option:checked').innerText()) && await d.locator('.resume li', { hasText: 'Built and maintained the design system' }).count() === 1, 'the Resume page opens the tailored version');
+  await axe(d, 'resume with versions');
+  // the letter from the job description, then the AI letter with its check
+  await d.getByRole('button', { name: /^Tailor for a job/ }).click();
+  await d.getByLabel('Job description').fill('Requirements\n- Expert in Figma and prototyping\n- Experience building and maintaining design systems\n- Strong user research skills\n- 5+ years of experience in product design');
+  await d.getByLabel('Role').fill('Senior Product Designer'); await d.getByLabel('Company').fill('Acme');
+  await d.getByRole('button', { name: 'Check my resume' }).click(); await d.getByRole('button', { name: 'Write a cover letter for this job' }).click();
+  await d.waitForFunction(() => (document.getElementById('cl-text')?.value ?? '').includes('Dear'), null, { timeout: 5000 });
+  const letter = await d.getByLabel('Letter', { exact: true }).inputValue();
+  ok(letter.startsWith('Dear Acme hiring team') && /Your posting asks for/.test(letter) && /At Northwind Labs, I built the design system/.test(letter), `the letter answers what the posting asks for with your own lines (${letter.replace(/\n/g, ' / ').slice(0, 400)})`);
+  await axe(d, 'cover letter from the job');
+  await d.getByRole('button', { name: 'Write with AI' }).click(); await d.getByText('Check before sending:').waitFor({ timeout: 10000 });
+  ok(/lifting conversion by 40%/.test(await d.getByLabel('Letter', { exact: true }).inputValue()) && /40%.*isn.t in your profile/.test(await d.getByRole('alert').innerText()), 'an AI letter is flagged where it uses a number your profile does not have');
+  await h.ctx.close();
+});
+
 await step('contacts, outreach drafts, connections', async () => {
   const h = await launch(); const store = async (k) => (await h.sw.evaluate((key) => chrome.storage.local.get(key), k))[k];
   await h.sw.evaluate(() => chrome.storage.local.set({ applications: [{ key: 'manual:1', title: 'Staff Designer', company_name: 'Initech', location: null, application_url: 'https://careers.initech.com/jobs/1', source: 'manual', status: 'applied', notes: '', applied_at: new Date().toISOString(), follow_up_at: null, created_at: new Date().toISOString(), updated_at: new Date().toISOString() }],

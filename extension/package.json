@@ -12,6 +12,7 @@
     "e2e:screens": "bash e2e/run.sh screenshots"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^1.3.0",
     "@hugeicons/core-free-icons": "^4.3.5",
     "@lucasmarkes/hairline": "^0.5.1",
     "clsx": "^2.1.1",

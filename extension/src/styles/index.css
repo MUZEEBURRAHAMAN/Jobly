@@ -571,3 +571,23 @@ fieldset.profile-card > legend { padding: 0 var(--space-1); }
 .setup-missing { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--space-2); }
 .setup-missing li { padding: var(--space-2) var(--space-3); border: 1px solid var(--border); border-radius: var(--radius); }
 .setup-nav { gap: var(--space-2); }
+
+/* Tailor for a job */
+.tailor-job { padding: var(--space-4); display: grid; gap: var(--space-3); }
+.tailor-score { padding: var(--space-4); display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-4) var(--space-6); }
+.tailor-score .grow { min-width: 0; flex: 1 1 260px; display: grid; gap: var(--space-1); }
+.tailor-big { font-size: 32px; line-height: 1; font-weight: 700; font-variant-numeric: tabular-nums; }
+.tailor-after { color: var(--brand); }
+.tailor-list { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--space-2); }
+.tailor-list > li.card { padding: var(--space-3) var(--space-4); }
+.tailor-list label { cursor: pointer; }
+.tailor-list input[type="checkbox"] { margin-top: 3px; width: 16px; height: 16px; accent-color: var(--brand); flex: none; }
+.tailor-req { color: var(--foreground); }
+.badge.tailor-covered { background: var(--success-soft, color-mix(in srgb, var(--success) 14%, transparent)); color: var(--success); flex: none; min-width: 68px; justify-content: center; }
+.badge.tailor-partial { background: color-mix(in srgb, var(--warning) 16%, transparent); color: var(--warning); flex: none; min-width: 68px; justify-content: center; }
+.badge.tailor-missing { background: var(--muted); color: var(--muted-foreground); flex: none; min-width: 68px; justify-content: center; }
+.tailor-ol { margin: 0; padding-left: 1.2em; display: grid; gap: 2px; }
+.tailor-diff { display: grid; grid-template-columns: auto 1fr; gap: 2px var(--space-3); align-items: baseline; }
+.tailor-before { color: var(--muted-foreground); text-decoration: line-through; text-decoration-color: color-mix(in srgb, var(--muted-foreground) 50%, transparent); }
+.ai-box { padding: var(--space-3) var(--space-4); background: var(--brand-soft); border-color: transparent; }
+.resume-version { gap: var(--space-2) var(--space-3); }

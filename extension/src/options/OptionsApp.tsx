@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Bell, Bookmark, Briefcase, Building2, Calendar, FileText, Kanban, ListChecks, Mail, Moon, RefreshCw, Settings, SlidersHorizontal, Sun, User, Contacts, X } from '../lib/icons';
+import { Bell, Bookmark, Briefcase, Building2, Calendar, FileText, Kanban, ListChecks, Mail, Moon, RefreshCw, Settings, SlidersHorizontal, Sun, Target, User, Contacts, X } from '../lib/icons';
 import { api, ConnectionStatus } from '../lib/api';
 import { FEATURES, MAX_PAGE_SIZE } from '../lib/config';
 import { DEFAULT_FILTERS, JobFilters } from '../lib/filters';
@@ -29,6 +29,8 @@ import { CoverLetterView } from '../components/CoverLetterView';
 import { useProfiles } from '../lib/useProfiles';
 import { ContactsView } from '../components/ContactsView';
 import { DataSetting } from '../components/DataSetting';
+import { AiSetting } from '../components/AiSetting';
+import { LetterContext, TailorView } from '../components/TailorView';
 import { CalendarImport } from '../components/CalendarImport';
 import { HUNTER_KEY } from '../lib/integrations';
 import { onKeysChanged, readKey, writeKey } from '../lib/userData';
@@ -37,10 +39,10 @@ import { dueLabel } from '../lib/dates';
 import { useCompleteness } from '../lib/useCompleteness';
 import { CompletenessBar } from '../components/CompletenessBar';
 
-type Tab = 'jobs' | 'companies' | 'saved' | 'tracker' | 'interviews' | 'tasks' | 'profile' | 'resume' | 'letters' | 'contacts' | 'alerts' | 'preferences';
+type Tab = 'jobs' | 'companies' | 'saved' | 'tracker' | 'interviews' | 'tasks' | 'profile' | 'tailor' | 'resume' | 'letters' | 'contacts' | 'alerts' | 'preferences';
 const n = (v: number | undefined) => (v ?? 0).toLocaleString();
 const TRACKER_TABS: Tab[] = ['tracker', 'interviews', 'tasks'];
-const TABS: Tab[] = ['jobs', 'companies', 'saved', 'tracker', 'interviews', 'tasks', 'profile', 'resume', 'letters', 'contacts', 'alerts', 'preferences'];
+const TABS: Tab[] = ['jobs', 'companies', 'saved', 'tracker', 'interviews', 'tasks', 'profile', 'tailor', 'resume', 'letters', 'contacts', 'alerts', 'preferences'];
 const tabFromHash = (): Tab => {
   const h = window.location.hash.replace('#', '');
   // Links to the switched-off tracker pages (old bookmarks, notifications) open Saved, where applied jobs are listed
@@ -83,6 +85,9 @@ export const OptionsApp: React.FC = () => {
   useEffect(() => { const onHash = () => setTab(tabFromHash()); window.addEventListener('hashchange', onHash); return () => window.removeEventListener('hashchange', onHash); }, []);
   useEffect(() => { if (onboardedRef.current && window.location.hash.replace('#', '') !== tab) history.replaceState(null, '', tab === 'jobs' ? window.location.pathname : `#${tab}`); }, [tab]);
   const profiles = useProfiles();
+  // Tailor hands a job to Cover letters and a saved version to Resume
+  const [letterContext, setLetterContext] = useState<LetterContext | null>(null);
+  const [openVersion, setOpenVersion] = useState<string | null>(null);
   const completeness = useCompleteness(profiles.active);
   // Opened from "Complete your profile" in the popup or the jobs list: start the setup steps
   const [setupOnOpen, setSetupOnOpen] = useState(() => window.location.hash === '#profile-setup');
@@ -226,6 +231,7 @@ export const OptionsApp: React.FC = () => {
     { id: 'interviews', label: 'Interviews', icon: Calendar, badge: upcomingInterviews },
     { id: 'tasks', label: 'Tasks', icon: ListChecks, badge: dueCount },
     { id: 'profile', label: 'Profile', icon: User, badgeText: profiles.ready && completeness.percent < 100 ? `${completeness.percent}%` : undefined },
+    { id: 'tailor', label: 'Tailor for a job', icon: Target },
     { id: 'resume', label: 'Resume', icon: FileText },
     { id: 'letters', label: 'Cover letters', icon: Mail },
     { id: 'contacts', label: 'Contacts', icon: Contacts },
@@ -330,12 +336,14 @@ export const OptionsApp: React.FC = () => {
               {FEATURES.tracker && tab === 'interviews' && <InterviewsView store={tracker} onOpenTracker={() => setTab('tracker')} calendarImport={<CalendarImport store={tracker} notify={showNotice} />} />}
               {FEATURES.tracker && tab === 'tasks' && <TasksView store={tracker} notify={showNotice} />}
               {tab === 'profile' && <ProfileView store={profiles} notify={showNotice} openSetup={setupOnOpen} />}
-              {tab === 'resume' && <ResumeView store={profiles} onOpenProfile={() => setTab('profile')} />}
-              {tab === 'letters' && <CoverLetterView profiles={profiles} tracker={tracker} savedJobs={savedJobs} notify={showNotice} onOpenProfile={() => setTab('profile')} />}
+              {tab === 'tailor' && <TailorView profiles={profiles} tracker={tracker} savedJobs={savedJobs} notify={showNotice} onOpenProfile={() => setTab('profile')}
+                onOpenResume={(id) => { setOpenVersion(id); setTab('resume'); }} onWriteLetter={(c) => { setLetterContext(c); setTab('letters'); }} />}
+              {tab === 'resume' && <ResumeView store={profiles} onOpenProfile={() => setTab('profile')} initialVersion={openVersion} />}
+              {tab === 'letters' && <CoverLetterView profiles={profiles} tracker={tracker} savedJobs={savedJobs} notify={showNotice} onOpenProfile={() => setTab('profile')} context={letterContext} />}
               {tab === 'contacts' && <ContactsView tracker={tracker} profile={profiles.active} notify={showNotice} onOpenPreferences={() => setTab('preferences')} hasHunterKey={hasHunterKey} />}
               {tab === 'alerts' && <AlertsView large alerts={alerts} newIds={newThisVisit} onMarkAllRead={markAlertsRead} />}
               {tab === 'preferences' && preferences && <PreferencesView wide title="Settings" preferences={preferences} onSave={handleSavePreferences} onReplayWelcome={resetOnboarding}
-                extra={<DataSetting store={tracker} notify={showNotice} />} />}
+                extra={<><AiSetting /><DataSetting store={tracker} notify={showNotice} /></>} />}
               {tab === 'preferences' && !preferences && <div className="section" aria-busy="true" aria-label="Loading your settings">{[0, 1, 2, 3].map((i) => <div key={i} className="skeleton" style={{ height: i ? 56 : 28, width: i ? '100%' : '40%' }} />)}</div>}
             </ErrorBoundary>
           </div>

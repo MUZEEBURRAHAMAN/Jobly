@@ -1,0 +1,14 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "overused-font",
+        "value": "arial",
+        "createdAt": "2026-11-08T07:37:47.301Z",
+        "reason": "Claude: Arial is used only inside exported resume and cover-letter documents (Word/PDF), where a system font every computer and applicant tracking system has is the point; the app UI uses Switzer"
+      }
+    ]
+  }
+}

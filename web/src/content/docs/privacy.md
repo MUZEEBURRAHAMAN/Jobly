@@ -6,7 +6,7 @@ updated: 2026-11-07
 figure: padlock
 ---
 
-> **The short version.** Jobly has no accounts and no analytics. Your preferences, saved and applied jobs, profiles and contacts stay in your browser. To show you jobs, the extension downloads Jobly's public job files and filters them in your browser. It reads a web page only when you click to save that job, check your fit or autofill its form. Optional connections (Chrome sync, Hunter) are off until you turn them on, and talk to those services directly. Jobly has no server of its own, so nothing passes through it. We don't build a profile of you, and we don't sell or share data.
+> **The short version.** Jobly has no accounts and no analytics. Your preferences, saved and applied jobs, profiles and contacts stay in your browser. To show you jobs, the extension downloads Jobly's public job files and filters them in your browser. It reads a web page only when you click to save that job, check your fit or autofill its form. Optional connections (Chrome sync, Claude with your own key, Hunter) are off until you turn them on, and talk to those services directly. Jobly has no server of its own, so nothing passes through it. We don't build a profile of you, and we don't sell or share data.
 
 ## What Jobly is
 
@@ -23,7 +23,8 @@ The extension keeps these in your browser's extension storage. Jobly never uploa
 - **Your saved answers:** what you typed into application questions your profile doesn't cover, so apply assist can fill them next time. Questions about gender, ethnicity, disability, veteran status, date of birth or ID numbers are never saved. You can delete each one on the Profile page.
 - **Imported PDFs:** when you import your LinkedIn PDF or resume, it is read inside the extension and the details go into your profile. The file is kept only if you choose to attach it as your resume.
 - **Your contacts:** recruiters and hiring managers you save, and whether you contacted them.
-- **Keys you add:** your own Hunter API key, if you add one. It is never included in backups.
+- **Keys you add:** your own Hunter and Anthropic API keys, if you add them. They are never included in backups.
+- **Tailored resumes:** the versions you save for a job, with the job description you pasted.
 - **Small settings:** your theme and whether you have seen the welcome tour. The theme uses Chrome's sync storage, so Chrome may copy it to your other devices through your Google account.
 
 You can export all of this as a file from Settings (Download a backup) and import it again; the file is created on your computer and goes nowhere else.
@@ -53,6 +54,8 @@ This happens in your browser. Nothing read from the page leaves it. Chrome grant
 Each is off until you turn it on, and each talks to that service straight from your browser:
 
 - **Chrome sync:** copies your preferences, saved and applied jobs and profiles to Chrome on your other computers through your Google account. Google stores it under Chrome's sync terms; Jobly never sees it.
+- **Chrome's built-in AI:** if you choose it in Settings › AI, rewording your resume and drafting letters runs on Chrome's own model on your computer. Nothing is sent anywhere.
+- **Claude (Anthropic), with your own API key:** if you choose it, the text needed for a rewrite (your profile's headline, summary, skills and experience, and the job description you pasted) is sent from your browser to Anthropic with your key, only when you press Reword with AI or Write with AI. Anthropic's own terms and privacy policy apply, and Anthropic charges your account. Your key stays on this device and is never in backups or sync.
 - **Hunter (contacts):** when you search a company's domain, Jobly sends that domain and your own Hunter API key to Hunter, which returns publicly listed work contacts. Hunter's own privacy policy applies to that search.
 
 ## This website

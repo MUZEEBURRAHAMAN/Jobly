@@ -7,7 +7,7 @@ import { Profile, skillList } from './profile';
 
 // Common skills and tools in Jobly's five roles. Only words that appear in the posting and aren't in the profile are
 // suggested, as "worth adding if you have them".
-const KEYWORDS = [
+export const KEYWORDS = [
   'Figma', 'Sketch', 'Adobe XD', 'Framer', 'Prototyping', 'Wireframing', 'User research', 'Usability testing', 'Design systems', 'Interaction design',
   'Visual design', 'Accessibility', 'WCAG', 'Information architecture', 'Motion design', 'Illustrator', 'Photoshop',
   'JavaScript', 'TypeScript', 'React', 'Next.js', 'Vue', 'Angular', 'Svelte', 'HTML', 'CSS', 'Tailwind', 'Redux', 'GraphQL', 'REST', 'Webpack', 'Vite',
