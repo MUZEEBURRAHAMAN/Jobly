@@ -27,6 +27,8 @@ import { ProfileView } from '../components/ProfileView';
 import { ResumeView } from '../components/ResumeView';
 import { CoverLetterView } from '../components/CoverLetterView';
 import { useProfiles } from '../lib/useProfiles';
+import { MatchContext } from '../lib/matchScore';
+import { skillList } from '../lib/profile';
 import { ContactsView } from '../components/ContactsView';
 import { DataSetting } from '../components/DataSetting';
 import { AiSetting } from '../components/AiSetting';
@@ -85,6 +87,7 @@ export const OptionsApp: React.FC = () => {
   useEffect(() => { const onHash = () => setTab(tabFromHash()); window.addEventListener('hashchange', onHash); return () => window.removeEventListener('hashchange', onHash); }, []);
   useEffect(() => { if (onboardedRef.current && window.location.hash.replace('#', '') !== tab) history.replaceState(null, '', tab === 'jobs' ? window.location.pathname : `#${tab}`); }, [tab]);
   const profiles = useProfiles();
+  const matchValue = React.useMemo(() => ({ prefs: preferences, skills: profiles.active ? skillList(profiles.active) : [] }), [preferences, profiles.active]);
   // Tailor hands a job to Cover letters and a saved version to Resume
   const [letterContext, setLetterContext] = useState<LetterContext | null>(null);
   const [openVersion, setOpenVersion] = useState<string | null>(null);
@@ -249,6 +252,7 @@ export const OptionsApp: React.FC = () => {
   const finishWelcome = async (p: Preferences) => { await handleSavePreferences(p); completeOnboarding(); window.location.hash = ''; };
 
   return (
+    <MatchContext.Provider value={matchValue}>
     <div className="dash" data-theme={theme}>
       <header className="topbar" style={{ padding: '12px 24px' }}>
         <div className="row" style={{ gap: 12 }}>
@@ -353,5 +357,6 @@ export const OptionsApp: React.FC = () => {
 
       <Notice notice={notice} onClose={clearNotice} />
     </div>
+    </MatchContext.Provider>
   );
 };

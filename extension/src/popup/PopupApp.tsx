@@ -18,6 +18,8 @@ import { Welcome } from '../components/Welcome';
 import { ApplyPrompt } from '../components/ApplyPrompt';
 import { ApplyKitView } from '../components/ApplyKitView';
 import { useProfiles } from '../lib/useProfiles';
+import { MatchContext } from '../lib/matchScore';
+import { skillList } from '../lib/profile';
 import { useTrackerContext } from '../lib/trackerContext';
 
 type Tab = 'jobs' | 'apply' | 'companies' | 'saved' | 'preferences';
@@ -46,6 +48,7 @@ export const PopupApp: React.FC = () => {
   const { onboarded, complete: completeOnboarding, reset: resetOnboarding } = useOnboarded();
   const jobsSeq = useRef(0); // only the newest request may update the list
   const profiles = useProfiles();
+  const matchValue = React.useMemo(() => ({ prefs: preferences, skills: profiles.active ? skillList(profiles.active) : [] }), [preferences, profiles.active]);
   const tracker = useTrackerContext()!.store;
 
   useEffect(() => {
@@ -190,6 +193,7 @@ export const PopupApp: React.FC = () => {
   }
 
   return (
+    <MatchContext.Provider value={matchValue}>
     <div className="popup" data-theme={theme}>
       <Header status={status} onRetry={() => { connect(); }} isSyncing={isSyncing} onSync={handleSync} openOptions={openOptions} theme={theme} onToggleTheme={toggleTheme} />
 
@@ -231,5 +235,6 @@ export const PopupApp: React.FC = () => {
 
       <Notice notice={notice} onClose={clearNotice} />
     </div>
+    </MatchContext.Provider>
   );
 };

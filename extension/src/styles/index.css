@@ -591,3 +591,7 @@ fieldset.profile-card > legend { padding: 0 var(--space-1); }
 .tailor-before { color: var(--muted-foreground); text-decoration: line-through; text-decoration-color: color-mix(in srgb, var(--muted-foreground) 50%, transparent); }
 .ai-box { padding: var(--space-3) var(--space-4); background: var(--brand-soft); border-color: transparent; }
 .resume-version { gap: var(--space-2) var(--space-3); }
+
+/* Match % on job cards: strong matches in the brand colour, middling ones softer */
+.badge.match-badge { cursor: help; font-variant-numeric: tabular-nums; }
+.badge.match-mid { background: color-mix(in srgb, var(--brand) 8%, transparent); color: var(--foreground); border-color: color-mix(in srgb, var(--brand) 25%, var(--border)); }

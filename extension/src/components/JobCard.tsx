@@ -8,6 +8,7 @@ import { BOARD_NAMES, EMPLOYMENT_LABELS, EXPERIENCE_LABELS, timeAgo } from '../l
 import { useTrackerContext } from '../lib/trackerContext';
 import { APPLIED_STATUSES, AppStatus, STATUSES, statusLabel } from '../lib/tracker';
 import { FEATURES } from '../lib/config';
+import { matchScore, useMatch } from '../lib/matchScore';
 
 interface JobCardProps {
   job: Job;
@@ -30,6 +31,10 @@ export const JobCard: React.FC<JobCardProps> = ({ job, onToggleSave }) => {
     setShareNote(problem ?? (value ? `Tracked as ${statusLabel(value as AppStatus)}` : 'Removed from tracker'));
     window.setTimeout(() => setShareNote(null), 2500);
   };
+
+  const { prefs, skills } = useMatch();
+  const match = React.useMemo(() => matchScore(job, prefs, skills), [job, prefs, skills]);
+  const matchTip = match ? match.reasons.map((r) => `${r.ok === true ? '✓' : r.ok === false ? '✗' : '·'} ${r.label}`).join('\n') : '';
 
   // With the tracker switched off, one toggle records that you applied (it shows under Saved › Applied)
   const applied = !!status && APPLIED_STATUSES.includes(status);
@@ -78,7 +83,10 @@ export const JobCard: React.FC<JobCardProps> = ({ job, onToggleSave }) => {
       <div className="row wrap" style={{ gap: 6 }}>
         {FEATURES.tracker && status && status !== 'saved' && <span className="badge badge-success"><CheckCircle2 size={12} aria-hidden="true" /> {statusLabel(status)}</span>}
         {appliedBefore && <span className="badge badge-warning">You applied here before</span>}
-        {job.is_match && <span className="badge badge-brand"><Sparkles size={12} duo aria-hidden="true" /> Matches you</span>}
+        {match
+          ? <span className={`badge match-badge ${match.percent >= 75 ? 'badge-brand' : match.percent >= 50 ? 'match-mid' : 'badge-outline'}`} title={matchTip}
+              aria-label={`${match.percent}% match: ${match.reasons.map((r) => r.label).join(', ')}`}><Sparkles size={12} duo aria-hidden="true" /> {match.percent}% match</span>
+          : job.is_match && <span className="badge badge-brand"><Sparkles size={12} duo aria-hidden="true" /> Matches you</span>}
         {job.work_mode === 'remote' && <span className="badge badge-success">Remote</span>}
         {job.employment_type && job.employment_type !== 'full_time' && EMPLOYMENT_LABELS[job.employment_type] && <span className="badge badge-outline">{EMPLOYMENT_LABELS[job.employment_type]}</span>}
         {job.experience_tier && EXPERIENCE_LABELS[job.experience_tier] && <span className="badge badge-outline">{EXPERIENCE_LABELS[job.experience_tier]}</span>}

@@ -219,6 +219,26 @@ await step('production build: https only, no localhost, no CSP errors', async ()
   await h.ctx.close();
 });
 
+await step('match % on job cards', async () => {
+  const h = await launch();
+  await h.sw.evaluate(() => chrome.storage.local.set({
+    userPreferences: { roles: ['product_design'], seniorities: ['senior'], locations: [], remote_only: true, custom_keywords: '', excluded_keywords: '', min_salary: 0, employment_types: [], notify_enabled: false, sync_interval_mins: 60 },
+    profiles: [{ id: 'p1', label: 'x', first_name: 'A', last_name: 'B', email: '', phone: '', location: '', headline: '', summary: '', linkedin: '', github: '', portfolio: '', website: '', work_authorization: '', needs_sponsorship: '', years_experience: '', salary_expectation: '', notice_period: '', skills: 'Product Designer', work: [], education: [], updated_at: new Date().toISOString() }], activeProfileId: 'p1',
+  }));
+  const d = await open(h, 'options.html', { width: 1280, height: 900 }); await firstCard(d);
+  await d.getByRole('button', { name: /^All/ }).click(); await sleep(800);
+  const badges = await d.locator('article .match-badge').evaluateAll((els) => els.map((e) => ({ text: e.textContent.trim(), label: e.getAttribute('aria-label'), card: e.closest('article').getAttribute('aria-label') })));
+  ok(badges.length > 3 && badges.every((b) => /^\d+% match$/.test(b.text)), `every card shows a match percentage (${badges.length})`);
+  const best = badges.find((b) => /^100% match/.test(b.label));
+  ok(best && /One of your roles/.test(best.label) && /Senior level/.test(best.label) && /Remote/.test(best.label), `a remote senior job in your role is a 100% match, with the reasons (${best?.label})`);
+  const mid = badges.find((b) => /Mid level, not one you picked/.test(b.label) && /One of your roles/.test(b.label));
+  ok(!mid || parseInt(mid.text) < 100, 'a level you did not pick lowers the match');
+  const other = badges.find((b) => /Account Executive|Sales/.test(b.card));
+  ok(!other || parseInt(other.text) < 50, `a job outside your roles scores low (${other?.text})`);
+  await axe(d, 'jobs with match %');
+  await h.ctx.close();
+});
+
 await step('focus: tracker hidden, Applied toggle, Saved | Applied, data in Settings, "Did you apply?"', async () => {
   const h = await launch();
   const store = async (k) => (await h.sw.evaluate((key) => chrome.storage.local.get(key), k))[k];
