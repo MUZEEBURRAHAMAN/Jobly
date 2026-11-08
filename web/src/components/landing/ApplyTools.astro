@@ -2,19 +2,28 @@
 import SectionHead from '../SectionHead.astro';
 import Icon from '../Icon.astro';
 
-// Demo content uses the same fictional people and companies as the extension's screenshots.
+// Small illustrations of the extension, drawn in HTML so they follow the theme. Demo people and companies are
+// the same fictional ones as the extension's screenshots.
+const fields = [
+  { label: 'First name', value: 'Ananya', state: 'filled' },
+  { label: 'Email', value: 'ananya.rao@example.com', state: 'filled' },
+  { label: 'How did you hear about us?', value: 'LinkedIn', state: 'filled' },
+  { label: 'Earliest start date', value: '', state: 'need' },
+];
 const answers = [
-  { q: 'First name', a: 'Ananya', src: 'profile', label: 'From your profile' },
-  { q: 'How did you hear about us?', a: 'LinkedIn', src: 'saved', label: 'Saved answer' },
-  { q: 'Why Northwind Labs?', a: 'Product designer with seven years of experience…', src: 'suggested', label: 'Suggested: check it' },
+  { q: 'First name', a: 'Ananya', src: 'profile', label: 'Profile' },
+  { q: 'How did you hear?', a: 'LinkedIn', src: 'saved', label: 'Saved' },
+  { q: 'Why Northwind?', a: 'Product designer with seven…', src: 'suggested', label: 'Check it' },
 ];
-const found = ['Name', 'Email', 'LinkedIn', '3 roles', '1 school', '12 skills'];
+const found = ['Name', 'Email', '3 roles', '1 school', '12 skills'];
 const reqs = [
-  { s: 'covered', t: 'Covered', r: '5+ years in product design' },
-  { s: 'covered', t: 'Covered', r: 'Building design systems' },
-  { s: 'partial', t: 'Partly', r: 'Figma and prototyping' },
-  { s: 'missing', t: 'Missing', r: 'Familiarity with React' },
+  { s: 'covered', r: '5+ years in product design' },
+  { s: 'covered', r: 'Building design systems' },
+  { s: 'covered', r: 'User research' },
+  { s: 'partial', r: 'Figma and prototyping' },
+  { s: 'missing', r: 'Familiarity with React' },
 ];
+const STATUS = { covered: 'Covered', partial: 'Partly', missing: 'Missing' } as const;
 ---
 <section class="shell apply-wrap" id="apply" aria-labelledby="apply-title">
   <div class="panel panel-pad">
@@ -23,61 +32,85 @@ const reqs = [
         lead="Import your profile once, tailor your resume for each job, and let Jobly fill the application with you. You always press Submit." />
 
       <div class="bento" data-stagger>
-        <!-- 1. Apply assist -->
+        <!-- 1. Apply assist: a careers page with the form filling in, and Jobly's panel beside it -->
         <article class="tile t-assist" data-reveal data-play>
-          <div class="visual">
-            <div class="mock panel-mock" aria-hidden="true">
-              <div class="p-head"><span class="j">J</span><span class="p-title"><b>Apply assist</b><small>Profile: Product design · Northwind Labs</small></span></div>
-              <p class="p-status"><b>Step 1</b> · 3 answers ready · 1 needs you</p>
-              <ul class="answers">
+          <div class="stage" aria-hidden="true">
+            <div class="browser">
+              <div class="b-bar"><span class="dots"><i></i><i></i><i></i></span><span class="url">careers.northwind.example/apply</span></div>
+              <div class="b-body">
+                <p class="b-title">Senior Product Designer</p>
+                {fields.map((f, i) => (
+                  <div class:list={['field', f.state]} style={`--i:${i}`}>
+                    <span class="f-label">{f.label}{f.state === 'need' ? ' *' : ''}</span>
+                    <span class="f-input"><span class="f-value">{f.value}</span></span>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div class="assist">
+              <div class="a-head"><span class="j">J</span><b>Apply assist</b><span class="a-step">Step 1</span></div>
+              <ul class="a-list">
                 {answers.map((x, i) => (
                   <li style={`--i:${i}`}>
-                    <span class:list={['tick', { off: x.src === 'suggested' }]}><Icon name="check" size={11} /></span>
-                    <span class="qa"><small>{x.q}</small><b>{x.a}</b><span class:list={['src', x.src]}>{x.label}</span></span>
+                    <span class:list={['tick', { off: x.src === 'suggested' }]}><Icon name="check" size={9} duo={false} /></span>
+                    <span class="a-qa"><small>{x.q}</small><b>{x.a}</b></span>
+                    <span class:list={['src', x.src]}>{x.label}</span>
                   </li>
                 ))}
-                <li class="need"><span class="qa"><small>Earliest start date *</small><b>Action required</b></span><span class="go">Go to field</span></li>
+                <li class="a-need"><span class="a-qa"><small>Earliest start date</small><b>Needs you</b></span><Icon name="arrow-right" size={12} duo={false} /></li>
               </ul>
-              <div class="p-foot"><span class="fill">Fill 2 answers</span><span class="never">You press Submit. Jobly never does.</span></div>
+              <div class="a-foot"><span class="fill">Fill 2 answers</span></div>
             </div>
           </div>
           <h3>Apply assist fills it with you</h3>
           <p>Open Jobly on any application. A panel fills each step from your profile after you approve the answers, shows where every answer came from, and marks the questions only you can answer. Answers you type once are remembered for the next form.</p>
         </article>
 
-        <!-- 2. Profile import -->
+        <!-- 2. Profile import: a LinkedIn PDF becomes a profile -->
         <article class="tile t-import" data-reveal data-play>
-          <div class="visual">
-            <div class="mock import" aria-hidden="true">
-              <span class="file"><Icon name="file" size={16} /> linkedin.pdf</span>
-              <div class="found">{found.map((f, i) => <span style={`--i:${i}`}>{f}</span>)}</div>
-              <div class="meter-wrap"><span class="m-label">Profile 93% complete</span><span class="meter"><span></span></span></div>
+          <div class="stage" aria-hidden="true">
+            <div class="import">
+              <div class="pdf">
+                <span class="pdf-tag">PDF</span>
+                <span class="pdf-name">linkedin.pdf</span>
+                <span class="pdf-lines"><i></i><i></i><i></i><i class="short"></i></span>
+              </div>
+              <span class="flow"><Icon name="arrow-right" size={16} duo={false} /></span>
+              <div class="person">
+                <span class="ring"><span class="avatar">AR</span></span>
+                <b>Ananya Rao</b>
+                <small>93% complete</small>
+              </div>
             </div>
+            <div class="found">{found.map((f, i) => <span style={`--i:${i}`}><Icon name="check" size={11} duo={false} />{f}</span>)}</div>
           </div>
           <h3>Your profile in a minute</h3>
           <p>Import the PDF LinkedIn makes of your profile, or your resume. Jobly reads it in your browser, never uploads it, and you check each step.</p>
         </article>
 
-        <!-- 3. Tailor -->
+        <!-- 3. Tailor: coverage gauge and the requirement checklist -->
         <article class="tile t-tailor" data-reveal data-play>
-          <div class="visual">
-            <div class="mock tailor" aria-hidden="true">
-              <div class="score"><span class="big">68%</span><Icon name="arrow-right" size={16} /><span class="big after">82%</span><small>coverage, before and after your changes</small></div>
-              <ul class="reqs">{reqs.map((x) => <li><span class:list={['chip', x.s]}>{x.t}</span><span>{x.r}</span></li>)}</ul>
+          <div class="stage" aria-hidden="true">
+            <div class="tailor">
+              <div class="gauge"><span class="g-ring"></span><span class="g-num"><b>82%</b><small>was 68%</small></span></div>
+              <ul class="reqs">
+                {reqs.map((x) => <li><span class:list={['dot', x.s]}></span><span class="r-text">{x.r}</span><span class:list={['r-status', x.s]}>{STATUS[x.s as keyof typeof STATUS]}</span></li>)}
+              </ul>
             </div>
           </div>
           <h3>A resume for each job</h3>
           <p>Paste a job description. Jobly lists what it asks for, shows which line of your resume covers each requirement, and suggests changes you accept one by one. Save the tailored version for that job.</p>
         </article>
 
-        <!-- 4. Cover letters -->
+        <!-- 4. Cover letter: the posting's words highlighted, checked against the profile -->
         <article class="tile t-letter" data-reveal>
-          <div class="visual">
-            <div class="mock letter" aria-hidden="true">
-              <p>Dear Acme hiring team,</p>
-              <p>Your posting asks for <mark>design systems</mark>, <mark>user research</mark> and <mark>5+ years in product design</mark>, which is the work I've been doing for 7 years.</p>
+          <div class="stage" aria-hidden="true">
+            <div class="paper">
+              <p class="greet">Dear Acme hiring team,</p>
+              <p>Your posting asks for <mark>design systems</mark>, <mark>user research</mark> and <mark>5+ years in product design</mark>: the work I've done for seven years.</p>
               <p>At Northwind Labs, I built the design system used by six product teams.</p>
-              <span class="guard"><Icon name="shield" size={13} /> Checked against your profile</span>
+              <span class="p-lines"><i></i><i class="short"></i></span>
+              <span class="stamp"><Icon name="shield" size={14} duo={false} />Checked against your profile</span>
             </div>
           </div>
           <h3>Cover letters that answer the job</h3>
@@ -93,72 +126,111 @@ const reqs = [
   .tile { background: var(--card); border: 1px solid var(--border); border-radius: 18px; padding: 6px 6px 24px; display: flex; flex-direction: column; min-width: 0; }
   .t-assist { grid-column: span 4; } .t-import { grid-column: span 2; }
   .t-tailor, .t-letter { grid-column: span 3; }
-  .visual { position: relative; height: 360px; flex: none; border-radius: 13px; background: var(--panel); display: grid; place-items: center; overflow: hidden; padding: 20px; }
   h3 { margin: 22px 18px 0; font-size: 1.1875rem; font-weight: 500; letter-spacing: -0.015em; color: var(--fg); }
   .tile > p { margin: 8px 18px 0; font-size: var(--text-md); line-height: 1.6; color: var(--muted); }
-  .mock { width: 100%; min-width: 0; max-width: 100%; font-size: 13px; color: var(--fg); }
-  .j { width: 24px; height: 24px; flex: none; display: grid; place-items: center; border-radius: 7px; background: var(--brand); color: var(--on-brand); font-size: 12px; font-weight: 700; }
 
-  /* 1. apply assist panel: answers tick in one after another */
-  .panel-mock { width: min(400px, 100%); background: var(--card); border: 1px solid var(--border); border-radius: 14px; box-shadow: var(--shadow-md); overflow: hidden; }
-  .p-head { display: flex; gap: 10px; align-items: center; padding: 10px 12px; border-bottom: 1px solid var(--border); }
-  .p-title { display: flex; flex-direction: column; line-height: 1.3; min-width: 0; }
-  .p-title small { font-size: 11px; color: var(--subtle); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .p-status { margin: 0; padding: 8px 12px 0; font-size: 12px; color: var(--subtle); }
-  .p-status b { color: var(--fg); font-weight: 600; }
-  .answers { list-style: none; margin: 0; padding: 6px 12px; display: grid; grid-template-columns: minmax(0, 1fr); gap: 5px; }
-  .answers li { display: flex; gap: 8px; align-items: flex-start; border: 1px solid var(--border); border-radius: 9px; padding: 5px 8px; }
-  .answers li.need { justify-content: space-between; align-items: center; background: color-mix(in srgb, var(--warning, #d97706) 12%, var(--card)); border-color: transparent; }
-  .tick { width: 16px; height: 16px; flex: none; margin-top: 2px; border-radius: 4px; display: grid; place-items: center; background: var(--brand); color: var(--on-brand); }
+  /* the stage: a soft panel with a faint dot grid; every illustration sits inside it with room around it */
+  .stage { position: relative; height: 340px; flex: none; border-radius: 13px; overflow: hidden; padding: 28px;
+    display: grid; place-items: center; font-size: 12px; color: var(--fg);
+    background:
+      radial-gradient(120% 90% at 50% 0%, color-mix(in srgb, var(--brand) 7%, transparent), transparent 60%),
+      radial-gradient(circle, color-mix(in srgb, var(--fg) 9%, transparent) 1px, transparent 1.4px) 0 0 / 16px 16px,
+      var(--panel); }
+  .stage * { box-sizing: border-box; }
+  .j { width: 20px; height: 20px; flex: none; display: grid; place-items: center; border-radius: 6px; background: var(--brand); color: var(--on-brand); font-size: 11px; font-weight: 700; }
+
+  /* 1. browser + floating assist panel */
+  .t-assist .stage { place-items: center start; padding: 28px 32px; }
+  .browser { width: 62%; max-width: 420px; background: var(--card); border: 1px solid var(--border); border-radius: 12px; box-shadow: var(--shadow-md); overflow: hidden; }
+  .b-bar { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-bottom: 1px solid var(--border); background: color-mix(in srgb, var(--panel) 60%, var(--card)); }
+  .dots { display: flex; gap: 4px; } .dots i { width: 7px; height: 7px; border-radius: 50%; background: var(--border-strong); }
+  .url { flex: 1; min-width: 0; font-size: 10.5px; color: var(--subtle); background: var(--card); border: 1px solid var(--border); border-radius: 999px; padding: 2px 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .b-body { padding: 12px 16px 14px; display: grid; gap: 7px; }
+  .b-title { margin: 0 0 2px; font-weight: 600; font-size: 13px; }
+  .field { display: grid; gap: 3px; }
+  .f-label { font-size: 10.5px; color: var(--subtle); }
+  .f-input { height: 26px; border: 1px solid var(--border-strong); border-radius: 7px; display: flex; align-items: center; padding: 0 9px; background: var(--card); overflow: hidden; }
+  .f-value { white-space: nowrap; overflow: hidden; font-size: 12px; }
+  .field.filled .f-input { border-color: color-mix(in srgb, var(--brand) 55%, var(--border)); box-shadow: 0 0 0 3px color-mix(in srgb, var(--brand) 10%, transparent); }
+  .field.need .f-input { border: 1.5px dashed color-mix(in srgb, var(--brand) 60%, var(--border)); background: var(--brand-soft); }
+  .assist { position: absolute; right: 28px; top: 50%; transform: translateY(-50%); width: 236px; background: var(--card); border: 1px solid var(--border); border-radius: 14px; box-shadow: var(--shadow-lg); overflow: hidden; }
+  .a-head { display: flex; align-items: center; gap: 8px; padding: 10px 12px; border-bottom: 1px solid var(--border); font-size: 12.5px; }
+  .a-step { margin-left: auto; font-size: 10.5px; color: var(--subtle); }
+  .a-list { list-style: none; margin: 0; padding: 8px; display: grid; gap: 6px; grid-template-columns: minmax(0, 1fr); }
+  .a-list li { display: flex; align-items: center; gap: 8px; padding: 7px 8px; border-radius: 9px; background: color-mix(in srgb, var(--panel) 55%, var(--card)); min-width: 0; }
+  .tick { width: 15px; height: 15px; flex: none; border-radius: 4px; display: grid; place-items: center; background: var(--brand); color: var(--on-brand); }
   .tick.off { background: var(--card); border: 1px solid var(--border-strong); color: transparent; }
-  .qa { display: flex; flex-direction: column; min-width: 0; flex: 1; line-height: 1.3; }
-  .qa small { font-size: 11px; color: var(--subtle); }
-  .qa b { font-weight: 500; font-size: 12.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .src { align-self: flex-start; margin-top: 2px; font-size: 10.5px; font-weight: 600; padding: 1px 6px; border-radius: 5px; }
-  .src.profile { background: color-mix(in srgb, var(--success) 14%, var(--card)); color: var(--success); }
-  .src.saved { background: var(--panel); color: var(--fg); }
+  .a-qa { display: flex; flex-direction: column; flex: 1; min-width: 0; line-height: 1.25; }
+  .a-qa small { font-size: 10px; color: var(--subtle); }
+  .a-qa b { font-weight: 500; font-size: 11.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .src { flex: none; font-size: 9.5px; font-weight: 600; padding: 2px 6px; border-radius: 999px; }
+  .src.profile { background: color-mix(in srgb, var(--success) 15%, var(--card)); color: var(--success); }
+  .src.saved { background: var(--card); color: var(--fg); border: 1px solid var(--border); }
   .src.suggested { background: var(--brand-soft); color: var(--brand); }
-  .go { font-size: 11px; border: 1px solid var(--border-strong); background: var(--card); border-radius: 6px; padding: 3px 8px; white-space: nowrap; }
-  .p-foot { display: flex; align-items: center; gap: 10px; padding: 8px 12px 12px; border-top: 1px solid var(--border); }
-  .fill { font-size: 12px; font-weight: 600; background: var(--ink); color: var(--on-ink); border-radius: 7px; padding: 5px 10px; white-space: nowrap; }
-  .never { font-size: 11px; color: var(--subtle); }
-  [data-playing] .answers li:not(.need) { animation: answer-in 6s var(--ease-out) infinite; animation-delay: calc(var(--i) * 0.25s); }
-  @keyframes answer-in { 0% { opacity: 0; transform: translateY(6px); } 8%, 88% { opacity: 1; transform: none; } 96%, 100% { opacity: 0; } }
+  .a-list li.a-need { background: var(--brand-soft); color: var(--brand); }
+  .a-need .a-qa b { color: var(--brand); }
+  .a-foot { padding: 0 8px 10px; }
+  .fill { display: block; text-align: center; font-size: 11.5px; font-weight: 600; background: var(--ink); color: var(--on-ink); border-radius: 8px; padding: 7px; }
+  /* the filled fields type in one after another, as if Jobly were filling them */
+  [data-playing] .field.filled .f-value { animation: type 7s steps(18, end) infinite; animation-delay: calc(var(--i) * 0.5s); }
+  [data-playing] .field.filled .f-input { animation: lit 7s ease infinite; animation-delay: calc(var(--i) * 0.5s); }
+  [data-playing] .a-list li:not(.a-need) { animation: rise-in 7s var(--ease-out) infinite; animation-delay: calc(var(--i) * 0.15s); }
+  @keyframes type { 0%, 8% { max-width: 0; } 22%, 92% { max-width: 100%; } 100% { max-width: 0; } }
+  @keyframes lit { 0%, 8% { border-color: var(--border-strong); box-shadow: none; } 22%, 92% { border-color: color-mix(in srgb, var(--brand) 55%, var(--border)); box-shadow: 0 0 0 3px color-mix(in srgb, var(--brand) 10%, transparent); } 100% { border-color: var(--border-strong); box-shadow: none; } }
+  @keyframes rise-in { 0% { opacity: 0; transform: translateY(4px); } 5%, 94% { opacity: 1; transform: none; } 100% { opacity: 0; } }
 
-  /* 2. import: the file is read, found details pop in, the bar fills */
-  .import { display: grid; gap: 14px; max-width: 280px; }
-  .file { justify-self: start; display: inline-flex; align-items: center; gap: 8px; background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 8px 12px; font-weight: 500; }
-  .found { display: flex; flex-wrap: wrap; gap: 6px; }
-  .found span { font-size: 12px; padding: 3px 9px; border-radius: 999px; background: color-mix(in srgb, var(--success) 12%, var(--card)); color: var(--success); }
-  .meter-wrap { display: grid; gap: 6px; }
-  .m-label { font-size: 13px; font-weight: 500; }
-  .meter { height: 6px; border-radius: 999px; background: var(--border); overflow: hidden; }
-  .meter span { display: block; height: 100%; width: 93%; background: var(--brand); border-radius: inherit; }
-  [data-playing] .found span { animation: chip-in 6s var(--ease-out) infinite; animation-delay: calc(0.3s + var(--i) * 0.2s); }
-  [data-playing] .meter span { animation: fill 6s var(--ease-out) infinite; }
-  @keyframes chip-in { 0% { opacity: 0; transform: scale(0.85); } 6%, 88% { opacity: 1; transform: none; } 96%, 100% { opacity: 0; } }
-  @keyframes fill { 0%, 25% { width: 0; } 55%, 92% { width: 93%; } 100% { width: 0; } }
+  /* 2. pdf → profile */
+  .t-import .stage { grid-template-rows: auto auto; align-content: center; gap: 22px; }
+  .import { display: flex; align-items: center; gap: 14px; }
+  .pdf { position: relative; width: 92px; height: 118px; background: var(--card); border: 1px solid var(--border); border-radius: 8px; box-shadow: var(--shadow-md); padding: 12px 10px; display: flex; flex-direction: column; gap: 7px; transform: rotate(-4deg); }
+  .pdf::after { content: ''; position: absolute; top: -1px; right: -1px; width: 18px; height: 18px; background: linear-gradient(225deg, var(--panel) 50%, var(--border) 50%); border-radius: 0 8px 0 4px; }
+  .pdf-tag { align-self: flex-start; font-size: 9px; font-weight: 700; letter-spacing: .04em; color: var(--on-brand); background: var(--brand); border-radius: 4px; padding: 1px 5px; }
+  .pdf-name { font-size: 10px; font-weight: 600; }
+  .pdf-lines, .p-lines { display: grid; gap: 5px; }
+  .pdf-lines i, .p-lines i { display: block; height: 4px; border-radius: 4px; background: var(--border); }
+  .pdf-lines i.short, .p-lines i.short { width: 60%; }
+  .flow { color: var(--brand); display: grid; place-items: center; width: 30px; height: 30px; flex: none; border-radius: 50%; background: var(--brand-soft); }
+  .person { display: flex; flex-direction: column; align-items: center; gap: 4px; background: var(--card); border: 1px solid var(--border); border-radius: 12px; box-shadow: var(--shadow-md); padding: 14px 16px; min-width: 112px; }
+  .ring { width: 56px; height: 56px; border-radius: 50%; display: grid; place-items: center; background: conic-gradient(var(--brand) calc(var(--p) * 1%), var(--border) 0); }
+  .avatar { width: 46px; height: 46px; border-radius: 50%; display: grid; place-items: center; background: var(--card); font-weight: 700; font-size: 14px; color: var(--brand); }
+  .person b { font-size: 12.5px; font-weight: 600; margin-top: 4px; }
+  .person small { font-size: 10.5px; color: var(--subtle); }
+  .found { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; max-width: 280px; }
+  .found span { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; padding: 3px 9px; border-radius: 999px; background: var(--card); border: 1px solid var(--border); color: var(--fg); }
+  .found span :global(svg) { color: var(--success); }
+  @property --p { syntax: '<number>'; inherits: false; initial-value: 93; }
+  [data-playing] .found span { animation: pop-in 6s var(--ease-out) infinite; animation-delay: calc(0.4s + var(--i) * 0.18s); }
+  [data-playing] .ring { animation: ring 6s var(--ease-out) infinite; }
+  @keyframes ring { 0%, 10% { --p: 0; } 45%, 92% { --p: 93; } 100% { --p: 0; } }
+  @keyframes pop-in { 0% { opacity: 0; transform: scale(0.85); } 6%, 92% { opacity: 1; transform: none; } 100% { opacity: 0; } }
 
-  /* 3. tailor: score before and after, requirements with their status */
-  .tailor { display: grid; gap: 14px; max-width: 360px; }
-  .score { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; }
-  .score small { flex-basis: 100%; font-size: 12px; color: var(--subtle); }
-  .big { font-size: 30px; font-weight: 700; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
-  .big.after { color: var(--brand); }
-  .reqs { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: minmax(0, 1fr); gap: 6px; }
-  .reqs li { display: flex; align-items: center; gap: 10px; background: var(--card); border: 1px solid var(--border); border-radius: 9px; padding: 7px 10px; }
-  .chip { flex: none; min-width: 62px; text-align: center; font-size: 11px; font-weight: 600; padding: 2px 6px; border-radius: 6px; }
-  .chip.covered { background: color-mix(in srgb, var(--success) 14%, var(--card)); color: var(--success); }
-  .chip.partial { background: color-mix(in srgb, var(--warning, #d97706) 16%, var(--card)); color: var(--warning, #b45309); }
-  .chip.missing { background: var(--panel); color: var(--subtle); }
-  [data-playing] .big.after { animation: after-in 5s var(--ease-out) infinite; }
-  @keyframes after-in { 0%, 30% { opacity: 0; transform: translateX(-6px); } 40%, 90% { opacity: 1; transform: none; } 100% { opacity: 0; } }
+  /* 3. coverage gauge + checklist */
+  .tailor { display: flex; align-items: center; gap: 22px; width: 100%; max-width: 440px; }
+  .gauge { position: relative; width: 116px; height: 116px; flex: none; display: grid; place-items: center; }
+  .g-ring { position: absolute; inset: 0; border-radius: 50%; background: conic-gradient(var(--brand) calc(var(--a) * 1%), color-mix(in srgb, var(--brand) 14%, var(--border)) 0);
+    -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 11px), #000 calc(100% - 10px)); mask: radial-gradient(farthest-side, transparent calc(100% - 11px), #000 calc(100% - 10px)); }
+  .g-num { display: flex; flex-direction: column; align-items: center; line-height: 1.1; }
+  .g-num b { font-size: 24px; font-weight: 700; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+  .g-num small { font-size: 10.5px; color: var(--subtle); margin-top: 2px; }
+  .reqs { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; flex: 1; min-width: 0; grid-template-columns: minmax(0, 1fr); }
+  .reqs li { display: flex; align-items: center; gap: 8px; background: var(--card); border: 1px solid var(--border); border-radius: 9px; padding: 7px 9px; min-width: 0; }
+  .dot { width: 8px; height: 8px; flex: none; border-radius: 50%; }
+  .dot.covered { background: var(--success); } .dot.partial { background: var(--brand); } .dot.missing { background: var(--border-strong); }
+  .r-text { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 11.5px; }
+  .r-status { flex: none; font-size: 10px; font-weight: 600; color: var(--subtle); }
+  .r-status.covered { color: var(--success); } .r-status.partial { color: var(--brand); }
+  @property --a { syntax: '<number>'; inherits: false; initial-value: 82; }
+  [data-playing] .g-ring { animation: sweep 6s var(--ease-out) infinite; }
+  @keyframes sweep { 0%, 15% { --a: 68; } 45%, 92% { --a: 82; } 100% { --a: 68; } }
 
-  /* 4. letter */
-  .letter { max-width: 360px; background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; display: grid; gap: 8px; line-height: 1.5; }
-  .letter p { margin: 0; font-size: 12.5px; color: var(--fg); }
-  .letter mark { background: var(--brand-soft); color: var(--brand); border-radius: 4px; padding: 0 3px; }
-  .guard { justify-self: start; display: inline-flex; align-items: center; gap: 6px; font-size: 11.5px; color: var(--success); background: color-mix(in srgb, var(--success) 12%, var(--card)); border-radius: 999px; padding: 3px 9px; }
+  /* 4. letter page */
+  .paper { position: relative; width: 100%; max-width: 360px; background: var(--card); border: 1px solid var(--border); border-radius: 10px; box-shadow: var(--shadow-md); padding: 20px 22px 26px; display: grid; gap: 9px; transform: rotate(-1.5deg); }
+  .paper p { margin: 0; font-size: 12px; line-height: 1.55; color: var(--fg); }
+  .paper .greet { font-weight: 600; }
+  .paper mark { background: var(--brand-soft); color: var(--brand); border-radius: 4px; padding: 0 3px; box-decoration-break: clone; -webkit-box-decoration-break: clone; }
+  .p-lines { margin-top: 2px; }
+  .stamp { position: absolute; right: -10px; bottom: -14px; display: inline-flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 600; color: var(--success);
+    background: var(--card); border: 1px solid color-mix(in srgb, var(--success) 35%, var(--border)); border-radius: 999px; padding: 5px 11px; box-shadow: var(--shadow-md); transform: rotate(1.5deg); }
 
   @media (max-width: 1000px) {
     .bento { grid-template-columns: repeat(2, 1fr); }
@@ -168,6 +240,12 @@ const reqs = [
   @media (max-width: 640px) {
     .bento { grid-template-columns: 1fr; }
     .tile { grid-column: auto !important; }
-    .visual { height: auto; min-height: 280px; }
+    .stage { height: auto; min-height: 300px; padding: 24px 18px; }
+    /* on a phone the panel tells the story by itself */
+    .t-assist .stage { place-items: center; }
+    .browser { display: none; }
+    .assist { position: static; transform: none; width: 100%; max-width: 280px; }
+    .tailor { flex-direction: column; }
+    .reqs { width: 100%; }
   }
 </style>
