@@ -13138,5 +13138,13 @@
     "source_identifier": "mural",
     "industry": null,
     "region": "design"
+  },
+  {
+    "name": "Hootsuite Inc",
+    "slug": "hootsuite-inc",
+    "careers_url": "https://boards.greenhouse.io/hootsuite",
+    "source_type": "greenhouse",
+    "source_identifier": "hootsuite",
+    "industry": "Financial Services & Insurance"
   }
 ]
