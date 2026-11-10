@@ -31,14 +31,20 @@ const profile = {
 const JD = ['Senior Product Designer, Acme (demo posting)', 'Requirements', '- 5+ years of experience in product design', '- Expert in Figma and prototyping',
   '- Experience building and maintaining design systems', '- Strong user research skills', 'Nice to have', '- Experience with fintech products', '- Familiarity with React'].join('\n');
 
-for (const theme of ['light', 'dark']) {
+for (const theme of (process.env.THEMES || 'light,dark').split(',')) {
   const h = await launch({ colorScheme: theme, scale: 2 });
   await h.ctx.route(/t2\.gstatic\.com/, (r) => r.abort());
   await h.sw.evaluate((d) => chrome.storage.local.set(d), {
     profiles: [profile], activeProfileId: 'p1',
     resumeFile: { p1: { name: 'Ananya-Rao-resume.pdf', type: 'application/pdf', size: 20, data: 'data:application/pdf;base64,JVBERi0xLjQK' } },
     savedAnswers: [{ question: 'How did you hear about us?', key: 'how did hear about us', value: 'LinkedIn', kind: 'text', used_at: iso(-3), uses: 2 }],
-    userPreferences: { roles: ['product_design'], seniorities: ['mid', 'senior', 'lead'], locations: [], remote_only: false, custom_keywords: '', excluded_keywords: '', min_salary: 0, employment_types: [], notify_enabled: true, sync_interval_mins: 60 },
+    userPreferences: { roles: ['product_design'], seniorities: ['mid', 'senior', 'lead'], locations: [], remote_only: false, custom_keywords: 'product designer', excluded_keywords: '', min_salary: 0, employment_types: [], notify_enabled: true, sync_interval_mins: 60 },
+    applications: [{ key: 'https://careers.northwind.example/designer', title: 'Senior Product Designer', company_name: 'Northwind Labs', location: 'Bengaluru, India', application_url: 'https://careers.northwind.example/designer', source: 'page', status: 'applied', notes: '', applied_at: iso(-1), follow_up_at: null, created_at: iso(-1), updated_at: iso(-1) }],
+    contacts: [
+      { id: 'c1', name: 'Priya Shah', position: 'Design Manager', email: '', linkedin: 'https://linkedin.com/in/example-priya', company: 'Northwind Labs', app_key: 'https://careers.northwind.example/designer', source: 'manual', relation: 'hiring_manager', notes: '', contacted_at: null, created_at: iso(0) },
+      { id: 'c2', name: 'Arjun Menon', position: 'Talent Partner', email: 'arjun@example.com', linkedin: '', company: 'Northwind Labs', app_key: 'https://careers.northwind.example/designer', source: 'manual', relation: 'recruiter', notes: '', contacted_at: iso(-1), created_at: iso(0) },
+      { id: 'c3', name: 'Rahul Mehta', position: 'Former manager at Quill Systems', email: 'rahul@example.com', linkedin: '', company: 'Quill Systems', app_key: null, source: 'manual', relation: 'reference', notes: '', contacted_at: null, created_at: iso(0) },
+    ],
     seenAlertKeys: staticJobs().filter((j) => ['1', '3', '7'].includes(j.bucket)).map((j) => j.application_url),
   });
   const shot = (page, name) => page.screenshot({ path: path.join(OUT, `dashboard-${name}-${theme}.png`) }).then(() => console.log('wrote', name, theme));
@@ -55,7 +61,10 @@ for (const theme of ['light', 'dark']) {
   await form.goto('https://apply.example.test/northwind/senior-product-designer');
   await h.sw.evaluate(async () => { const [t] = await chrome.tabs.query({ url: 'https://apply.example.test/*' }); await chrome.scripting.executeScript({ target: { tabId: t.id }, files: ['assist.js'] }); });
   await form.getByRole('dialog', { name: 'Jobly apply assist' }).getByText('Ready for your approval').waitFor({ timeout: 10000 }); await sleep(800);
-  await shot(form, 'assist'); await form.close();
+  await shot(form, 'assist');
+  // the same form after Fill, for the store screenshot
+  await form.getByRole('button', { name: /^Fill \d+ answers/ }).click(); await sleep(1500);
+  await shot(form, 'assist-filled'); await form.close();
   // Tailor for a job
   await d.goto(`chrome-extension://${h.id}/options.html#tailor`); await sleep(1000);
   await d.getByLabel('Role').fill('Senior Product Designer'); await d.getByLabel('Company').fill('Acme'); await d.getByLabel('Job description').fill(JD);
@@ -68,5 +77,9 @@ for (const theme of ['light', 'dark']) {
   await d.locator('input[type="file"]').setInputFiles(path.join(here, 'fixtures', 'linkedin.pdf'));
   await d.getByText(/LinkedIn profile read/).waitFor({ timeout: 20000 }); await sleep(500);
   await shot(d, 'profile');
+  // People: who to look for at the company, and saved people with how you know them
+  await d.goto(`chrome-extension://${h.id}/options.html#contacts`); await sleep(1000);
+  await d.getByLabel('Job', { exact: true }).selectOption({ index: 1 }); await d.getByRole('radio', { name: 'Hiring manager' }).click(); await sleep(500);
+  await shot(d, 'people');
   await h.ctx.close();
 }
