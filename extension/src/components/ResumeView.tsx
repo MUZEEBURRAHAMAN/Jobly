@@ -1,5 +1,5 @@
 import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { CheckCircle2, Download, FileText, Save, Target, Trash, Wand } from '../lib/icons';
+import { CheckCircle2, Download, FileText, Save, Target, Trash, Wand, X } from '../lib/icons';
 import { ProfilesStore } from '../lib/useProfiles';
 import { AccentId, ACCENTS, allResumeCss, defaultPage, fileSafe, PageId, PAGES, resumeHtml, resumeWordDoc, TemplateId, TEMPLATES } from '../lib/resume';
 import { fullName, Profile, skillList } from '../lib/profile';
@@ -7,6 +7,7 @@ import { readKey, writeKey } from '../lib/userData';
 import { removeVersion, saveVersion, useVersions } from '../lib/resumeVersions';
 import { analyzeJob, applySuggestions, coverage, defaultAccepted, JobAnalysis, suggestions } from '../lib/tailor';
 import { resumeScore } from '../lib/resumeScore';
+import { AtsScan, atsScan } from '../lib/atsScan';
 import { AiError, AI_KEY, AiSettings, loadAi, runAi } from '../lib/ai';
 import { guardRewrite, rewriteTask } from '../lib/aiGuard';
 import { onKeysChanged } from '../lib/userData';
@@ -39,6 +40,7 @@ export const ResumeView: React.FC<{ store: ProfilesStore; onOpenProfile: () => v
   const [ai, setAi] = useState<AiSettings | null>(null);
   const [rewording, setRewording] = useState(false);
   const [fit, setFit] = useState<{ scale: number; over: boolean }>({ scale: 1, over: false });
+  const [scan, setScan] = useState<AtsScan | null>(null);
   const resumeRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => { void readKey<Partial<Settings>>(SETTINGS_KEY).then((s) => {
@@ -76,6 +78,8 @@ export const ResumeView: React.FC<{ store: ProfilesStore; onOpenProfile: () => v
     el.style.zoom = String(scale);
     if (settings.template === 'sidebar') el.style.minHeight = `${page.h / scale}px`;
     setFit({ scale, over: h * scale > page.h + 1 });
+    // The ATS check reads the finished page's own text, top to bottom, like a parser reads the PDF
+    setScan(atsScan(el.innerText, { singleColumn: single, roles: p?.work.filter((w) => w.title.trim() || w.company.trim()).length ?? 0 }));
   }, [html, settings.fit, settings.page, settings.template, settings.accent, page.h]);
 
   if (!base || !p) {
@@ -187,10 +191,8 @@ export const ResumeView: React.FC<{ store: ProfilesStore; onOpenProfile: () => v
                   {ai && ai.provider !== 'off' && <button type="button" className="btn btn-outline btn-sm" onClick={() => void reword()} disabled={rewording}><Wand size={14} aria-hidden="true" /> {rewording ? 'Rewording…' : 'Reword with AI'}</button>}
                   <button type="button" className="btn btn-ghost btn-sm" onClick={() => setTailored(null)}>Undo</button>
                 </div>
-                {cov && (cov.keywordsFound.length + cov.keywordsMissing.length) > 0 && (
+                {cov && missing.length > 0 && (
                   <div className="rv-keywords">
-                    {cov.keywordsFound.length > 0 && <div><p className="label">In your resume ({cov.keywordsFound.length})</p>
-                      <ul className="chips-list" aria-label="Keywords in your resume">{cov.keywordsFound.map((k) => <li key={k} className="kw kw-found"><CheckCircle2 size={12} aria-hidden="true" /> {k}</li>)}</ul></div>}
                     {missing.length > 0 && <div><p className="label">Missing ({missing.length}): do you have these?</p>
                       <ul className="rv-missing" aria-label="Missing keywords">{missing.map((k) => (
                         <li key={k}><span className="kw">{k}</span>
@@ -203,6 +205,43 @@ export const ResumeView: React.FC<{ store: ProfilesStore; onOpenProfile: () => v
               </div>
             )}
           </section>
+
+          {scan && (
+            <section className="card rv-card" aria-labelledby="rv-ats-title">
+              <div className="row" style={{ justifyContent: 'space-between' }}>
+                <h3 id="rv-ats-title">ATS check</h3>
+                <span className={`ats-badge ${scan.problems ? 'ats-warn' : 'ats-ok'}`}>{scan.problems ? `${scan.problems} to fix` : 'Reads cleanly'}</span>
+              </div>
+              <p className="hint">How an applicant tracking system reads this resume. Checked here with rules, no AI; nothing leaves your browser.</p>
+              {cov ? (
+                <div className="ats-match">
+                  <div className="row" style={{ justifyContent: 'space-between' }}>
+                    <span><span className="font-medium">Qualification match</span><span className="text-xs muted" style={{ display: 'block' }}>Against the job description</span></span>
+                    <b className={`ats-pct ${cov.percent >= 70 ? 'ats-high' : cov.percent >= 40 ? 'ats-mid' : 'ats-low'}`}>{cov.percent}%</b>
+                  </div>
+                  <span className={`meter ${cov.percent >= 70 ? 'ats-high' : cov.percent >= 40 ? 'ats-mid' : 'ats-low'}`} role="progressbar" aria-label="Qualification match" aria-valuemin={0} aria-valuemax={100} aria-valuenow={cov.percent}><span style={{ width: `${cov.percent}%` }} /></span>
+                </div>
+              ) : <p className="text-sm muted">Paste a job description above to see your qualification match.</p>}
+              <div>
+                <p className="label">Parsed fields</p>
+                <ul className="ats-fields" aria-label="Parsed fields">
+                  {scan.fields.map((f) => (
+                    <li key={f.id} className={`ats-${f.status}`}>
+                      <span className="row">{f.status === 'ok' ? <CheckCircle2 size={14} aria-hidden="true" /> : <X size={14} aria-hidden="true" />}<span className="font-medium">{f.label}</span></span>
+                      <span className="ats-detail">{f.detail}</span>
+                      {f.fix && <span className="ats-fix">{f.fix}</span>}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              {cov && cov.keywordsFound.length > 0 && <div><p className="label">Hard skills matched ({cov.keywordsFound.length})</p>
+                <ul className="chips-list" aria-label="Keywords in your resume">{cov.keywordsFound.map((k) => <li key={k} className="kw kw-found"><CheckCircle2 size={12} aria-hidden="true" /> {k}</li>)}</ul></div>}
+              {cov && cov.keywordsMissing.length > 0 && <div><p className="label">Job skills missing ({cov.keywordsMissing.length})</p>
+                <ul className="chips-list" aria-label="Job skills missing">{cov.keywordsMissing.map((k) => <li key={k} className="kw kw-missing">{k}</li>)}</ul></div>}
+              {cov && cov.matches.some((m) => m.status === 'missing') && <div><p className="label">Requirements your resume doesn’t show ({cov.matches.filter((m) => m.status === 'missing').length} of {cov.matches.length})</p>
+                <ul className="ats-reqs" aria-label="Requirements not shown">{cov.matches.filter((m) => m.status === 'missing').map((m) => <li key={m.requirement.id}>{m.requirement.text}</li>)}</ul></div>}
+            </section>
+          )}
 
           {score && (
             <section className="card rv-card" aria-labelledby="rv-score-title">

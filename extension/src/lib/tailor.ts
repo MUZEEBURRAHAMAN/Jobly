@@ -1,4 +1,4 @@
-import { KEYWORDS } from './fit';
+import { asksFor, KEYWORDS } from './fit';
 import { bulletList, Profile, skillList } from './profile';
 
 /**
@@ -45,11 +45,14 @@ export function analyzeJob(text: string, profileSkills: string[] = []): JobAnaly
     else if (BULLET.test(raw) && mode !== 'other') loose.push(line);
   }
   // No headings Jobly knows: use bullet lines that name a skill or ask for experience
-  const source = picked.length ? picked : loose.filter((l) => /experience|proficien|familiar|knowledge|degree|skill|years?/i.test(l) || KEYWORDS.some((k) => mentions(l, k))).map((t) => ({ text: t, must: true }));
+  const source = picked.length ? picked : loose.filter((l) => /experience|proficien|familiar|knowledge|degree|skill|years?/i.test(l) || KEYWORDS.some((k) => asksFor(l, k))).map((t) => ({ text: t, must: true }));
   const vocab = [...new Set([...KEYWORDS, ...profileSkills])];
+  // Jobly's own keyword list is checked strictly ("go-to-market" is not Go); the user's own skills as written
+  const own = new Set(profileSkills.map((k) => k.toLowerCase()));
+  const named = (t: string, k: string) => (own.has(k.toLowerCase()) ? mentions(t, k) : asksFor(t, k));
   const uniq = (list: string[]) => [...new Map(list.map((k) => [k.toLowerCase(), k])).values()];
-  const requirements = source.slice(0, 14).map((r, i) => ({ id: `r${i + 1}`, text: r.text, must: r.must, keywords: uniq(vocab.filter((k) => mentions(r.text, k))) }));
-  const keywords = [...new Map(vocab.filter((k) => mentions(text, k)).map((k) => [k.toLowerCase(), k])).values()];
+  const requirements = source.slice(0, 14).map((r, i) => ({ id: `r${i + 1}`, text: r.text, must: r.must, keywords: uniq(vocab.filter((k) => named(r.text, k))) }));
+  const keywords = [...new Map(vocab.filter((k) => named(text, k)).map((k) => [k.toLowerCase(), k])).values()];
   const m = /(\d{1,2})\s*\+?\s*(?:-|–|to)?\s*(?:\d{1,2})?\s*\+?\s*years?/i.exec(text);
   return { requirements, keywords, yearsAsked: m ? Number(m[1]) : null };
 }

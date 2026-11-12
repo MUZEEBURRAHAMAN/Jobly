@@ -43,8 +43,8 @@ export function resumeCss(t: TemplateId, accent: AccentId = 'black'): string {
     classic: `.resume{font-family:Georgia,'Times New Roman',serif}.resume header{text-align:center}.resume h2{border-bottom:1px solid var(--a);padding-bottom:2px;color:var(--a)}`,
     executive: `.resume{padding:0 0 36px}.resume header{background:var(--a);color:#fff;padding:30px 48px 24px}.resume header .headline,.resume header .contact{color:rgba(255,255,255,.85)}
 .resume header h1{color:#fff;font-size:24pt;letter-spacing:.02em}.resume .body{padding:6px 48px 0}.resume h2{font-variant:small-caps;text-transform:none;font-size:13pt;letter-spacing:.04em;color:var(--a);border-bottom:1px solid #d4d4d8;padding-bottom:2px}`,
-    sidebar: `.resume{padding:0;display:grid;grid-template-columns:31% 1fr;min-height:100%}.resume aside{background:#f4f4f5;padding:36px 22px;font-size:9.5pt}
-.resume main{padding:36px 34px 36px 30px}.resume aside h2{font-size:9.5pt;margin:18px 0 6px;color:var(--a)}.resume aside h2:first-child{margin-top:0}
+    sidebar: `.resume{padding:0;display:grid;grid-template-columns:31% 1fr;min-height:100%}.resume aside{grid-column:1;grid-row:1;background:#f4f4f5;padding:36px 22px;font-size:9.5pt}
+.resume main{grid-column:2;grid-row:1;padding:36px 34px 36px 30px}.resume aside h2{font-size:9.5pt;margin:18px 0 6px;color:var(--a)}.resume aside h2:first-child{margin-top:0}
 .resume aside p,.resume aside li{margin:0 0 5px;overflow-wrap:anywhere}.resume aside ul{list-style:none;padding:0}.resume aside a{color:inherit;text-decoration:none}
 .resume h1{font-size:24pt;color:var(--a)}.resume main h2{border-bottom:1.5px solid var(--a);padding-bottom:3px;color:var(--a)}.resume .edu{margin-bottom:8px}`,
     compact: `.resume{font-size:9.5pt;padding:28px 34px;line-height:1.3}.resume h1{font-size:18pt;color:var(--a)}.resume h2{margin:12px 0 4px;font-size:10pt;border-bottom:1px solid #d4d4d8;color:var(--a)}.resume .item{margin-bottom:6px}`,
@@ -88,7 +88,8 @@ export function resumeHtml(p: Profile, t: TemplateId = 'modern'): string {
       sec('Education', x.education),
     ].join('');
     const main = `<header><h1>${x.name}</h1>${x.headline ? `<p class="headline">${x.headline}</p>` : ''}</header>${sec('Summary', x.summary ? `<p>${x.summary}</p>` : '')}${sec('Experience', x.work)}`;
-    return `<div class="resume r-sidebar"><aside>${side}</aside><main>${main}</main></div>`;
+    // The main column comes first in the markup so the text reads name first (what a parser sees); CSS puts the aside on the left
+    return `<div class="resume r-sidebar"><main>${main}</main><aside>${side}</aside></div>`;
   }
   const contact = t === 'bold' ? `<div class="contact">${x.contact.map((c) => `<span>${c}</span>`).join('')}</div>` : x.contact.length ? `<p class="contact">${x.contact.join(' · ')}</p>` : '';
   const header = t === 'bold'

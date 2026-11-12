@@ -22,6 +22,17 @@ export const KEYWORDS = [
 const esc = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 const mentions = (text: string, term: string) => new RegExp(`(^|[^a-z0-9])${esc(term.toLowerCase())}($|[^a-z0-9])`).test(text);
 
+// Skill names that are also everyday words: "go-to-market", "the rest of the team", "swift delivery", "express interest".
+// In a job description these count only when written as the skill (capitalised, mid-sentence or in a list).
+const EVERYDAY = new Set(['go', 'swift', 'rust', 'spark', 'express', 'flask']);
+/** Whether a job description names this skill. */
+export function asksFor(posting: string, skill: string): boolean {
+  const k = skill.toLowerCase();
+  if (k === 'rest') return /(?<![\w-])REST(ful)?(?![\w-])/.test(posting);
+  if (EVERYDAY.has(k)) return new RegExp(`(?:(?<=[a-z,/(:]\\s?)${esc(skill)}(?![\\w-])|(?<![\\w-])${esc(skill)}(?=\\s?[,/)]))`).test(posting);
+  return mentions(posting.toLowerCase(), skill);
+}
+
 export interface FitResult {
   level: 'strong' | 'good' | 'low' | 'unknown';
   found: string[];
@@ -37,7 +48,7 @@ export function fitCheck(profile: Profile | null, postingText: string): FitResul
   const found = skills.filter((s) => mentions(text, s));
   const missing = skills.filter((s) => !mentions(text, s));
   const have = new Set(skills.map((s) => s.toLowerCase()));
-  const suggestions = [...new Set(KEYWORDS.filter((k) => !have.has(k.toLowerCase()) && mentions(text, k)))].slice(0, 12);
+  const suggestions = [...new Set(KEYWORDS.filter((k) => !have.has(k.toLowerCase()) && asksFor(postingText, k)))].slice(0, 12);
   const m = /(\d{1,2})\s*\+?\s*(?:-|–|to)?\s*(?:\d{1,2})?\s*\+?\s*years?/i.exec(postingText);
   const yearsAsked = m ? Number(m[1]) : null;
   const yearsHave = profile?.years_experience ? Number.parseFloat(profile.years_experience) : null;

@@ -88,5 +88,10 @@ export function resumeScore(p: Profile, opts: ScoreOptions = {}): ResumeScore {
   const categories = CATEGORIES.map((name) => { const l = checks.filter((c) => c.category === name); return { name, percent: l.length ? Math.round((got(l) / total(l)) * 100) : 100, failed: l.filter((c) => !c.ok).length }; });
   const rank: Record<Impact, number> = { high: 0, medium: 1, low: 2 };
   const fixes = checks.filter((c) => !c.ok).sort((a, b) => rank[a.impact] - rank[b.impact] || (b.max - b.got) - (a.max - a.got));
-  return { score, grade: score >= 85 ? 'Excellent' : score >= 70 ? 'Good' : score >= 50 ? 'Needs work' : 'Weak', checks, categories, fixes };
+  // With a job description the grade is "for this job": a well-written resume that shows under half of what the
+  // job asks for can't be called excellent for it, whatever its total.
+  const match = opts.coverage?.percent ?? 100;
+  const cap = match < 40 ? 69 : match < 60 ? 84 : 100;
+  const g = Math.min(score, cap);
+  return { score, grade: g >= 85 ? 'Excellent' : g >= 70 ? 'Good' : g >= 50 ? 'Needs work' : 'Weak', checks, categories, fixes };
 }
