@@ -12,3 +12,12 @@ def test_whole_words_only():
     assert detect_geo_hub("Kyiv, Ukraine", None) == "global"
     assert detect_geo_hub("Singapore", None) == "apac"
     assert detect_geo_hub(None, None) == "global"
+    assert detect_geo_hub("Washington, DC", None) == "us"
+    assert detect_geo_hub("Austin, TX", "Product Manager") == "us"
+    assert detect_geo_hub("London, UK", "Engineering Manager") == "europe"   # "Manager" is not MA
+    assert detect_geo_hub("Indianapolis, IN", None) == "us"
+    assert detect_geo_hub("US (NY - Hybrid)", None) == "us"
+    assert detect_geo_hub("CA - Toronto", None) == "global"                  # Canada, not California
+    assert detect_geo_hub("Remote", "Product Designer, India") == "india"
+    assert detect_geo_hub("Airoli", None) == "india"
+    assert detect_geo_hub("Remote UK", None) == "europe"

@@ -361,23 +361,42 @@ def matches_preferences(job: dict[str, Any], preferences: dict[str, Any]) -> boo
     return True
 
 
-_HUB_WORDS: list[tuple[str, re.Pattern[str]]] = [
-    ("india", re.compile(r"\b(india|bengaluru|bangalore|gurgaon|gurugram|hyderabad|mumbai|pune|noida|delhi|chennai|kolkata|ahmedabad)\b")),
-    ("us", re.compile(r"\b(united states|usa|u\.s\.|san francisco|sf bay|new york|nyc|seattle|austin|california|boston|los angeles|"
-                      r"ca|ny|wa|tx|ma)\b|remote - us|us - remote|remote \(us\)|remote, us")),
-    ("europe", re.compile(r"\b(london|united kingdom|uk|germany|berlin|munich|france|paris|amsterdam|netherlands|dublin|ireland|"
-                          r"sweden|stockholm|switzerland|zurich)\b")),
-    ("apac", re.compile(r"\b(singapore|tokyo|japan|sydney|australia|melbourne|korea|seoul)\b")),
+_US_PLACES = (
+    "united states|usa|u\\.s\\.a?|america|san francisco|sf bay|bay area|new york|nyc|seattle|austin|boston|los angeles|chicago|denver|"
+    "atlanta|dallas|houston|miami|philadelphia|phoenix|portland|san diego|san jose|raleigh|pittsburgh|detroit|minneapolis|nashville|"
+    "salt lake|washington,? d\\.?c|indianapolis|columbus|charlotte|baltimore|st\\.? louis|kansas city|las vegas|orlando|tampa|"
+    "california|texas|florida|illinois|colorado|virginia|massachusetts|new jersey|north carolina|south carolina|ohio|michigan|oregon|"
+    "arizona|utah|pennsylvania|minnesota|indiana|wisconsin|maryland|tennessee|missouri|connecticut|kentucky|alabama|iowa|nebraska"
+)
+_US_CODES = "al|az|ca|co|ct|dc|fl|ga|ia|il|in|ky|ma|md|mi|mn|mo|nc|ne|nj|nv|ny|oh|or|pa|sc|tn|tx|ut|va|wa|wi"
+_HUBS: list[tuple[str, re.Pattern[str]]] = [
+    ("india", re.compile(r"\b(india|bengaluru|bangalore|gurgaon|gurugram|hyderabad|mumbai|pune|noida|delhi|chennai|kolkata|ahmedabad|navi mumbai|airoli|kochi|coimbatore|jaipur|indore|chandigarh|trivandrum|thiruvananthapuram|mohali|vadodara|nagpur)\b")),
+    ("us", re.compile(rf"\b({_US_PLACES})\b")),
+    ("europe", re.compile(r"\b(london|united kingdom|uk|england|scotland|germany|berlin|munich|hamburg|frankfurt|france|paris|amsterdam|netherlands|dublin|"
+                          r"ireland|sweden|stockholm|switzerland|zurich|spain|madrid|barcelona|lisbon|portugal|italy|milan|rome|poland|warsaw|krakow|"
+                          r"denmark|copenhagen|norway|oslo|finland|helsinki|belgium|brussels|austria|vienna|prague|czech|romania|bucharest|greece|athens|"
+                          r"estonia|tallinn|hungary|budapest|bulgaria|sofia|europe|emea)\b")),
+    ("apac", re.compile(r"\b(singapore|tokyo|japan|sydney|australia|melbourne|korea|seoul|hong kong|taiwan|taipei|manila|philippines|jakarta|"
+                        r"indonesia|kuala lumpur|malaysia|bangkok|thailand|vietnam|ho chi minh|hanoi|new zealand|auckland|apac|asia pacific)\b")),
 ]
+# US only in the location: "Austin, TX", "US-CA", "US (NY - Hybrid)", "Remote - US"; not "CA - Toronto" (Canada)
+_US_LOCATION = re.compile(rf"(,\s*({_US_CODES})\b|\bus\b|^({_US_CODES})\s*,)")
 
 
 def detect_geo_hub(location: str | None, title: str | None) -> str:
-    # Whole words only: "Indiana" is not India, "Canada" is not CA
-    text = f"{location or ''} {title or ''}".lower()
-    for hub, words in _HUB_WORDS:
-        if words.search(text):
+    """Region from the location (whole words only: "Indiana" is not India, "Manager" is not Massachusetts).
+    The title is a fallback for places like "Designer, Bengaluru" when the location is empty or just "Remote"."""
+    loc = (location or "").lower()
+    for hub, words in _HUBS:
+        if words.search(loc):
             return hub
-    return 'global'
+    if _US_LOCATION.search(loc):
+        return "us"
+    t = (title or "").lower()
+    for hub, words in _HUBS:
+        if words.search(t):
+            return hub
+    return "global"
 
 
 def detect_experience_tier(seniority: str | None, title: str | None = None) -> str:
