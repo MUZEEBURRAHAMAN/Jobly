@@ -505,7 +505,27 @@ await step('profile, copy kit, resume, cover letter, backup, sync', async () => 
   // cover letter
   await d.getByRole('button', { name: /^Cover letters/ }).click(); await d.getByLabel('Role', { exact: true }).fill('Staff Designer'); await d.getByLabel('Company', { exact: true }).fill('Initech'); await sleep(300);
   const letter = await d.getByLabel('Letter', { exact: true }).inputValue();
-  ok(letter.includes('Dear Initech hiring team') && letter.includes('Staff Designer') && letter.includes('Ada Lovelace') && letter.includes('led the redesign of checkout'), 'the cover letter fills in the job and the profile');
+  ok(letter.includes('Dear Initech hiring team') && letter.includes('Staff Designer') && letter.includes('Ada Lovelace') && /led the redesign of checkout/i.test(letter), `the cover letter fills in the job and the profile (${letter.replace(/\n/g, ' / ').slice(0, 300)})`);
+  ok(/^Led the redesign of checkout, lifting conversion 12%/m.test(letter), 'the default letter leads with the result that has a number');
+  ok(await d.getByRole('radio', { name: /^Answers the job description/ }).isDisabled(), 'the job-description template waits for a pasted description');
+  const L = () => d.getByLabel('Letter', { exact: true }).inputValue();
+  await d.getByRole('radio', { name: 'Formal' }).click(); await sleep(150);
+  ok(/Yours sincerely,/.test(await L()) && /consideration/.test(await L()) && (await store('letterSettings'))?.tone === 'formal', 'the tone changes the wording and sign-off, and is remembered');
+  const std = (await L()).length; await d.getByRole('radio', { name: 'Detailed' }).click(); await sleep(150);
+  ok((await L()).length > std, 'a detailed letter is longer than a standard one');
+  await d.getByText('Make it personal (optional)').click();
+  await d.getByLabel("Hiring manager's name").fill('Priya Shah'); await d.getByLabel('Referred by').fill('Rahul Mehta');
+  await d.getByRole('radio', { name: /^Referred by someone/ }).click(); await sleep(150);
+  ok(/^Dear Priya Shah,\n\nRahul Mehta suggested I get in touch about the Staff Designer role at Initech\./.test(await L()), `the referral letter names the referrer first, to the hiring manager (${(await L()).slice(0, 120)})`);
+  await d.getByRole('radio', { name: /^Short email/ }).click(); await sleep(150);
+  ok(/^Hi Priya,/.test(await L()) && (await L()).split(/\s+/).length < 90, 'the short email is a few lines');
+  await d.getByRole('radio', { name: /^Why this company/ }).click(); await sleep(150);
+  ok(await d.getByRole('list', { name: 'Letter check' }).getByText('No [gaps] left to fill').count() === 1 && /\[why you want to work there/.test(await L()), 'without a reason, the company letter leaves a gap and the check says so');
+  await d.getByLabel('Why this company').fill('your tools help small teams ship faster'); await sleep(150);
+  ok(/Initech stands out to me because your tools help small teams ship faster\./.test(await L()), 'the reason you write opens the letter');
+  const lp = await d.evaluate(() => new Promise((res) => { window.print = () => res({ css: [...document.head.querySelectorAll('style')].map((x) => x.textContent).join(' '), cls: document.documentElement.className, text: document.querySelector('.letter-print').innerText, title: document.title }); [...document.querySelectorAll('button')].find((b) => b.textContent.trim() === 'PDF').click(); }));
+  ok(/@page \{ size: auto; margin: 0; \}/.test(lp.css) && /printing-letter/.test(lp.cls) && lp.title === 'Ada-Lovelace-Cover-letter-Initech' && /Ada Lovelace/.test(lp.text), 'the letter PDF has no browser header or footer and is named after you');
+  await d.evaluate(() => window.dispatchEvent(new Event('afterprint')));
   await axe(d, 'cover letters');
   // backup carries profiles
   await d.getByRole('button', { name: 'Settings', exact: true }).click();

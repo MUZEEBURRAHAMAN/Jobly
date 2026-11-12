@@ -654,3 +654,31 @@ fieldset.profile-card > legend { padding: 0 var(--space-1); }
 .company-filter { display: flex; align-items: center; gap: var(--space-3); margin-bottom: var(--space-4); }
 
 .sort-select { width: auto; flex: none; }
+
+/* ---------- Cover letters ---------- */
+.cl-fieldset { border: 0; margin: 0; padding: 0; min-width: 0; }
+.cl-templates { display: flex; flex-direction: column; gap: 6px; margin-top: 4px; }
+.cl-tpl { display: flex; flex-direction: column; gap: 2px; text-align: left; font: inherit; color: inherit; background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--space-2) var(--space-3); cursor: pointer; }
+.cl-tpl:hover:not(:disabled) { border-color: var(--muted-foreground); }
+.cl-tpl[aria-checked="true"] { border-color: var(--foreground); box-shadow: inset 0 0 0 1px var(--foreground); }
+.cl-tpl:disabled { opacity: .6; cursor: not-allowed; }
+.seg { display: inline-flex; border: 1px solid var(--border); border-radius: var(--radius); padding: 2px; gap: 2px; background: var(--muted); }
+.seg button { font: inherit; font-size: var(--text-xs); font-weight: 500; border: 0; background: none; color: var(--muted-foreground); padding: 4px 10px; border-radius: calc(var(--radius) - 2px); cursor: pointer; }
+.seg button[aria-checked="true"] { background: var(--card); color: var(--foreground); box-shadow: 0 1px 2px rgb(0 0 0 / .08); }
+.cl-more summary { cursor: pointer; }
+.cl-checks { list-style: none; margin: 0; padding: var(--space-3) var(--space-4); display: flex; flex-wrap: wrap; gap: var(--space-2) var(--space-4); border-top: 1px solid var(--border); font-size: var(--text-xs); color: var(--muted-foreground); }
+.cl-checks li { display: inline-flex; align-items: center; gap: 6px; }
+.cl-checks li.ok { color: var(--foreground); }
+.cl-checks li.ok svg { color: var(--success); }
+.cl-dot { width: 10px; height: 10px; border-radius: 50%; border: 1.5px solid var(--warning); }
+.letter-print { display: none; }
+@media print {
+  html.printing-letter body * { visibility: hidden; }
+  html.printing-letter .letter-print, html.printing-letter .letter-print * { visibility: visible; }
+  html.printing-letter .letter-print { display: block; position: absolute; inset: 0 auto auto 0; width: 100%; padding: 0.9in 1in; background: #fff; color: #18181b; font: 11pt/1.55 Arial, Helvetica, sans-serif; }
+  html.printing-letter .letter-print header { border-bottom: 1px solid #18181b; padding-bottom: 10px; margin-bottom: 28px; }
+  html.printing-letter .letter-print h1 { margin: 0; font-size: 20pt; color: #18181b; }
+  html.printing-letter .letter-print header p { margin: 4px 0 0; color: #3f3f46; font-size: 9.5pt; }
+  html.printing-letter .letter-print > p { margin: 0 0 12px; color: #18181b; }
+  html.printing-letter .resume-view { display: none; }
+}

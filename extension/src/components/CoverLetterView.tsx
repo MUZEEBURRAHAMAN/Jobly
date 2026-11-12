@@ -1,110 +1,23 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Download, Save } from '../lib/icons';
+import { CheckCircle2, Download, Save } from '../lib/icons';
 import { Job } from '../types';
 import { ProfilesStore } from '../lib/useProfiles';
 import { TrackerStore } from '../lib/useTracker';
 import { FEATURES } from '../lib/config';
-import { bulletList, fullName, Profile, skillList } from '../lib/profile';
+import { fullName, skillList } from '../lib/profile';
+import { LENGTHS, Length, letterChecks, LETTER_TEMPLATES, LetterTemplateId, Tone, TONES, writeLetter } from '../lib/coverLetter';
+import { readKey, writeKey } from '../lib/userData';
 import { jobKey } from '../lib/userData';
 import { fileSafe } from '../lib/resume';
 import { CopyButton } from './CopyButton';
 import { Wand } from '../lib/icons';
-import { analyzeJob, coverage, relevantBullets } from '../lib/tailor';
+import { analyzeJob } from '../lib/tailor';
 import { AiError, AiSettings, loadAi, runAi, AI_KEY } from '../lib/ai';
 import { guardLetter, letterTask } from '../lib/aiGuard';
 import { onKeysChanged } from '../lib/userData';
 import type { LetterContext } from './TailorView';
 
-// Fill-in templates (no AI): every {field} comes from the profile or the chosen job, and the result stays editable.
-const TEMPLATES = [
-  { id: 'direct', label: 'Short and direct', body: `Dear {company} hiring team,
-
-I'm applying for the {role} role. I'm a {headline} with {years} years of experience, and my strengths are {skills}.
-
-Most recently at {current_company}, I {achievement_lower}. I'd bring the same focus to {company}.
-
-I'd welcome the chance to talk about how I can help your team. Thank you for your time.
-
-Best regards,
-{name}
-{email} · {phone}` },
-  { id: 'story', label: 'Why this company', body: `Dear {company} team,
-
-When I saw the {role} opening, it stood out because of the work {company} is doing. It matches what I've spent the last {years} years getting good at.
-
-A few things I'd bring:
-- {achievement}
-- {achievement_2}
-- Hands-on skill with {skills}
-
-I'd love to learn more about the team and the problems you're solving next. You can reach me at {email} or {phone}.
-
-Thank you,
-{name}` },
-  { id: 'switch', label: 'Career change', body: `Dear {company} hiring team,
-
-I'm writing about the {role} position. My background is as a {headline}, and I'm moving into this kind of role because it builds directly on what I already do well.
-
-In my current work I {achievement_lower}. Along the way I've built skills in {skills} that carry over to this role.
-
-I'm a fast learner and would bring a fresh perspective to {company}. I'd be glad to talk about how my experience fits.
-
-Sincerely,
-{name}
-{email}` },
-];
-
-const MATCHED = { id: 'matched', label: 'Matches the job description', body: '' };
-const lowerFirst = (s: string) => (s ? s.charAt(0).toLowerCase() + s.slice(1).replace(/[.;]$/, '') : '');
-
-/** A letter built from the job description: what it asks for, and the profile's own lines that show each. */
-function matchedLetter(p: Profile | null, role: string, company: string, description: string): string {
-  if (!p) return fill(TEMPLATES[0].body, p, role, company);
-  const job = analyzeJob(description, skillList(p));
-  const cov = coverage(p, job);
-  const shown = cov.matches.filter((m) => m.status !== 'missing' && m.evidence);
-  const asks = shown.slice(0, 3).map((m) => lowerFirst(m.requirement.text));
-  const list = asks.length > 1 ? `${asks.slice(0, -1).join(', ')} and ${asks[asks.length - 1]}` : asks[0];
-  const proof: string[] = [];
-  for (const m of shown) {
-    const w = p.work.find((x) => bulletList(x.bullets).includes(m.evidence!.text));
-    if (!w || proof.some((x) => x.includes(m.evidence!.text.slice(0, 30)))) continue;
-    const at = `${w.current ? 'At' : 'Earlier, at'} ${w.company || 'my last company'}`;
-    const verb = /^(\w+ed|built|ran|led|cut|grew|made|won|wrote|drove|set|took|began|brought|taught|kept|sold|spent|held|met)\b/i.test(m.evidence!.text);
-    proof.push(verb ? `${at}, I ${lowerFirst(m.evidence!.text)}.` : `${at}: ${m.evidence!.text.replace(/[.;]$/, '')}.`);
-    if (proof.length === 3) break;
-  }
-  // Not enough requirement-specific lines: add the bullets most relevant to the job
-  for (const r of relevantBullets(p, job, 4)) {
-    if (proof.length >= 2) break;
-    if (proof.some((x) => x.includes(lowerFirst(r.text).slice(0, 30)) || x.includes(r.text.slice(0, 30)))) continue;
-    const at = `${r.work.current ? 'At' : 'Earlier, at'} ${r.work.company || 'my last company'}`;
-    const verb = /^(\w+ed|built|ran|led|cut|grew|made|won|wrote|drove|set|took|began|brought|taught|kept|sold|spent|held|met)\b/i.test(r.text);
-    proof.push(verb ? `${at}, I ${lowerFirst(r.text)}.` : `${at}: ${r.text.replace(/[.;]$/, '')}.`);
-  }
-  const skills = cov.keywordsFound.slice(0, 4).join(', ');
-  return [
-    `Dear ${company || '[company]'} hiring team,`, '',
-    `I'm applying for the ${role || '[role]'} role.${list ? ` Your posting asks for ${list}, which is the work I've been doing${p.years_experience ? ` for ${p.years_experience} years` : ''}.` : ''}`, '',
-    proof.length ? proof.join(' ') : `In my current work I ${lowerFirst(bulletList(p.work[0]?.bullets ?? '')[0] ?? '[an achievement]')}.`,
-    ...(skills ? ['', `I work every day with ${skills}, and I'd bring that to ${company || '[company]'} from the first week.`] : []), '',
-    `I'd welcome the chance to talk about the role. Thank you for your time.`, '',
-    'Best regards,', fullName(p) || '[name]', [p.email, p.phone].filter(Boolean).join(' · '),
-  ].join('\n').trim();
-}
-
-function fill(body: string, p: Profile | null, role: string, company: string): string {
-  const latest = p?.work[0];
-  const bullets = latest ? bulletList(latest.bullets) : [];
-  const lower = (s: string) => (s ? s.charAt(0).toLowerCase() + s.slice(1).replace(/\.$/, '') : '');
-  const values: Record<string, string> = {
-    name: p ? fullName(p) : '', email: p?.email ?? '', phone: p?.phone ?? '', headline: (p?.headline || latest?.title || '').toLowerCase(),
-    years: p?.years_experience || '', skills: p ? skillList(p).slice(0, 4).join(', ') : '', current_company: latest?.company ?? '',
-    achievement: bullets[0] ?? '', achievement_2: bullets[1] ?? '', achievement_lower: lower(bullets[0] ?? ''), role, company,
-  };
-  // A field with no value stays visible as [field] so it is easy to spot and fill in.
-  return body.replace(/\{(\w+)\}/g, (_, k: string) => values[k] || `[${k.replace(/_/g, ' ')}]`);
-}
+const TONE_SIGN: Record<Tone, string> = { confident: 'Best regards,', warm: 'Warm regards,', formal: 'Yours sincerely,' };
 
 export const CoverLetterView: React.FC<{ profiles: ProfilesStore; tracker: TrackerStore; savedJobs: Job[]; notify: (m: string, kind?: 'error' | 'info') => void; onOpenProfile: () => void; context?: LetterContext | null }> = ({ profiles, tracker, savedJobs, notify, onOpenProfile, context }) => {
   const targets = useMemo(() => {
@@ -115,7 +28,12 @@ export const CoverLetterView: React.FC<{ profiles: ProfilesStore; tracker: Track
     return list;
   }, [tracker.apps, savedJobs]);
   const [target, setTarget] = useState('');
-  const [template, setTemplate] = useState(TEMPLATES[0].id);
+  const [template, setTemplate] = useState<LetterTemplateId>('achievement');
+  const [tone, setTone] = useState<Tone>('confident');
+  const [length, setLength] = useState<Length>('standard');
+  const [manager, setManager] = useState('');
+  const [motivation, setMotivation] = useState('');
+  const [referrer, setReferrer] = useState('');
   const [role, setRole] = useState('');
   const [company, setCompany] = useState('');
   const [text, setText] = useState('');
@@ -127,7 +45,10 @@ export const CoverLetterView: React.FC<{ profiles: ProfilesStore; tracker: Track
   useEffect(() => { const load = () => void loadAi().then(setAi); load(); return onKeysChanged([AI_KEY], load); }, []);
   // From Tailor: the job and its description, with the letter built from it
   useEffect(() => { if (context) { setRole(context.role); setCompany(context.company); setDescription(context.description); setTemplate('matched'); setEdited(false); } }, [context]);
-  const build = (t: string) => (t === 'matched' && description.trim().length > 80 ? matchedLetter(profiles.active, role, company, description) : fill((TEMPLATES.find((x) => x.id === t) ?? TEMPLATES[0]).body, profiles.active, role || '[role]', company || '[company]'));
+  const hasJd = description.trim().length > 80;
+  useEffect(() => { void readKey<{ tone?: Tone; length?: Length }>('letterSettings').then((x) => { if (x?.tone) setTone(x.tone); if (x?.length) setLength(x.length); }); }, []);
+  const pick = (patch: { tone?: Tone; length?: Length }) => { if (patch.tone) setTone(patch.tone); if (patch.length) setLength(patch.length); setEdited(false); void writeKey('letterSettings', { tone, length, ...patch }); };
+  const build = (t: LetterTemplateId) => writeLetter({ profile: profiles.active, role, company, description, template: t === 'matched' && !hasJd ? 'achievement' : t, tone, length, manager, motivation, referrer });
   const writeWithAi = async () => {
     if (!ai || !profiles.active) return;
     setWriting(true); setIssues([]);
@@ -137,14 +58,14 @@ export const CoverLetterView: React.FC<{ profiles: ProfilesStore; tracker: Track
       const out = await runAi<{ paragraphs?: unknown }>(letterTask(p, job, role, company, description), ai);
       const paras = (Array.isArray(out.paragraphs) ? out.paragraphs : []).map((x) => String(x).trim()).filter(Boolean).slice(0, 6);
       if (!paras.length) { notify('The AI returned no letter. Try again.'); return; }
-      const letter = [`Dear ${company || '[company]'} hiring team,`, '', paras.join('\n\n'), '', 'Best regards,', fullName(p) || '[name]', [p.email, p.phone].filter(Boolean).join(' · ')].join('\n').trim();
+      const letter = [manager.trim() ? `Dear ${manager.trim()},` : `Dear ${company || '[company]'} hiring team,`, '', paras.join('\n\n'), '', TONE_SIGN[tone], fullName(p) || '[name]', [p.email, p.phone].filter(Boolean).join(' · ')].join('\n').trim();
       setText(letter); setEdited(true); setIssues(guardLetter(p, job, paras.join(' ')));
     } catch (e) { notify(e instanceof AiError ? e.message : 'Something went wrong. Try again.'); }
     finally { setWriting(false); }
   };
 
   useEffect(() => { const t = targets.find((x) => x.key === target); if (t) { setRole(t.role); setCompany(t.company); } }, [target, targets]);
-  useEffect(() => { if (!edited) setText(build(template)); }, [template, role, company, profiles.active, edited, description]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => { if (!edited) setText(build(template)); }, [template, role, company, profiles.active, edited, description, tone, length, manager, motivation, referrer]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const regenerate = () => { setEdited(false); setIssues([]); setText(build(template)); };
   const tracked = targets.find((x) => x.key === target && x.tracked);
@@ -160,7 +81,18 @@ export const CoverLetterView: React.FC<{ profiles: ProfilesStore; tracker: Track
     const a = Object.assign(document.createElement('a'), { href: url, download: `cover-letter-${fileSafe(company || 'company')}.doc` });
     document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 1000);
   };
-  const gaps = text.match(/\[[a-z ]+\]/g) ?? [];
+  const printPdf = () => {
+    // Same clean-PDF approach as the resume: zero page margin, so Chrome prints no header or footer
+    const style = document.createElement('style');
+    style.textContent = '@page { size: auto; margin: 0; }';
+    document.head.appendChild(style); document.documentElement.classList.add('printing-letter');
+    const title = document.title; document.title = fileSafe(`${p ? fullName(p) : 'Cover'} Cover letter ${company}`);
+    const done = () => { style.remove(); document.documentElement.classList.remove('printing-letter'); document.title = title; window.removeEventListener('afterprint', done); };
+    window.addEventListener('afterprint', done); window.print();
+  };
+  const p = profiles.active;
+  const checks = letterChecks(text, company, role);
+  const gaps = text.match(/\[[a-z ,:'’-]+\]/gi) ?? [];
   const missing = gaps.length;
   const profileGaps = gaps.some((g) => g !== '[role]' && g !== '[company]');
 
@@ -185,14 +117,36 @@ export const CoverLetterView: React.FC<{ profiles: ProfilesStore; tracker: Track
             <div>
               <label className="label" htmlFor="cl-desc">Job description (optional)</label>
               <textarea id="cl-desc" className="textarea" rows={4} maxLength={20000} value={description} placeholder="Paste it to write a letter that answers what the job asks for"
-                onChange={(e) => { const v = e.target.value; setDescription(v); if (v.trim().length > 80 && template !== 'matched' && !edited) setTemplate('matched'); }} />
+                onChange={(e) => { const v = e.target.value; setDescription(v); if (v.trim().length > 80 && !hasJd && !edited) setTemplate('matched'); }} />
             </div>
-            <div>
-              <label className="label" htmlFor="cl-template">Template</label>
-              <select id="cl-template" className="select" value={template} onChange={(e) => { setTemplate(e.target.value); setEdited(false); setIssues([]); }}>
-                {[MATCHED, ...TEMPLATES].map((t) => <option key={t.id} value={t.id} disabled={t.id === 'matched' && description.trim().length <= 80}>{t.label}{t.id === 'matched' && description.trim().length <= 80 ? ' (paste the job description)' : ''}</option>)}
-              </select>
+            <div className="row wrap" style={{ gap: 'var(--space-4)' }}>
+              <div role="radiogroup" aria-label="Tone" className="seg">{TONES.map((t) => <button key={t.id} type="button" role="radio" aria-checked={tone === t.id} onClick={() => pick({ tone: t.id })}>{t.label}</button>)}</div>
+              <div role="radiogroup" aria-label="Length" className="seg">{LENGTHS.map((l) => <button key={l.id} type="button" role="radio" aria-checked={length === l.id} onClick={() => pick({ length: l.id })}>{l.label}</button>)}</div>
             </div>
+            <fieldset className="cl-fieldset">
+              <legend className="label">Template</legend>
+              <div className="cl-templates" role="radiogroup" aria-label="Template">
+                {LETTER_TEMPLATES.map((t) => {
+                  const off = t.needsJd && !hasJd;
+                  return (
+                    <button key={t.id} type="button" role="radio" aria-checked={template === t.id} aria-disabled={off} className="cl-tpl" disabled={off}
+                      onClick={() => { setTemplate(t.id); setEdited(false); setIssues([]); }}>
+                      <span className="font-medium text-sm">{t.label}</span>
+                      <span className="text-xs muted">{off ? 'Paste the job description to use this.' : t.hint}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </fieldset>
+            <details className="cl-more" open={template === 'company' || template === 'referral' || undefined}>
+              <summary className="text-sm font-medium">Make it personal (optional)</summary>
+              <div className="stack" style={{ marginTop: 'var(--space-3)' }}>
+                <div><label className="label" htmlFor="cl-manager">Hiring manager's name</label><input id="cl-manager" className="input" value={manager} maxLength={80} placeholder="e.g. Priya Shah" onChange={(e) => { setManager(e.target.value); setEdited(false); }} /></div>
+                <div><label className="label" htmlFor="cl-why">Why this company</label><input id="cl-why" className="input" value={motivation} maxLength={240} placeholder="e.g. your design system is used by millions of people" onChange={(e) => { setMotivation(e.target.value); setEdited(false); }} />
+                  <p className="hint">One honest line in your own words. It's what makes a letter feel written for them.</p></div>
+                <div><label className="label" htmlFor="cl-ref">Referred by</label><input id="cl-ref" className="input" value={referrer} maxLength={80} placeholder="e.g. Rahul Mehta, Design Lead" onChange={(e) => { setReferrer(e.target.value); setEdited(false); }} /></div>
+              </div>
+            </details>
             {ai && ai.provider !== 'off' && (
               <button type="button" className="btn btn-brand btn-sm" style={{ alignSelf: 'flex-start' }} onClick={() => void writeWithAi()} disabled={writing || description.trim().length <= 80 || !profiles.active}
                 title={description.trim().length <= 80 ? 'Paste the job description first' : undefined}>
@@ -212,11 +166,19 @@ export const CoverLetterView: React.FC<{ profiles: ProfilesStore; tracker: Track
               {edited && <button type="button" className="btn btn-ghost btn-sm" onClick={regenerate}>Start again</button>}
               {tracked && <button type="button" className="btn btn-outline btn-sm" onClick={() => void saveToNotes()}><Save size={14} aria-hidden="true" /> Save to notes</button>}
               <button type="button" className="btn btn-outline btn-sm" onClick={download}><Download size={14} aria-hidden="true" /> Word</button>
+              <button type="button" className="btn btn-outline btn-sm" onClick={printPdf}><Download size={14} aria-hidden="true" /> PDF</button>
               <CopyButton value={text} label="cover letter" text />
             </div>
           </div>
           {issues.length > 0 && <div className="banner" role="alert"><p className="font-medium">Check before sending:</p><ul className="tailor-ol">{issues.map((i) => <li key={i}>{i}</li>)}</ul></div>}
           <textarea id="cl-text" className="textarea letter" rows={18} value={text} onChange={(e) => { setText(e.target.value); setEdited(true); }} />
+          <ul className="cl-checks" aria-label="Letter check">
+            {checks.map((c) => <li key={c.label} className={c.ok ? 'ok' : ''}>{c.ok ? <CheckCircle2 size={14} aria-hidden="true" /> : <span className="cl-dot" aria-hidden="true" />}<span>{c.label}</span><span className="sr-only">{c.ok ? ': done' : ': to do'}</span></li>)}
+          </ul>
+          <div className="letter-print" aria-hidden="true">
+            {p && <header><h1>{fullName(p)}</h1><p>{[p.email, p.phone, p.location].filter(Boolean).join(' · ')}</p></header>}
+            {text.split(/\n{2,}/).map((para, i) => <p key={i}>{para.split('\n').map((l, j) => <React.Fragment key={j}>{j > 0 && <br />}{l}</React.Fragment>)}</p>)}
+          </div>
           {missing > 0 && (
             <p className="panel-foot text-xs muted">
               {profileGaps
