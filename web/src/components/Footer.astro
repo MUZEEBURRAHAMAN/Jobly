@@ -56,9 +56,9 @@ const cols = [
   .wordmark { font-size: var(--wm); font-weight: 600; letter-spacing: -0.06em; line-height: 1; white-space: nowrap;
     transform: translateX(-0.206em); /* centre what is visible: the J's hook sits in the hidden lower half */
     padding-inline: 0.15em; /* the gradient only paints inside the box; tight tracking lets the y overhang it, so give it room on both sides */
-    background: linear-gradient(100deg, rgb(233 118 76 / 0.5) 0%, rgb(243 154 108 / 0.42) 40%, rgb(248 189 151 / 0.36) 75%, rgb(252 210 186 / 0.32) 100%);
+    background: linear-gradient(100deg, rgb(24 24 27 / 0.22) 0%, rgb(63 63 70 / 0.16) 40%, rgb(113 113 122 / 0.12) 75%, rgb(161 161 170 / 0.1) 100%);
     -webkit-background-clip: text; background-clip: text; color: transparent; user-select: none;
     -webkit-mask-image: linear-gradient(180deg, #000 40%, rgb(0 0 0 / 0.35) 62%); mask-image: linear-gradient(180deg, #000 40%, rgb(0 0 0 / 0.35) 62%); }
-  :global([data-theme='dark']) .wordmark { background-image: linear-gradient(100deg, rgb(178 76 36 / 0.55) 0%, rgb(200 104 62 / 0.45) 50%, rgb(150 60 28 / 0.38) 100%); }
+  :global([data-theme='dark']) .wordmark { background-image: linear-gradient(100deg, rgb(250 250 250 / 0.22) 0%, rgb(212 212 216 / 0.16) 50%, rgb(161 161 170 / 0.12) 100%); }
   @media (max-width: 860px) { .top { grid-template-columns: 1fr 1fr; } .brand { grid-column: 1 / -1; } }
 </style>

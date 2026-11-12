@@ -82,9 +82,9 @@ const cursor = `<svg class="cursor" width="22" height="22" viewBox="0 0 24 24" a
 
   /* scenes: warm gradients from the brand palette */
   .scene { position: relative; height: 240px; border-radius: 13px; overflow: hidden; isolation: isolate; }
-  .s1 { background: radial-gradient(70% 90% at 30% 0%, #fff4d6 0%, transparent 60%), linear-gradient(135deg, #f7a35c 0%, #f06a4f 45%, #e8508a 100%); }
-  .s2 { background: radial-gradient(60% 80% at 10% 0%, #fff1e8 0%, transparent 60%), linear-gradient(120deg, #f9b38a 0%, #f07e5a 50%, #d9557e 100%); }
-  .s3 { background: radial-gradient(70% 90% at 90% 10%, #ffe6c9 0%, transparent 55%), linear-gradient(225deg, #f8b26a 0%, #ee6d4f 50%, #c94b7c 100%); }
+  .s1 { background: radial-gradient(70% 90% at 30% 0%, #ffffff 0%, transparent 60%), linear-gradient(135deg, #e4e4e7 0%, #a1a1aa 45%, #3f3f46 100%); }
+  .s2 { background: radial-gradient(60% 80% at 10% 0%, #fafafa 0%, transparent 60%), linear-gradient(120deg, #d4d4d8 0%, #a1a1aa 50%, #52525b 100%); }
+  .s3 { background: radial-gradient(70% 90% at 90% 10%, #fafafa 0%, transparent 55%), linear-gradient(225deg, #d4d4d8 0%, #71717a 50%, #27272a 100%); }
   :global([data-theme='dark']) .s1, :global([data-theme='dark']) .s2, :global([data-theme='dark']) .s3 { filter: saturate(0.85) brightness(0.82); }
 
   /* the dark app window shared by scenes 2 and 3 */
@@ -101,7 +101,7 @@ const cursor = `<svg class="cursor" width="22" height="22" viewBox="0 0 24 24" a
   .rings { position: absolute; inset: -40%; background: repeating-radial-gradient(circle at 50% 50%, rgb(255 255 255 / 0.18) 0 2px, transparent 2px 46px); opacity: 0.6; }
   .press { position: absolute; left: 50%; top: 50%; translate: -50% -50%; }
   .cta { position: relative; display: inline-flex; align-items: center; gap: 6px; padding: 11px 18px; border-radius: 10px; font-weight: 600; font-size: 15px; color: #fff;
-    background: linear-gradient(180deg, #ef6a3a, #c8410f); box-shadow: 0 1px 0 rgb(255 255 255 / 0.35) inset, 0 10px 22px -8px rgb(120 30 0 / 0.6); }
+    background: linear-gradient(180deg, #3f3f46, #18181b); box-shadow: 0 1px 0 rgb(255 255 255 / 0.2) inset, 0 10px 22px -8px rgb(0 0 0 / 0.55); }
   .ripple { position: absolute; right: 2px; bottom: -4px; width: 26px; height: 26px; border-radius: 50%; border: 2px solid rgb(255 255 255 / 0.9); opacity: 0; translate: 50% 50%; }
 
   /* cursor (filled white with a dark outline, like a real pointer) */
@@ -112,10 +112,10 @@ const cursor = `<svg class="cursor" width="22" height="22" viewBox="0 0 24 24" a
 
   /* scene 3: a notification in the dark window; the cursor opens it */
   .note { position: absolute; left: 12px; right: 12px; top: 14px; display: flex; align-items: center; gap: 10px; padding: 10px; border-radius: 11px; background: #1d1d21; border: 1px solid #2f2f36; }
-  .j { width: 28px; height: 28px; flex: none; display: grid; place-items: center; border-radius: 8px; background: #fb923c; color: #111; font-weight: 700; font-size: 13px; }
+  .j { width: 28px; height: 28px; flex: none; display: grid; place-items: center; border-radius: 8px; background: #fafafa; color: #111; font-weight: 700; font-size: 13px; }
   .note-text { display: flex; flex-direction: column; flex: 1; min-width: 0; line-height: 1.3; }
   .note-text b { font-size: 12.5px; font-weight: 600; } .note-text small { font-size: 11px; color: #a1a1aa; }
-  .open { font-size: 12px; font-weight: 600; padding: 6px 12px; border-radius: 8px; background: linear-gradient(180deg, #ef6a3a, #c8410f); color: #fff; }
+  .open { font-size: 12px; font-weight: 600; padding: 6px 12px; border-radius: 8px; background: linear-gradient(180deg, #3f3f46, #18181b); color: #fff; }
   .matches { position: absolute; left: 12px; right: 12px; top: 78px; display: flex; flex-direction: column; gap: 8px; }
   .m-row { display: flex; align-items: center; gap: 10px; padding: 9px 10px; border-radius: 10px; background: #18181b; border: 1px solid #26262b; }
   .m-logo { width: 22px; height: 22px; flex: none; display: grid; place-items: center; border-radius: 6px; border: 1px solid #34343b; font-size: 10px; font-weight: 600; color: #a1a1aa; }
@@ -136,7 +136,7 @@ const cursor = `<svg class="cursor" width="22" height="22" viewBox="0 0 24 24" a
   [data-playing] .s2 .o2 .tick { animation: tick 5.4s infinite 0.9s; }
   [data-playing] .s2 .o3 .tick { animation: tick 5.4s infinite 1.8s; }
   @keyframes aim2 { 0% { transform: translate(0, -2px); } 16%, 28% { transform: translate(-6px, 2px); } 34%, 44% { transform: translate(-14px, 34px); } 50%, 62% { transform: translate(-22px, 66px); } 100% { transform: translate(0, -2px); } }
-  @keyframes tick { 0%, 18% { background: transparent; border-color: #52525b; color: transparent; } 22%, 86% { background: #fb923c; border-color: #fb923c; color: #111; } 92%, 100% { background: transparent; border-color: #52525b; color: transparent; } }
+  @keyframes tick { 0%, 18% { background: transparent; border-color: #52525b; color: transparent; } 22%, 86% { background: #fafafa; border-color: #fafafa; color: #111; } 92%, 100% { background: transparent; border-color: #52525b; color: transparent; } }
 
   [data-playing] .s3 .note { animation: drop 4.2s var(--ease-out) infinite; }
   [data-playing] .s3 :global(.cursor) { animation: aim3 4.2s var(--ease-out) infinite; }
@@ -153,5 +153,5 @@ const cursor = `<svg class="cursor" width="22" height="22" viewBox="0 0 24 24" a
   .under-icon { width: 28px; height: 28px; flex: none; display: grid; place-items: center; border-radius: 8px; background: var(--card); color: var(--fg); border: 1px solid var(--border); }
 
   @media (max-width: 900px) { .steps { grid-template-columns: 1fr; max-width: 480px; } }
-  @media (prefers-reduced-motion: reduce) { .s2 .tick { background: #fb923c; border-color: #fb923c; color: #111; } }
+  @media (prefers-reduced-motion: reduce) { .s2 .tick { background: #fafafa; border-color: #fafafa; color: #111; } }
 </style>

@@ -19,14 +19,14 @@ const SUBMIT = /^(submit|submit application|submit your application|send applica
 
 const STYLES = `
 :host { all: initial; }
-.panel { --bg:#fff; --fg:#0a0a0a; --muted:#52525b; --line:#e4e4e7; --soft:#f4f4f5; --brand:#b83a0a; --brand-soft:#fff1e8; --ok:#166534; --ok-soft:#ecfdf3; --warn:#92400e; --warn-soft:#fffbeb;
+.panel { --bg:#fff; --fg:#0a0a0a; --muted:#52525b; --line:#e4e4e7; --soft:#f4f4f5; --brand:#18181b; --brand-soft:#f4f4f5; --ok:#166534; --ok-soft:#ecfdf3; --warn:#92400e; --warn-soft:#fffbeb;
   position: fixed; right: 16px; bottom: 16px; z-index: 2147483647; width: 360px; max-width: calc(100vw - 32px); max-height: min(640px, calc(100vh - 32px));
   display: flex; flex-direction: column; background: var(--bg); color: var(--fg); border: 1px solid var(--line); border-radius: 12px;
   box-shadow: 0 12px 32px rgb(0 0 0 / .16); font: 13px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; overflow: hidden; }
-@media (prefers-color-scheme: dark) { .panel { --bg:#111113; --fg:#fafafa; --muted:#a1a1aa; --line:#27272a; --soft:#1c1c1f; --brand:#fb923c; --brand-soft:#2a1608; --ok:#4ade80; --ok-soft:#0d2417; --warn:#fbbf24; --warn-soft:#2a1f05; } }
+@media (prefers-color-scheme: dark) { .panel { --bg:#111113; --fg:#fafafa; --muted:#a1a1aa; --line:#27272a; --soft:#1c1c1f; --brand:#fafafa; --brand-soft:#27272a; --ok:#4ade80; --ok-soft:#0d2417; --warn:#fbbf24; --warn-soft:#2a1f05; } }
 .panel.min .body, .panel.min .foot { display: none; }
 .head { display: flex; align-items: center; gap: 8px; padding: 10px 12px; border-bottom: 1px solid var(--line); }
-.mark { width: 22px; height: 22px; border-radius: 6px; background: var(--brand); color: #fff; display: grid; place-items: center; font-weight: 700; font-size: 12px; }
+.mark { width: 22px; height: 22px; border-radius: 6px; background: var(--brand); color: var(--bg); display: grid; place-items: center; font-weight: 700; font-size: 12px; }
 .title { font-weight: 600; flex: 1; min-width: 0; }
 .title small { display: block; font-weight: 400; color: var(--muted); font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 button { font: inherit; cursor: pointer; border-radius: 8px; border: 1px solid var(--line); background: var(--bg); color: var(--fg); padding: 6px 10px; min-height: 30px; }

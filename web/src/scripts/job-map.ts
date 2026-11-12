@@ -33,7 +33,7 @@ function init(root: HTMLElement) {
   let intro = reduce ? 1 : 0, introStart = 0, started = reduce;
   const pointer = { x: -999, y: -999, strength: 0, target: 0 };
   let raf = 0;
-  const colors = { land: '#d4d4d2', ink: '#0a0a0a', brand: '#b83a0a', card: '#ffffff' };
+  const colors = { land: '#d4d4d2', ink: '#0a0a0a', brand: '#18181b', card: '#ffffff' };
 
   const readColors = () => {
     const css = getComputedStyle(document.documentElement);

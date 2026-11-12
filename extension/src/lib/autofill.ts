@@ -142,7 +142,7 @@ export async function fillForm(items: FillItem[], resume: ResumePayload | null):
       } else {
         setNative(el, item.value);
       }
-      el.style.outline = '2px solid #b83a0a'; el.style.outlineOffset = '2px';
+      el.style.outline = '2px solid #18181b'; el.style.outlineOffset = '2px';
       filled++;
     } catch { failed.push(item.id); }
   }

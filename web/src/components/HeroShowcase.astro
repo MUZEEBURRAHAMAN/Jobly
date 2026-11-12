@@ -23,8 +23,8 @@ function band(stops: [number, string][], id: string) {
 }
 // sky → haze → warm hills → deep ground, in the brand's oranges
 // transparent at the top, so the pixels dissolve into the hero's gradient
-const light = band([[0, 'none'], [0.26, 'none'], [0.44, '#fde8da'], [0.58, '#fcd3b6'], [0.72, '#f8b48c'], [0.85, '#f29467'], [1, '#e2774c']], 'l');
-const dark = band([[0, 'none'], [0.22, 'none'], [0.4, '#2a1710'], [0.54, '#3e1e12'], [0.67, '#5d2814'], [0.8, '#7f3416'], [0.92, '#9a3f1a'], [1, '#6b2a12']], 'd');
+const light = band([[0, 'none'], [0.26, 'none'], [0.44, '#f4f4f5'], [0.58, '#e4e4e7'], [0.72, '#d4d4d8'], [0.85, '#a1a1aa'], [1, '#71717a']], 'l');
+const dark = band([[0, 'none'], [0.22, 'none'], [0.4, '#18181b'], [0.54, '#202024'], [0.67, '#2a2a2e'], [0.8, '#3f3f46'], [0.92, '#52525b'], [1, '#3f3f46']], 'd');
 
 const tabs = [
   { id: 'jobs', label: 'Jobs', icon: 'briefcase', alt: 'The Jobly dashboard: product designer jobs with company, place, posting time, a Matches you badge, and Save, Mark applied and Apply buttons.' },

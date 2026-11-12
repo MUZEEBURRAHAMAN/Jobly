@@ -28,12 +28,12 @@ const html = (p) => `<!doctype html><html><head><meta charset="utf-8"><style>
 * { margin: 0; box-sizing: border-box; }
 body { width: 1200px; height: 630px; font-family: Switzer, sans-serif; background: #ffffff; padding: 18px; }
 .card { position: relative; width: 100%; height: 100%; border-radius: 36px; overflow: hidden; background: #f6f6f5; padding: 64px 72px; display: flex; flex-direction: column; }
-.b1 { position: absolute; width: 640px; height: 520px; right: -140px; top: -180px; border-radius: 50%; background: #ffc9a8; filter: blur(80px); opacity: .9; }
-.b2 { position: absolute; width: 520px; height: 420px; right: 160px; bottom: -260px; border-radius: 50%; background: #ffe3cf; filter: blur(80px); }
-.b3 { position: absolute; width: 360px; height: 320px; right: -60px; bottom: -120px; border-radius: 50%; background: #e8e4ff; filter: blur(70px); opacity: .8; }
+.b1 { position: absolute; width: 640px; height: 520px; right: -140px; top: -180px; border-radius: 50%; background: #e4e4e7; filter: blur(80px); opacity: .9; }
+.b2 { position: absolute; width: 520px; height: 420px; right: 160px; bottom: -260px; border-radius: 50%; background: #f4f4f5; filter: blur(80px); }
+.b3 { position: absolute; width: 360px; height: 320px; right: -60px; bottom: -120px; border-radius: 50%; background: #ececee; filter: blur(70px); opacity: .8; }
 .logo { position: relative; display: flex; align-items: center; gap: 14px; font-weight: 700; font-size: 34px; letter-spacing: -0.02em; color: #0a0a0a; }
 .logo img { height: 64px; width: auto; display: block; }
-.eyebrow { position: relative; margin-top: auto; display: flex; align-items: center; gap: 10px; color: #b83a0a; font-size: 28px; font-weight: 500; }
+.eyebrow { position: relative; margin-top: auto; display: flex; align-items: center; gap: 10px; color: #18181b; font-size: 28px; font-weight: 500; }
 .eyebrow::before { content: ''; width: 10px; height: 10px; border-radius: 50%; background: currentColor; }
 h1 { position: relative; margin-top: 18px; font-size: ${p.title.length > 48 ? 62 : 74}px; line-height: 1.04; letter-spacing: -0.045em; font-weight: 500; color: #0a0a0a; max-width: 960px; text-wrap: balance; }
 .foot { position: relative; margin-top: 36px; display: flex; justify-content: space-between; align-items: center; font-size: 24px; color: #525252; }

@@ -25,9 +25,9 @@
   --border: #e7e7e5;
   --border-strong: #d4d4d2;
   /* brand */
-  --brand: #b83a0a;          /* 5.8:1 on white */
-  --brand-hover: #9a3008;
-  --brand-soft: #fff1e8;
+  --brand: #18181b;          /* monochrome: zinc 900 */
+  --brand-hover: #3f3f46;
+  --brand-soft: #f4f4f5;
   --on-brand: #ffffff;
   --ink: #0a0a0a;            /* primary button */
   --on-ink: #ffffff;
@@ -35,15 +35,15 @@
   --success: #15803d;
   --danger: #b91c1c;
   /* hero gradient blobs */
-  --blob-1: #ffc9a8;
-  --blob-2: #ffe3cf;
-  --blob-3: #e8e4ff;
+  --blob-1: #e4e4e7;
+  --blob-2: #f4f4f5;
+  --blob-3: #ececee;
   --blob-opacity: 1;
   /* effects */
   --shadow-sm: 0 1px 2px rgb(10 10 10 / 0.06);
   --shadow-md: 0 1px 2px rgb(10 10 10 / 0.04), 0 8px 24px -6px rgb(10 10 10 / 0.12);
   --shadow-lg: 0 2px 4px rgb(10 10 10 / 0.04), 0 24px 60px -12px rgb(10 10 10 / 0.22);
-  --ring: 0 0 0 3px rgb(184 58 10 / 0.35);
+  --ring: 0 0 0 3px rgb(24 24 27 / 0.3);
 
   /* type */
   --font: 'Switzer', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
@@ -85,23 +85,23 @@
   --subtle: #8f8f8f;         /* 6.0:1 on --page, 5.5:1 on --panel */
   --border: #262628;
   --border-strong: #35353a;
-  --brand: #fb923c;          /* 8.6:1 on --page */
-  --brand-hover: #fdba74;
-  --brand-soft: #2a1a10;
-  --on-brand: #111111;
+  --brand: #fafafa;          /* monochrome */
+  --brand-hover: #d4d4d8;
+  --brand-soft: #1f1f22;
+  --on-brand: #0a0a0a;
   --ink: #fafafa;
   --on-ink: #0a0a0a;
   --ink-hover: #e5e5e5;
   --success: #4ade80;
   --danger: #f87171;
-  --blob-1: #7c2d12;
-  --blob-2: #431407;
-  --blob-3: #1e1b4b;
+  --blob-1: #2a2a2e;
+  --blob-2: #1c1c1f;
+  --blob-3: #232327;
   --blob-opacity: 0.7;
   --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.4);
   --shadow-md: 0 1px 2px rgb(0 0 0 / 0.3), 0 8px 24px -6px rgb(0 0 0 / 0.6);
   --shadow-lg: 0 2px 4px rgb(0 0 0 / 0.3), 0 24px 60px -12px rgb(0 0 0 / 0.7);
-  --ring: 0 0 0 3px rgb(251 146 60 / 0.45);
+  --ring: 0 0 0 3px rgb(250 250 250 / 0.4);
 }
 
 /* ---------- reset ---------- */
