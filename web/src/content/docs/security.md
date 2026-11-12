@@ -2,11 +2,11 @@
 title: Security
 eyebrow: Security
 description: The permissions Jobly asks for, when it reads a page, the services it talks to, how data moves, and how to report a security problem.
-updated: 2026-11-07
+updated: 2026-11-12
 figure: vault
 ---
 
-> **The short version.** Jobly has no server: it downloads public job files and filters them in your browser. It reads the page you're on only when you click Save, Fit check or Autofill, and only that tab. The optional Hunter contact search is asked for the first time you use it. Everything personal stays in your browser.
+> **The short version.** Jobly has no server: it downloads public job files and filters them in your browser. It reads the page you're on only when you click Save, Fit check or Autofill, and only that tab. The optional Brave Search, Apollo and Hunter searches are each asked for the first time you use them. Everything personal stays in your browser.
 
 ## Permissions
 
@@ -20,6 +20,8 @@ These are all the permissions in Jobly's manifest. Chrome shows them when you in
 | `activeTab` + `scripting` | Read or fill the tab you're on when you click Save, Fit check or Autofill | Touch any other tab, or any page you didn't click on |
 | `contextMenus` | Add "Save this job to Jobly" to the right-click menu | Do anything until you choose it |
 | `https://jobly-data.pages.dev/*` | Download Jobly's public job files | Reach any other website |
+| Optional: `https://api.search.brave.com/*` | Profile search, asked for the first time you use it | Anything before you allow it |
+| Optional: `https://api.apollo.io/*` | Who works at a company, asked for the first time you use it | Anything before you allow it |
 | Optional: `https://api.hunter.io/*` | Contact search, asked for the first time you use it | Anything before you allow it |
 
 Jobly does **not** ask for `tabs`, `history`, `cookies`, `webRequest` or access to "all sites", and it has no content scripts that run on pages by themselves. Autofill never presses Submit and never touches password fields.
@@ -35,10 +37,10 @@ There is no Jobly server, so there is nothing that receives your searches, prefe
 
 ## Built-in protections
 
-- **Content Security Policy.** The extension only runs its own scripts and only connects to Jobly's job files and the optional services you turn on: `default-src 'self'; script-src 'self'; connect-src https://jobly-data.pages.dev https://api.hunter.io`.
+- **Content Security Policy.** The extension only runs its own scripts and only connects to Jobly's job files and the optional services you turn on: `default-src 'self'; script-src 'self'; connect-src https://jobly-data.pages.dev https://api.hunter.io https://api.search.brave.com https://api.apollo.io https://api.anthropic.com`.
 - **Links that don't leak.** Apply links open the job's original page in a new tab with `noopener noreferrer`, so that site can't see or control the page you came from.
 - **Nothing to attack on our side.** With no server, there is no database of users, no login and no API that accepts input. The job files are read-only.
-- **No secrets in the extension.** The extension ships with no API keys or tokens. If you add your own Hunter key, it stays in your browser and is left out of backups.
+- **No secrets in the extension.** The extension ships with no API keys or tokens. If you add your own Brave Search, Apollo or Hunter key, it stays in your browser and is left out of backups.
 - **This website** uses a strict policy too: no inline scripts, no third-party scripts, self-hosted fonts.
 
 ## Logs

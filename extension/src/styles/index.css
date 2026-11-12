@@ -682,3 +682,14 @@ fieldset.profile-card > legend { padding: 0 var(--space-1); }
   html.printing-letter .letter-print > p { margin: 0 0 12px; color: #18181b; }
   html.printing-letter .resume-view { display: none; }
 }
+
+/* People finder: results from search APIs */
+.pf-api { display: flex; flex-direction: column; gap: var(--space-2); }
+.input-sm { height: 32px; font-size: var(--text-sm); }
+.pf-hits { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; border: 1px solid var(--border); border-radius: var(--radius); }
+.pf-hit { display: grid; grid-template-columns: 78px minmax(0, 1fr) auto; gap: var(--space-3); align-items: center; padding: var(--space-2) var(--space-3); }
+.pf-hit + .pf-hit { border-top: 1px solid var(--border); }
+.pf-site { font-size: 11px; font-weight: 500; text-align: center; padding: 2px 6px; border-radius: var(--radius-full); background: var(--muted); color: var(--foreground); }
+.pf-who { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+.pf-snip { overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+@media (max-width: 560px) { .pf-hit { grid-template-columns: 1fr; } .pf-site { justify-self: start; } }

@@ -785,6 +785,7 @@ await step('contacts, outreach drafts, connections', async () => {
   await d.getByRole('button', { name: 'Save person' }).click(); await sleep(300);
   const ada = (await store('contacts')).find((c) => c.name === 'Ada Byron');
   ok(ada?.relation === 'hiring_manager' && ada.company === 'Initech' && ada.linkedin === 'https://linkedin.com/in/adabyron' && ada.app_key === 'manual:1', 'someone found is saved with how you know them, the company and the job');
+  ok(await d.getByRole('button', { name: 'Find profiles' }).isDisabled() && await d.getByText('Find profiles uses your own Brave Search key; Who works there uses your own Apollo key.').count() === 1, 'without keys, the API searches are off and the page says where to add them');
   await axe(d, 'people finder');
   await d.getByLabel('For application').selectOption('manual:1'); ok((await d.getByLabel('Company domain').inputValue()) === 'initech.com', "the company's domain is taken from the application link");
   await axe(d, 'contacts');
@@ -802,7 +803,7 @@ await step('contacts, outreach drafts, connections', async () => {
   await axe(d, 'outreach dialog');
   await d.getByRole('button', { name: 'Mark as contacted' }).click(); await sleep(400); ok(!!(await store('contacts'))[0].contacted_at, 'marking as contacted is remembered');
   // Hunter key in Settings, never in a backup; Google Calendar (for Interviews) is hidden while the tracker is off
-  await d.getByRole('button', { name: 'Settings', exact: true }).click(); await d.getByLabel(/Hunter API key/).fill('test-key-123'); await d.getByRole('button', { name: 'Save', exact: true }).click(); await sleep(300);
+  await d.getByRole('button', { name: 'Settings', exact: true }).click(); await d.getByLabel(/Hunter API key/).fill('test-key-123'); await d.getByLabel(/Hunter API key/).locator('xpath=following-sibling::button').click(); await sleep(300);
   ok((await store('hunterApiKey')) === 'test-key-123', 'the Hunter key is stored on the device');
   ok(await d.getByText('Google Calendar').count() === 0, 'the calendar connection is hidden while Interviews are switched off');
   const [bk] = await Promise.all([d.waitForEvent('download'), d.getByRole('button', { name: 'Download a backup' }).click()]);
@@ -822,6 +823,26 @@ await step('contacts, outreach drafts, connections', async () => {
   const found = await page.evaluate(() => window.units.findContacts('initech.com', 'hr'));
   ok(found.length === 2 && found[0].name === 'Ann Lee', 'contacts without an email are dropped and recruiters come first');
   ok(asked[0]?.searchParams.get('domain') === 'initech.com' && asked[0].searchParams.get('department') === 'hr' && asked[0].searchParams.get('api_key') === 'k1', 'the search goes straight to Hunter with the user\'s own key');
+  // Brave Search: public profile pages from the search index, with the user's own key
+  const braveAsked = [];
+  await page.route('https://api.search.brave.com/**', (r) => { braveAsked.push({ url: new URL(r.request().url()), key: r.request().headers()['x-subscription-token'] }); r.fulfill({ contentType: 'application/json', headers: { 'access-control-allow-origin': '*' }, body: JSON.stringify({ web: { results: /behance/.test(r.request().url()) ? [
+    { title: 'Mina Park on Behance', url: 'https://www.behance.net/minapark', description: 'Product designer at Initech' },
+    { title: 'Checkout redesign :: Behance', url: 'https://www.behance.net/gallery/123/Checkout', description: 'A project' }] : /dribbble/.test(r.request().url()) ? [] : [
+    { title: 'Priya Shah - Design Manager - Initech | LinkedIn', url: 'https://in.linkedin.com/in/priyashah?trk=x', description: 'Design Manager at <strong>Initech</strong>. Bengaluru.' },
+    { title: 'Initech | LinkedIn', url: 'https://www.linkedin.com/company/initech', description: 'Company page' }] } }) }); });
+  await page.evaluate(() => { window.chrome.storage.local.get = async () => ({ hunterApiKey: 'k1', braveApiKey: 'bk1', apolloApiKey: 'ak1' }); });
+  const prof = await page.evaluate(() => window.units.searchProfiles('Initech', { id: 'hiring', label: 'Hiring manager', terms: '"design manager" OR "head of design"', hint: '' }, window.units.sitesFor('Product Designer')));
+  ok(braveAsked.length === 3 && braveAsked.every((a) => a.key === 'bk1') && braveAsked.some((a) => a.url.searchParams.get('q') === 'site:linkedin.com/in "Initech" "design manager" OR "head of design"'), `one Brave search per site, with your key and a site: query (${braveAsked.map((a) => a.url.searchParams.get('q')).join(' | ')})`);
+  ok(prof.length === 2 && prof[0].name === 'Priya Shah' && prof[0].headline === 'Design Manager · Initech' && prof[0].url === 'https://in.linkedin.com/in/priyashah' && prof.some((x) => x.site === 'Behance' && x.name === 'Mina Park'), `only profile pages are kept (no company or project pages), with name and headline (${JSON.stringify(prof.map((x) => [x.site, x.name, x.headline]))})`);
+  // Apollo: who works there, by title, with the user's own key
+  let apolloAsked = null;
+  await page.route('https://api.apollo.io/**', (r) => { apolloAsked = { url: new URL(r.request().url()), method: r.request().method(), key: r.request().headers()['x-api-key'] }; r.fulfill({ contentType: 'application/json', headers: { 'access-control-allow-origin': '*' }, body: JSON.stringify({ total_entries: 1, people: [{ first_name: 'Ravi', last_name_obfuscated: 'Ku***r', title: 'Technical Recruiter', has_email: true, organization: { name: 'Initech' } }] }) }); });
+  const ap = await page.evaluate(() => window.units.apolloPeople('initech.com', { id: 'recruiters', label: 'Recruiters', terms: 'recruiter OR "talent acquisition"', hint: '' }, 'Product Designer'));
+  ok(apolloAsked?.method === 'POST' && apolloAsked.key === 'ak1' && apolloAsked.url.searchParams.getAll('q_organization_domains_list[]').join() === 'initech.com' && apolloAsked.url.searchParams.getAll('person_titles[]').includes('recruiter')
+    && ap[0]?.name === 'Ravi Ku***r' && ap[0].title === 'Technical Recruiter', 'Apollo is asked for recruiters at the company domain with your key');
+  await page.route('https://api.apollo.io/**', (r) => r.fulfill({ status: 403, contentType: 'application/json', headers: { 'access-control-allow-origin': '*' }, body: '{}' }));
+  const apErr = await page.evaluate(() => window.units.apolloPeople('initech.com', { id: 'recruiters', label: 'R', terms: 'recruiter', hint: '' }, '').then(() => '', (e) => e.message));
+  ok(/Apollo refused the key/.test(apErr), 'a refused Apollo key gives a readable message');
   ok(await page.evaluate(() => window.units.companyDomain('https://boards.greenhouse.io/acme/jobs/1') === '' && window.units.companyDomain('https://jobs.acme.com/x') === 'acme.com'), 'hiring-system links are not mistaken for company domains');
   await h.ctx.close();
 });

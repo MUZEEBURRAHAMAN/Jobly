@@ -4,3 +4,4 @@ export { fitCheck } from './lib/fit';
 export { emptyProfile } from './lib/profile';
 export { scanForm, fillForm, proposeAnswers } from './lib/autofill';
 export { findContacts, companyDomain } from './lib/integrations';
+export { searchProfiles, apolloPeople, parseTitle, sitesFor } from './lib/profileSearch';

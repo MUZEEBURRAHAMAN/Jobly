@@ -18,7 +18,9 @@
     "https://jobly-data.pages.dev/*"
   ],
   "optional_host_permissions": [
-    "https://api.hunter.io/*"
+    "https://api.hunter.io/*",
+    "https://api.search.brave.com/*",
+    "https://api.apollo.io/*"
   ],
   "action": {
     "default_popup": "popup.html",
@@ -35,6 +37,6 @@
     "128": "icons/icon-128.png"
   },
   "content_security_policy": {
-    "extension_pages": "default-src 'self'; img-src 'self' https://t2.gstatic.com data:; connect-src https://jobly-data.pages.dev https://api.hunter.io https://api.anthropic.com; script-src 'self'"
+    "extension_pages": "default-src 'self'; img-src 'self' https://t2.gstatic.com data:; connect-src https://jobly-data.pages.dev https://api.hunter.io https://api.search.brave.com https://api.apollo.io https://api.anthropic.com; script-src 'self'"
   }
 }

@@ -11,7 +11,7 @@ export interface Contact {
   linkedin: string;
   company: string;
   app_key: string | null;
-  source: 'hunter' | 'manual';
+  source: 'hunter' | 'brave' | 'apollo' | 'manual';
   /** How the user knows them, or what they could do: recruiter, hiring manager, team, referral, reference. */
   relation: Relation;
   notes: string;
@@ -35,7 +35,7 @@ export function cleanContact(c: Partial<Contact>): Contact | null {
   return {
     id: clip(c.id, 80) || crypto.randomUUID(), name: name || email, position: clip(c.position, 160), email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ? email : '',
     linkedin: c.linkedin ? safeHttpUrl(/^https?:/i.test(c.linkedin) ? c.linkedin : `https://${c.linkedin}`) ?? '' : '', company: clip(c.company, 120),
-    app_key: c.app_key ? clip(c.app_key, 600) : null, source: c.source === 'hunter' ? 'hunter' : 'manual',
+    app_key: c.app_key ? clip(c.app_key, 600) : null, source: c.source === 'hunter' || c.source === 'brave' || c.source === 'apollo' ? c.source : 'manual',
     relation: RELATIONS.some((r) => r.id === c.relation) ? c.relation as Relation : 'other', notes: clip(c.notes, 2000),
     contacted_at: c.contacted_at && !Number.isNaN(Date.parse(c.contacted_at)) ? c.contacted_at : null, created_at: c.created_at ?? new Date().toISOString(),
   };

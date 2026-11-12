@@ -1,8 +1,10 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Contacts, ExternalLink, Mail, Plus, Search, Trash } from '../lib/icons';
 import { Contact, Relation, RELATIONS, useContacts } from '../lib/contacts';
 import { searchLinks, Who, whoOptions } from '../lib/peopleSearch';
 import { companyDomain, findContacts, FoundContact } from '../lib/integrations';
+import { APOLLO_KEY, apolloPeople, ApolloPerson, BRAVE_KEY, linkedinFor, loadKey, ProfileHit, searchProfiles, sitesFor } from '../lib/profileSearch';
+import { onKeysChanged } from '../lib/userData';
 import { TrackerStore } from '../lib/useTracker';
 import { fullName, Profile } from '../lib/profile';
 import { Dialog } from './Dialog';
@@ -86,6 +88,32 @@ export const ContactsView: React.FC<{ tracker: TrackerStore; profile: Profile | 
     setFound((f) => ({ ...f, name: '', position: '', link: '' }));
   };
   const shown = filter === 'all' ? contacts : contacts.filter((c) => c.relation === filter);
+  // Search APIs with the user's own keys (Settings): Brave for public profile pages, Apollo for who works there
+  const [keys, setKeys] = useState({ brave: false, apollo: false });
+  useEffect(() => { const load = () => void Promise.all([loadKey(BRAVE_KEY), loadKey(APOLLO_KEY)]).then(([b, a]) => setKeys({ brave: !!b, apollo: !!a })); load(); return onKeysChanged([BRAVE_KEY, APOLLO_KEY], load); }, []);
+  const [hits, setHits] = useState<ProfileHit[] | null>(null);
+  const [people, setPeople] = useState<ApolloPerson[] | null>(null);
+  const [apiBusy, setApiBusy] = useState<'brave' | 'apollo' | null>(null);
+  const [apiError, setApiError] = useState<string | null>(null);
+  const relationFor = (id: Who): Relation => (id === 'recruiters' ? 'recruiter' : id === 'hiring' ? 'hiring_manager' : id === 'team' ? 'team' : 'referral');
+  const runBrave = async () => {
+    setApiBusy('brave'); setApiError(null); setPeople(null);
+    try { setHits(await searchProfiles(company, current, sitesFor(role))); } catch (e) { setApiError(e instanceof Error ? e.message : "Couldn't search right now."); setHits(null); }
+    finally { setApiBusy(null); }
+  };
+  const cleanDomain = () => domain.trim().toLowerCase().replace(/^https?:\/\//, '').replace(/^www\./, '').replace(/\/.*$/, '');
+  const runApollo = async () => {
+    const d = cleanDomain();
+    if (!/^[a-z0-9-]+(\.[a-z0-9-]+)+$/.test(d)) { setApiError("Enter the company's website, like acme.com, for Apollo."); return; }
+    setApiBusy('apollo'); setApiError(null); setHits(null);
+    try { setPeople(await apolloPeople(d, current, role)); } catch (e) { setApiError(e instanceof Error ? e.message : "Couldn't search right now."); setPeople(null); }
+    finally { setApiBusy(null); }
+  };
+  const savedLinks = useMemo(() => new Set(contacts.map((c) => c.linkedin).filter(Boolean)), [contacts]);
+  const keepHit = async (h: ProfileHit) => {
+    const problem = await save({ name: h.name, position: h.headline.slice(0, 120), linkedin: h.url, company: company.trim(), app_key: appKey || null, relation: relationFor(current.id), source: 'brave' });
+    notify(problem ?? `${h.name} saved to your people.`, problem ? 'error' : 'info');
+  };
 
   const chooseApp = (key: string) => {
     setAppKey(key); const a = tracker.byKey.get(key); setDomain(companyDomain(a?.application_url) || ''); setResults(null);
@@ -114,7 +142,7 @@ export const ContactsView: React.FC<{ tracker: TrackerStore; profile: Profile | 
 
       <section className="card people-finder" aria-labelledby="pf-title">
         <h3 id="pf-title">Find people at a company</h3>
-        <p className="text-sm muted">Jobly opens the search on each site in a new tab. It doesn't read those sites or collect anything; you look, and save who you choose.</p>
+        <p className="text-sm muted">Search links open each site in a new tab. With your own Brave Search or Apollo key, Jobly can also list public profiles here. It never signs in to or reads those sites; you look, and save who you choose.</p>
         <div className="form-grid finder-grid">
           <div className="wide"><label className="label" htmlFor="pf-app">Job</label>
             <select id="pf-app" className="select" value={appKey} onChange={(e) => chooseApp(e.target.value)}>
@@ -133,6 +161,47 @@ export const ContactsView: React.FC<{ tracker: TrackerStore; profile: Profile | 
             {links.map((l) => <a key={l.site} className="btn btn-outline btn-sm" href={l.url} target="_blank" rel="noopener noreferrer" aria-label={`Search ${l.site} for ${current.label.toLowerCase()} at ${company}`}>{l.site} <ExternalLink size={13} aria-hidden="true" /></a>)}
           </div>
         )}
+        <div className="pf-api">
+          <div className="row wrap">
+            <button type="button" className="btn btn-sm" onClick={() => void runBrave()} disabled={!keys.brave || !company.trim() || apiBusy !== null}>
+              <Search size={14} aria-hidden="true" /> {apiBusy === 'brave' ? 'Searching…' : 'Find profiles'}</button>
+            <span className="row" style={{ gap: 6 }}>
+              <label className="sr-only" htmlFor="pf-domain">Company website</label>
+              <input id="pf-domain" className="input input-sm" style={{ width: 150 }} value={domain} onChange={(e) => setDomain(e.target.value)} placeholder="acme.com" />
+              <button type="button" className="btn btn-outline btn-sm" onClick={() => void runApollo()} disabled={!keys.apollo || apiBusy !== null}>{apiBusy === 'apollo' ? 'Searching…' : 'Who works there'}</button>
+            </span>
+          </div>
+          {(!keys.brave || !keys.apollo) && <p className="hint">{!keys.brave && !keys.apollo ? 'Find profiles uses your own Brave Search key; Who works there uses your own Apollo key.' : !keys.brave ? 'Find profiles uses your own Brave Search key.' : 'Who works there uses your own Apollo key.'} <button type="button" className="link" onClick={onOpenPreferences}>Add a key in Settings</button></p>}
+          {apiError && <p className="text-sm" role="alert" style={{ color: 'var(--destructive)' }}>{apiError}</p>}
+          {hits && (hits.length === 0 ? <p className="text-sm muted" role="status">No public profiles found for that search. Try another kind of person, or the search links above.</p> : (
+            <ul className="pf-hits" aria-label="Profiles found">
+              {hits.map((h) => (
+                <li key={h.url} className="pf-hit">
+                  <span className={`pf-site pf-${h.site.toLowerCase()}`}>{h.site}</span>
+                  <span className="pf-who"><span className="font-medium text-sm">{h.name}</span>{h.headline && <span className="text-xs">{h.headline}</span>}{h.snippet && <span className="text-xs muted pf-snip">{h.snippet}</span>}</span>
+                  <span className="row" style={{ gap: 6 }}>
+                    <a className="btn btn-ghost btn-xs" href={h.url} target="_blank" rel="noopener noreferrer" aria-label={`Open ${h.name}'s ${h.site} profile`}>Open <ExternalLink size={12} aria-hidden="true" /></a>
+                    <button type="button" className="btn btn-outline btn-xs" onClick={() => void keepHit(h)} disabled={savedLinks.has(h.url)} aria-label={savedLinks.has(h.url) ? `${h.name} saved` : `Save ${h.name}`}>{savedLinks.has(h.url) ? 'Saved' : 'Save'}</button>
+                  </span>
+                </li>
+              ))}
+            </ul>
+          ))}
+          {people && (people.length === 0 ? <p className="text-sm muted" role="status">Apollo has no one with those titles at {cleanDomain()}.</p> : (
+            <>
+              <p className="hint">Apollo shows the first name and title; open the LinkedIn search to find the person.</p>
+              <ul className="pf-hits" aria-label="People at the company">
+                {people.map((x, i) => (
+                  <li key={`${x.name}-${i}`} className="pf-hit">
+                    <span className="pf-site">Apollo</span>
+                    <span className="pf-who"><span className="font-medium text-sm">{x.name}</span><span className="text-xs">{x.title}{x.company ? ` · ${x.company}` : ''}</span></span>
+                    <a className="btn btn-ghost btn-xs" href={linkedinFor(x, x.company || company)} target="_blank" rel="noopener noreferrer" aria-label={`Find ${x.name} on LinkedIn`}>LinkedIn <ExternalLink size={12} aria-hidden="true" /></a>
+                  </li>
+                ))}
+              </ul>
+            </>
+          ))}
+        </div>
         <div className="sub-card people-add">
           <p className="font-medium text-sm">Found someone? Save them here</p>
           <div className="form-grid">
