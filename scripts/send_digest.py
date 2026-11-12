@@ -112,7 +112,9 @@ def render(sub: dict[str, Any], found: list[dict[str, Any]], total: int, labels:
     rows = []
     for j in found[:TOP]:
         where = " · ".join(x for x in [j.get("company_name"), j.get("location"), "Remote" if j.get("work_mode") == "remote" else ""] if x)
-        link = j.get("application_url") or SITE
+        link = j.get("application_url") or ""
+        if not link.lower().startswith(("https://", "http://")):  # job data comes from outside: only web links go in an email
+            link = SITE
         rows.append(f"""<tr><td style="padding:12px 0;border-bottom:1px solid #e4e4e7">
 <a href="{esc(link)}" style="color:#18181b;font-weight:600;text-decoration:none;font-size:15px">{esc(j.get('title') or 'Job')}</a>
 <div style="color:#52525b;font-size:13px;margin-top:2px">{esc(where)}{(' · ' + esc(j['salary_summary'])) if j.get('salary_summary') else ''}</div></td></tr>""")

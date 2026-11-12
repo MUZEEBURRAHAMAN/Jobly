@@ -1,6 +1,7 @@
 import { Application, AppStatus, STATUSES, sanitizeApp, TRACKER_KEYS } from './tracker';
 import { readKey, writeKey, STORAGE_KEYS } from './userData';
 import { cleanProfile, MAX_PROFILES, Profile } from './profile';
+import { cleanContact, Contact, MAX_CONTACTS } from './contacts';
 
 /**
  * Export and import. A JSON backup holds everything Jobly keeps on this device; a CSV holds the tracker only and is
@@ -129,7 +130,8 @@ export async function importFile(file: File): Promise<ImportResult> {
         if (k === TRACKER_KEYS.tasks) value = arr.filter((t) => ok(t, ['id', 'text']));
         if (k === 'savedJobs') value = arr.filter((j) => ok(j, ['title', 'company_name']));
         if (k === 'mutedCompanyIds' || k === 'followedCompanyIds') value = arr.filter((n) => typeof n === 'number');
-        if (k === 'contacts') value = arr.filter((c) => ok(c, ['id', 'name']));
+        // Through the same cleaning as a contact saved by hand: a backup file is outside data (profile links must be http/https)
+        if (k === 'contacts') value = arr.filter((c) => ok(c, ['id', 'name'])).map((c) => cleanContact(c as Partial<Contact>)).filter(Boolean).slice(0, MAX_CONTACTS);
       }
       if (k === 'profiles') value = (Array.isArray(value) ? value : []).slice(0, MAX_PROFILES).map((x) => cleanProfile(x as Partial<Profile>));
       if (k === 'resumeFile' && (typeof value !== 'object' || value === null || Array.isArray(value))) continue;

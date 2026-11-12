@@ -4,14 +4,43 @@ const form = document.querySelector<HTMLFormElement>('form[data-digest]');
 const status = form?.querySelector<HTMLElement>('[data-form-status]');
 const params = new URLSearchParams(location.search);
 
-// A confirmation or unsubscribe result from the links in the emails
-const result = params.get('status');
-const tpl = result ? document.querySelector<HTMLTemplateElement>(`template[data-msg="${CSS.escape(result)}"]`) : null;
+// The result of a confirmation or an unsubscribe, or (from a link in an email) the question with its button.
+// Opening a link changes nothing; only pressing the button does, so mail scanners can't confirm or unsubscribe anyone.
 const box = document.querySelector<HTMLElement>('[data-status]');
-if (tpl && box) {
+const action = box?.querySelector<HTMLButtonElement>('[data-status-action]');
+function show(tpl: HTMLTemplateElement | null, plain = false) {
+  if (!tpl || !box) return;
   box.querySelector('[data-status-title]')!.textContent = tpl.content.querySelector('[data-t]')!.textContent;
   box.querySelector('[data-status-text]')!.textContent = tpl.content.querySelector('[data-d]')!.textContent;
+  const label = tpl.content.querySelector('[data-b]')?.textContent ?? '';
+  if (action) { action.hidden = !label; action.textContent = label; action.disabled = false; }
+  box.classList.toggle('plain', plain);
   box.hidden = false; box.focus();
+}
+const message = (k: string) => document.querySelector<HTMLTemplateElement>(`template[data-msg="${CSS.escape(k)}"]`);
+
+const result = params.get('status');
+if (result) show(message(result), result !== 'confirmed');
+const ask = params.get('do');
+const hex = (k: string, n: number) => new RegExp(`^[a-f0-9]{${n}}$`).test(params.get(k) ?? '');
+if (ask === 'confirm' || ask === 'unsubscribe') {
+  const valid = ask === 'confirm' ? hex('t', 48) : hex('t', 48) && hex('id', 64);
+  if (!valid) show(message('invalid'), true);
+  else {
+    show(document.querySelector<HTMLTemplateElement>(`template[data-ask="${ask}"]`), true);
+    const query = ask === 'confirm' ? `t=${params.get('t')}` : `id=${params.get('id')}&t=${params.get('t')}`;
+    action?.addEventListener('click', async () => {
+      action.disabled = true;
+      try {
+        const res = await fetch(`/api/digest/${ask}?${query}`, { method: 'POST' });
+        const out = await res.json().catch(() => ({})) as { status?: string };
+        const status = out.status && message(out.status) ? out.status : 'error';
+        show(message(status), status !== 'confirmed');
+      } catch { show(message('error'), true); }
+      // The link has done its job: take the token out of the address bar
+      history.replaceState(null, '', location.pathname);
+    }, { once: true });
+  }
 }
 
 if (form) {

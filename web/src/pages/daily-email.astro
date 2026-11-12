@@ -12,6 +12,12 @@ const messages: Record<string, [string, string]> = {
   unsubscribed: ['You’re unsubscribed', 'You won’t get the daily email any more. You can sign up again any time.'],
   expired: ['That link has expired', 'Confirmation links work for 48 hours. Sign up again below and use the new link.'],
   invalid: ['That link doesn’t look right', 'Copy the whole link from the email, or sign up again below.'],
+  error: ['Something went wrong', 'Check your connection and open the link from the email again.'],
+};
+// Links in the emails land here and ask for one press; nothing changes just by opening a link
+const asks: Record<string, [string, string, string]> = {
+  confirm: ['One more step', 'Press the button to start your daily job email.', 'Confirm my email'],
+  unsubscribe: ['Unsubscribe from the daily email?', 'Press the button and Jobly deletes your email and choices.', 'Unsubscribe'],
 };
 ---
 <Base title="Daily job email" description="One email a day with the new jobs that match the roles, level and place you pick. Free, no account, unsubscribe in one click.">
@@ -21,9 +27,10 @@ const messages: Record<string, [string, string]> = {
   <section class="container digest">
     <div class="form-card">
       <div class="notice" data-status hidden role="status" tabindex="-1">
-        <span class="n-icon"><Icon name="check" size={18} /></span><div><h2 data-status-title></h2><p data-status-text></p></div>
+        <span class="n-icon"><Icon name="check" size={18} /></span><div><h2 data-status-title></h2><p data-status-text></p><button class="btn btn-ink" type="button" data-status-action hidden></button></div>
       </div>
       {Object.entries(messages).map(([k, [t, d]]) => <template data-msg={k}><span data-t>{t}</span><span data-d>{d}</span></template>)}
+      {Object.entries(asks).map(([k, [t, d, b]]) => <template data-ask={k}><span data-t>{t}</span><span data-d>{d}</span><span data-b>{b}</span></template>)}
 
       <p class="unavailable" data-unavailable hidden>The daily email is being set up. Check back soon.</p>
       <form data-digest novalidate>
@@ -90,6 +97,8 @@ const messages: Record<string, [string, string]> = {
   .notice:focus { outline: none; }
   .notice h2 { font-size: 1.1rem; font-weight: 600; margin-bottom: 2px; }
   .notice p { color: var(--muted); margin: 0; }
+  .notice .btn { margin-top: 12px; }
+  .notice.plain .n-icon { background: var(--border); color: var(--text); }
   .n-icon { width: 34px; height: 34px; flex: none; display: grid; place-items: center; border-radius: 50%; background: color-mix(in srgb, var(--success) 15%, transparent); color: var(--success); }
   .unavailable { color: var(--muted); }
   .side { display: grid; gap: 16px; }

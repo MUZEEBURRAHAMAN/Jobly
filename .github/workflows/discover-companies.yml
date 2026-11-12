@@ -35,7 +35,10 @@ jobs:
           cache-dependency-path: backend/requirements.txt
       - run: pip install -r backend/requirements.txt
       - name: Discover
-        run: python scripts/discover_boards.py --limit "${{ inputs.limit || 0 }}" ${{ inputs.retry && '--retry' || '' }}
+        env:   # inputs go through the environment, never straight into the shell line
+          LIMIT: ${{ inputs.limit || 0 }}
+          RETRY: ${{ inputs.retry && '--retry' || '' }}
+        run: python scripts/discover_boards.py --limit "$LIMIT" $RETRY
       - name: Commit new companies
         run: |
           git config user.name "github-actions[bot]"

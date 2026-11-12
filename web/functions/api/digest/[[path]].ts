@@ -4,13 +4,17 @@
  *
  *   GET  /api/digest/status       { ready } — whether the email is set up (KV binding and Brevo key present)
  *   POST /api/digest/subscribe    { email, roles[], seniority[], hub, remote, consent } → sends a confirmation email
- *   GET  /api/digest/confirm?t=…  turns the pending sign-up into a subscription, then back to /daily-email
- *   GET  /api/digest/unsubscribe?id=…&t=…  removes it at once (also answers POST, for one-click List-Unsubscribe)
+ *   POST /api/digest/confirm?t=…  turns the pending sign-up into a subscription
+ *   POST /api/digest/unsubscribe?id=…&t=…  removes it at once (also what one-click List-Unsubscribe calls)
+ *   GET  on confirm or unsubscribe only shows /daily-email with a button that sends the POST. Mail scanners and
+ *        link previews open every link in an email; a GET that changed anything would let them confirm or
+ *        unsubscribe people who never pressed anything.
  *
  * Storage (KV binding SUBS):
  *   pending:<token>   the sign-up waiting for confirmation, expires after 48 hours
  *   sub:<id>          { email, prefs, token, created } where id = SHA-256 of the email
  *   rate:<ip>:<day>   sign-up attempts from one address per day (max 5)
+ *   sent:<id>         a confirmation email went to this address in the last 10 minutes (no second one)
  * Secrets: BREVO_API_KEY. Variables: DIGEST_FROM (sender email verified in Brevo), DIGEST_FROM_NAME.
  */
 interface KV {
@@ -71,8 +75,9 @@ export async function onRequest({ request, env, params }: Ctx): Promise<Response
     if (tries >= 5) return json({ error: 'Too many sign-ups from here today. Try again tomorrow.' }, 429);
     await kv.put(rateKey, String(tries + 1), { expirationTtl: 86400 });
 
+    if (!(request.headers.get('content-type') ?? '').includes('application/json')) return json({ error: 'Something went wrong. Try again.' }, 415);
     const body = await request.json().catch(() => null) as Record<string, unknown> | null;
-    if (!body || typeof body !== 'object') return json({ error: 'Something went wrong. Try again.' }, 400);
+    if (!body || typeof body !== 'object' || Array.isArray(body)) return json({ error: 'Something went wrong. Try again.' }, 400);
     if (typeof body.website === 'string' && body.website) return json({ ok: true });  // hidden field: bots fill it
     const email = String(body.email ?? '').trim().toLowerCase();
     if (!EMAIL.test(email)) return json({ error: 'Enter a valid email address.' }, 400);
@@ -80,9 +85,15 @@ export async function onRequest({ request, env, params }: Ctx): Promise<Response
     const prefs = cleanPrefs(body);
     if (!prefs) return json({ error: 'Pick at least one kind of job.' }, 400);
 
+    // One confirmation email per address every 10 minutes, so the form can't be used to flood someone's inbox.
+    // Same answer either way: the form never says whether an address was already asked.
+    const sentKey = `sent:${await emailId(email)}`;
+    if (await kv.get(sentKey)) return json({ ok: true });
+    await kv.put(sentKey, '1', { expirationTtl: 600 });
+
     const t = token();
     await kv.put(`pending:${t}`, JSON.stringify({ email, prefs, at: Date.now() }), { expirationTtl: 172800 });
-    const link = `${origin}/api/digest/confirm?t=${t}`;
+    const link = `${origin}/daily-email?do=confirm&t=${t}`;
     const ok = await send(env, email, 'Confirm your daily Jobly email',
       `<div style="font-family:Arial,sans-serif;font-size:15px;line-height:1.5;color:#18181b;max-width:520px">
 <p>Hi,</p><p>Press the button to start getting one email a day with new jobs that match what you picked.</p>
@@ -93,26 +104,33 @@ export async function onRequest({ request, env, params }: Ctx): Promise<Response
     return json({ ok: true });
   }
 
+  const post = request.method === 'POST';
+  const parse = <T,>(raw: string | null): T | null => { try { return raw ? JSON.parse(raw) as T : null; } catch { return null; } };
+
   if (action === 'confirm') {
     const t = url.searchParams.get('t') ?? '';
-    if (!/^[a-f0-9]{48}$/.test(t)) return back(origin, 'invalid');
-    const raw = await kv.get(`pending:${t}`);
-    if (!raw) return back(origin, 'expired');
-    const { email, prefs } = JSON.parse(raw) as { email: string; prefs: Prefs };
-    const id = await emailId(email);
-    await kv.put(`sub:${id}`, JSON.stringify({ email, prefs, token: token(), created: new Date().toISOString() }));
+    if (!/^[a-f0-9]{48}$/.test(t)) return post ? json({ status: 'invalid' }, 400) : back(origin, 'invalid');
+    if (!post) return Response.redirect(`${origin}/daily-email?do=confirm&t=${t}`, 303);
+    const from = request.headers.get('origin');
+    if (from && from !== origin) return json({ error: 'Not allowed.' }, 403);
+    const pending = parse<{ email: string; prefs: Prefs }>(await kv.get(`pending:${t}`));
+    if (!pending?.email || !pending.prefs) return json({ status: 'expired' });
+    const id = await emailId(pending.email);
+    await kv.put(`sub:${id}`, JSON.stringify({ email: pending.email, prefs: pending.prefs, token: token(), created: new Date().toISOString() }));
     await kv.delete(`pending:${t}`);
-    return back(origin, 'confirmed');
+    return json({ status: 'confirmed' });
   }
 
   if (action === 'unsubscribe') {
     const id = url.searchParams.get('id') ?? '';
     const t = url.searchParams.get('t') ?? '';
-    if (!/^[a-f0-9]{64}$/.test(id) || !/^[a-f0-9]{48}$/.test(t)) return back(origin, 'invalid');
-    const raw = await kv.get(`sub:${id}`);
-    if (raw && (JSON.parse(raw) as { token: string }).token === t) await kv.delete(`sub:${id}`);
+    if (!/^[a-f0-9]{64}$/.test(id) || !/^[a-f0-9]{48}$/.test(t)) return post ? json({ status: 'invalid' }, 400) : back(origin, 'invalid');
+    if (!post) return Response.redirect(`${origin}/daily-email?do=unsubscribe&id=${id}&t=${t}`, 303);
+    // No origin check here: mail apps send the one-click unsubscribe POST themselves, and the token is the proof
+    const sub = parse<{ token?: string }>(await kv.get(`sub:${id}`));
+    if (sub?.token === t) await kv.delete(`sub:${id}`);
     // Same answer whether or not it existed, so the link reveals nothing
-    return request.method === 'POST' ? json({ ok: true }) : back(origin, 'unsubscribed');
+    return json({ ok: true, status: 'unsubscribed' });
   }
 
   return json({ error: 'Not found.' }, 404);

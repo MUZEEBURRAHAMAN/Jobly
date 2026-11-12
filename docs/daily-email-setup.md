@@ -43,9 +43,10 @@ Repository → **Settings → Secrets and variables → Actions**:
 ## 4. Check it
 
 1. Push (the website deploy publishes the functions). Open `/daily-email`: the form shows when step 2 is done.
-2. Sign up with your own address, press the link in the confirmation email: the page says "You're in".
+2. Sign up with your own address, open the link in the confirmation email and press **Confirm my email**: the page
+   says "You're in". (Opening a link never changes anything by itself, so mail scanners can't confirm or unsubscribe anyone.)
 3. **Actions → Daily job email → Run workflow** with *dry run* ticked: the log shows how many subscribers and matches,
    without sending. Untick it to send for real.
-4. Use the unsubscribe link in that email: the page says "You're unsubscribed" and the entry is gone from KV.
+4. Use the unsubscribe link in that email and press **Unsubscribe**: the page says "You're unsubscribed" and the entry is gone from KV.
 
 Tests: `node web/tests/digest.test.mjs` (sign-up functions) and `pytest backend/tests/test_send_digest.py` (matching).
