@@ -1,8 +1,8 @@
 import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { CheckCircle2, Download, FileText, Save, Target, Trash, Wand, X } from '../lib/icons';
+import { CheckCircle2, Download, FileText, Save, Trash, Wand, X } from '../lib/icons';
 import { ProfilesStore } from '../lib/useProfiles';
-import { AccentId, ACCENTS, allResumeCss, defaultPage, fileSafe, PageId, PAGES, resumeHtml, resumeWordDoc, TemplateId, TEMPLATES } from '../lib/resume';
-import { fullName, Profile, skillList } from '../lib/profile';
+import { AccentId, ACCENTS, allResumeCss, defaultPage, fileSafe, PageId, PAGES, resumeHtml, resumeWordDoc, TemplateId, templateId, TEMPLATES } from '../lib/resume';
+import { fullName, Profile, skillList, skillsText } from '../lib/profile';
 import { readKey, writeKey } from '../lib/userData';
 import { removeVersion, saveVersion, useVersions } from '../lib/resumeVersions';
 import { analyzeJob, applySuggestions, coverage, defaultAccepted, JobAnalysis, suggestions } from '../lib/tailor';
@@ -15,6 +15,8 @@ import { onKeysChanged } from '../lib/userData';
 const SETTINGS_KEY = 'resumeSettings';
 interface Settings { template: TemplateId; accent: AccentId; page: PageId; fit: boolean }
 const MIN_FIT = 0.75;
+type Tab = 'design' | 'tailor' | 'check';
+const TABS: { id: Tab; label: string }[] = [{ id: 'design', label: 'Design' }, { id: 'tailor', label: 'Tailor to a job' }, { id: 'check', label: 'Score and ATS' }];
 
 function download(name: string, type: string, body: string) {
   const url = URL.createObjectURL(new Blob([body], { type }));
@@ -41,11 +43,15 @@ export const ResumeView: React.FC<{ store: ProfilesStore; onOpenProfile: () => v
   const [rewording, setRewording] = useState(false);
   const [fit, setFit] = useState<{ scale: number; over: boolean }>({ scale: 1, over: false });
   const [scan, setScan] = useState<AtsScan | null>(null);
+  const [tab, setTab] = useState<Tab>('design');
+  const [view, setView] = useState(1);
+  const frameRef = useRef<HTMLDivElement>(null);
+  const stageRef = useRef<HTMLDivElement>(null);
   const resumeRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => { void readKey<Partial<Settings>>(SETTINGS_KEY).then((s) => {
-    if (!s) { void readKey<TemplateId>('resumeTemplate').then((t) => { if (t && TEMPLATES.some((x) => x.id === t)) setSettings((x) => ({ ...x, template: t })); }); return; }
-    setSettings((x) => ({ ...x, ...s, template: TEMPLATES.some((t) => t.id === s.template) ? s.template! : x.template }));
+    if (!s) { void readKey<string>('resumeTemplate').then((t) => { const id = templateId(t); if (id) setSettings((x) => ({ ...x, template: id })); }); return; }
+    setSettings((x) => ({ ...x, ...s, template: templateId(s.template) ?? x.template }));
   }); }, []);
   useEffect(() => { const load = () => void loadAi().then(setAi); load(); return onKeysChanged([AI_KEY], load); }, []);
   const update = (patch: Partial<Settings>) => setSettings((s) => { const n = { ...s, ...patch }; void writeKey(SETTINGS_KEY, n); if (patch.template) void writeKey('resumeTemplate', patch.template); return n; });
@@ -55,7 +61,7 @@ export const ResumeView: React.FC<{ store: ProfilesStore; onOpenProfile: () => v
   const page = PAGES[settings.page];
   const html = useMemo(() => (p ? resumeHtml(p, settings.template) : ''), [p, settings.template]);
   const cov = useMemo(() => (p && tailored ? coverage(p, tailored.analysis) : null), [p, tailored]);
-  const single = TEMPLATES.find((t) => t.id === settings.template)?.ats ?? true;
+  const single = true;  // every template is one column
   const score = useMemo(() => (p ? resumeScore(p, { coverage: cov, singleColumn: single, overflows: fit.over }) : null), [p, cov, single, fit.over]);
 
   // Template styles live in a constructed stylesheet (the extension's security policy blocks inline <style>)
@@ -71,16 +77,24 @@ export const ResumeView: React.FC<{ store: ProfilesStore; onOpenProfile: () => v
     const el = resumeRef.current?.querySelector<HTMLElement>('.resume');
     if (!el) return;
     el.style.zoom = '1';
-    el.style.minHeight = settings.template === 'sidebar' ? `${page.h}px` : '';
     const h = el.scrollHeight;
     const need = page.h / h;
     const scale = settings.fit && h > page.h ? Math.max(MIN_FIT, need) : 1;
     el.style.zoom = String(scale);
-    if (settings.template === 'sidebar') el.style.minHeight = `${page.h / scale}px`;
     setFit({ scale, over: h * scale > page.h + 1 });
     // The ATS check reads the finished page's own text, top to bottom, like a parser reads the PDF
     setScan(atsScan(el.innerText, { singleColumn: single, roles: p?.work.filter((w) => w.title.trim() || w.company.trim()).length ?? 0 }));
   }, [html, settings.fit, settings.page, settings.template, settings.accent, page.h]);
+
+  // The preview is scaled down to the space it has, so the whole page is in view (the PDF is always full size)
+  useLayoutEffect(() => {
+    const frame = frameRef.current;
+    if (!frame) return;
+    const measure = () => { const w = frame.clientWidth - 32; setView(Math.min(1, Math.max(0.35, w / page.w))); };
+    measure();
+    const ro = new ResizeObserver(measure); ro.observe(frame);
+    return () => ro.disconnect();
+  }, [page.w, base]);
 
   if (!base || !p) {
     return (
@@ -140,16 +154,25 @@ export const ResumeView: React.FC<{ store: ProfilesStore; onOpenProfile: () => v
   // Keyword targeting: add a missing keyword to the skills only when the user says they have it
   const haveKeyword = (k: string) => {
     if (!tailored) return;
-    const next = { ...tailored.profile, skills: [...skillList(tailored.profile), k].join(', ') };
+    const next = { ...tailored.profile, skills: skillsText(tailored.profile, [k, ...skillList(tailored.profile)]) };
     setTailored({ ...tailored, profile: next, after: coverage(next, tailored.analysis).percent });
   };
   const missing = cov ? cov.keywordsMissing.filter((k) => !tailored?.skipped.includes(k)) : [];
+  const tplLabel = TEMPLATES.find((t) => t.id === settings.template)?.label ?? '';
+  const onTabKey = (e: React.KeyboardEvent) => {
+    const i = TABS.findIndex((t) => t.id === tab);
+    const next = e.key === 'ArrowRight' ? (i + 1) % TABS.length : e.key === 'ArrowLeft' ? (i + TABS.length - 1) % TABS.length : e.key === 'Home' ? 0 : e.key === 'End' ? TABS.length - 1 : -1;
+    if (next < 0) return;
+    e.preventDefault(); setTab(TABS[next].id); document.getElementById(`rv-tab-${TABS[next].id}`)?.focus();
+  };
 
   return (
     <div className="section resume-view">
       <div className="row wrap rv-head" style={{ justifyContent: 'space-between' }}>
         <div><h2>Resume</h2><p className="text-sm">{tailored ? `Tailored to the job description below (not saved yet).` : version ? `Tailored for ${version.job.title}${version.job.company ? ` at ${version.job.company}` : ''}.` : `From your profile “${base.label}”.`}</p></div>
         <div className="row wrap">
+          {score && scan && <button type="button" className="rv-pill" onClick={() => setTab('check')} title="Open Score and ATS">
+            Score <b>{score.score}</b>/100 · ATS {scan.problems ? <span className="warn">{scan.problems} to fix</span> : <span className="ok">clean</span>}</button>}
           <button type="button" className="btn btn-outline btn-sm" onClick={onOpenProfile}><FileText size={14} aria-hidden="true" /> Edit profile</button>
           <button type="button" className="btn btn-outline btn-sm" onClick={() => download(`${name}.doc`, 'application/msword', resumeWordDoc(p, settings.template, settings.accent))}><Download size={14} aria-hidden="true" /> Word</button>
           <button type="button" className="btn btn-sm" onClick={printPdf}><Download size={14} aria-hidden="true" /> Download PDF</button>
@@ -158,6 +181,45 @@ export const ResumeView: React.FC<{ store: ProfilesStore; onOpenProfile: () => v
 
       <div className="rv-layout">
         <div className="rv-controls">
+          <div className="rv-tabs" role="tablist" aria-label="Resume tools" onKeyDown={onTabKey}>
+            {TABS.map((t) => (
+              <button key={t.id} id={`rv-tab-${t.id}`} type="button" role="tab" aria-selected={tab === t.id} aria-controls={`rv-panel-${t.id}`} tabIndex={tab === t.id ? 0 : -1} onClick={() => setTab(t.id)}>
+                {t.label}{t.id === 'check' && score ? <span className="rv-tab-badge">{score.score}</span> : null}{t.id === 'tailor' && tailored ? <span className="rv-tab-badge">{tailored.after}%</span> : null}
+              </button>
+            ))}
+          </div>
+
+          <div id="rv-panel-design" role="tabpanel" aria-labelledby="rv-tab-design" className="rv-panel" hidden={tab !== 'design'}>
+          <section className="card rv-card" aria-labelledby="rv-tpl-title">
+            <div className="row" style={{ justifyContent: 'space-between' }}><h3 id="rv-tpl-title">Template</h3><span className="text-xs muted">All {TEMPLATES.length} read cleanly in an ATS</span></div>
+            <div className="rv-templates" role="radiogroup" aria-label="Template">
+              {TEMPLATES.map((t) => (
+                <button key={t.id} type="button" role="radio" aria-checked={settings.template === t.id} className="rv-tpl" onClick={() => update({ template: t.id })} title={t.hint}>
+                  <span className="rv-thumb" aria-hidden="true" dangerouslySetInnerHTML={{ __html: resumeHtml(p, t.id) }} />
+                  <span className="rv-tpl-name">{t.label}</span>
+                </button>
+              ))}
+            </div>
+            <p className="hint">{TEMPLATES.find((t) => t.id === settings.template)?.hint}</p>
+            <p className="label" style={{ margin: 0 }}>Accent colour</p>
+            <div className="row wrap" role="radiogroup" aria-label="Accent colour">
+              {ACCENTS.map((a) => <button key={a.id} type="button" role="radio" aria-checked={settings.accent === a.id} aria-label={a.label} title={a.label} className="rv-swatch" style={{ background: a.color }} onClick={() => update({ accent: a.id })} />)}
+            </div>
+          </section>
+
+          <section className="card rv-card" aria-labelledby="rv-page-title">
+            <h3 id="rv-page-title">Page</h3>
+            <div className="row wrap">
+              <select className="select" style={{ width: 'auto' }} value={settings.page} onChange={(e) => update({ page: e.target.value as PageId })} aria-label="Page size">
+                {Object.entries(PAGES).map(([id, v]) => <option key={id} value={id}>{v.label}</option>)}
+              </select>
+              <label className="row text-sm"><input type="checkbox" className="switch" role="switch" checked={settings.fit} onChange={(e) => update({ fit: e.target.checked })} /> Fit to one page</label>
+            </div>
+            <p className="hint" role="status">{fit.over ? 'Longer than one page even at 75%. Remove older points, or try Compact.' : fit.scale < 1 ? `Fits on one page at ${Math.round(fit.scale * 100)}%.` : 'Fits on one page.'}</p>
+          </section>
+          </div>
+
+          <div id="rv-panel-tailor" role="tabpanel" aria-labelledby="rv-tab-tailor" className="rv-panel" hidden={tab !== 'tailor'}>
           {versions.length > 0 && !tailored && (
             <div className="card rv-card">
               <label className="label" htmlFor="rv-which">Version</label>
@@ -171,7 +233,7 @@ export const ResumeView: React.FC<{ store: ProfilesStore; onOpenProfile: () => v
           )}
 
           <section className="card rv-card" aria-labelledby="rv-jd-title">
-            <h3 id="rv-jd-title" className="row"><Target size={16} aria-hidden="true" /> Tailor to a job description</h3>
+            <h3 id="rv-jd-title">Tailor to a job description</h3>
             {!tailored ? (
               <>
                 <div className="form-grid">
@@ -201,11 +263,15 @@ export const ResumeView: React.FC<{ store: ProfilesStore; onOpenProfile: () => v
                       <p className="hint">Only add what you really have; an interviewer will ask about it.</p></div>}
                   </div>
                 )}
+                <div className="row wrap"><button type="button" className="btn btn-outline btn-sm" onClick={() => setTab('check')}>See the ATS check</button></div>
                 <p className="hint">For requirement-by-requirement detail and changes one at a time, use Tailor for a job.</p>
               </div>
             )}
           </section>
 
+          </div>
+
+          <div id="rv-panel-check" role="tabpanel" aria-labelledby="rv-tab-check" className="rv-panel" hidden={tab !== 'check'}>
           {scan && (
             <section className="card rv-card" aria-labelledby="rv-ats-title">
               <div className="row" style={{ justifyContent: 'space-between' }}>
@@ -221,7 +287,7 @@ export const ResumeView: React.FC<{ store: ProfilesStore; onOpenProfile: () => v
                   </div>
                   <span className={`meter ${cov.percent >= 70 ? 'ats-high' : cov.percent >= 40 ? 'ats-mid' : 'ats-low'}`} role="progressbar" aria-label="Qualification match" aria-valuemin={0} aria-valuemax={100} aria-valuenow={cov.percent}><span style={{ width: `${cov.percent}%` }} /></span>
                 </div>
-              ) : <p className="text-sm muted">Paste a job description above to see your qualification match.</p>}
+              ) : <p className="text-sm muted">Paste a job description in <button type="button" className="link-btn" onClick={() => setTab('tailor')}>Tailor to a job</button> to see your qualification match.</p>}
               <div>
                 <p className="label">Parsed fields</p>
                 <ul className="ats-fields" aria-label="Parsed fields">
@@ -266,47 +332,34 @@ export const ResumeView: React.FC<{ store: ProfilesStore; onOpenProfile: () => v
                   {score.fixes.slice(0, 5).map((c) => <li key={c.id} className={`fix-${c.impact}`}><span className="row" style={{ justifyContent: 'space-between' }}><span className="text-sm font-medium">{c.label}</span><span className={`imp imp-${c.impact}`}>{c.impact === 'high' ? 'High impact' : c.impact === 'medium' ? 'Medium' : 'Low'}</span></span><span className="text-xs muted">{c.tip}</span></li>)}
                 </ul>
               )}
-              {!cov && <p className="hint">Paste a job description above to add the job match to your score.</p>}
+              {!cov && <p className="hint">Paste a job description in Tailor to a job to add the job match to your score.</p>}
               <details className="text-sm"><summary>All {score.checks.length} checks</summary>
                 {score.categories.map((cat) => <div key={cat.name}><p className="label" style={{ marginTop: 8 }}>{cat.name} · {cat.percent}%</p>
                   <ul className="rv-all">{score.checks.filter((c) => c.category === cat.name).map((c) => <li key={c.id} className={c.ok ? 'ok' : ''}>{c.ok ? '✓' : '○'} {c.label} <span className="muted">{c.got}/{c.max}</span></li>)}</ul></div>)}</details>
             </section>
           )}
 
-          <section className="card rv-card" aria-labelledby="rv-tpl-title">
-            <h3 id="rv-tpl-title">Template</h3>
-            <div className="rv-templates" role="radiogroup" aria-label="Template">
-              {TEMPLATES.map((t) => (
-                <button key={t.id} type="button" role="radio" aria-checked={settings.template === t.id} className="rv-tpl" onClick={() => update({ template: t.id })} title={t.hint}>
-                  <span className="rv-thumb" aria-hidden="true" dangerouslySetInnerHTML={{ __html: resumeHtml(p, t.id) }} />
-                  <span className="rv-tpl-name">{t.label}{!t.ats && <span className="text-xs muted"> · 2 columns</span>}</span>
-                </button>
-              ))}
-            </div>
-            <p className="hint">{TEMPLATES.find((t) => t.id === settings.template)?.hint}{settings.template === 'sidebar' ? ' Some older applicant tracking systems read single-column resumes more reliably.' : ''}</p>
-            <div className="row wrap" role="radiogroup" aria-label="Accent colour">
-              {ACCENTS.map((a) => <button key={a.id} type="button" role="radio" aria-checked={settings.accent === a.id} aria-label={a.label} title={a.label} className="rv-swatch" style={{ background: a.color }} onClick={() => update({ accent: a.id })} />)}
-            </div>
-          </section>
-
-          <section className="card rv-card" aria-labelledby="rv-page-title">
-            <h3 id="rv-page-title">Page</h3>
-            <div className="row wrap">
-              <select className="select" style={{ width: 'auto' }} value={settings.page} onChange={(e) => update({ page: e.target.value as PageId })} aria-label="Page size">
-                {Object.entries(PAGES).map(([id, v]) => <option key={id} value={id}>{v.label}</option>)}
-              </select>
-              <label className="row text-sm"><input type="checkbox" className="switch" role="switch" checked={settings.fit} onChange={(e) => update({ fit: e.target.checked })} /> Fit to one page</label>
-            </div>
-            <p className="hint" role="status">{fit.over ? 'Longer than one page even at 75%. Remove older points, or try Compact.' : fit.scale < 1 ? `Fits on one page at ${Math.round(fit.scale * 100)}%.` : 'Fits on one page.'}</p>
-          </section>
+          </div>
         </div>
 
-        <div className="resume-frame" role="region" aria-label="Resume preview" tabIndex={0}>
+        <div className="rv-preview">
+          <div className="rv-preview-bar">
+            <span className="text-sm font-medium">{tplLabel} · {page.label}</span>
+            <span className="text-xs muted" role="status">{fit.over ? 'Runs past one page' : fit.scale < 1 ? `One page at ${Math.round(fit.scale * 100)}%` : 'One page'}</span>
+            <span className="grow" />
+            <button type="button" className="btn btn-ghost btn-xs" onClick={() => setTab('design')}>Change template</button>
+          </div>
+        <div ref={frameRef} className="resume-frame" role="region" aria-label="Resume preview" tabIndex={0}>
+          <div className="rv-stage-box" style={{ width: page.w * view, height: (stageRef.current?.offsetHeight ?? page.h) * view }}>
+          <div ref={stageRef} className="rv-stage" style={{ transform: `scale(${view})` }}>
           <div className="resume-page" style={{ width: page.w, minHeight: page.h }}>
             {/* Our own escaped markup (lib/resume.ts) built from the user's profile. */}
             <div ref={resumeRef} className="resume-print" dangerouslySetInnerHTML={{ __html: html }} />
             {!settings.fit && <span className="page-line" style={{ top: page.h }} aria-hidden="true">End of page 1</span>}
           </div>
+          </div>
+          </div>
+        </div>
         </div>
       </div>
     </div>

@@ -474,37 +474,49 @@ await step('profile, copy kit, resume, cover letter, backup, sync', async () => 
   // resume
   await d.getByRole('button', { name: /^Resume/ }).click(); await d.locator('.resume-print .resume h1').waitFor({ timeout: 5000 });
   ok((await d.locator('.resume-print .resume h1').innerText()) === 'Ada Lovelace' && await d.locator('.resume-print .resume li', { hasText: 'Built the design system' }).count() === 1, 'the resume preview is built from the profile');
-  ok(await d.locator('.rv-thumb .resume').count() === 7, 'the template gallery shows all 7 templates with your own resume');
+  ok(await d.locator('.rv-thumb .resume').count() === 8 && await d.getByRole('tab', { name: 'Design' }).getAttribute('aria-selected') === 'true', 'the Resume page opens on Design, with all 8 templates first (your own resume in each)');
   await d.getByRole('radio', { name: 'Classic', exact: true }).click(); await sleep(300); ok((await store('resumeSettings'))?.template === 'classic' && (await store('resumeTemplate')) === 'classic', 'the chosen template is remembered');
   ok(await d.evaluate(() => getComputedStyle(document.querySelector('.resume-print .resume')).fontFamily.includes('Georgia')), 'the Classic template applies its own styles (constructed stylesheet, no inline <style>)');
   await d.getByRole('radio', { name: 'Navy' }).click(); await sleep(200);
   ok(await d.evaluate(() => getComputedStyle(document.querySelector('.resume-print .resume h2')).borderBottomColor === 'rgb(30, 58, 138)'), 'the accent colour changes the section rules');
+  ok(/Fits on one page/.test(await d.locator('.rv-card [role="status"]').innerText()), 'a short resume fits on one page');
+  await d.getByRole('tab', { name: /^Score and ATS/ }).click();
   const sc = Number(/Score (\d+)/.exec(await d.getByRole('img', { name: /^Score \d+ out of 100/ }).getAttribute('aria-label'))?.[1]);
   const fixes = await d.getByRole('list', { name: 'Top fixes' }).locator('li').allInnerTexts();
   ok(sc > 0 && sc < 100 && await d.getByRole('progressbar', { name: 'Best practices' }).count() === 1 && /High impact/.test(fixes[0] ?? ''), `the resume score has five categories and puts high-impact fixes first (${sc}/100; ${fixes[0]?.replace(/\n/g, ' ')})`);
-  ok(/Fits on one page/.test(await d.locator('.rv-card [role="status"]').innerText()), 'a short resume fits on one page');
   // ATS check: reads the finished page's text like a parser, with rules only
   const ats = async () => (await d.getByRole('list', { name: 'Parsed fields' }).locator('li').allInnerTexts()).map((t) => t.replace(/\n+/g, ' | '));
   let fields = await ats();
   ok(fields.length === 6 && /^Name \| Detected/.test(fields[0]) && /Experience \| Section found, no dated positions/.test(fields.join('\n')) && /Skills \| Only 4 skills/.test(fields.join('\n')) && /Layout \| Single column/.test(fields.join('\n')), `the ATS check reads the page text: name found, the undated role and short skills list flagged (${fields.join(' ; ')})`);
-  await d.getByRole('radio', { name: /^Sidebar/ }).click(); await sleep(300); fields = await ats();
-  ok(/^Name \| Detected/.test(fields[0]) && /Layout \| Two columns/.test(fields.join('\n')) && /to fix/.test(await d.locator('.ats-badge').innerText()), 'the two-column template still reads name first, and is flagged as two columns');
-  await d.getByRole('radio', { name: 'Classic', exact: true }).click(); await sleep(300);
+  // Every template reads cleanly: name first, single column, the same fields found
+  const perTemplate = [];
+  for (const t of ['Modern', 'Engineer', 'Classic', 'Bold', 'Executive', 'Accent', 'Compact', 'Minimal']) {
+    await d.getByRole('tab', { name: 'Design' }).click(); await d.getByRole('radio', { name: t, exact: true }).click(); await sleep(250);
+    await d.getByRole('tab', { name: /^Score and ATS/ }).click(); const f = await ats();
+    if (!/^Name \| Detected/.test(f[0]) || !/Layout \| Single column/.test(f.join('\n')) || f.join('\n') !== fields.join('\n')) perTemplate.push(t);
+  }
+  ok(perTemplate.length === 0, `all 8 templates read the same to an ATS: name first, one column (${perTemplate.join(', ') || 'none differ'})`);
+  await d.getByRole('tab', { name: 'Design' }).click(); await d.getByRole('radio', { name: 'Classic', exact: true }).click(); await sleep(300);
   // Clean PDF: zero page margin (Chrome then prints no header or footer), one page, the file named after you
   const printed = await d.evaluate(() => new Promise((res) => { window.print = () => res({ css: [...document.head.querySelectorAll('style')].map((x) => x.textContent).join('\n'), title: document.title }); document.querySelector('.rv-head .btn:not(.btn-outline)').click(); }));
   ok(/@page \{ size: (A4|letter); margin: 0; \}/.test(printed.css) && /height: (1123|1056)px; overflow: hidden/.test(printed.css) && printed.title === 'Ada-Lovelace-Resume', `the PDF has no browser header or footer, one page, and your name as the file name (${printed.title})`);
   await d.evaluate(() => window.dispatchEvent(new Event('afterprint')));
   // Tailor to a pasted job description right on the Resume page
+  await d.getByRole('tab', { name: 'Tailor to a job' }).click();
   await d.getByLabel('Role', { exact: true }).fill('Design Systems Lead'); await d.getByLabel('Company', { exact: true }).fill('Globex');
   await d.getByLabel('Job description', { exact: true }).fill('Requirements\n- Experience building and maintaining design systems\n- Strong user research skills\n- React and TypeScript knowledge is a plus\n- 5+ years of product design');
   await d.getByRole('button', { name: 'Apply to my resume' }).click(); await d.locator('.rv-coverage').waitFor({ timeout: 5000 });
   ok(/^Design systems/i.test(await d.locator('.resume-print .resume .skills').innerText()) && (await store('profiles'))[0].skills === 'Figma, Design systems, React, User research', 'Apply puts what the job asks for first; the profile is unchanged');
+  await d.getByRole('button', { name: 'See the ATS check' }).click();
   ok(await d.getByRole('list', { name: 'Keywords in your resume' }).getByText('React').count() === 1, 'keywords the resume already has are shown as found');
   const pct = Number(await d.getByRole('progressbar', { name: 'Qualification match' }).getAttribute('aria-valuenow'));
   ok(pct > 0 && pct <= 100 && await d.getByRole('list', { name: 'Job skills missing' }).getByText('TypeScript').count() === 1, `the ATS check shows the qualification match and the job skills the resume is missing (${pct}%)`);
+  await d.getByRole('tab', { name: /^Tailor to a job/ }).click();
   await d.getByRole('button', { name: 'I have TypeScript: add it to skills' }).click(); await sleep(200);
   ok(/TypeScript/.test(await d.locator('.resume-print .resume .skills').innerText()) && !/TypeScript/.test((await store('profiles'))[0].skills), 'a missing keyword is added only when you say you have it, and only to this tailored copy');
+  await d.getByRole('tab', { name: /^Score and ATS/ }).click();
   ok(/for this job/.test(await d.locator('.rv-cats').innerText()), 'the score includes the job match once a job description is applied');
+  await d.getByRole('tab', { name: /^Tailor to a job/ }).click();
   await d.getByRole('button', { name: 'Save for this job' }).click(); await sleep(400);
   ok((await store('resumeVersions'))?.[0]?.job.company === 'Globex' && /Tailored: Design Systems Lead at Globex/.test(await d.getByLabel('Version').locator('option:checked').innerText()), 'the tailored resume is saved as a version for the job');
   await d.getByLabel('Version').selectOption('base'); await sleep(200);
@@ -606,6 +618,21 @@ await step('ATS check: parses a resume from plain text (unit)', async () => {
   }));
   ok(kw.no.length === 0 && kw.yes.length === 5 && kw.jd.join() === 'Figma,SQL,Go-to-market', `everyday words are not read as skills: "go-to-market" is not Go, "the rest of" is not REST (${kw.no} | ${kw.yes} | ${kw.jd})`);
   ok(years.phone === '' && years.fields.find((f) => f.id === 'contact').status === 'warn', 'a year range is not mistaken for a phone number');
+  const eng = await page.evaluate(() => {
+    const p = { ...window.units.emptyProfile(), first_name: 'Rajveer', last_name: 'Singh', email: 'r@example.com', portfolio: 'rajveers.com', github: 'github.com/r',
+      skills: 'Frontend: React, TypeScript\nCloud: AWS (EC2, S3), Docker', achievements: 'Hackathons: Won **2** national hackathons',
+      work: [{ id: 'w', company: 'IABTM', title: 'Software Engineer', location: 'Remote', start: '2025-09', end: '', current: true, bullets: 'Built a **500+ endpoint** API <script>x</script>' }],
+      projects: [{ id: 'p', name: 'Safire', tech: 'React, Redis', link: 'github.com/r/safire', bullets: 'Cut latency **60%**' }],
+      education: [{ id: 'e', school: 'MSIT', degree: 'B.Tech', field: 'ECE', start: '2023-01', end: '2027-01', location: 'Delhi, India', grade: 'CGPA: 8.68 / 10' }] };
+    const div = document.createElement('div'); div.innerHTML = window.units.resumeHtml(p, 'engineer'); document.body.append(div);
+    const text = div.innerText; div.remove();
+    return { html: window.units.resumeHtml(p, 'engineer'), text, flat: window.units.skillList(p), regrouped: window.units.skillsText(p, ['Docker', 'React', 'Go', 'TypeScript', 'AWS (EC2, S3)']),
+      plain: window.units.bulletList('- Built a **500+** API'), scan: window.units.atsScan(text, { roles: 1 }) };
+  });
+  ok(/<b>IABTM<\/b> \| <i>Software Engineer<\/i>/.test(eng.html) && /<b>500\+ endpoint<\/b>/.test(eng.html) && !/<script>/.test(eng.html) && /<b>Frontend:<\/b> React, TypeScript/.test(eng.html) && /Safire<\/b> \| <i>React, Redis/.test(eng.html) && /CGPA: 8.68/.test(eng.html),
+    'the Engineer template: company | title, bold marks, grouped skills, projects and grade, all escaped');
+  ok(eng.flat.join('|') === 'React|TypeScript|AWS (EC2, S3)|Docker' && eng.regrouped === 'Frontend: Go, React, TypeScript\nCloud: Docker, AWS (EC2, S3)' && eng.plain[0] === 'Built a 500+ API', `skill groups survive reordering, brackets don't split, bold marks stay out of plain text (${eng.regrouped.replace(/\n/g, ' / ')})`);
+  ok(eng.scan.problems === 2 && eng.scan.fields.find((f) => f.id === 'skills').detail === 'Only 4 skills detected' && eng.scan.positions === 1, `the ATS check reads the Engineer layout: projects and achievements don't count as skills (${eng.scan.fields.map((f) => f.detail).join(' ; ')})`);
   const grade = await page.evaluate(() => { const p = { ...window.units.emptyProfile(), summary: 'x'.repeat(100), skills: 'a,b,c,d,e,f,g,h' }; return [window.units.resumeScore(p, { coverage: { percent: 30, matches: [], keywordsFound: [], keywordsMissing: [], covered: 0 } }).grade, window.units.resumeScore(p).grade]; });
   ok(grade[0] !== 'Excellent' && grade[0] !== 'Good', `a low job match never grades as Good or Excellent for that job (${grade})`);
   await h.ctx.close();

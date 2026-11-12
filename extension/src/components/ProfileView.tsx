@@ -4,7 +4,7 @@ import { MAX_PROFILES, Profile, PROFILE_KEYS, ResumeFile, saveResumeFile } from 
 import { ProfilesStore } from '../lib/useProfiles';
 import { readKey, writeKey } from '../lib/userData';
 import { CopyButton } from './CopyButton';
-import { EduEditor, WorkEditor } from './ProfileEditors';
+import { EduEditor, ProjectEditor, WorkEditor } from './ProfileEditors';
 import { ProfileSetup } from './ProfileSetup';
 import { SavedAnswers } from './SavedAnswers';
 import { CompletenessBar } from './CompletenessBar';
@@ -150,8 +150,8 @@ export const ProfileView: React.FC<{ store: ProfilesStore; notify: (m: string, k
           <div><div className="row" style={{ justifyContent: 'space-between' }}><label className="label" htmlFor="pf-summary">Summary</label><CopyButton value={draft.summary} label="summary" /></div>
             <textarea id="pf-summary" className="textarea" rows={4} maxLength={3000} value={draft.summary} onChange={(e) => set({ summary: e.target.value })} placeholder="Two or three sentences about what you do and what you're looking for" /></div>
           <div><div className="row" style={{ justifyContent: 'space-between' }}><label className="label" htmlFor="pf-skills">Skills</label><CopyButton value={draft.skills} label="skills" /></div>
-            <input id="pf-skills" className="input" maxLength={1500} value={draft.skills} onChange={(e) => set({ skills: e.target.value })} placeholder="e.g. Figma, design systems, React, user research" />
-            <p className="hint">Separate with commas. Jobly also uses these for the fit score on job cards.</p></div>
+            <textarea id="pf-skills" className="textarea" rows={3} maxLength={3000} value={draft.skills} onChange={(e) => set({ skills: e.target.value })} placeholder={'e.g. Figma, design systems, React, user research\nor grouped, one group per line:\nFrontend: React, TypeScript, Tailwind\nBackend: Node.js, PostgreSQL'} />
+            <p className="hint">Separate with commas. To group them on the resume, start a line with a label and a colon. Jobly also uses these for the fit score on job cards.</p></div>
         </div>
       </fieldset>
 
@@ -172,6 +172,16 @@ export const ProfileView: React.FC<{ store: ProfilesStore; notify: (m: string, k
 
       <fieldset className="card profile-card span-all"><legend className="label">Education</legend>
         <EduEditor education={draft.education} onChange={(education) => set({ education })} />
+      </fieldset>
+
+      <fieldset className="card profile-card span-all"><legend className="label">Projects</legend>
+        <ProjectEditor projects={draft.projects ?? []} onChange={(projects) => set({ projects })} />
+      </fieldset>
+
+      <fieldset className="card profile-card span-all"><legend className="label">Achievements and leadership</legend>
+        <label className="label" htmlFor="pf-ach">One per line <span className="muted">(optional)</span></label>
+        <textarea id="pf-ach" className="textarea" rows={3} maxLength={2500} value={draft.achievements ?? ''} onChange={(e) => set({ achievements: e.target.value })} placeholder={'Hackathons: Won 2 national hackathons (15,000+ participants)\nOpen source: 16 merged PRs to large projects'} />
+        <p className="hint">Start a line with a label and a colon to put the label in bold. In any point, wrap words in **double stars** to make them bold on the resume.</p>
       </fieldset>
 
       <SavedAnswers />

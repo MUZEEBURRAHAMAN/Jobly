@@ -1,4 +1,4 @@
-import { EduItem, newProfileId, Profile, WorkItem } from './profile';
+import { EduItem, newProfileId, Profile, ProjectItem, WorkItem } from './profile';
 
 /**
  * Reads a LinkedIn "Save to PDF" export or a resume PDF in the browser and turns it into profile fields.
@@ -96,6 +96,20 @@ function range(text: string): { start: string; end: string; current: boolean } |
   return { start: monthOf(m[1]), end: current ? '' : monthOf(m[2]), current };
 }
 
+/** Countries and regions that end a "City, Country" place. */
+const COUNTRY = 'India|USA|US|U\\.S\\.|United States|UK|United Kingdom|Canada|Germany|France|Netherlands|Spain|Ireland|Australia|Singapore|UAE|Japan|Israel|Poland|Portugal|Sweden|Brazil|Mexico|Remote';
+/** Words that make a phrase a job title, to tell "Company | Title" from "Title | Company". */
+const TITLE_WORDS = /\b(engineer|developer|designer|manager|lead|head|director|intern|analyst|scientist|architect|consultant|specialist|officer|associate|coordinator|founder|ceo|cto|vp|president|researcher|administrator|writer|editor|marketer|recruiter|executive|assistant|technician|programmer|strategist|product owner)\b/i;
+/** A skills line split on commas, but not inside brackets ("AWS (EC2, S3)" stays one skill). */
+export function splitSkills(line: string): string[] {
+  const out: string[] = []; let depth = 0; let cur = '';
+  for (const ch of line) {
+    if (ch === '(') depth++; if (ch === ')') depth = Math.max(0, depth - 1);
+    if (depth === 0 && /[,•|;·]/.test(ch)) { if (cur.trim()) out.push(cur.trim()); cur = ''; } else cur += ch;
+  }
+  if (cur.trim()) out.push(cur.trim());
+  return out;
+}
 const isRangeLine = (t: string) => { const m = RANGE.exec(t); return !!m && t.replace(m[0], '').replace(/\(.*?\)/g, '').trim().length < 4; };
 const looksLikePlace = (t: string) => t.length < 80 && !RANGE.test(t) && (/,/.test(t) || /\b(remote|hybrid|on-?site|india|united states|united kingdom|area)\b/i.test(t)) && !/[.!?]$/.test(t);
 const yearsSince = (start: string) => {
@@ -223,11 +237,14 @@ function experienceFrom(lines: PdfLine[]): WorkItem[] {
 /** Wrapped lines back into one point per line: a new point starts after a full stop or at a bullet sign. */
 function joinBullets(lines: string[]): string {
   const out: string[] = [];
+  let fresh = false;  // a bullet sign on a line of its own: the next line starts a point
   for (const raw of lines) {
     const t = raw.trim();
     if (!t) continue;
-    const bullet = /^[-•*▪◦●]\s*/.test(t);
-    const clean = t.replace(/^[-•*▪◦●]\s*/, '');
+    if (/^[-•*▪◦●∙·]$/.test(t)) { fresh = true; continue; }
+    const bullet = fresh || /^[-•*▪◦●∙]\s*/.test(t);
+    fresh = false;
+    const clean = t.replace(/^[-•*▪◦●∙]\s*/, '');
     if (!out.length || bullet || /[.!?:]$/.test(out[out.length - 1])) out.push(clean);
     else out[out.length - 1] += ` ${clean}`;
   }
@@ -264,7 +281,9 @@ export function parseResume(lines: PdfLine[]): ImportResult {
     experience: /^(experience|work experience|professional experience|employment( history)?|work history|career history)$/i,
     education: /^(education|education & training|academic background)$/i,
     skills: /^(skills|technical skills|core skills|key skills|core competencies|tools|skills & tools)$/i,
-    other: /^(projects|certifications|awards|languages|interests|publications|volunteering|references)$/i,
+    projects: /^((selected|personal|key|academic) )?projects$/i,
+    achievements: /^(achievements|awards|honou?rs( (&|and) awards)?|achievements (&|and) (leadership|awards)|leadership|accomplishments)$/i,
+    other: /^(certifications|languages|interests|publications|volunteering|references)$/i,
   });
   // The name: the biggest text near the top that isn't contact details
   const candidates = s.head.slice(0, 6).filter((l) => !EMAIL.test(l.text) && !/\d{3}/.test(l.text) && l.text.split(' ').length <= 5);
@@ -276,13 +295,29 @@ export function parseResume(lines: PdfLine[]): ImportResult {
     const after = s.head[s.head.indexOf(nameLine) + 1]?.text;
     if (after && !EMAIL.test(after) && !PHONE.test(after) && after.length < 120) { p.headline = after; found.push('Headline'); }
   }
+  // A bare web address in the contact lines ("yourname.com") is the portfolio
+  if (!p.portfolio) {
+    const site = s.head.slice(0, 8).flatMap((l) => l.text.split(/\s*[|·•,]\s*|\s{2,}/)).map((t) => t.trim())
+      .find((t) => /^(https?:\/\/)?(www\.)?[a-z0-9-]+(\.[a-z0-9-]+)*\.[a-z]{2,}(\/\S*)?$/i.test(t) && !EMAIL.test(t) && !/linkedin\.com|github\.com/i.test(t));
+    if (site) { p.portfolio = site.replace(/^https?:\/\//, ''); found.push('Website'); }
+  }
   // The place usually sits in the contact line: "email · phone · Pune, India"
   const place = s.head.slice(0, 8).flatMap((l) => l.text.split(/\s*[·|•]\s*/)).find((t) => looksLikePlace(t) && !EMAIL.test(t) && !/\d{4}|https?:|www\.|\.com/.test(t));
   if (place) { p.location = place; found.push('Location'); }
   const summary = (s.parts.summary ?? []).map((l) => l.text).join(' ').trim();
   if (summary) { p.summary = summary.slice(0, 3000); found.push('Summary'); }
-  const skills = (s.parts.skills ?? []).flatMap((l) => l.text.replace(/^[^:]{1,30}:\s*/, '').split(/\s*[,•|;·]\s*/)).map((t) => t.trim()).filter((t) => t && t.length < 40);
-  if (skills.length) { p.skills = [...new Set(skills)].slice(0, 40).join(', '); found.push(`${Math.min(skills.length, 40)} skills`); }
+  // Skills: grouped lines ("Backend: Node.js, Express") stay grouped; a wrapped line joins the group above it
+  const skillLines = (s.parts.skills ?? []).map((l) => l.text.trim()).filter(Boolean);
+  const LABEL = /^([^:,]{2,40}):\s*(.+)$/;
+  if (skillLines.filter((l) => LABEL.test(l)).length >= 2) {
+    const groups: string[] = [];
+    for (const l of skillLines) { if (LABEL.test(l) || !groups.length) groups.push(l.replace(/\s*[•|;·]\s*/g, ', ')); else groups[groups.length - 1] += `, ${l}`; }
+    p.skills = groups.slice(0, 12).join('\n').slice(0, 3000);
+    found.push(`${groups.length} skill groups`);
+  } else {
+    const skills = skillLines.flatMap((l) => splitSkills(l.replace(/^[^:]{1,30}:\s*/, ''))).filter((t) => t && t.length < 40);
+    if (skills.length) { p.skills = [...new Set(skills)].slice(0, 40).join(', '); found.push(`${Math.min(skills.length, 40)} skills`); }
+  }
 
   // Roles: each line with a date range starts one. "Title, Company  Jan 2020 – Present", or the title and company on the line before.
   const exp = s.parts.experience ?? [];
@@ -290,14 +325,23 @@ export function parseResume(lines: PdfLine[]): ImportResult {
   for (let i = 0; i < exp.length && work.length < 15; i++) {
     const r = range(exp[i].text);
     if (!r) continue;
-    const rest = exp[i].text.replace(RANGE, '').replace(/\(.*?\)/g, '').trim().replace(/[|–—,·•-]\s*$/, '').trim();
+    let rest = exp[i].text.replace(RANGE, '').replace(/\((?![^)]*\b(intern|internship|contract|part[- ]time|freelance)\b).*?\)/gi, '').trim().replace(/[|–—,·•-]\s*$/, '').trim();
+    // "Company | Title   Remote · Sep 2025 – Present": the place sits just before the dates
+    let location = '';
+    // a work mode always; a "City, Country" only when a separator ties it to the dates ("Delhi, India · Jan 2020 –")
+    const mode = /\s+(remote|hybrid|on-?site)$/i.exec(rest);
+    const city = new RegExp(`\\s+([A-Z][a-zA-Z.]+(?: [A-Z][a-zA-Z.]+)?, (?:${COUNTRY}|[A-Z]{2}))$`).exec(rest);
+    const place = mode ?? city;
+    if (place && rest.length - place[0].length > 2) { location = place[1]; rest = rest.slice(0, place.index).replace(/[|–—,·•-]\s*$/, '').trim(); }
     let title = ''; let company = '';
     const split = (t: string) => t.split(/\s+(?:at|@|\||—|–|-)\s+|,\s+/).map((x) => x.trim()).filter(Boolean);
     if (rest.length > 2) [title, company = ''] = split(rest);
     else if (exp[i - 1] && !range(exp[i - 1].text)) [title, company = ''] = split(exp[i - 1].text);
+    // "Company | Title" (company first): the part that reads like a job title is the title
+    if (company && TITLE_WORDS.test(company) && !TITLE_WORDS.test(title)) [title, company] = [company, title];
     let j = i + 1; const body: string[] = [];
     while (j < exp.length && !range(exp[j].text) && !(exp[j + 1] && isRangeLine(exp[j + 1].text))) { body.push(exp[j].text); j++; }
-    work.push({ id: newProfileId(), title, company, location: '', start: r.start, end: r.end, current: r.current, bullets: joinBullets(body) });
+    work.push({ id: newProfileId(), title, company, location, start: r.start, end: r.end, current: r.current, bullets: joinBullets(body) });
   }
   if (work.length) {
     p.work = work; found.push(`${work.length} role${work.length === 1 ? '' : 's'}`);
@@ -313,9 +357,31 @@ export function parseResume(lines: PdfLine[]): ImportResult {
     const degreeLine = [eduLines[i + 1]?.text, eduLines[i - 1]?.text].find((x) => x && /\b(bachelor|master|b\.?\s?(sc|tech|des|a|e|com)|m\.?\s?(sc|tech|des|a|ba|s)|phd|diploma|mba|bs|ba|ms|ma)\b/i.test(x)) ?? '';
     const r = range(near);
     const [degree, ...field] = degreeLine.replace(RANGE, '').replace(/[|·]/g, ',').split(/,| in /);
-    edu.push({ id: newProfileId(), school: t.replace(RANGE, '').replace(/[|,–—-]\s*$/, '').trim(), degree: (degree ?? '').trim(), field: field.join(' ').trim().replace(/^,\s*/, ''), start: r?.start ?? '', end: r ? r.end : '' });
+    let school = t.replace(RANGE, '').replace(/[|,–—-]\s*$/, '').trim();
+    const where = new RegExp(`\\s+([A-Z][a-zA-Z.]+(?: [A-Z][a-zA-Z.]+)?, (?:${COUNTRY}|[A-Z]{2}))$`).exec(school);
+    if (where && /(university|college|institute|school|academy|polytechnic|\))/i.test(school.slice(0, where.index))) school = school.slice(0, where.index).trim();
+    const grade = eduLines.slice(i + 1, i + 4).map((l) => l.text).find((x) => /\b(c?gpa|grade|percentage|score)\b\s*[:\-]?\s*\d/i.test(x)) ?? '';
+    edu.push({ id: newProfileId(), school, degree: (degree ?? '').trim(), field: field.join(' ').trim().replace(/^,\s*/, ''), start: r?.start ?? '', end: r ? r.end : '', location: where?.[1] ?? '', grade: grade.slice(0, 60) });
   }
   if (edu.length) { p.education = edu; found.push(`${edu.length} school${edu.length === 1 ? '' : 's'}`); }
+
+  // Projects: a heading line "Name | Built with   GitHub | Live Demo" followed by its points
+  const proj = (s.parts.projects ?? []).map((l) => l.text.trim()).filter(Boolean);
+  const projects: ProjectItem[] = [];
+  const isBullet = (t: string | undefined) => !!t && /^[-•*▪◦●∙]/.test(t);
+  for (let i = 0; i < proj.length && projects.length < 10; i++) {
+    const t = proj[i];
+    if (isBullet(t) || !(/\s\|\s/.test(t) && (isBullet(proj[i + 1]) || i === 0))) continue;
+    const head = t.replace(/(\s+(github|live demo|demo|npm|website|link|code|repo|app store|play store)(\s*\|\s*|\s*$))+$/i, '').trim();
+    const [name, ...tech] = head.split(/\s+\|\s+/);
+    let j = i + 1; const body: string[] = [];
+    while (j < proj.length && !(/\s\|\s/.test(proj[j]) && !isBullet(proj[j]) && isBullet(proj[j + 1]))) { body.push(proj[j]); j++; }
+    projects.push({ id: newProfileId(), name: name.slice(0, 120), tech: tech.join(', ').slice(0, 200), link: '', bullets: joinBullets(body) });
+    i = j - 1;
+  }
+  if (projects.length) { p.projects = projects; found.push(`${projects.length} project${projects.length === 1 ? '' : 's'}`); }
+  const ach = joinBullets((s.parts.achievements ?? []).map((l) => l.text));
+  if (ach) { p.achievements = ach; found.push('Achievements'); }
   return { source: 'resume', profile: p, found };
 }
 

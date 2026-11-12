@@ -11,7 +11,9 @@ import { safeHttpUrl } from './url';
  */
 
 export interface WorkItem { id: string; company: string; title: string; location: string; start: string; end: string; current: boolean; bullets: string }
-export interface EduItem { id: string; school: string; degree: string; field: string; start: string; end: string }
+export interface EduItem { id: string; school: string; degree: string; field: string; start: string; end: string; location?: string; grade?: string }
+/** A project for the resume: name, what it was built with, a link, and what it did (one point per line). */
+export interface ProjectItem { id: string; name: string; tech: string; link: string; bullets: string }
 
 export interface Profile {
   id: string;
@@ -35,6 +37,8 @@ export interface Profile {
   skills: string;              // comma separated
   work: WorkItem[];
   education: EduItem[];
+  projects: ProjectItem[];
+  achievements: string;        // one per line; "Label: text" puts the label in bold
   updated_at: string;
 }
 
@@ -47,7 +51,7 @@ export function emptyProfile(label = 'My profile'): Profile {
   return {
     id: newProfileId(), label, first_name: '', last_name: '', email: '', phone: '', location: '', headline: '', summary: '',
     linkedin: '', github: '', portfolio: '', website: '', work_authorization: '', needs_sponsorship: '', years_experience: '',
-    salary_expectation: '', notice_period: '', skills: '', work: [], education: [], updated_at: new Date().toISOString(),
+    salary_expectation: '', notice_period: '', skills: '', work: [], education: [], projects: [], achievements: '', updated_at: new Date().toISOString(),
   };
 }
 
@@ -64,14 +68,19 @@ export function cleanProfile(p: Partial<Profile>): Profile {
     location: clip(p.location, 120), headline: clip(p.headline, 160), summary: clip(p.summary, 3000),
     work_authorization: clip(p.work_authorization, 160), needs_sponsorship: ['yes', 'no'].includes(String(p.needs_sponsorship)) ? String(p.needs_sponsorship) : '',
     years_experience: clip(p.years_experience, 10), salary_expectation: clip(p.salary_expectation, 60), notice_period: clip(p.notice_period, 60),
-    skills: clip(p.skills, 1500),
+    skills: clip(p.skills, 3000),
     work: (Array.isArray(p.work) ? p.work : []).slice(0, 15).map((w) => ({
       id: clip(w.id, 80) || newProfileId(), company: clip(w.company, 120), title: clip(w.title, 120), location: clip(w.location, 120),
       start: clip(w.start, 7), end: clip(w.end, 7), current: !!w.current, bullets: clip(w.bullets, 2500),
     })),
     education: (Array.isArray(p.education) ? p.education : []).slice(0, 8).map((e) => ({
       id: clip(e.id, 80) || newProfileId(), school: clip(e.school, 160), degree: clip(e.degree, 120), field: clip(e.field, 120), start: clip(e.start, 7), end: clip(e.end, 7),
+      location: clip(e.location, 120), grade: clip(e.grade, 60),
     })),
+    projects: (Array.isArray(p.projects) ? p.projects : []).slice(0, 10).map((x) => ({
+      id: clip(x.id, 80) || newProfileId(), name: clip(x.name, 120), tech: clip(x.tech, 200), link: clip(x.link, 300).trim(), bullets: clip(x.bullets, 2500),
+    })),
+    achievements: clip(p.achievements, 2500),
     updated_at: new Date().toISOString(),
   };
   for (const k of URL_FIELDS) out[k] = clip(p[k], 300).trim();
@@ -87,8 +96,34 @@ export const loadActiveProfileId = () => readKey<string>(PROFILE_KEYS.active);
 export const storeActiveProfileId = (id: string) => writeKey(PROFILE_KEYS.active, id);
 
 export const fullName = (p: Profile) => [p.first_name, p.last_name].filter(Boolean).join(' ').trim();
-export const skillList = (p: Profile) => p.skills.split(',').map((s) => s.trim()).filter(Boolean);
-export const bulletList = (text: string) => text.split('\n').map((b) => b.replace(/^[-•*]\s*/, '').trim()).filter(Boolean);
+/** Skills may be one comma-separated list or grouped lines ("Frontend: React, TypeScript"); this is the flat list. */
+export const skillList = (p: Profile) => skillGroups(p).flatMap((g) => g.items);
+/** Skill groups when lines carry a label; one unlabelled group otherwise. */
+export function skillGroups(p: Profile): { label: string; items: string[] }[] {
+  // Commas inside brackets don't split: "AWS (EC2, S3)" is one skill
+  const split = (s: string) => { const out: string[] = []; let depth = 0, cur = ''; for (const ch of s) { if (ch === '(') depth++; else if (ch === ')') depth = Math.max(0, depth - 1); if (ch === ',' && !depth) { if (cur.trim()) out.push(cur.trim()); cur = ''; } else cur += ch; } if (cur.trim()) out.push(cur.trim()); return out; };
+  const lines = p.skills.split('\n').map((l) => l.trim()).filter(Boolean);
+  return lines.map((l) => { const m = /^([^:,]{2,40}):\s*(.+)$/.exec(l); return m ? { label: m[1].trim(), items: split(m[2]) } : { label: '', items: split(l) }; })
+    .filter((g) => g.items.length);
+}
+/** The skills text for a new order or set of skills, keeping the user's groups: each group's skills follow the new
+ *  order, and skills that are in no group yet join the first group. */
+export function skillsText(p: Profile, ordered: string[]): string {
+  const groups = skillGroups(p);
+  if (!groups.some((g) => g.label)) return ordered.join(', ');
+  const key = (x: string) => x.toLowerCase();
+  const pos = new Map(ordered.map((x, i) => [key(x), i]));
+  const known = new Set(groups.flatMap((g) => g.items.map(key)));
+  const fresh = ordered.filter((x) => !known.has(key(x)));
+  return groups.map((g, i) => {
+    const items = [...(i === 0 ? fresh : []), ...g.items.filter((x) => pos.has(key(x))).sort((a, b) => pos.get(key(a))! - pos.get(key(b))!)];
+    return `${g.label ? `${g.label}: ` : ''}${items.join(', ')}`;
+  }).join('\n');
+}
+/** Points, one per line, as plain text ("**" emphasis marks taken out). */
+export const bulletList = (text: string) => richBullets(text).map((b) => b.replace(/\*\*/g, ''));
+/** Points with their "**bold**" marks kept, for the resume. */
+export const richBullets = (text: string) => text.split('\n').map((b) => b.replace(/^[-•]\s*|^\*\s+/, '').trim()).filter(Boolean);
 export const linkOrNull = (u: string) => (u ? safeHttpUrl(/^https?:\/\//i.test(u) ? u : `https://${u}`) : null);
 
 /** "Mar 2024" from "2024-03"; "Present" for an ongoing role. */

@@ -14,8 +14,10 @@ const HEADS: Record<string, RegExp> = {
   summary: /^(summary|profile|professional summary|about( me)?|objective)$/i,
   experience: /^((work|professional|relevant) )?(experience|employment|work history)$/i,
   education: /^(education|education and training|academic background)$/i,
-  skills: /^((technical|core|key|expert-level) )?(skills|competencies|skills and tools)$/i,
+  skills: /^((technical|core|key|expert-level) )?(skills|competencies|skills and tools|skills (&|and) tools)$/i,
   contact: /^(contact|contact details|contact information)$/i,
+  projects: /^((selected|personal|key) )?projects$/i,
+  achievements: /^(achievements|awards|honou?rs|achievements (&|and) leadership|leadership|certifications?|publications|volunteering)$/i,
 };
 const EMAIL = /[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}/i;
 const PHONE = /(?:\+?\d[\s().-]{0,2}){7,15}/;
@@ -47,7 +49,7 @@ export function atsScan(text: string, opts: { singleColumn?: boolean; roles?: nu
   const ROLE_DATES = new RegExp(`${DATE_RANGE.source}\\s*$`, 'i');
   const positions = exp.filter((l) => l.length <= 110 && ROLE_DATES.test(l)).length;
   const edu = sections.education ?? [];
-  const skills = (sections.skills ?? []).flatMap((l) => l.split(/\s*[·•|,;]\s*/)).map((s) => s.trim()).filter((s) => s.length > 1 && s.length <= 40);
+  const skills = (sections.skills ?? []).flatMap((l) => l.replace(/^[^:,]{2,40}:\s*/, '').split(/\s*[·•|,;]\s*(?![^()]*\))/)).map((s) => s.trim()).filter((s) => s.length > 1 && s.length <= 40);
 
   const fields: ParsedField[] = [];
   fields.push(nameOk

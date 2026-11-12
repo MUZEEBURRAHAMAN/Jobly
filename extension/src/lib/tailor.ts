@@ -1,5 +1,5 @@
 import { asksFor, KEYWORDS } from './fit';
-import { bulletList, Profile, skillList } from './profile';
+import { bulletList, Profile, skillList, skillsText } from './profile';
 
 /**
  * Resume tailoring without AI, in the browser:
@@ -156,7 +156,7 @@ export function applySuggestions(p: Profile, list: Suggestion[], accepted: Set<s
   const added: string[] = [];
   for (const s of list) {
     if (!accepted.has(s.id)) continue;
-    if (s.kind === 'skills-order') out.skills = s.after.join(', ');
+    if (s.kind === 'skills-order') out.skills = skillsText(out, s.after);
     if (s.kind === 'add-skill') added.push(s.skill);
     if (s.kind === 'bullets-order') out.work = out.work.map((w) => (w.id === s.workId ? { ...w, bullets: s.after.join('\n') } : w));
     if (s.kind === 'rewrite') {
@@ -171,6 +171,6 @@ export function applySuggestions(p: Profile, list: Suggestion[], accepted: Set<s
       }
     }
   }
-  if (added.length) out = { ...out, skills: [...added, ...skillList(out)].filter((v, i, a) => a.findIndex((x) => x.toLowerCase() === v.toLowerCase()) === i).join(', ') };
+  if (added.length) out = { ...out, skills: skillsText(out, [...added, ...skillList(out)].filter((v, i, a) => a.findIndex((x) => x.toLowerCase() === v.toLowerCase()) === i)) };
   return out;
 }

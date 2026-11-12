@@ -1,6 +1,6 @@
 import React from 'react';
 import { Plus, Trash } from '../lib/icons';
-import { EduItem, newProfileId, WorkItem } from '../lib/profile';
+import { EduItem, newProfileId, ProjectItem, WorkItem } from '../lib/profile';
 import { CopyButton } from './CopyButton';
 
 /** The experience list, shared by the Profile page and profile setup. */
@@ -46,12 +46,41 @@ export const EduEditor: React.FC<{ education: EduItem[]; onChange: (education: E
                 <div><label className="label" htmlFor={`e-f-${e.id}`}>Field of study</label><input id={`e-f-${e.id}`} className="input" value={e.field} onChange={(ev) => setEdu(e.id, { field: ev.target.value })} /></div>
                 <div><label className="label" htmlFor={`e-st-${e.id}`}>Start</label><input id={`e-st-${e.id}`} type="month" className="input" value={e.start} onChange={(ev) => setEdu(e.id, { start: ev.target.value })} /></div>
                 <div><label className="label" htmlFor={`e-en-${e.id}`}>End</label><input id={`e-en-${e.id}`} type="month" className="input" value={e.end} onChange={(ev) => setEdu(e.id, { end: ev.target.value })} /></div>
+                <div><label className="label" htmlFor={`e-l-${e.id}`}>Location <span className="muted">(optional)</span></label><input id={`e-l-${e.id}`} className="input" value={e.location ?? ''} onChange={(ev) => setEdu(e.id, { location: ev.target.value })} placeholder="e.g. Delhi, India" /></div>
+                <div><label className="label" htmlFor={`e-g-${e.id}`}>Grade <span className="muted">(optional)</span></label><input id={`e-g-${e.id}`} className="input" value={e.grade ?? ''} onChange={(ev) => setEdu(e.id, { grade: ev.target.value })} placeholder="e.g. CGPA: 8.7 / 10" /></div>
               </div>
               <div className="row" style={{ justifyContent: 'flex-end', marginTop: 8 }}><button type="button" className="btn btn-ghost btn-sm" onClick={() => onChange(education.filter((x) => x.id !== e.id))}><Trash size={14} aria-hidden="true" /> Remove</button></div>
             </div>
           ))}
           <button type="button" className="btn btn-outline btn-sm" style={{ alignSelf: 'flex-start' }} disabled={education.length >= 8}
             onClick={() => onChange([...education, { id: newProfileId(), school: '', degree: '', field: '', start: '', end: '' }])}><Plus size={14} aria-hidden="true" /> Add education</button>
+        </div>
+  );
+};
+
+/** Projects for the resume: name, what it was built with, a link and what it did. */
+export const ProjectEditor: React.FC<{ projects: ProjectItem[]; onChange: (projects: ProjectItem[]) => void }> = ({ projects, onChange }) => {
+  const setP = (id: string, patch: Partial<ProjectItem>) => onChange(projects.map((x) => (x.id === id ? { ...x, ...patch } : x)));
+  return (
+        <div className="stack">
+          {projects.length === 0 && <p className="text-sm muted">Side projects, open source, hackathons or coursework that show your skills. They appear on the resume under Projects.</p>}
+          {projects.map((x, i) => (
+            <div key={x.id} className="sub-card">
+              <div className="form-grid">
+                <div><label className="label" htmlFor={`p-n-${x.id}`}>Project name</label><input id={`p-n-${x.id}`} className="input" value={x.name} onChange={(e) => setP(x.id, { name: e.target.value })} /></div>
+                <div><label className="label" htmlFor={`p-l-${x.id}`}>Link <span className="muted">(optional)</span></label><input id={`p-l-${x.id}`} className="input" value={x.link} onChange={(e) => setP(x.id, { link: e.target.value })} placeholder="github.com/you/project" /></div>
+                <div className="wide"><label className="label" htmlFor={`p-t-${x.id}`}>Built with</label><input id={`p-t-${x.id}`} className="input" value={x.tech} onChange={(e) => setP(x.id, { tech: e.target.value })} placeholder="e.g. React, TypeScript, Redis" /></div>
+                <div className="wide"><label className="label" htmlFor={`p-b-${x.id}`}>What it did (one point per line)</label>
+                  <textarea id={`p-b-${x.id}`} className="textarea" rows={3} value={x.bullets} onChange={(e) => setP(x.id, { bullets: e.target.value })} placeholder={'Cut detection latency 60% (480ms to 190ms) with a Redis cache'} /></div>
+              </div>
+              <div className="row" style={{ justifyContent: 'flex-end', marginTop: 8 }}>
+                {i > 0 && <button type="button" className="btn btn-ghost btn-sm" onClick={() => { const list = [...projects]; [list[i - 1], list[i]] = [list[i], list[i - 1]]; onChange(list); }}>Move up</button>}
+                <button type="button" className="btn btn-ghost btn-sm" onClick={() => onChange(projects.filter((y) => y.id !== x.id))}><Trash size={14} aria-hidden="true" /> Remove</button>
+              </div>
+            </div>
+          ))}
+          <button type="button" className="btn btn-outline btn-sm" style={{ alignSelf: 'flex-start' }} disabled={projects.length >= 10}
+            onClick={() => onChange([...projects, { id: newProfileId(), name: '', tech: '', link: '', bullets: '' }])}><Plus size={14} aria-hidden="true" /> Add a project</button>
         </div>
   );
 };
