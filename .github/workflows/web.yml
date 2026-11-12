@@ -61,5 +61,6 @@ jobs:
             echo "::warning::CLOUDFLARE_API_TOKEN / CLOUDFLARE_ACCOUNT_ID secrets are not set; skipping the deploy"
             exit 0
           fi
-          npx -y wrangler@4 pages deploy web/dist --project-name "$WEB_PROJECT" --branch main --commit-dirty=true
+          # From web/ so the functions in web/functions (daily email sign-up) are published with the site
+          (cd web && npx -y wrangler@4 pages deploy dist --project-name "$WEB_PROJECT" --branch main --commit-dirty=true)
           npx -y wrangler@4 pages deploy studio/dist --project-name "$STUDIO_PROJECT" --branch main --commit-dirty=true

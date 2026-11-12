@@ -133,6 +133,14 @@ export const PreferencesView: React.FC<PreferencesViewProps> = ({ preferences, o
         <input type="checkbox" className="switch" role="switch" checked={prefs.notify_enabled} onChange={(e) => edit({ notify_enabled: e.target.checked })} />
       </label>
 
+      <div className="row card" style={{ padding: 12, justifyContent: 'space-between', gap: 12 }}>
+        <span><span className="font-medium" style={{ display: 'block' }}>Daily job email</span><span className="text-xs muted">One email each morning with the new jobs that match these choices. You sign up on Jobly's website.</span></span>
+        {/* Only the choices go in the link (roles, levels, remote), never your email or profile */}
+        <a className="btn btn-outline btn-sm" target="_blank" rel="noopener noreferrer" style={{ flex: 'none' }}
+          href={`${SITE}/daily-email?${new URLSearchParams({ roles: prefs.roles.join(','), seniority: prefs.seniorities.join(','), ...(prefs.remote_only ? { remote: '1' } : {}) })}`}>
+          Get the email <ExternalLink size={13} aria-hidden="true" /></a>
+      </div>
+
       <SyncSetting />
       <ConnectionsSetting />
       {extra}

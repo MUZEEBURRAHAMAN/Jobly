@@ -1,0 +1,47 @@
+name: Daily job email
+
+# Once a day: email each confirmed subscriber the new jobs that match what they picked (scripts/send_digest.py).
+# Does nothing until it's set up (docs/daily-email-setup.md):
+#   secrets  CLOUDFLARE_API_TOKEN (with Workers KV read), CLOUDFLARE_ACCOUNT_ID, BREVO_API_KEY
+#   variables  DIGEST_KV_ID, DIGEST_FROM, DIGEST_FROM_NAME (optional)
+on:
+  schedule:
+    - cron: "45 3 * * *"          # 03:45 UTC = 09:15 in India, early morning in Europe
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Match and render only, don't send"
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: digest
+  cancel-in-progress: false
+
+jobs:
+  send:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      BREVO_API_KEY: ${{ secrets.BREVO_API_KEY }}
+      DIGEST_KV_ID: ${{ vars.DIGEST_KV_ID }}
+      DIGEST_FROM: ${{ vars.DIGEST_FROM }}
+      DIGEST_FROM_NAME: ${{ vars.DIGEST_FROM_NAME || 'Jobly' }}
+      DRY_RUN: ${{ inputs.dry_run && '1' || '0' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Send
+        run: |
+          if [ -z "$BREVO_API_KEY" ] || [ -z "$DIGEST_KV_ID" ] || [ -z "$DIGEST_FROM" ] || [ -z "$CLOUDFLARE_API_TOKEN" ]; then
+            echo "::notice::The daily email isn't set up yet (see docs/daily-email-setup.md); nothing to send"
+            exit 0
+          fi
+          python scripts/send_digest.py

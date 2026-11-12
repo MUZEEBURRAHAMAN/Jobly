@@ -1,12 +1,12 @@
 ---
 title: Privacy policy
 eyebrow: Privacy
-description: What Jobly keeps on your device, what it downloads, and what it never collects. No account, no server, no analytics, no tracking.
+description: What Jobly keeps on your device, what it downloads, and what it never collects. No account, no analytics, no tracking.
 updated: 2026-11-12
 figure: padlock
 ---
 
-> **The short version.** Jobly has no accounts and no analytics. Your preferences, saved and applied jobs, profiles and contacts stay in your browser. To show you jobs, the extension downloads Jobly's public job files and filters them in your browser. It reads a web page only when you click to save that job, check your fit or autofill its form. Optional connections (Chrome sync, Claude with your own key, Brave Search, Apollo, Hunter) are off until you turn them on, and talk to those services directly. Jobly has no server of its own, so nothing passes through it. We don't build a profile of you, and we don't sell or share data.
+> **The short version.** Jobly has no accounts and no analytics. Your preferences, saved and applied jobs, profiles and contacts stay in your browser. To show you jobs, the extension downloads Jobly's public job files and filters them in your browser. It reads a web page only when you click to save that job, check your fit or autofill its form. Optional connections (Chrome sync, Claude with your own key, Brave Search, Apollo, Hunter) are off until you turn them on, and talk to those services directly. The extension has no server of its own, so nothing passes through Jobly. The one exception is the optional daily job email: if you sign up, we keep your email address and job choices to send it. We don't build a profile of you, and we don't sell or share data.
 
 ## What Jobly is
 
@@ -66,6 +66,18 @@ Each is off until you turn it on, and each talks to that service straight from y
 - Your theme choice is saved in your browser's local storage so the page doesn't flash the wrong colours.
 - Some pages show live numbers, the list of companies and the latest jobs for a role. Your browser downloads them from Jobly's public job files, the same way the extension does; nothing about you is sent.
 
+## Daily job email
+
+The daily email is optional and needs no account. If you sign up on the [daily email page](/daily-email):
+
+- **What we keep:** your email address, the job choices you ticked (kinds of job, levels, place, remote) and when you signed up. Nothing from your profile, resume or the jobs you saved.
+- **Double opt-in:** we first send one email with a confirmation link. Until you press it, nothing is sent and your sign-up is deleted after 48 hours.
+- **Where it's kept:** in Cloudflare's key-value storage, used only by this website. The daily send runs on GitHub Actions and reads the list only to send that day's emails.
+- **Who sends it:** Brevo, our email provider, receives your address and the email's content to deliver it. Brevo's privacy policy applies to delivery.
+- **Unsubscribe:** every email has a one-click unsubscribe link. Using it deletes your email address and choices straight away. You can also write to us.
+- **No tracking:** the emails have no tracking pixels or tracked links from us; job links go straight to the employer's page.
+- **Abuse protection:** to stop misuse, the sign-up form counts attempts per IP address for one day (at most five), then forgets them.
+
 ## Forms you can send us
 
 Two forms on this site help you write to us. Both are optional. Neither sends anything by itself: they open your own email app with the message filled in, and you send it like any other email.
@@ -79,7 +91,7 @@ We delete form messages once we have dealt with them, and at the latest after 12
 
 ## What we never do
 
-- Ask for your name, email or account details to use Jobly.
+- Ask for your name, email or account details to use Jobly (the daily email is the only place we ask for an email, and it's optional).
 - Use analytics, advertising or tracking scripts, in the extension or on this site.
 - Sell or rent data, or use it for credit, lending or anything unrelated to finding jobs.
 - Read the pages you browse in the background. The extension reads a page only when you click to save, check or autofill it, and it has no access to your browsing history.
@@ -94,14 +106,17 @@ We delete form messages once we have dealt with them, and at the latest after 12
 | Brave Search (only if you add your own key) | Finding public profile pages | The company name, kind of person and site you search, and your API key |
 | Apollo (only if you add your own key) | Who works at a company | The company domain and job titles you search, and your API key |
 | Hunter (only if you add your own key) | Finding contacts at a company | The company domain you search and your API key |
+| Cloudflare Workers KV (only if you sign up for the daily email) | Keeps the daily email list | Your email address and job choices |
+| Brevo (only if you sign up for the daily email) | Sends the daily email and the confirmation email | Your email address and the email's content |
+| GitHub Actions (only if you sign up for the daily email) | Runs the daily send | Your email address and choices while the send runs |
 
 ## Where your data goes
 
-This website, Jobly Studio and the job files are served from Cloudflare's network, so requests from other countries can cross borders. Cloudflare says it relies on the EU-U.S. Data Privacy Framework and the European Commission's standard contractual clauses for such transfers. Almost nothing that identifies you is stored: your preferences stay in your browser, and the only things we keep are messages you choose to send us.
+This website, Jobly Studio and the job files are served from Cloudflare's network, so requests from other countries can cross borders. Cloudflare says it relies on the EU-U.S. Data Privacy Framework and the European Commission's standard contractual clauses for such transfers. Almost nothing that identifies you is stored: your preferences stay in your browser, and the only things we keep are messages you choose to send us and, if you sign up, your daily email address and choices. Brevo is based in the EU.
 
 ## Your rights
 
-You can ask us what we hold about you, to correct it, or to delete it. Because we keep so little (only the emails you send us: reports, suggestions and form messages), this usually means finding and removing a message. Write to the address below and we will answer within 30 days. If you are in the EU or UK you can also complain to your data protection authority.
+You can ask us what we hold about you, to correct it, or to delete it. Because we keep so little (the emails you send us and, if you signed up, your daily email address and choices), this usually means removing a message or a subscription; the unsubscribe link removes a subscription at once. Write to the address below and we will answer within 30 days. If you are in the EU or UK you can also complain to your data protection authority.
 
 ## Permissions the extension asks for
 

@@ -178,8 +178,8 @@ async def upsert_job_record(
         if existing["content_hash"] == content_hash:
             # FAST-PATH: Job content hasn't changed. Update last_seen_at with minimal I/O & memory.
             await db.execute(
-                "UPDATE jobs SET last_seen_at = ?, status = 'active', employment_type = COALESCE(employment_type, ?) WHERE id = ?",
-                (now, employment, existing["id"])
+                "UPDATE jobs SET last_seen_at = ?, status = 'active', employment_type = COALESCE(employment_type, ?), geo_hub = ? WHERE id = ?",
+                (now, employment, geo_hub, existing["id"])
             )
             return
 

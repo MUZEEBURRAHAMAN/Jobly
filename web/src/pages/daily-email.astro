@@ -1,0 +1,103 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHero from '../components/page/PageHero.astro';
+import Icon from '../components/Icon.astro';
+import { ROLES, AREAS } from '../lib/roles';
+
+const roles = [...ROLES, ...AREAS].map((r) => ({ id: r.id, name: r.name }));
+const levels = [['intern', 'Intern'], ['junior', 'Junior'], ['mid', 'Mid'], ['senior', 'Senior'], ['lead', 'Lead and above']];
+const hubs = [['', 'Anywhere'], ['india', 'India'], ['us', 'United States'], ['europe', 'Europe'], ['apac', 'Asia-Pacific']];
+const messages: Record<string, [string, string]> = {
+  confirmed: ['You’re in', 'Your first email arrives tomorrow morning with the new jobs that match what you picked.'],
+  unsubscribed: ['You’re unsubscribed', 'You won’t get the daily email any more. You can sign up again any time.'],
+  expired: ['That link has expired', 'Confirmation links work for 48 hours. Sign up again below and use the new link.'],
+  invalid: ['That link doesn’t look right', 'Copy the whole link from the email, or sign up again below.'],
+};
+---
+<Base title="Daily job email" description="One email a day with the new jobs that match the roles, level and place you pick. Free, no account, unsubscribe in one click.">
+  <PageHero crumbs={[{ label: 'Daily job email' }]} eyebrow="Daily job email" title="New jobs for you, every morning" figure="relay" intensity={0.8}
+    lead="One email a day: how many jobs were posted in the last 24 hours, and the ones that match what you pick. Free, no account, unsubscribe in one click." />
+
+  <section class="container digest">
+    <div class="form-card">
+      <div class="notice" data-status hidden role="status" tabindex="-1">
+        <span class="n-icon"><Icon name="check" size={18} /></span><div><h2 data-status-title></h2><p data-status-text></p></div>
+      </div>
+      {Object.entries(messages).map(([k, [t, d]]) => <template data-msg={k}><span data-t>{t}</span><span data-d>{d}</span></template>)}
+
+      <p class="unavailable" data-unavailable hidden>The daily email is being set up. Check back soon.</p>
+      <form data-digest novalidate>
+        <fieldset>
+          <legend>Jobs in</legend>
+          <div class="chips">{roles.map((r) => <label class="chip"><input type="checkbox" name="roles" value={r.id} /><span>{r.name}</span></label>)}</div>
+        </fieldset>
+        <fieldset>
+          <legend>Level <span class="opt">(optional)</span></legend>
+          <div class="chips">{levels.map(([id, name]) => <label class="chip"><input type="checkbox" name="seniority" value={id} /><span>{name}</span></label>)}</div>
+        </fieldset>
+        <div class="row">
+          <div class="field"><label for="d-hub">Where</label><select class="input" id="d-hub" name="hub">{hubs.map(([id, name]) => <option value={id}>{name}</option>)}</select></div>
+          <label class="check"><input type="checkbox" name="remote" value="1" /> Remote only</label>
+        </div>
+        <div class="field"><label for="d-email">Email</label>
+          <input class="input" id="d-email" name="email" type="email" required autocomplete="email" maxlength="200" aria-describedby="d-email-hint" />
+          <span class="hint" id="d-email-hint">We’ll send a link to confirm it’s yours. Used only for this email.</span></div>
+        <input class="trap" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" />
+        <label class="check"><input type="checkbox" name="consent" required /> <span>Send me the daily Jobly job email. I can unsubscribe at any time from any email.</span></label>
+        <div class="submit">
+          <button class="btn btn-ink btn-lg" type="submit"><Icon name="mail" size={17} />Sign up</button>
+          <p class="form-status" data-form-status role="status" aria-live="polite"></p>
+        </div>
+        <p class="small">We keep your email and choices only while you’re subscribed; unsubscribing deletes them. Emails are sent with Brevo. See the <a href="/privacy#daily-job-email">privacy policy</a>.</p>
+      </form>
+    </div>
+    <aside class="side">
+      <div class="box">
+        <h2 class="box-title">What you get</h2>
+        <ul class="points">
+          <li><Icon name="clock" size={16} /> One email around 9am India time, never more.</li>
+          <li><Icon name="check" size={16} /> Up to 10 matching jobs, newest first, each linked to the employer’s own page.</li>
+          <li><Icon name="check" size={16} /> No email on days with no matches.</li>
+          <li><Icon name="shield" size={16} /> No account, no tracking pixels, one-click unsubscribe.</li>
+        </ul>
+      </div>
+    </aside>
+  </section>
+  <script>import '../scripts/digest';</script>
+</Base>
+
+<style>
+  .digest { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: clamp(24px, 4vw, 48px); align-items: start; padding-block: clamp(40px, 5vw, 72px) var(--section-y); }
+  .form-card { padding: clamp(20px, 3vw, 36px); border-radius: 24px; border: 1px solid var(--border); background: var(--card); box-shadow: var(--shadow-md); display: grid; gap: 20px; }
+  form { display: grid; gap: 22px; position: relative; }
+  fieldset { border: 0; padding: 0; margin: 0; min-width: 0; }
+  legend { font-weight: 500; margin-bottom: 10px; }
+  .opt { color: var(--subtle); font-weight: 400; }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip { position: relative; display: inline-flex; }
+  .chip input { position: absolute; opacity: 0; inset: 0; margin: 0; cursor: pointer; }
+  .chip span { padding: 7px 13px; border-radius: 999px; border: 1px solid var(--border); font-size: var(--text-sm); transition: background-color var(--dur-fast) ease, border-color var(--dur-fast) ease; }
+  .chip input:checked + span { background: var(--ink); color: var(--on-ink); border-color: transparent; }
+  .chip input:focus-visible + span { outline: 2px solid var(--ring, var(--brand)); outline-offset: 2px; }
+  .row { display: grid; grid-template-columns: 1fr auto; gap: 16px; align-items: end; }
+  .check { display: flex; gap: 10px; align-items: flex-start; font-size: var(--text-sm); cursor: pointer; }
+  .check input { margin-top: 3px; }
+  .trap { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
+  .submit { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+  .small { color: var(--muted); font-size: var(--text-sm); }
+  .small a { color: var(--muted); text-decoration: underline; text-underline-offset: 3px; }
+  .notice { display: flex; gap: 12px; padding: 16px; border-radius: 16px; background: var(--panel); border: 1px solid var(--border); }
+  .notice:focus { outline: none; }
+  .notice h2 { font-size: 1.1rem; font-weight: 600; margin-bottom: 2px; }
+  .notice p { color: var(--muted); margin: 0; }
+  .n-icon { width: 34px; height: 34px; flex: none; display: grid; place-items: center; border-radius: 50%; background: color-mix(in srgb, var(--success) 15%, transparent); color: var(--success); }
+  .unavailable { color: var(--muted); }
+  .side { display: grid; gap: 16px; }
+  .box { padding: 20px; border-radius: 20px; background: var(--panel); border: 1px solid var(--border); }
+  .box-title { font-size: 1rem; font-weight: 600; margin-bottom: 12px; }
+  .points { list-style: none; padding: 0; margin: 0; display: grid; gap: 10px; color: var(--muted); font-size: var(--text-md); }
+  .points li { display: flex; gap: 10px; align-items: flex-start; }
+  .points :global(.icon) { flex: none; margin-top: 3px; color: var(--text); }
+  @media (max-width: 900px) { .digest { grid-template-columns: 1fr; } }
+  @media (max-width: 560px) { .row { grid-template-columns: 1fr; } .submit .btn { width: 100%; } }
+</style>

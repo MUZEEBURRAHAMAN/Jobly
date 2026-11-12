@@ -361,23 +361,22 @@ def matches_preferences(job: dict[str, Any], preferences: dict[str, Any]) -> boo
     return True
 
 
+_HUB_WORDS: list[tuple[str, re.Pattern[str]]] = [
+    ("india", re.compile(r"\b(india|bengaluru|bangalore|gurgaon|gurugram|hyderabad|mumbai|pune|noida|delhi|chennai|kolkata|ahmedabad)\b")),
+    ("us", re.compile(r"\b(united states|usa|u\.s\.|san francisco|sf bay|new york|nyc|seattle|austin|california|boston|los angeles|"
+                      r"ca|ny|wa|tx|ma)\b|remote - us|us - remote|remote \(us\)|remote, us")),
+    ("europe", re.compile(r"\b(london|united kingdom|uk|germany|berlin|munich|france|paris|amsterdam|netherlands|dublin|ireland|"
+                          r"sweden|stockholm|switzerland|zurich)\b")),
+    ("apac", re.compile(r"\b(singapore|tokyo|japan|sydney|australia|melbourne|korea|seoul)\b")),
+]
+
+
 def detect_geo_hub(location: str | None, title: str | None) -> str:
+    # Whole words only: "Indiana" is not India, "Canada" is not CA
     text = f"{location or ''} {title or ''}".lower()
-    if any(k in text for k in ['india', 'bengaluru', 'bangalore', 'gurgaon', 'gurugram', 'hyderabad', 'mumbai', 'pune', 'noida', 'delhi']):
-        return 'india'
-    if any(k in text for k in [
-        'united states', 'usa', 'san francisco', 'sf bay', 'new york', 'nyc', 'seattle',
-        'austin', 'california', ' ca', ' ny', ' wa', ' tx', ' ma', 'boston', 'los angeles',
-        'remote - us', 'us - remote', 'remote (us)', 'remote, us'
-    ]):
-        return 'us'
-    if any(k in text for k in [
-        'london', 'united kingdom', ' uk', 'germany', 'berlin', 'munich', 'france',
-        'paris', 'amsterdam', 'netherlands', 'dublin', 'ireland', 'sweden', 'stockholm', 'switzerland', 'zurich'
-    ]):
-        return 'europe'
-    if any(k in text for k in ['singapore', 'tokyo', 'japan', 'sydney', 'australia', 'melbourne', 'korea', 'seoul']):
-        return 'apac'
+    for hub, words in _HUB_WORDS:
+        if words.search(text):
+            return hub
     return 'global'
 
 

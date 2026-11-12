@@ -25,6 +25,7 @@ export async function listPages(): Promise<PageInfo[]> {
     { path: '/alternatives', title: 'Jobly and the tools you already use.', eyebrow: 'Alternatives', summary: 'Honest comparisons with LinkedIn Jobs, Indeed, Simplify and HiringCafe.', section: 'Alternatives' },
     { path: '/faq', title: 'Questions, answered.', eyebrow: 'FAQ', summary: 'Answers about coverage, dates, alerts, privacy and troubleshooting.', section: 'Main' },
     { path: '/roadmap', title: 'What’s next, and what shipped.', eyebrow: 'Roadmap', summary: 'Work in progress, plans and a dated changelog.', section: 'Main' },
+    { path: '/daily-email', title: 'New jobs for you, every morning', eyebrow: 'Daily job email', summary: 'One email a day with the new jobs that match the roles, level and place you pick.', section: 'Main' },
     { path: '/support', title: 'How can we help?', eyebrow: 'Support', summary: 'Contact the Jobly team.', section: 'Company' },
     ...['privacy', 'terms', 'security'].map((id) => ({ path: `/${id}`, title: doc(id).data.title, eyebrow: doc(id).data.eyebrow, summary: doc(id).data.description, lastmod: isoDate(doc(id).data.updated), section: 'Company' })),
   ];
