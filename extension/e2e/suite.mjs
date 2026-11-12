@@ -235,6 +235,9 @@ await step('match % on job cards', async () => {
   ok(!mid || parseInt(mid.text) < 100, 'a level you did not pick lowers the match');
   const other = badges.find((b) => /Account Executive|Sales/.test(b.card));
   ok(!other || parseInt(other.text) < 50, `a job outside your roles scores low (${other?.text})`);
+  await d.getByLabel('Sort jobs').selectOption('match'); await sleep(400);
+  const order = await d.locator('article .match-badge').evaluateAll((els) => els.map((e) => parseInt(e.textContent)));
+  ok(order.length > 3 && order.every((v, i) => i === 0 || order[i - 1] >= v) && order[0] === 100, `Best match first puts the highest match on top (${order.slice(0, 8).join(', ')})`);
   await axe(d, 'jobs with match %');
   await h.ctx.close();
 });
@@ -469,12 +472,35 @@ await step('profile, copy kit, resume, cover letter, backup, sync', async () => 
   ok(prof?.first_name === 'Ada' && prof.work[0].company === 'Analytical Engines' && prof.work[0].current === true, 'the profile is saved on the device with its experience');
   await axe(d, 'profile filled');
   // resume
-  await d.getByRole('button', { name: /^Resume/ }).click(); await d.locator('.resume h1').waitFor({ timeout: 5000 });
-  ok((await d.locator('.resume h1').innerText()) === 'Ada Lovelace' && await d.locator('.resume li', { hasText: 'Built the design system' }).count() === 1, 'the resume preview is built from the profile');
-  await d.getByText('Classic', { exact: true }).click(); await sleep(300); ok((await store('resumeTemplate')) === 'classic', 'the chosen template is remembered');
-  ok(await d.evaluate(() => getComputedStyle(document.querySelector('.resume')).fontFamily.includes('Georgia')), 'the Classic template applies its own styles (constructed stylesheet, no inline <style>)');
+  await d.getByRole('button', { name: /^Resume/ }).click(); await d.locator('.resume-print .resume h1').waitFor({ timeout: 5000 });
+  ok((await d.locator('.resume-print .resume h1').innerText()) === 'Ada Lovelace' && await d.locator('.resume-print .resume li', { hasText: 'Built the design system' }).count() === 1, 'the resume preview is built from the profile');
+  ok(await d.locator('.rv-thumb .resume').count() === 7, 'the template gallery shows all 7 templates with your own resume');
+  await d.getByRole('radio', { name: 'Classic', exact: true }).click(); await sleep(300); ok((await store('resumeSettings'))?.template === 'classic' && (await store('resumeTemplate')) === 'classic', 'the chosen template is remembered');
+  ok(await d.evaluate(() => getComputedStyle(document.querySelector('.resume-print .resume')).fontFamily.includes('Georgia')), 'the Classic template applies its own styles (constructed stylesheet, no inline <style>)');
+  await d.getByRole('radio', { name: 'Navy' }).click(); await sleep(200);
+  ok(await d.evaluate(() => getComputedStyle(document.querySelector('.resume-print .resume h2')).borderBottomColor === 'rgb(30, 58, 138)'), 'the accent colour changes the section rules');
+  const sc = Number(/Score (\d+)/.exec(await d.getByRole('img', { name: /^Score \d+ out of 100/ }).getAttribute('aria-label'))?.[1]);
+  const fixes = await d.getByRole('list', { name: 'Top fixes' }).locator('li').allInnerTexts();
+  ok(sc > 0 && sc < 100 && await d.getByRole('progressbar', { name: 'Best practices' }).count() === 1 && /High impact/.test(fixes[0] ?? ''), `the resume score has five categories and puts high-impact fixes first (${sc}/100; ${fixes[0]?.replace(/\n/g, ' ')})`);
+  ok(/Fits on one page/.test(await d.locator('.rv-card [role="status"]').innerText()), 'a short resume fits on one page');
+  // Clean PDF: zero page margin (Chrome then prints no header or footer), one page, the file named after you
+  const printed = await d.evaluate(() => new Promise((res) => { window.print = () => res({ css: [...document.head.querySelectorAll('style')].map((x) => x.textContent).join('\n'), title: document.title }); document.querySelector('.rv-head .btn:not(.btn-outline)').click(); }));
+  ok(/@page \{ size: (A4|letter); margin: 0; \}/.test(printed.css) && /height: (1123|1056)px; overflow: hidden/.test(printed.css) && printed.title === 'Ada-Lovelace-Resume', `the PDF has no browser header or footer, one page, and your name as the file name (${printed.title})`);
+  await d.evaluate(() => window.dispatchEvent(new Event('afterprint')));
+  // Tailor to a pasted job description right on the Resume page
+  await d.getByLabel('Role', { exact: true }).fill('Design Systems Lead'); await d.getByLabel('Company', { exact: true }).fill('Globex');
+  await d.getByLabel('Job description', { exact: true }).fill('Requirements\n- Experience building and maintaining design systems\n- Strong user research skills\n- React and TypeScript knowledge is a plus\n- 5+ years of product design');
+  await d.getByRole('button', { name: 'Apply to my resume' }).click(); await d.locator('.rv-coverage').waitFor({ timeout: 5000 });
+  ok(/^Design systems/i.test(await d.locator('.resume-print .resume .skills').innerText()) && (await store('profiles'))[0].skills === 'Figma, Design systems, React, User research', 'Apply puts what the job asks for first; the profile is unchanged');
+  ok(await d.getByRole('list', { name: 'Keywords in your resume' }).getByText('React').count() === 1, 'keywords the resume already has are shown as found');
+  await d.getByRole('button', { name: 'I have TypeScript: add it to skills' }).click(); await sleep(200);
+  ok(/TypeScript/.test(await d.locator('.resume-print .resume .skills').innerText()) && !/TypeScript/.test((await store('profiles'))[0].skills), 'a missing keyword is added only when you say you have it, and only to this tailored copy');
+  ok(/for this job/.test(await d.locator('.rv-cats').innerText()), 'the score includes the job match once a job description is applied');
+  await d.getByRole('button', { name: 'Save for this job' }).click(); await sleep(400);
+  ok((await store('resumeVersions'))?.[0]?.job.company === 'Globex' && /Tailored: Design Systems Lead at Globex/.test(await d.getByLabel('Version').locator('option:checked').innerText()), 'the tailored resume is saved as a version for the job');
+  await d.getByLabel('Version').selectOption('base'); await sleep(200);
   const [doc] = await Promise.all([d.waitForEvent('download'), d.getByRole('button', { name: 'Word' }).click()]);
-  const docText = fs.readFileSync(await doc.path(), 'utf8'); ok(docText.includes('Ada Lovelace') && docText.includes('Experience') && doc.suggestedFilename() === 'Ada-Lovelace.doc', 'Word export holds the resume');
+  const docText = fs.readFileSync(await doc.path(), 'utf8'); ok(docText.includes('Ada Lovelace') && docText.includes('Experience') && doc.suggestedFilename() === 'Ada-Lovelace-Resume.doc', 'Word export holds the resume');
   await axe(d, 'resume');
   // cover letter
   await d.getByRole('button', { name: /^Cover letters/ }).click(); await d.getByLabel('Role', { exact: true }).fill('Staff Designer'); await d.getByLabel('Company', { exact: true }).fill('Initech'); await sleep(300);
@@ -702,8 +728,8 @@ await step('tailor for a job: requirements, coverage, suggestions, AI with fact 
   ok(v?.job.title === 'Senior Product Designer' && v.job.company === 'Acme' && v.after > v.before && v.profile.skills.startsWith('Prototyping') && /fintech and consumer work/.test(v.profile.summary)
     && v.profile.work[0].bullets.includes('Built and maintained the design system'), `the tailored version is saved with the job (coverage ${v?.before}% → ${v?.after}%)`);
   ok((await store('profiles'))[0].skills === 'Accessibility, Figma, User Research, Design Systems', 'your profile itself is unchanged');
-  await d.getByRole('button', { name: 'Open in Resume' }).click(); await d.locator('.resume h1').waitFor({ timeout: 5000 });
-  ok(/Tailored: Senior Product Designer at Acme/.test(await d.getByLabel('Version').locator('option:checked').innerText()) && await d.locator('.resume li', { hasText: 'Built and maintained the design system' }).count() === 1, 'the Resume page opens the tailored version');
+  await d.getByRole('button', { name: 'Open in Resume' }).click(); await d.locator('.resume-print .resume h1').waitFor({ timeout: 5000 });
+  ok(/Tailored: Senior Product Designer at Acme/.test(await d.getByLabel('Version').locator('option:checked').innerText()) && await d.locator('.resume-print .resume li', { hasText: 'Built and maintained the design system' }).count() === 1, 'the Resume page opens the tailored version');
   await axe(d, 'resume with versions');
   // the letter from the job description, then the AI letter with its check
   await d.getByRole('button', { name: /^Tailor for a job/ }).click();

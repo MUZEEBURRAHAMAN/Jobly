@@ -353,7 +353,7 @@ export const OptionsApp: React.FC = () => {
               {tab === 'profile' && <ProfileView store={profiles} notify={showNotice} openSetup={setupOnOpen} />}
               {tab === 'tailor' && <TailorView profiles={profiles} tracker={tracker} savedJobs={savedJobs} notify={showNotice} onOpenProfile={() => setTab('profile')}
                 onOpenResume={(id) => { setOpenVersion(id); setTab('resume'); }} onWriteLetter={(c) => { setLetterContext(c); setTab('letters'); }} />}
-              {tab === 'resume' && <ResumeView store={profiles} onOpenProfile={() => setTab('profile')} initialVersion={openVersion} />}
+              {tab === 'resume' && <ResumeView store={profiles} onOpenProfile={() => setTab('profile')} initialVersion={openVersion} notify={showNotice} />}
               {tab === 'letters' && <CoverLetterView profiles={profiles} tracker={tracker} savedJobs={savedJobs} notify={showNotice} onOpenProfile={() => setTab('profile')} context={letterContext} />}
               {tab === 'contacts' && <ContactsView tracker={tracker} profile={profiles.active} notify={showNotice} onOpenPreferences={() => setTab('preferences')} hasHunterKey={hasHunterKey} />}
               {tab === 'alerts' && <AlertsView large alerts={alerts} newIds={newThisVisit} onMarkAllRead={markAlertsRead} />}

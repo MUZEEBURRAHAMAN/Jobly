@@ -95,6 +95,7 @@ export function makeRunner(name, hardTimeoutMs = 600000) {
   const axe = async (page, label) => {
     const r = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa']).analyze();
     const bad = r.violations.filter((v) => v.impact === 'serious' || v.impact === 'critical');
+    if (process.env.AXE_DEBUG && bad.length) console.log('AXEDBG', JSON.stringify(bad.map((v) => v.nodes.slice(0, 4).map((n) => [n.target, n.failureSummary.slice(0, 200)]))));
     ok(bad.length === 0, `axe ${label}${bad.length ? ': ' + bad.map((v) => `${v.id} ${v.nodes[0].html.slice(0, 70)}`).join(' | ') : ''}`);
   };
   const done = () => { console.log(`\n${name}: ${pass} passed, ${fail} failed`); process.exit(fail ? 1 : 0); };

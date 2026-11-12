@@ -5,6 +5,7 @@ import { JobCard } from './JobCard';
 import { EmptyState } from './EmptyState';
 import { ROLES, DEFAULT_ROLE_IDS, EXPERIENCE_LABELS, HUB_LABELS, timeAgo, EMPLOYMENT_LABELS, CATEGORIES, CATEGORY_IDS, CATEGORY_GROUPS } from '../lib/format';
 import { jobKey } from '../lib/userData';
+import { matchScore, useMatch } from '../lib/matchScore';
 import { DEFAULT_FILTERS, JobFilters, activeFilterCount, chipCounts, filterJobs } from '../lib/filters';
 
 interface JobsFeedProps {
@@ -48,7 +49,16 @@ export const JobsFeed: React.FC<JobsFeedProps> = ({
 
   const counts = useMemo(() => chipCounts(jobs, filters, targetRoles, mutedCompanyIds, ROLES.map((r) => r.id)), [jobs, filters, targetRoles, mutedCompanyIds]);
   const mutedHidden = useMemo(() => (mutedCompanyIds.length ? jobs.filter((j) => mutedCompanyIds.includes(j.company_id)).length : 0), [jobs, mutedCompanyIds]);
-  const visible = useMemo(() => filterJobs(jobs, filters, roleFilter, targetRoles, mutedCompanyIds), [jobs, filters, roleFilter, targetRoles, mutedCompanyIds]);
+  const match = useMatch();
+  const canMatch = !!match.prefs;
+  const byMatch = canMatch && filters.sort === 'match';
+  const visible = useMemo(() => {
+    const list = filterJobs(jobs, filters, roleFilter, targetRoles, mutedCompanyIds);
+    if (!byMatch) return list;
+    // Best match first; ties keep the newest-first order the list already has
+    const pct = new Map(list.map((j) => [j, matchScore(j, match.prefs, match.skills)?.percent ?? 0]));
+    return list.map((j, i) => [j, i] as const).sort((a, b) => pct.get(b[0])! - pct.get(a[0])! || a[1] - b[1]).map(([j]) => j);
+  }, [jobs, filters, roleFilter, targetRoles, mutedCompanyIds, byMatch, match]);
 
   const chips = [{ id: 'all_matching', label: 'For you' }, ...ROLES.map((r) => ({ id: r.id, label: r.short })), { id: 'design_it', label: 'Design & IT' }, { id: 'all', label: 'All' }];
   const resetFilters = () => onFiltersChange({ ...DEFAULT_FILTERS, search: filters.search });
@@ -142,6 +152,12 @@ export const JobsFeed: React.FC<JobsFeedProps> = ({
           <button type="button" className={`btn ${showFilters || filterCount ? 'btn-toggled' : 'btn-outline'}`} onClick={() => setShowFilters((v) => !v)} aria-expanded={showFilters} aria-controls="job-filters">
             <SlidersHorizontal size={14} aria-hidden="true" /> Filters{filterCount > 0 && ` · ${filterCount}`}
           </button>
+          {canMatch && (
+            <select className="select sort-select" value={byMatch ? 'match' : 'newest'} onChange={(e) => set({ sort: e.target.value as 'newest' | 'match' })} aria-label="Sort jobs">
+              <option value="newest">Newest first</option>
+              <option value="match">Best match first</option>
+            </select>
+          )}
         </div>
 
         {showFilters && (

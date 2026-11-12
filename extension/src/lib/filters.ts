@@ -10,6 +10,7 @@ export interface JobFilters {
   freshnessDays: number;  // 0 = any
   remoteOnly: boolean;
   jobType: string;        // 'all' | full_time | part_time | contract | internship
+  sort?: 'newest' | 'match';  // job list order; not counted as a filter
 }
 
 export const DEFAULT_FILTERS: JobFilters = { search: '', hub: 'all', exp: 'all', minBudget: 0, salaryOnly: false, freshnessDays: 0, remoteOnly: false, jobType: 'all' };
