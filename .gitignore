@@ -26,3 +26,4 @@ store-assets/*.zip
 
 # Playwright test output
 test-results/
+.wrangler/
