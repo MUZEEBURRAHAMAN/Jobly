@@ -1,0 +1,157 @@
+<title>Jobly Autopilot Plan</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+  /* Layout: one reading column; phases as a vertical track with status stripes; comparison as a table */
+  :root {
+    --bg: #fafafa; --fg: #18181b; --muted: #52525b; --line: #e4e4e7; --panel: #ffffff; --soft: #f4f4f5;
+    --done: #15803d; --next: #b45309; --later: #71717a;
+    --sans: "Instrument Sans", ui-sans-serif, system-ui, sans-serif; --mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
+  }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --bg: #0b0b0c; --fg: #fafafa; --muted: #a1a1aa; --line: #27272a; --panel: #131315; --soft: #1c1c1f; --done: #4ade80; --next: #fbbf24; --later: #a1a1aa; color-scheme: dark; } }
+  :root[data-theme="dark"] { --bg: #0b0b0c; --fg: #fafafa; --muted: #a1a1aa; --line: #27272a; --panel: #131315; --soft: #1c1c1f; --done: #4ade80; --next: #fbbf24; --later: #a1a1aa; color-scheme: dark; }
+  body { background: var(--bg); color: var(--fg); font: 15px/1.6 var(--sans); }
+  .wrap { max-width: 860px; margin: 0 auto; padding-block: 48px 72px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: grid; gap: 40px; }
+  h1 { font-size: clamp(28px, 5vw, 40px); line-height: 1.1; margin: 0; letter-spacing: -.02em; text-wrap: balance; }
+  h2 { font-size: 20px; margin: 0 0 12px; letter-spacing: -.01em; }
+  h3 { font-size: 16px; margin: 0; }
+  p { margin: 0; max-width: 68ch; }
+  .lead { color: var(--muted); font-size: 17px; margin-top: 12px; }
+  .eyebrow { font: 500 12px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-bottom: 14px; }
+  section { display: grid; gap: 14px; }
+  .muted { color: var(--muted); }
+  ul { margin: 0; padding-left: 20px; display: grid; gap: 6px; }
+  .flow { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; list-style: none; padding: 0; }
+  .flow li { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 12px; font-size: 13px; display: grid; gap: 4px; align-content: start; }
+  .flow b { font: 500 11px var(--mono); color: var(--muted); }
+  @media (max-width: 640px) { .flow { grid-template-columns: 1fr 1fr; } }
+  .tablewrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+  table { border-collapse: collapse; width: 100%; min-width: 560px; font-size: 14px; }
+  th, td { text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { font: 500 12px var(--mono); color: var(--muted); text-transform: uppercase; letter-spacing: .05em; background: var(--soft); }
+  tr:last-child td { border-bottom: 0; }
+  .phases { display: grid; gap: 12px; }
+  .phase { background: var(--panel); border: 1px solid var(--line); border-left: 4px solid var(--later); border-radius: 12px; padding: 18px 20px; display: grid; gap: 10px; }
+  .phase.done { border-left-color: var(--done); } .phase.next { border-left-color: var(--next); }
+  .phase header { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+  .tag { font: 500 11px var(--mono); padding: 2px 8px; border-radius: 999px; border: 1px solid var(--line); color: var(--muted); white-space: nowrap; }
+  .done .tag { color: var(--done); border-color: currentColor; } .next .tag { color: var(--next); border-color: currentColor; }
+  .meta { font: 12px var(--mono); color: var(--muted); }
+  .rules { background: var(--soft); border-radius: 12px; padding: 18px 20px; }
+  code { font: 13px var(--mono); background: var(--soft); padding: 1px 5px; border-radius: 4px; }
+</style>
+
+<div class="wrap">
+  <header>
+    <p class="eyebrow">Jobly · plan · 13 Nov 2026</p>
+    <h1>Jobly Autopilot Plan</h1>
+    <p class="lead">What applyhira.com does well, what Jobly now does the same way, and the order to build the rest. Jobly runs in the user's browser with no server and no account, so it keeps one rule Hira doesn't: the user always presses Submit.</p>
+  </header>
+
+  <section>
+    <h2>What applyhira does (looked at on 13 Nov 2026)</h2>
+    <ul>
+      <li><b>Roles</b>: one wide search bar, a row of filter pills (sort, posted, location, workplace, companies), a list of row cards (logo, title, "Posted 2h ago", company, place, pay, tags, bookmark, Apply), and the chosen job open in a panel on the right.</li>
+      <li><b>Applications</b>: a board with In progress, Submitted, Not submitted and Wishlist, a "Needs your input" box, and a daily streak.</li>
+      <li><b>One application</b>: seven steps (Opening, Reading the form, Filling in, Checking answers, Your review, Sending, Sent), "Nothing is submitted until you approve", and a clear reason when it stops ("Workday hates our agents… finish it on Workday").</li>
+      <li><b>Knowledge</b>: everything it knows about you, by folder (education, experience, identity, job preferences, projects, skills, work authorization), with where each fact came from.</li>
+      <li><b>Agents</b>: a chat that sets up job-search agents which watch the board for you.</li>
+      <li>It works in <b>its own cloud browser</b>: it creates accounts on hiring sites with your email and keeps the password.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>How the Jobly apply queue works (built in this batch)</h2>
+    <ol class="flow">
+      <li><b>1</b>Opens the job in a background tab</li>
+      <li><b>2</b>Reads the form; presses the page's own Apply link if the form is behind it</li>
+      <li><b>3</b>Fills profile, resume file and saved answers; never overwrites what's there</li>
+      <li><b>4</b>Lists what it couldn't answer under Needs your input</li>
+      <li><b>5</b>Stops. You check the form and press Submit; it goes to Applied</li>
+    </ol>
+    <p class="muted">Two tabs are prepared at a time, up to six open. It stops with a reason when there's no form, the form moves to a site Jobly can't open, the site needs a sign-in, or the tab is closed. Answers typed in Jobly are saved for the next form (never gender, ethnicity, disability, veteran status or ID numbers).</p>
+  </section>
+
+  <section>
+    <h2>Where Jobly differs on purpose</h2>
+    <div class="tablewrap"><table>
+      <thead><tr><th>Topic</th><th>applyhira</th><th>Jobly</th></tr></thead>
+      <tbody>
+        <tr><td>Where it runs</td><td>Their cloud browser</td><td>The user's own Chrome, in background tabs</td></tr>
+        <tr><td>Submit</td><td>Sends after you approve</td><td>Never presses Submit or Next; the user does</td></tr>
+        <tr><td>Hiring-site accounts</td><td>Creates them and stores the password</td><td>Never creates accounts or stores passwords; asks you to sign in</td></tr>
+        <tr><td>Site access</td><td>Not needed (their browser)</td><td>Asked for only the sites in the queue, when you press Start</td></tr>
+        <tr><td>Your data</td><td>On their servers</td><td>On this device only</td></tr>
+        <tr><td>Cost</td><td>Pro plan for chat</td><td>Free</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section>
+    <h2>Phases</h2>
+    <div class="phases">
+      <article class="phase done">
+        <header><h3>1. Queue, board and a new Jobs page</h3><span class="tag">Done, not pushed</span></header>
+        <ul>
+          <li>Applications page: Queue, In progress, Ready for you, Submitted, Not submitted, plus Needs your input.</li>
+          <li>Add to queue on every job card and in the job panel.</li>
+          <li>Jobs page: filter pills, row cards, the chosen job open beside the list with fit, details and description.</li>
+          <li>Resume: Engineer template, projects and achievements, all 8 templates single-column, page in tabs.</li>
+        </ul>
+        <p class="meta">Commits 8effb2c, d3cab0f · 331 browser tests</p>
+      </article>
+      <article class="phase next">
+        <header><h3>2. One application, step by step</h3><span class="tag">Next · about 1 week</span></header>
+        <ul>
+          <li>A page per application: the steps as a timeline, every answer filled with where it came from, edit an answer and fill it again.</li>
+          <li>"Checking answers": flag answers that look wrong for the question (a city in a salary field, a long text in a one-line field).</li>
+          <li>Knowledge page: the profile and saved answers together, by folder, with their source (Profile, Saved, You typed).</li>
+        </ul>
+        <p class="meta">Impact high · effort medium · risk low</p>
+      </article>
+      <article class="phase next">
+        <header><h3>3. Job agents and the daily habit</h3><span class="tag">After 2 · about 1 week</span></header>
+        <ul>
+          <li>Agents as saved searches: "remote senior product designer, posted today" adds new matches to the queue's wishlist each morning. Rules, no AI.</li>
+          <li>Connect to the daily job email: one link to queue a job from the email.</li>
+          <li>A weekly goal and streak on Applications.</li>
+        </ul>
+        <p class="meta">Impact high · effort medium · risk low</p>
+      </article>
+      <article class="phase">
+        <header><h3>4. More hiring systems</h3><span class="tag">Later · 2 to 3 weeks</span></header>
+        <ul>
+          <li>Fill adapters and tests per system: Workday (with sign-in guidance), iCIMS, SmartRecruiters, Taleo, SuccessFactors.</li>
+          <li>Forms inside frames on company sites (Greenhouse and Lever embeds).</li>
+        </ul>
+        <p class="meta">Impact high · effort high · risk medium (sites change, some block automation)</p>
+      </article>
+      <article class="phase">
+        <header><h3>5. Interface pass, page by page</h3><span class="tag">In parallel</span></header>
+        <ul>
+          <li>Apply the new card, pill and panel patterns to Companies, Saved, Profile, Tailor, Cover letters, People, Settings and the popup.</li>
+          <li>One spacing scale and one card style per role; check each page in light, dark and at 1100px and 1440px.</li>
+        </ul>
+        <p class="meta">Impact medium · effort medium · risk low</p>
+      </article>
+      <article class="phase">
+        <header><h3>6. Release 1.5.0</h3><span class="tag">When 2 is done</span></header>
+        <ul>
+          <li>Version bump, store packet and screenshots; explain the optional site access in the store listing (only the sites in your queue, asked when you press Start).</li>
+        </ul>
+        <p class="meta">Store review may take longer because of the optional <code>https://*/*</code> access</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="rules">
+    <h2>Rules that stay</h2>
+    <ul>
+      <li>The user presses Submit. Jobly fills and stops.</li>
+      <li>No account creation on hiring sites, no stored passwords, no CAPTCHA solving.</li>
+      <li>No copying of another product's code or artwork; the flow above is Jobly's own build.</li>
+      <li>Everything stays on the device; site access is asked for per site.</li>
+    </ul>
+  </section>
+</div>
