@@ -2,6 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { RotateCcw, Search, SlidersHorizontal, X } from '../lib/icons';
 import { Job, Preferences } from '../types';
 import { JobCard } from './JobCard';
+import { JobDetail } from './JobDetail';
 import { EmptyState } from './EmptyState';
 import { ROLES, DEFAULT_ROLE_IDS, EXPERIENCE_LABELS, HUB_LABELS, timeAgo, EMPLOYMENT_LABELS, CATEGORIES, CATEGORY_IDS, CATEGORY_GROUPS } from '../lib/format';
 import { jobKey } from '../lib/userData';
@@ -60,6 +61,12 @@ export const JobsFeed: React.FC<JobsFeedProps> = ({
     return list.map((j, i) => [j, i] as const).sort((a, b) => pct.get(b[0])! - pct.get(a[0])! || a[1] - b[1]).map(([j]) => j);
   }, [jobs, filters, roleFilter, targetRoles, mutedCompanyIds, byMatch, match]);
 
+  // Wide page: the job open in the side panel (the first one until the user picks another)
+  const [picked, setPicked] = useState<string | null>(null);
+  const [panelClosed, setPanelClosed] = useState(false);
+  const selected = large && !panelClosed ? (visible.slice(0, displayLimit).find((j) => jobKey(j) === picked) ?? visible[0] ?? null) : null;
+  const select = (j: Job) => { setPicked(jobKey(j)); setPanelClosed(false); };
+
   const chips = [{ id: 'all_matching', label: 'For you' }, ...ROLES.map((r) => ({ id: r.id, label: r.short })), { id: 'design_it', label: 'Design & IT' }, { id: 'all', label: 'All' }];
   const resetFilters = () => onFiltersChange({ ...DEFAULT_FILTERS, search: filters.search });
 
@@ -115,7 +122,7 @@ export const JobsFeed: React.FC<JobsFeedProps> = ({
     }
     return (
       <>
-        {visible.slice(0, displayLimit).map((job) => <JobCard key={`${job.id}-${jobKey(job)}`} job={job} onToggleSave={onToggleSave} />)}
+        {visible.slice(0, displayLimit).map((job) => <JobCard key={`${job.id}-${jobKey(job)}`} job={job} onToggleSave={onToggleSave} onSelect={large ? select : undefined} selected={!!selected && jobKey(selected) === jobKey(job)} />)}
         {(visible.length > displayLimit || hasMore) && (
           <button
             type="button"
@@ -149,9 +156,9 @@ export const JobsFeed: React.FC<JobsFeedProps> = ({
               aria-label="Search jobs"
             />
           </div>
-          <button type="button" className={`btn ${showFilters || filterCount ? 'btn-toggled' : 'btn-outline'}`} onClick={() => setShowFilters((v) => !v)} aria-expanded={showFilters} aria-controls="job-filters">
+          {!large && <button type="button" className={`btn ${showFilters || filterCount ? 'btn-toggled' : 'btn-outline'}`} onClick={() => setShowFilters((v) => !v)} aria-expanded={showFilters} aria-controls="job-filters">
             <SlidersHorizontal size={14} aria-hidden="true" /> Filters{filterCount > 0 && ` · ${filterCount}`}
-          </button>
+          </button>}
           {canMatch && (
             <select className="select sort-select" value={byMatch ? 'match' : 'newest'} onChange={(e) => set({ sort: e.target.value as 'newest' | 'match' })} aria-label="Sort jobs">
               <option value="newest">Newest first</option>
@@ -160,7 +167,35 @@ export const JobsFeed: React.FC<JobsFeedProps> = ({
           )}
         </div>
 
-        {showFilters && (
+        {large && (
+          <div id="job-filters" className="pill-filters" role="group" aria-label="Filters">
+            <label className={`pill-select${filters.freshnessDays ? ' on' : ''}`}><span>Posted</span>
+              <select id="f-new" value={filters.freshnessDays} onChange={(e) => set({ freshnessDays: Number(e.target.value) })}>
+                <option value={0}>Any time</option><option value={1}>Past 24 hours</option><option value={3}>Past 3 days</option><option value={7}>Past week</option><option value={14}>Past 2 weeks</option><option value={30}>Past month</option>
+              </select></label>
+            <label className={`pill-select${filters.hub !== 'all' ? ' on' : ''}`}><span>Location</span>
+              <select id="f-hub" value={filters.hub} onChange={(e) => set({ hub: e.target.value })}>
+                <option value="all">Anywhere</option>{['us', 'india', 'europe', 'apac'].map((h) => <option key={h} value={h}>{HUB_LABELS[h]}</option>)}
+              </select></label>
+            <label className={`pill-select${filters.exp !== 'all' ? ' on' : ''}`}><span>Level</span>
+              <select id="f-exp" value={filters.exp} onChange={(e) => set({ exp: e.target.value })}>
+                <option value="all">Any level</option>{Object.entries(EXPERIENCE_LABELS).map(([id, label]) => <option key={id} value={id}>{label}</option>)}
+              </select></label>
+            <label className={`pill-select${filters.jobType !== 'all' ? ' on' : ''}`}><span>Type</span>
+              <select id="f-type" value={filters.jobType} onChange={(e) => set({ jobType: e.target.value })}>
+                <option value="all">Any type</option>{Object.entries(EMPLOYMENT_LABELS).map(([id, label]) => <option key={id} value={id}>{label}</option>)}
+              </select></label>
+            <label className={`pill-select${filters.minBudget ? ' on' : ''}`}><span>Salary</span>
+              <select id="f-pay" value={filters.minBudget} onChange={(e) => set({ minBudget: Number(e.target.value) })}>
+                <option value={0}>Any</option>{[100000, 150000, 200000, 250000].map((n) => <option key={n} value={n}>${n / 1000}K+</option>)}
+              </select></label>
+            <button type="button" className="pill-toggle" aria-pressed={filters.remoteOnly} onClick={() => set({ remoteOnly: !filters.remoteOnly })}>Remote only</button>
+            <button type="button" className="pill-toggle" aria-pressed={filters.salaryOnly} onClick={() => set({ salaryOnly: !filters.salaryOnly })}>Lists a salary</button>
+            {filterCount > 0 && <button type="button" className="btn btn-ghost btn-sm" onClick={resetFilters}><RotateCcw size={14} aria-hidden="true" /> Reset</button>}
+          </div>
+        )}
+
+        {!large && showFilters && (
           <div id="job-filters" className="filters" role="group" aria-label="Filters">
             <div>
               <label className="label" htmlFor="f-hub">Location</label>
@@ -227,7 +262,8 @@ export const JobsFeed: React.FC<JobsFeedProps> = ({
         </div>
       </div>
 
-      <div className={`list${large ? ' grid' : ''}`}>
+      <div className={large ? `jobs-split${selected ? ' with-detail' : ''}` : undefined}>
+      <div className="list">
         {loadError && jobs.length > 0 && (
           <div className="banner" role="status">
             <span className="grow">
@@ -240,6 +276,8 @@ export const JobsFeed: React.FC<JobsFeedProps> = ({
         {visible.length > 0 && <p className="text-sm" style={{ marginBottom: large ? 0 : 12 }} aria-live="polite">{visible.length}{hasMore ? '+' : ''} job{visible.length === 1 ? '' : 's'}{roleFilter === 'all_matching' ? ' that fit your preferences' : ''}{filters.freshnessDays === 0 ? ' · posted in the last 2 months' : ''}
           {mutedHidden > 0 && <> · {mutedHidden} hidden from companies you turned off{onOpenCompanies && <> (<button type="button" className="link" onClick={onOpenCompanies}>manage</button>)</>}</>}</p>}
         {renderBody()}
+      </div>
+      {selected && <JobDetail key={jobKey(selected)} job={selected} onToggleSave={onToggleSave} onClose={() => setPanelClosed(true)} />}
       </div>
     </div>
   );

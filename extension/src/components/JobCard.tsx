@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Bookmark, BookmarkCheck, Check, CheckCircle2, ExternalLink, Flag, MapPin, Share2, Sparkles } from '../lib/icons';
+import { Bookmark, BookmarkCheck, Briefcase, Check, CheckCircle2, ExternalLink, Flag, MapPin, Plus, Share2, Sparkles } from '../lib/icons';
+import { addToQueue, useApplyQueue } from '../lib/applyQueue';
 import { ReportModal } from './ReportModal';
 import { Job } from '../types';
 import { getCompanyLogoUrl } from '../lib/companyLogos';
@@ -13,9 +14,29 @@ import { matchScore, useMatch } from '../lib/matchScore';
 interface JobCardProps {
   job: Job;
   onToggleSave: (job: Job) => void;
+  /** The wide page: a row card that opens the job in the side panel. */
+  onSelect?: (job: Job) => void;
+  selected?: boolean;
 }
 
-export const JobCard: React.FC<JobCardProps> = ({ job, onToggleSave }) => {
+const WORK_MODE: Record<string, string> = { remote: 'Remote', hybrid: 'Hybrid', onsite: 'On-site', on_site: 'On-site' };
+
+/** "Add to queue" for the apply queue: Jobly prepares the application and stops before Submit. */
+export const QueueButton: React.FC<{ job: Job; size?: 'sm' | 'md'; onNote?: (m: string) => void }> = ({ job, size = 'sm', onNote }) => {
+  const queue = useApplyQueue();
+  const url = safeHttpUrl(job.application_url);
+  const inQueue = !!url && queue.some((x) => x.url === url && x.state !== 'stopped');
+  if (!url) return null;
+  return (
+    <button type="button" className={`btn ${size === 'sm' ? 'btn-sm ' : ''}${inQueue ? 'btn-toggled' : 'btn-outline'}`} disabled={inQueue} aria-pressed={inQueue}
+      aria-label={`${inQueue ? 'Queued' : 'Add to queue'}: ${job.title} at ${job.company_name}`} title={inQueue ? 'In your apply queue (Applications)' : 'Jobly prepares this application and stops before Submit'}
+      onClick={async () => { const problem = await addToQueue([{ url, title: job.title, company: job.company_name, location: job.location }]); onNote?.(problem ?? 'Added to your apply queue. Start it from Applications.'); }}>
+      {inQueue ? <Check size={14} aria-hidden="true" /> : <Plus size={14} aria-hidden="true" />} {inQueue ? 'Queued' : 'Add to queue'}
+    </button>
+  );
+};
+
+export const JobCard: React.FC<JobCardProps> = ({ job, onToggleSave, onSelect, selected }) => {
   const [imgFailed, setImgFailed] = useState(false);
   const [showReport, setShowReport] = useState(false);
   const [shareNote, setShareNote] = useState<string | null>(null);
@@ -59,6 +80,62 @@ export const JobCard: React.FC<JobCardProps> = ({ job, onToggleSave }) => {
 
   const place = job.location || null;
   const posted = job.posted_at ? timeAgo(job.posted_at) : '';
+  const note = (m: string) => { setShareNote(m); window.setTimeout(() => setShareNote(null), 2500); };
+
+  if (onSelect) {
+    // Wide page: the whole card opens the job in the side panel; its own buttons still work as buttons
+    const salary = job.salary_summary?.split('•')[0].trim();
+    return (
+      <article className={`card job job-row${selected ? ' selected' : ''}`} aria-label={`${job.title} at ${job.company_name}`}
+        onClick={(e) => { if (!(e.target as HTMLElement).closest('a, button, select, input')) onSelect(job); }}>
+        <div className="logo job-logo" aria-hidden="true">
+          {!imgFailed ? <img src={getCompanyLogoUrl(job.company_name)} alt="" loading="lazy" onError={() => setImgFailed(true)} /> : <span className="logo-fallback">{job.company_name.slice(0, 1).toUpperCase()}</span>}
+        </div>
+        <div className="job-main">
+          <div className="job-head">
+            <h3 className="job-title"><button type="button" className="job-open" aria-expanded={selected} onClick={() => onSelect(job)}>{job.title}</button></h3>
+            {posted && <span className="posted-chip">Posted {posted.toLowerCase()}</span>}
+          </div>
+          <p className="job-company">{job.company_name}</p>
+          <p className="job-meta">
+            {place && <span><MapPin size={13} aria-hidden="true" /> {place}</span>}
+            {job.work_mode && WORK_MODE[job.work_mode] && <span>{WORK_MODE[job.work_mode]}</span>}
+            {salary && <span><Briefcase size={13} aria-hidden="true" /> {salary}</span>}
+          </p>
+          <div className="job-tags">
+            {match
+              ? <span className={`badge match-badge ${match.percent >= 75 ? 'badge-brand' : match.percent >= 50 ? 'match-mid' : 'badge-outline'}`} title={matchTip}
+                  aria-label={`${match.percent}% match: ${match.reasons.map((r) => r.label).join(', ')}`}><Sparkles size={12} duo aria-hidden="true" /> {match.percent}% match</span>
+              : job.is_match && <span className="badge badge-brand"><Sparkles size={12} duo aria-hidden="true" /> Matches you</span>}
+            {appliedBefore && <span className="badge badge-warning">You applied here before</span>}
+            {job.employment_type && EMPLOYMENT_LABELS[job.employment_type] && <span className="badge badge-soft">{EMPLOYMENT_LABELS[job.employment_type]}</span>}
+            {job.experience_tier && EXPERIENCE_LABELS[job.experience_tier] && <span className="badge badge-soft">{EXPERIENCE_LABELS[job.experience_tier]}</span>}
+          </div>
+        </div>
+        <div className="job-side">
+          <button type="button" className={`btn btn-ghost btn-sm btn-icon${job.is_saved ? ' is-on' : ''}`} onClick={() => onToggleSave(job)} aria-pressed={job.is_saved}
+            aria-label={`${job.is_saved ? 'Remove from saved' : 'Save'}: ${job.title} at ${job.company_name}`} title={job.is_saved ? 'Saved' : 'Save'}>
+            {job.is_saved ? <BookmarkCheck size={16} aria-hidden="true" /> : <Bookmark size={16} aria-hidden="true" />}
+          </button>
+          <span className="grow" />
+          <div className="row" style={{ gap: 6 }}>
+            {tracker && !FEATURES.tracker && (
+              <button type="button" className={`btn btn-sm mark-applied ${applied ? 'btn-toggled' : 'btn-ghost'}`} onClick={() => void toggleApplied()} aria-pressed={applied}
+                title={applied ? 'You applied. Click to undo' : 'Mark applied'} aria-label={`${applied ? 'Applied' : 'Mark applied'}: ${job.title} at ${job.company_name}`}>
+                <Check size={14} aria-hidden="true" /> <span className="btn-label">{applied ? 'Applied' : 'Mark applied'}</span>
+              </button>
+            )}
+            {!applied && <QueueButton job={job} onNote={note} />}
+            {applyUrl
+              ? <a href={applyUrl} target="_blank" rel="noopener noreferrer" className="btn btn-sm" onClick={() => tracker?.noteApplyClick(job)} title={applyHost ? `Opens ${applyHost}` : undefined}
+                  aria-label={`Apply to ${job.title} at ${job.company_name}${applyHost ? ` (opens ${applyHost})` : ''}`}>Apply</a>
+              : <span className="btn btn-secondary btn-sm" aria-disabled="true">Link unavailable</span>}
+          </div>
+          <span role="status" className="text-xs muted card-note">{shareNote}</span>
+        </div>
+      </article>
+    );
+  }
 
   return (
     <article className="card job" aria-label={`${job.title} at ${job.company_name}`}>

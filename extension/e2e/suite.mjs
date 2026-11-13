@@ -176,8 +176,10 @@ await step('states: offline, 429, 500, empty, hidden', async () => {
 
 await step('dashboard layout fills the window', async () => {
   const h = await launch(); const p = await open(h, 'options.html', { width: 1920, height: 900 });
-  for (const [w, minCols] of [[1920, 3], [1280, 2], [700, 1]]) {
+  for (const [w, minCols] of [[1920, 1], [1280, 1], [700, 1]]) {
     await p.setViewportSize({ width: w, height: 900 }); await p.goto(`chrome-extension://${h.id}/options.html`); await p.locator('article').nth(3).waitFor({ timeout: 30000 }); await sleep(400);
+    const panel = await p.locator('.job-detail').isVisible();
+    ok(w >= 1280 ? panel : !panel, `${w}px: ${w >= 1280 ? 'the job list with the selected job open beside it' : 'the job list alone'}`);
     const m = await p.evaluate(() => ({ cols: new Set([...document.querySelectorAll('article')].slice(0, 12).map((a) => Math.round(a.getBoundingClientRect().left))).size, inner: document.querySelector('.content-inner').getBoundingClientRect().width, over: document.documentElement.scrollWidth > document.documentElement.clientWidth + 1 }));
     ok(m.cols >= minCols && !m.over, `${w}px: ${m.cols} column(s), content ${Math.round(m.inner)}px, no sideways scroll`);
     if (w === 1920) ok(m.inner > 1500, 'uses the full 1920px window');
@@ -750,6 +752,82 @@ await step('apply assist: panel on the page, sources, action required, steps, sa
   // the store build keeps the panel's shadow root closed, so the page's scripts can't read the answers
   const prod = fs.readFileSync(path.join(process.env.EXT_PROD, 'assist.js'), 'utf8');
   ok(/mode:"closed"/.test(prod) && !/mode:"open"/.test(prod), 'the store build opens the panel in a closed shadow root');
+  await h.ctx.close();
+});
+
+await step('jobs page: job panel, apply queue from a card', async () => {
+  const h = await launch(); const store = async (k) => (await h.sw.evaluate((key) => chrome.storage.local.get(key), k))[k];
+  const d = await open(h, 'options.html', { width: 1440, height: 900 }); await firstCard(d);
+  const second = d.locator('article.job-row').nth(1); const title2 = (await second.getAttribute('aria-label')).split(' at ')[0];
+  ok(await d.locator('.job-detail').count() === 1 && await d.locator('article.job-row.selected').count() === 1, 'the first job is open in the panel beside the list');
+  await second.locator('.job-meta').click(); await sleep(300);
+  ok((await d.locator('.jd-title').innerText()) === title2 && await second.evaluate((e) => e.classList.contains('selected')), 'clicking a card opens it in the panel');
+  await d.locator('.jd-desc').getByText(/About the job/).waitFor(); await sleep(500);
+  ok(await d.locator('.jd-desc [aria-busy]').count() === 0, 'the description loads in the panel (or says where to read it)');
+  await axe(d, 'jobs page with panel');
+  await second.getByRole('button', { name: /^Add to queue:/ }).click(); await sleep(400);
+  const q = await store('applyQueue');
+  ok(q?.length === 1 && q[0].state === 'queued' && q[0].title === title2 && await second.getByRole('button', { name: /^Queued:/ }).isDisabled(), 'Add to queue puts the job in the apply queue once');
+  await d.getByRole('button', { name: 'Close job details' }).click(); await sleep(200);
+  ok(await d.locator('.job-detail').count() === 0, 'the panel can be closed');
+  await h.ctx.close();
+});
+
+await step('apply queue: opens, finds the form behind Apply, fills, asks, stops for review, submit goes to Applied', async () => {
+  const h = await launch(); const store = async (k) => (await h.sw.evaluate((key) => chrome.storage.local.get(key), k))[k];
+  const fixtures = path.resolve(path.dirname(fileURLToPath(import.meta.url)), 'fixtures');
+  const form = fs.readFileSync(path.join(fixtures, 'apply-form.html'), 'utf8');
+  await h.ctx.route('https://apply.example.test/**', (r) => {
+    const u = new URL(r.request().url());
+    if (u.pathname === '/posting/7') return r.fulfill({ contentType: 'text/html', body: '<html><head><title>Designer</title></head><body><h1>Product Designer</h1><p>About the role.</p><a href="/jobs/7/apply">Apply now</a></body></html>' });
+    if (u.pathname === '/empty') return r.fulfill({ contentType: 'text/html', body: '<html><body><h1>This job is closed</h1></body></html>' });
+    return r.fulfill({ contentType: 'text/html', body: form });
+  });
+  const now = new Date().toISOString();
+  await h.sw.evaluate((d) => chrome.storage.local.set(d), {
+    profiles: [{ id: 'p1', label: 'Design', first_name: 'Ada', last_name: 'Lovelace', email: 'ada@example.com', phone: '+1 555 0100', location: 'Remote', headline: 'Senior Product Designer', summary: 'Designer.',
+      linkedin: 'linkedin.com/in/ada', github: '', portfolio: 'ada.design', website: '', work_authorization: 'US citizen', needs_sponsorship: 'no', years_experience: '8', salary_expectation: '', notice_period: '', skills: 'Figma', work: [], education: [], updated_at: now }],
+    activeProfileId: 'p1', resumeFile: { p1: { name: 'ada.pdf', type: 'application/pdf', size: 20, data: 'data:application/pdf;base64,JVBERi0xLjQK' } },
+    applyQueue: [
+      { id: 'q1', url: 'https://apply.example.test/jobs/42', title: 'Staff Product Designer', company: 'Initech', location: 'Remote', state: 'queued', note: '', needs: [], filled: 0, tabId: null, added_at: now, updated_at: now },
+      { id: 'q2', url: 'https://apply.example.test/posting/7', title: 'Product Designer', company: 'Globex', location: '', state: 'queued', note: '', needs: [], filled: 0, tabId: null, added_at: now, updated_at: now },
+      { id: 'q3', url: 'https://apply.example.test/empty', title: 'Closed role', company: 'Hooli', location: '', state: 'queued', note: '', needs: [], filled: 0, tabId: null, added_at: now, updated_at: now },
+    ],
+  });
+  const d = await open(h, 'options.html', { width: 1440, height: 900 });
+  await d.goto(`chrome-extension://${h.id}/options.html#applications`); await d.getByRole('heading', { name: 'Applications' }).waitFor({ timeout: 8000 });
+  await axe(d, 'applications');
+  await d.getByRole('button', { name: 'Start 3 applications' }).click();
+  const until = async (fn, ms = 30000) => { const end = Date.now() + ms; while (Date.now() < end) { const q = await store('applyQueue'); if (fn(q)) return q; await sleep(300); } return store('applyQueue'); };
+  let q = await until((q) => q.find((x) => x.id === 'q1')?.state === 'needs-input' && q.find((x) => x.id === 'q2')?.state === 'needs-input' && q.find((x) => x.id === 'q3')?.state === 'stopped');
+  const s = Object.fromEntries(q.map((x) => [x.id, x.state]));
+  ok(s.q1 === 'needs-input' && s.q2 === 'needs-input' && s.q3 === 'stopped', `each job is opened and prepared, two at a time (${JSON.stringify(s)})`);
+  const q1 = q.find((x) => x.id === 'q1');
+  ok(q1.filled >= 5 && q1.needs.some((n) => /Earliest start date/.test(n)) && !q1.needs.some((n) => /Gender/i.test(n)), `known answers are filled, the rest is listed as needs your input (${q1.filled} filled; ${q1.needs.join(', ')})`);
+  ok(/No application form/.test(q.find((x) => x.id === 'q3').note), 'a page with no form stops with a reason');
+  const tab = (await h.ctx.pages()).find((p) => p.url() === 'https://apply.example.test/jobs/42');
+  const tab2 = (await h.ctx.pages()).find((p) => p.url().endsWith('/jobs/7/apply'));
+  ok(!!tab2 && await tab2.inputValue('#fn') === 'Ada', 'on a job page, Jobly presses its own Apply link to reach the form, then fills it');
+  ok(await tab.inputValue('#fn') === 'Ada' && await tab.inputValue('#em') === 'ada@example.com' && await tab.evaluate(() => document.querySelector('#cv').files[0]?.name) === 'ada.pdf' && await tab.evaluate(() => !document.body.dataset.submitted),
+    'the form is filled (resume attached) and nothing is submitted');
+  // the user answers in Jobly; it is saved and filled into the open tab
+  await d.reload(); await d.getByRole('heading', { name: 'Needs your input' }).waitFor();
+  await d.locator('.aq-need', { hasText: 'Staff Product Designer' }).getByLabel(/Earliest start date/).fill('In 30 days');
+  await d.locator('.aq-need', { hasText: 'Staff Product Designer' }).getByRole('button', { name: 'Save and fill again' }).click();
+  const end = Date.now() + 8000; while (Date.now() < end && (await tab.inputValue('#start')) !== 'In 30 days') await sleep(200);
+  ok(await tab.inputValue('#start') === 'In 30 days' && (await store('savedAnswers')).some((a) => /Earliest start date/.test(a.question)), 'an answer typed in Jobly is saved and filled into the open form');
+  // the user finishes on the page and presses Submit
+  await tab.selectOption('#gender', 'Woman'); await tab.click('#country-b'); await tab.click('#country-list [role=option]:has-text("India")'); await tab.click('#next'); await sleep(1500);
+  await tab.click('button[type="submit"]');
+  q = await until((q) => q.find((x) => x.id === 'q1')?.state === 'submitted', 8000);
+  const app = (await store('applications'))?.find((a) => a.key.startsWith('https://apply.example.test/jobs/42'));
+  ok(q.find((x) => x.id === 'q1').state === 'submitted' && app?.status === 'applied' && app.title === 'Staff Product Designer', 'pressing Submit on the page marks it submitted and adds it to Applied');
+  await tab2.close(); q = await until((q) => q.find((x) => x.id === 'q2')?.state === 'stopped', 5000);
+  ok(/closed before you submitted/.test(q.find((x) => x.id === 'q2').note), 'closing a tab before submitting stops that application');
+  await d.reload(); await d.getByRole('heading', { name: 'Applications' }).waitFor();
+  ok(await d.getByRole('list', { name: 'Submitted' }).getByText('Staff Product Designer').count() === 1 && await d.getByRole('list', { name: 'Not submitted' }).locator('li').count() === 2, 'the board shows submitted and not-submitted jobs');
+  await d.getByRole('button', { name: /^Remove Closed role/ }).click(); await sleep(300);
+  ok(!(await store('applyQueue')).some((x) => x.id === 'q3'), 'a job can be removed from the queue');
   await h.ctx.close();
 });
 

@@ -12,6 +12,8 @@ import { flushSync } from 'react-dom';
 import { Company, Job, Preferences, RadarStats } from '../types';
 import { StatusPill, appVersion } from '../components/Header';
 import { JobsFeed } from '../components/JobsFeed';
+import { ApplicationsView } from '../components/ApplicationsView';
+import { useApplyQueue, WAITING } from '../lib/applyQueue';
 import { CompaniesView } from '../components/CompaniesView';
 import { SavedJobsView } from '../components/SavedJobsView';
 import { PreferencesView } from '../components/PreferencesView';
@@ -41,10 +43,10 @@ import { dueLabel } from '../lib/dates';
 import { useCompleteness } from '../lib/useCompleteness';
 import { CompletenessBar } from '../components/CompletenessBar';
 
-type Tab = 'jobs' | 'companies' | 'saved' | 'tracker' | 'interviews' | 'tasks' | 'profile' | 'tailor' | 'resume' | 'letters' | 'contacts' | 'alerts' | 'preferences';
+type Tab = 'jobs' | 'applications' | 'companies' | 'saved' | 'tracker' | 'interviews' | 'tasks' | 'profile' | 'tailor' | 'resume' | 'letters' | 'contacts' | 'alerts' | 'preferences';
 const n = (v: number | undefined) => (v ?? 0).toLocaleString();
 const TRACKER_TABS: Tab[] = ['tracker', 'interviews', 'tasks'];
-const TABS: Tab[] = ['jobs', 'companies', 'saved', 'tracker', 'interviews', 'tasks', 'profile', 'tailor', 'resume', 'letters', 'contacts', 'alerts', 'preferences'];
+const TABS: Tab[] = ['jobs', 'applications', 'companies', 'saved', 'tracker', 'interviews', 'tasks', 'profile', 'tailor', 'resume', 'letters', 'contacts', 'alerts', 'preferences'];
 const tabFromHash = (): Tab => {
   const h = window.location.hash.replace('#', '');
   // Links to the switched-off tracker pages (old bookmarks, notifications) open Saved, where applied jobs are listed
@@ -56,6 +58,7 @@ const tabFromHash = (): Tab => {
 export const OptionsApp: React.FC = () => {
   const [theme, setTheme] = useState<Theme>(getInitialTheme());
   const [tab, setTab] = useState<Tab>(tabFromHash);
+  const applyQueue = useApplyQueue();
   const [jobs, setJobs] = useState<Job[]>([]);
   const [jobsTotal, setJobsTotal] = useState(0);
   const [companies, setCompanies] = useState<Company[]>([]);
@@ -230,8 +233,10 @@ export const OptionsApp: React.FC = () => {
     if (!(await markAllRead())) showNotice("Couldn't mark alerts as read. Please try again.");
   };
 
+  const queueWaiting = applyQueue.filter((x) => WAITING.includes(x.state)).length;
   const allTabs: { id: Tab; label: string; icon: React.ElementType; badge?: number; badgeText?: string }[] = [
     { id: 'jobs', label: 'Jobs', icon: Briefcase },
+    { id: 'applications', label: 'Applications', icon: Kanban, badge: queueWaiting },
     { id: 'companies', label: 'Companies', icon: Building2 },
     { id: 'saved', label: 'Saved', icon: Bookmark, badge: savedJobs.length },
     { id: 'tracker', label: 'Tracker', icon: Kanban, badge: tracker.apps.length },
@@ -344,6 +349,7 @@ export const OptionsApp: React.FC = () => {
                   />
                 </div>
               )}
+              {tab === 'applications' && <ApplicationsView notify={showNotice} onBrowseJobs={() => setTab('jobs')} />}
               {tab === 'companies' && <CompaniesView large companies={companies} mutedCompanyIds={muted} onToggleMuted={toggleMuted} offline={status === 'offline'} loading={status === 'connecting'}
                 myRoles={preferences?.roles ?? []} onOpenCompany={(c) => { setCompanyFilter({ id: c.id, name: c.name }); setTab('jobs'); }} />}
               {tab === 'saved' && <SavedJobsView large savedJobs={savedJobs} onToggleSave={handleToggleSave} onBrowseJobs={() => setTab('jobs')} notify={showNotice} />}

@@ -20,7 +20,8 @@
   "optional_host_permissions": [
     "https://api.hunter.io/*",
     "https://api.search.brave.com/*",
-    "https://api.apollo.io/*"
+    "https://api.apollo.io/*",
+    "https://*/*"
   ],
   "action": {
     "default_popup": "popup.html",

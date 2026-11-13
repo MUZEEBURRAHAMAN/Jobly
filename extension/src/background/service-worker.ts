@@ -15,6 +15,7 @@ import { loadAnswers, markUsed, rememberAnswers } from '../lib/answerBank';
 import { loadActiveProfileId, loadProfiles, PROFILE_KEYS, ResumeFile } from '../lib/profile';
 import { safeHttpUrl } from '../lib/url';
 import { TRACKER_KEYS } from '../lib/tracker';
+import { ACTIVE, cleanItem, loadQueue, PARALLEL, QueueItem, storeQueue, WAITING } from '../lib/applyQueue';
 import { pullSnapshot, pushSnapshot, SYNC_SETTING, SYNC_STATE, syncEnabled, SYNCED_LOCAL_KEYS, syncState } from '../lib/sync';
 
 const ALARM_NAME = 'jobly-sync';
@@ -124,6 +125,7 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
 });
 
 chrome.alarms.onAlarm.addListener(async (alarm) => {
+  if (alarm.name === QUEUE_ALARM) { await checkQueue(); return; }
   if (alarm.name === ALARM_NAME || alarm.name === 'hiring-radar-sync') {
     await checkNewMatchesAndNotify();
   }
@@ -282,6 +284,12 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     return true;
   }
 
+  // From Jobly's own pages only (the Applications page runs in a tab, so check where it was sent from)
+  if (message?.type === 'QUEUE_PUMP' && sender.url?.startsWith(chrome.runtime.getURL(''))) {
+    void pumpQueue().then(() => sendResponse({ ok: true }), () => sendResponse({ ok: false }));
+    return true;
+  }
+
   if (message?.type === 'CLEAR_BADGE') {
     (async () => {
       await chrome.action.setBadgeText({ text: '' });
@@ -289,6 +297,94 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     })();
     return true;
   }
+});
+
+// ---------- Apply queue ----------
+// Jobs the user queued are prepared one or two at a time: open the page in a background tab, inject the assist in
+// auto mode, let it fill what it knows and report back. It stops at "Your review": the user presses Submit.
+const QUEUE_RUN = 'applyQueueRunning';
+const QUEUE_ALARM = 'jobly-apply-queue';
+const MAX_OPEN = 6;          // application tabs open at once (being prepared + waiting for the user)
+const STALE_MS = 75_000;     // no word from a tab this long while opening or reading: no form there
+
+async function patchQueue(match: (x: QueueItem) => boolean, patch: Partial<QueueItem>): Promise<QueueItem | null> {
+  const list = await loadQueue();
+  const i = list.findIndex(match);
+  if (i < 0) return null;
+  const next = cleanItem({ ...list[i], ...patch, id: list[i].id, added_at: list[i].added_at });
+  if (!next) return null;
+  list[i] = next;
+  await storeQueue(list);
+  return next;
+}
+
+async function pumpQueue(): Promise<void> {
+  if (!(await readKey<boolean>(QUEUE_RUN))) return;
+  const list = await loadQueue();
+  const active = list.filter((x) => ACTIVE.includes(x.state)).length;
+  const open = active + list.filter((x) => WAITING.includes(x.state)).length;
+  let slots = Math.min(PARALLEL - active, MAX_OPEN - open);
+  const queued = list.filter((x) => x.state === 'queued');
+  if (!queued.length && !active) { await writeKey(QUEUE_RUN, false); await chrome.alarms.clear(QUEUE_ALARM); return; }
+  for (const item of queued) {
+    if (slots <= 0) break;
+    const origin = `${new URL(item.url).origin}/*`;
+    if (!(await chrome.permissions.contains({ origins: [origin] }))) {
+      await patchQueue((x) => x.id === item.id, { state: 'stopped', note: 'Jobly needs your OK to open this site. Press Start again.' });
+      continue;
+    }
+    // A blank tab first, then the job: Jobly knows the tab before its page starts loading
+    const tab = await chrome.tabs.create({ url: 'about:blank', active: false });
+    await patchQueue((x) => x.id === item.id, { state: 'opening', note: '', tabId: tab.id ?? null, needs: [], filled: 0 });
+    if (tab.id != null) await chrome.tabs.update(tab.id, { url: item.url });
+    slots--;
+  }
+  if (!(await chrome.alarms.get(QUEUE_ALARM))) await chrome.alarms.create(QUEUE_ALARM, { periodInMinutes: 0.5 });
+}
+
+/** Tabs that went quiet: nothing to fill there. */
+async function checkQueue(): Promise<void> {
+  const list = await loadQueue();
+  const now = Date.now();
+  let changed = false;
+  for (const x of list) {
+    if (ACTIVE.includes(x.state) && now - Date.parse(x.updated_at) > STALE_MS) {
+      x.state = 'stopped'; x.note = 'No application form found on the page. Open it to apply yourself.'; x.updated_at = new Date().toISOString(); changed = true;
+    }
+  }
+  if (changed) await storeQueue(list);
+  await pumpQueue();
+}
+
+async function injectAuto(tabId: number, itemId: string): Promise<void> {
+  try {
+    await chrome.scripting.executeScript({ target: { tabId }, func: (id: string) => { (window as Window & { __joblyAuto?: string }).__joblyAuto = id; }, args: [itemId] });
+    await chrome.scripting.executeScript({ target: { tabId }, files: ['assist.js'] });
+  } catch {
+    // The page moved somewhere Jobly wasn't allowed to open (often a sign-in or another hiring site)
+    await patchQueue((x) => x.id === itemId, { state: 'stopped', note: 'The form moved to another site. Open the tab and finish it there.' });
+    await pumpQueue();
+  }
+}
+
+chrome.tabs.onUpdated.addListener((tabId, info, tab) => {
+  if (info.status !== 'complete' || !/^https?:/.test(tab.url ?? '')) return;
+  void loadQueue().then(async (list) => {
+    const item = list.find((x) => x.tabId === tabId && (ACTIVE.includes(x.state) || WAITING.includes(x.state)));
+    if (!item) return;
+    if (item.state === 'opening') await patchQueue((x) => x.id === item.id, { state: 'reading' });
+    await injectAuto(tabId, item.id);
+  });
+});
+
+chrome.tabs.onRemoved.addListener((tabId) => {
+  void (async () => {
+    const item = (await loadQueue()).find((x) => x.tabId === tabId);
+    if (!item) return;
+    if (item.state !== 'submitted' && item.state !== 'stopped') await patchQueue((x) => x.id === item.id, { state: 'stopped', note: 'The tab was closed before you submitted.', tabId: null });
+    else await patchQueue((x) => x.id === item.id, { tabId: null });
+    await pumpQueue();
+  })();
 });
 
 // ---------- Apply assist (the panel on an application page) ----------
@@ -328,7 +424,29 @@ async function handleAssist(message: Record<string, unknown>, sender: chrome.run
     case 'ASSIST_USED':
       await markUsed((Array.isArray(message.keys) ? message.keys : []).filter((k): k is string => typeof k === 'string').slice(0, 50));
       return { ok: true };
+    case 'ASSIST_PROGRESS': {
+      // The assist in a queued tab reports where it got to
+      const states = ['reading', 'filling', 'needs-input', 'review', 'stopped'] as const;
+      const state = states.find((s) => s === message.state);
+      if (!state) return null;
+      const item = await patchQueue((x) => x.tabId === sender.tab!.id && x.id === message.id, {
+        state, note: str(message.note, 200), filled: Number(message.filled) || 0,
+        needs: (Array.isArray(message.needs) ? message.needs : []).map((q) => str(q, 200)).filter(Boolean).slice(0, 30),
+      });
+      if (item && state !== 'reading' && state !== 'filling') await pumpQueue();
+      return { ok: !!item };
+    }
     case 'ASSIST_SUBMITTED': {
+      // From a queued tab: that application is done; it goes to Applied straight away
+      const queued = (await loadQueue()).find((x) => x.tabId === sender.tab!.id && x.state !== 'submitted');
+      if (queued) {
+        await patchQueue((x) => x.id === queued.id, { state: 'submitted', note: '', needs: [] });
+        const job = pageJobFrom({ ...(message.job as object), url: queued.url, title: queued.title, company: queued.company });
+        const app = job ? sanitizeApp({ ...appFromPageJob(job), status: 'applied', applied_at: new Date().toISOString() }) : null;
+        if (app) { const apps = await loadApps(); if (!apps.some((a) => a.key === app.key && a.status !== 'saved')) await storeApps([app, ...apps.filter((a) => a.key !== app.key)].slice(0, MAX_APPS)); }
+        await pumpQueue();
+        return { ok: true, queued: true };
+      }
       // Pressing Submit on the page: ask "Did you apply?" next time Jobly opens, in case the page moves on
       const job = pageJobFrom(message.job);
       if (!job) return null;

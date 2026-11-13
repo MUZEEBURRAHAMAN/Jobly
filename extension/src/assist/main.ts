@@ -1,3 +1,6 @@
+// Auto mode (the apply queue): injected by the extension into a tab it opened for a queued job, with __joblyAuto set to
+// the queue item. It then fills every answer it knows without asking, reports progress to the extension, and stops at
+// the user's review. Still never presses Next or Submit; it may press a job page's own "Apply" link to reach the form.
 // Apply assist: a small Jobly panel on the application page. It is injected only into the tab the user opened Jobly on,
 // only when they press "Start apply assist" (activeTab). It reads each step of the form, shows the proposed answers with
 // where each came from, fills only what the user approves, lists the questions left for them, and remembers what they
@@ -7,7 +10,7 @@ import { extractJobFromPage, PageJob } from '../lib/pageJob';
 import type { AssistAnswer } from '../lib/assistLogic';
 
 declare const __JOBLY_TEST__: boolean;
-type W = Window & { __joblyAssist?: { show: () => void } };
+type W = Window & { __joblyAssist?: { show: () => void }; __joblyAuto?: string };
 
 const send = <T>(message: Record<string, unknown>): Promise<T | null> =>
   new Promise((resolve) => {
@@ -76,6 +79,28 @@ function start() {
   let busy = false;
   let asking = false;
   let scannedIds = new Set<string>();
+  const autoId = w.__joblyAuto ?? '';
+  let selfClick = false;      // our own press of a job page's "Apply" link is not a submission
+  let pressedApply = false;
+  let autoTimer = 0;
+  const report = (state: 'reading' | 'filling' | 'needs-input' | 'review' | 'stopped', note = '') => {
+    if (!autoId) return;
+    const needs = answers.filter((a) => !a.value && !a.filled && (a.required || a.kind === 'custom')).map((a) => a.label || 'Unlabelled question');
+    const signIn = !!document.querySelector('input[type="password"]');
+    void send({ type: 'ASSIST_PROGRESS', id: autoId, state, note, filled: answers.filter((a) => a.filled).length, needs: signIn && state === 'needs-input' && !needs.length ? ['Sign in to the site'] : needs });
+  };
+  /** A job description page: press its own "Apply" link once to reach the form. */
+  const APPLY_LINK = /^(apply|apply now|apply for this (job|position|role)|apply to this job|start (your )?application|i'?m interested)$/i;
+  const pressApplyLink = (): boolean => {
+    if (pressedApply) return false;
+    const target = Array.from(document.querySelectorAll<HTMLElement>('a, button, [role="button"]')).find((n) => {
+      const t = (n.textContent || n.getAttribute('aria-label') || '').replace(/\s+/g, ' ').trim();
+      return APPLY_LINK.test(t) && n.offsetParent !== null && !n.closest('form') && !host.contains(n);
+    });
+    if (!target) return false;
+    pressedApply = true; selfClick = true; target.click(); window.setTimeout(() => { selfClick = false; }, 500);
+    return true;
+  };
   let seenQuestions = new Set<string>();
   const job: PageJob = (() => { try { return extractJobFromPage(); } catch { return { found: false, title: document.title, company: location.hostname, location: '', datePosted: '', employmentType: '', salary: '', url: location.href, description: '' }; } })();
 
@@ -152,6 +177,27 @@ function start() {
       if (f && a.required && !a.value && !a.filled) { f.style.outline = '2px dashed #d97706'; f.style.outlineOffset = '2px'; }
     }
     render();
+    if (autoId) void autoStep();
+  };
+
+  /** Auto mode after each read: fill what Jobly knows, or find the form, then tell the extension where it stands. */
+  const autoStep = async () => {
+    window.clearTimeout(autoTimer);
+    if (!answers.length) {
+      // Nothing to fill yet: the form may still be loading, or sit behind the page's own Apply link
+      autoTimer = window.setTimeout(() => {
+        if (answers.length) return;
+        if (pressApplyLink()) { report('reading', 'Opened the application form'); return; }
+        if (document.querySelector('input[type="password"]')) { report('needs-input', 'This site asks you to sign in first.'); return; }
+        report('stopped', 'No application form found on the page. Open it to apply yourself.');
+      }, 6000);
+      return;
+    }
+    for (const a of answers) if (a.value && !a.filled && !currentValue(a)) a.include = true; else if (currentValue(a)) a.include = false;  // never overwrite what's on the page
+    if (answers.some((a) => a.value && !a.filled && a.include)) { report('filling'); await fill(); }
+    const captcha = !!document.querySelector('iframe[src*="recaptcha"], iframe[src*="hcaptcha"], iframe[src*="turnstile"], .g-recaptcha, .h-captcha');
+    const left = answers.filter((a) => !a.value && !a.filled && (a.required || a.kind === 'custom')).length;
+    report(left ? 'needs-input' : 'review', captcha ? 'The page has a CAPTCHA: complete it yourself before submitting.' : '');
   };
 
   const fill = async () => {
@@ -255,12 +301,19 @@ function start() {
   document.addEventListener('submit', (e) => { if (!host.contains(e.target as Node)) onSubmitLike(); }, true);
   document.addEventListener('click', (e) => {
     const t = (e.target as HTMLElement | null)?.closest?.('button, input[type="submit"], [role="button"]') as HTMLElement | null;
-    if (!t || host.contains(t)) return;
+    if (!t || host.contains(t) || selfClick) return;
     const label = ((t as HTMLInputElement).value || t.textContent || t.getAttribute('aria-label') || '').replace(/\s+/g, ' ').trim();
     if (SUBMIT.test(label) && t.closest('form') === null) onSubmitLike(); // inside a form the submit event above covers it
   }, true);
 
   w.__joblyAssist = { show: () => { panel.classList.remove('min'); void scan(true); } };
+  // The user answered questions in Jobly's Applications page, or signed in: read the form again and fill
+  try {
+    chrome.runtime.onMessage.addListener((m: { type?: string; id?: string }) => {
+      if (m?.type === 'JOBLY_REFILL' && autoId && m.id === autoId) { message = ''; void scan(true); }
+    });
+  } catch { /* not in an extension context (tests) */ }
+  if (autoId) panel.classList.add('min');
   render();
   void scan();
 }
