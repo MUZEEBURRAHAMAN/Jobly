@@ -795,12 +795,14 @@ fieldset.profile-card > legend { padding: 0 var(--space-1); }
 .job-company { margin: 0; font-size: var(--text-sm); color: var(--foreground); }
 .job-meta { margin: 0; display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: var(--text-xs); color: var(--muted-foreground); }
 .job-meta span { display: inline-flex; align-items: center; gap: 4px; }
-.job-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+.job-foot { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-2) var(--space-3); margin-top: 8px; }
+.job-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.job-actions { display: flex; flex-wrap: wrap; gap: 6px; margin-left: auto; }
 .badge-soft { background: var(--muted); border-color: transparent; color: var(--foreground); }
 .job-side { display: flex; flex-direction: column; align-items: flex-end; gap: var(--space-2); min-width: 0; }
 .job-side .is-on { color: var(--foreground); }
 .job-side .card-note { min-height: 0; text-align: right; }
-@media (max-width: 760px) { .job-row { grid-template-columns: auto minmax(0, 1fr); } .job-side { grid-column: 1 / -1; flex-direction: row; align-items: center; } }
+
 .job-detail { position: sticky; top: var(--space-4); max-height: calc(100vh - 120px); overflow-y: auto; display: flex; flex-direction: column; gap: var(--space-3); padding: 2px; }
 .jd-hero { display: flex; flex-direction: column; gap: var(--space-3); padding: var(--space-5); border-radius: var(--radius-lg); background: var(--foreground); color: var(--background); }
 .jd-hero .logo { width: 40px; height: 40px; }

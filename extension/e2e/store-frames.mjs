@@ -1,5 +1,5 @@
 // Chrome Web Store screenshots in the marketing layout: a brand panel with a headline on the left, the real extension
-// screen framed on the right with one callout. 1280x800, written to store-assets/screenshots/v1.5/.
+// screen framed on the right with one callout. 1280x800, written to store-assets/screenshots/v1.5/ (the 1.5.0 set).
 //   RAW=<folder with dashboard-<name>-light.png from site-screenshots.mjs (THEMES=light)> node e2e/store-frames.mjs
 // Only the made-up demo profile and demo companies appear in callouts; no third-party logos.
 import fs from 'fs';
@@ -24,31 +24,31 @@ const slides = [
   {
     file: '1-jobs.png', shot: 'jobs', eyebrow: 'Find jobs', title: 'Fresh jobs,<br>real posting dates.',
     text: 'Jobs from 2,000+ company career pages, each with the date it was really posted and how well it fits you.',
-    crop: { x: 244, y: 196, w: 1196, h: 640 }, url: 'Jobly · Jobs',
+    crop: { x: 250, y: 180, w: 1190, h: 720 }, url: 'Jobly · Jobs',
     callout: `<div class="co co-bl"><div class="co-row"><span class="pill brand">✦ 100% match</span></div>
       <ul class="ticks"><li>One of your roles</li><li>Senior level</li><li>Title mentions product designer</li></ul></div>`,
   },
   {
-    file: '2-apply-assist.png', shot: 'assist-filled', eyebrow: 'Apply faster', title: 'You approve.<br>Jobly fills.<br>You submit.',
-    text: 'Apply assist fills each step from your profile, shows where every answer came from, and marks what only you can answer.',
+    file: '2-apply-queue.png', shot: 'applications', eyebrow: 'Apply queue', title: 'Queue the jobs.<br>Jobly fills them.',
+    text: 'Jobly opens each job, fills your profile, resume and saved answers, asks what it couldn’t answer, and stops for your review.',
+    crop: { x: 244, y: 56, w: 1196, h: 760 }, url: 'Jobly · Applications',
+    callout: `<div class="co co-br wide"><div class="co-row"><span class="dot ok"></span><b>15 fields filled for Acme</b></div>
+      <div class="co-row"><span class="dot need"></span><span>2 questions need your answer</span></div><div class="co-foot">You press Submit. Jobly never does.</div></div>`,
+  },
+  {
+    file: '3-apply-assist.png', shot: 'assist-filled', eyebrow: 'Apply faster', title: 'You approve.<br>Jobly fills.<br>You submit.',
+    text: 'On any application page, Jobly fills each step from your profile, shows where every answer came from, and marks what only you can answer.',
     crop: { x: 60, y: 120, w: 760, h: 760 }, url: 'careers.northwind.example/apply', frameWidth: 470, frameAlign: 'start',
     overlay: { crop: { x: 1048, y: 414, w: 362, h: 470 }, width: 330, right: 40, top: 150 },
     callout: `<div class="co co-bl wide"><div class="co-row"><span class="dot ok"></span><b>Filled 9 fields from your profile</b></div>
       <div class="co-row"><span class="dot need"></span><span>Each answer shows where it came from</span></div><div class="co-foot">You press Submit. Jobly never does.</div></div>`,
   },
   {
-    file: '3-tailor.png', shot: 'tailor', eyebrow: 'Tailor', title: 'A resume<br>for each job.',
-    text: 'Paste a job description. See what it asks for, which line of your resume covers each point, and what to change.',
-    crop: { x: 244, y: 56, w: 960, h: 640 }, url: 'Jobly · Tailor for a job',
-    callout: `<div class="co co-br"><div class="co-label">Coverage</div><div class="co-big"><span class="muted-num">68%</span> → <span class="brand-num">82%</span></div>
-      <div class="co-foot">after the changes you accept</div></div>`,
-  },
-  {
-    file: '4-profile.png', shot: 'profile', eyebrow: 'Set up in a minute', title: 'Your profile<br>in a minute.',
-    text: 'Import the PDF LinkedIn makes of your profile, or your resume. It is read in your browser and never uploaded.',
-    crop: { x: 244, y: 56, w: 980, h: 660 }, url: 'Jobly · Profile',
-    callout: `<div class="co co-br"><div class="co-row"><span class="file">PDF</span><b>linkedin.pdf read</b></div>
-      <div class="chips"><span>Name</span><span>Email</span><span>3 roles</span><span>1 school</span><span>Skills</span></div></div>`,
+    file: '4-resume.png', shot: 'resume', eyebrow: 'Resume', title: 'A resume that<br>reads cleanly.',
+    text: 'Eight one-column templates, a score with the fixes that matter most, and an ATS check of what a hiring system reads.',
+    crop: { x: 244, y: 84, w: 1196, h: 760 }, url: 'Jobly · Resume',
+    callout: `<div class="co co-br"><div class="co-label">ATS check</div>
+      <ul class="ticks"><li>Name and contact found</li><li>2 positions with dates</li><li>Single column, standard headings</li></ul><div class="co-foot">Checked in your browser, no AI</div></div>`,
   },
   {
     file: '5-people.png', shot: 'people', eyebrow: 'Get noticed', title: 'Reach the people<br>who hire.',

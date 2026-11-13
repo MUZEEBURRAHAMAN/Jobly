@@ -6,7 +6,7 @@ updated: 2026-11-12
 figure: vault
 ---
 
-> **The short version.** Jobly has no server: it downloads public job files and filters them in your browser. It reads the page you're on only when you click Save, Fit check or Autofill, and only that tab. The optional Brave Search, Apollo and Hunter searches are each asked for the first time you use them. Everything personal stays in your browser.
+> **The short version.** Jobly has no server: it downloads public job files and filters them in your browser. It reads the page you're on only when you click Save, Fit check or Autofill, and only that tab. The optional Brave Search, Apollo and Hunter searches are each asked for the first time you use them, and the apply queue asks for just the job sites in it when you press Start. Everything personal stays in your browser.
 
 ## Permissions
 
@@ -20,6 +20,7 @@ These are all the permissions in Jobly's manifest. Chrome shows them when you in
 | `activeTab` + `scripting` | Read or fill the tab you're on when you click Save, Fit check or Autofill | Touch any other tab, or any page you didn't click on |
 | `contextMenus` | Add "Save this job to Jobly" to the right-click menu | Do anything until you choose it |
 | `https://jobly-data.pages.dev/*` | Download Jobly's public job files | Reach any other website |
+| Optional: `https://*/*` (per site) | The apply queue: open and fill the job pages in your queue, asked for only those sites when you press Start | Any site you didn't queue, pressing Submit, signing in |
 | Optional: `https://api.search.brave.com/*` | Profile search, asked for the first time you use it | Anything before you allow it |
 | Optional: `https://api.apollo.io/*` | Who works at a company, asked for the first time you use it | Anything before you allow it |
 | Optional: `https://api.hunter.io/*` | Contact search, asked for the first time you use it | Anything before you allow it |

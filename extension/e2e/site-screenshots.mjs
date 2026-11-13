@@ -19,7 +19,7 @@ const profile = {
   id: 'p1', label: 'Product design', first_name: 'Ananya', last_name: 'Rao', email: 'ananya.rao@example.com', phone: '+91 98765 43210', location: 'Bengaluru, India',
   headline: 'Senior Product Designer', summary: 'Product designer with seven years of experience shipping consumer and fintech products, from research to polished UI.',
   linkedin: 'linkedin.com/in/ananyarao', github: '', portfolio: 'ananyarao.design', website: '', work_authorization: 'Indian citizen', needs_sponsorship: 'no',
-  years_experience: '7', salary_expectation: '', notice_period: '30 days', skills: 'Figma, Design systems, User research, Accessibility',
+  years_experience: '7', salary_expectation: '', notice_period: '30 days', skills: 'Figma, Design systems, User research, Accessibility, Prototyping, Usability testing',
   work: [
     { id: 'w1', company: 'Northwind Labs', title: 'Senior Product Designer', location: 'Bengaluru, India', start: '2022-04', end: '', current: true,
       bullets: 'Ran weekly research sessions with customers\nBuilt the design system used by 6 product teams\nLed the redesign of checkout, lifting conversion by 18%' },
@@ -45,6 +45,16 @@ for (const theme of (process.env.THEMES || 'light,dark').split(',')) {
       { id: 'c2', name: 'Arjun Menon', position: 'Talent Partner', email: 'arjun@example.com', linkedin: '', company: 'Northwind Labs', app_key: 'https://careers.northwind.example/designer', source: 'manual', relation: 'recruiter', notes: '', contacted_at: iso(-1), created_at: iso(0) },
       { id: 'c3', name: 'Rahul Mehta', position: 'Former manager at Quill Systems', email: 'rahul@example.com', linkedin: '', company: 'Quill Systems', app_key: null, source: 'manual', relation: 'reference', notes: '', contacted_at: null, created_at: iso(0) },
     ],
+    // The apply queue with made-up companies (their logos fall back to a letter)
+    applyQueue: [
+      { id: 'q1', url: 'https://careers.globex.example/1', title: 'Product Designer, Payments', company: 'Globex', location: 'Remote', state: 'queued', note: '', needs: [], filled: 0, tabId: null, added_at: iso(0), updated_at: iso(0) },
+      { id: 'q2', url: 'https://careers.initech.example/2', title: 'Senior Product Designer', company: 'Initech', location: 'Bengaluru', state: 'filling', note: '', needs: [], filled: 7, tabId: null, added_at: iso(0), updated_at: iso(0) },
+      { id: 'q3', url: 'https://careers.hooli.example/3', title: 'Design Systems Lead', company: 'Hooli', location: 'Remote', state: 'needs-input', note: '', needs: ['Earliest start date', 'Why do you want to work at Hooli?'], filled: 12, tabId: null, added_at: iso(0), updated_at: iso(0) },
+      { id: 'q4', url: 'https://careers.acme.example/4', title: 'Lead Product Designer', company: 'Acme', location: 'Pune', state: 'review', note: '', needs: [], filled: 15, tabId: null, added_at: iso(0), updated_at: iso(0) },
+      { id: 'q5', url: 'https://careers.northwind.example/designer', title: 'Senior Product Designer', company: 'Northwind Labs', location: 'Bengaluru', state: 'submitted', note: '', needs: [], filled: 14, tabId: null, added_at: iso(0), updated_at: iso(0) },
+      { id: 'q6', url: 'https://careers.umbrella.example/6', title: 'UX Designer', company: 'Umbrella', location: 'Hyderabad', state: 'stopped', note: 'This site asks you to sign in first.', needs: [], filled: 0, tabId: null, added_at: iso(0), updated_at: iso(0) },
+    ],
+    resumeSettings: { template: 'modern', accent: 'black', page: 'a4', fit: true },
     seenAlertKeys: staticJobs().filter((j) => ['1', '3', '7'].includes(j.bucket)).map((j) => j.application_url),
   });
   const shot = (page, name) => page.screenshot({ path: path.join(OUT, `dashboard-${name}-${theme}.png`) }).then(() => console.log('wrote', name, theme));
@@ -77,6 +87,13 @@ for (const theme of (process.env.THEMES || 'light,dark').split(',')) {
   await d.locator('input[type="file"]').setInputFiles(path.join(here, 'fixtures', 'linkedin.pdf'));
   await d.getByText(/LinkedIn profile read/).waitFor({ timeout: 20000 }); await sleep(500);
   await shot(d, 'profile');
+  // Applications: the apply queue board
+  await d.goto(`chrome-extension://${h.id}/options.html#applications`); await d.getByRole('heading', { name: 'Applications' }).waitFor(); await sleep(1200);
+  await shot(d, 'applications');
+  // Resume: the Score and ATS tab beside the page
+  await d.goto(`chrome-extension://${h.id}/options.html#resume`); await d.locator('.resume-print .resume h1').waitFor(); await sleep(600);
+  await d.getByRole('tab', { name: /^Score and ATS/ }).click(); await sleep(600);
+  await shot(d, 'resume');
   // People: who to look for at the company, and saved people with how you know them
   await d.goto(`chrome-extension://${h.id}/options.html#contacts`); await sleep(1000);
   await d.getByLabel('Job', { exact: true }).selectOption({ index: 1 }); await d.getByRole('radio', { name: 'Hiring manager' }).click(); await sleep(500);

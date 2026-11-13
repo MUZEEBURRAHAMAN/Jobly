@@ -2,7 +2,7 @@
 title: Privacy policy
 eyebrow: Privacy
 description: What Jobly keeps on your device, what it downloads, and what it never collects. No account, no analytics, no tracking.
-updated: 2026-11-12
+updated: 2026-11-13
 figure: padlock
 ---
 
@@ -48,6 +48,16 @@ The extension can read a web page only when you ask, and only the tab you're on:
 - **Autofill** lists the form's questions, shows you its proposed answers from your profile, and fills only the ones you approve. It never presses Submit, and never touches password fields.
 
 This happens in your browser. Nothing read from the page leaves it. Chrome grants this access for that one tab when you click (the "activeTab" permission), so Jobly can't read pages in the background.
+
+## The apply queue
+
+When you add jobs to your apply queue and press Start, Jobly asks Chrome for access to just the sites those jobs are on (for example the employer's hiring system). Then, for each job:
+
+- it opens the job in a background tab, and presses the page's own Apply link if the form sits behind it;
+- it reads the form's questions and fills them from your profile, your resume file and answers you saved, never replacing something already on the page;
+- it lists what it couldn't answer, and stops. You check the form and press Submit yourself.
+
+Jobly never presses Submit or Next, never signs in for you, never creates accounts on hiring sites, never stores their passwords and never solves CAPTCHAs. What it reads from these pages stays in your browser. The queue itself (job titles, companies, links, how far each got) is kept on your device. You can remove the site access any time in Chrome's extension settings.
 
 ## Optional connections
 
@@ -123,10 +133,11 @@ You can ask us what we hold about you, to correct it, or to delete it. Because w
 - **storage:** keep the items above on your device (and in Chrome sync, if you turn it on).
 - **notifications:** show job alerts, and confirm when you save a job with the right-click menu.
 - **alarms:** check for new jobs every so often in the background.
-- **activeTab and scripting:** read the page you're on when you click Save or Fit check, and open the apply assist panel on it when you click Start apply assist. The panel fills only the answers you approve and never presses Submit.
+- **activeTab and scripting:** read the page you're on when you click Save or Fit check, and open the apply assist panel on it when you click Start apply assist. The panel fills only the answers you approve and never presses Submit. In apply-queue tabs, the same panel fills the form on sites you allowed.
 - **contextMenus:** the right-click "Save this job to Jobly" item.
 - **Access to jobly-data.pages.dev:** download Jobly's public job files.
 - **Optional access to Brave Search, Apollo and Hunter:** each requested the first time you use it; nothing is requested otherwise.
+- **Optional access to job sites:** asked for only when you press Start on the apply queue, and only for the sites of the jobs in it.
 
 The [security page](/security) has the full permission list and how data moves.
 

@@ -307,7 +307,12 @@ const QUEUE_ALARM = 'jobly-apply-queue';
 const MAX_OPEN = 6;          // application tabs open at once (being prepared + waiting for the user)
 const STALE_MS = 75_000;     // no word from a tab this long while opening or reading: no form there
 
-async function patchQueue(match: (x: QueueItem) => boolean, patch: Partial<QueueItem>): Promise<QueueItem | null> {
+// Every change to the queue runs one after another: two tabs reporting at once must not overwrite each other
+let queueLock: Promise<unknown> = Promise.resolve();
+const locked = <T>(fn: () => Promise<T>): Promise<T> => { const run = queueLock.then(fn, fn); queueLock = run.catch(() => undefined); return run; };
+
+const patchQueue = (match: (x: QueueItem) => boolean, patch: Partial<QueueItem>) => locked(() => patchQueueNow(match, patch));
+async function patchQueueNow(match: (x: QueueItem) => boolean, patch: Partial<QueueItem>): Promise<QueueItem | null> {
   const list = await loadQueue();
   const i = list.findIndex(match);
   if (i < 0) return null;
@@ -318,7 +323,8 @@ async function patchQueue(match: (x: QueueItem) => boolean, patch: Partial<Queue
   return next;
 }
 
-async function pumpQueue(): Promise<void> {
+const pumpQueue = () => locked(pumpQueueNow);
+async function pumpQueueNow(): Promise<void> {
   if (!(await readKey<boolean>(QUEUE_RUN))) return;
   const list = await loadQueue();
   const active = list.filter((x) => ACTIVE.includes(x.state)).length;
@@ -330,20 +336,26 @@ async function pumpQueue(): Promise<void> {
     if (slots <= 0) break;
     const origin = `${new URL(item.url).origin}/*`;
     if (!(await chrome.permissions.contains({ origins: [origin] }))) {
-      await patchQueue((x) => x.id === item.id, { state: 'stopped', note: 'Jobly needs your OK to open this site. Press Start again.' });
+      await patchQueueNow((x) => x.id === item.id, { state: 'stopped', note: 'Jobly needs your OK to open this site. Press Start again.' });
       continue;
     }
     // A blank tab first, then the job: Jobly knows the tab before its page starts loading
     const tab = await chrome.tabs.create({ url: 'about:blank', active: false });
-    await patchQueue((x) => x.id === item.id, { state: 'opening', note: '', tabId: tab.id ?? null, needs: [], filled: 0 });
-    if (tab.id != null) await chrome.tabs.update(tab.id, { url: item.url });
+    await patchQueueNow((x) => x.id === item.id, { state: 'opening', note: '', tabId: tab.id ?? null, needs: [], filled: 0 });
+    if (tab.id != null) {
+      // let the blank tab settle before it loads the job page
+      for (let i = 0; i < 10; i++) { const t = await chrome.tabs.get(tab.id).catch(() => null); if (!t || t.status === 'complete') break; await new Promise((r) => setTimeout(r, 100)); }
+      await new Promise((r) => setTimeout(r, 300));
+      await chrome.tabs.update(tab.id, { url: item.url }).catch(() => null);
+    }
     slots--;
   }
   if (!(await chrome.alarms.get(QUEUE_ALARM))) await chrome.alarms.create(QUEUE_ALARM, { periodInMinutes: 0.5 });
 }
 
 /** Tabs that went quiet: nothing to fill there. */
-async function checkQueue(): Promise<void> {
+const checkQueue = () => locked(checkQueueNow);
+async function checkQueueNow(): Promise<void> {
   const list = await loadQueue();
   const now = Date.now();
   let changed = false;
@@ -353,7 +365,7 @@ async function checkQueue(): Promise<void> {
     }
   }
   if (changed) await storeQueue(list);
-  await pumpQueue();
+  await pumpQueueNow();
 }
 
 async function injectAuto(tabId: number, itemId: string): Promise<void> {
@@ -368,7 +380,12 @@ async function injectAuto(tabId: number, itemId: string): Promise<void> {
 }
 
 chrome.tabs.onUpdated.addListener((tabId, info, tab) => {
-  if (info.status !== 'complete' || !/^https?:/.test(tab.url ?? '')) return;
+  if (info.status !== 'complete') return;
+  if (/^chrome-error:/.test(tab.url ?? '')) {
+    void patchQueue((x) => x.tabId === tabId && ACTIVE.includes(x.state), { state: 'stopped', note: "The page didn't load. Check your connection and use Try again." }).then((x) => { if (x) void pumpQueue(); });
+    return;
+  }
+  if (!/^https?:/.test(tab.url ?? '')) return;
   void loadQueue().then(async (list) => {
     const item = list.find((x) => x.tabId === tabId && (ACTIVE.includes(x.state) || WAITING.includes(x.state)));
     if (!item) return;

@@ -102,7 +102,8 @@ export const JobCard: React.FC<JobCardProps> = ({ job, onToggleSave, onSelect, s
             {job.work_mode && WORK_MODE[job.work_mode] && <span>{WORK_MODE[job.work_mode]}</span>}
             {salary && <span><Briefcase size={13} aria-hidden="true" /> {salary}</span>}
           </p>
-          <div className="job-tags">
+          <div className="job-foot">
+            <div className="job-tags">
             {match
               ? <span className={`badge match-badge ${match.percent >= 75 ? 'badge-brand' : match.percent >= 50 ? 'match-mid' : 'badge-outline'}`} title={matchTip}
                   aria-label={`${match.percent}% match: ${match.reasons.map((r) => r.label).join(', ')}`}><Sparkles size={12} duo aria-hidden="true" /> {match.percent}% match</span>
@@ -111,14 +112,7 @@ export const JobCard: React.FC<JobCardProps> = ({ job, onToggleSave, onSelect, s
             {job.employment_type && EMPLOYMENT_LABELS[job.employment_type] && <span className="badge badge-soft">{EMPLOYMENT_LABELS[job.employment_type]}</span>}
             {job.experience_tier && EXPERIENCE_LABELS[job.experience_tier] && <span className="badge badge-soft">{EXPERIENCE_LABELS[job.experience_tier]}</span>}
           </div>
-        </div>
-        <div className="job-side">
-          <button type="button" className={`btn btn-ghost btn-sm btn-icon${job.is_saved ? ' is-on' : ''}`} onClick={() => onToggleSave(job)} aria-pressed={job.is_saved}
-            aria-label={`${job.is_saved ? 'Remove from saved' : 'Save'}: ${job.title} at ${job.company_name}`} title={job.is_saved ? 'Saved' : 'Save'}>
-            {job.is_saved ? <BookmarkCheck size={16} aria-hidden="true" /> : <Bookmark size={16} aria-hidden="true" />}
-          </button>
-          <span className="grow" />
-          <div className="row" style={{ gap: 6 }}>
+            <div className="job-actions">
             {tracker && !FEATURES.tracker && (
               <button type="button" className={`btn btn-sm mark-applied ${applied ? 'btn-toggled' : 'btn-ghost'}`} onClick={() => void toggleApplied()} aria-pressed={applied}
                 title={applied ? 'You applied. Click to undo' : 'Mark applied'} aria-label={`${applied ? 'Applied' : 'Mark applied'}: ${job.title} at ${job.company_name}`}>
@@ -131,6 +125,13 @@ export const JobCard: React.FC<JobCardProps> = ({ job, onToggleSave, onSelect, s
                   aria-label={`Apply to ${job.title} at ${job.company_name}${applyHost ? ` (opens ${applyHost})` : ''}`}>Apply</a>
               : <span className="btn btn-secondary btn-sm" aria-disabled="true">Link unavailable</span>}
           </div>
+          </div>
+        </div>
+        <div className="job-side">
+          <button type="button" className={`btn btn-ghost btn-sm btn-icon${job.is_saved ? ' is-on' : ''}`} onClick={() => onToggleSave(job)} aria-pressed={job.is_saved}
+            aria-label={`${job.is_saved ? 'Remove from saved' : 'Save'}: ${job.title} at ${job.company_name}`} title={job.is_saved ? 'Saved' : 'Save'}>
+            {job.is_saved ? <BookmarkCheck size={16} aria-hidden="true" /> : <Bookmark size={16} aria-hidden="true" />}
+          </button>
           <span role="status" className="text-xs muted card-note">{shareNote}</span>
         </div>
       </article>
