@@ -48,7 +48,7 @@ export const PopupApp: React.FC = () => {
   const { onboarded, complete: completeOnboarding, reset: resetOnboarding } = useOnboarded();
   const jobsSeq = useRef(0); // only the newest request may update the list
   const profiles = useProfiles();
-  const matchValue = React.useMemo(() => ({ prefs: preferences, skills: profiles.active ? skillList(profiles.active) : [] }), [preferences, profiles.active]);
+  const matchValue = React.useMemo(() => ({ prefs: preferences, skills: profiles.active ? skillList(profiles.active) : [], profile: profiles.active ?? null }), [preferences, profiles.active]);
   const tracker = useTrackerContext()!.store;
 
   useEffect(() => {

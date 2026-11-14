@@ -103,7 +103,7 @@ export const JobCard: React.FC<JobCardProps> = ({ job, onToggleSave, onSelect, s
           <p className="job-meta">
             <span className="job-company">{job.company_name}</span>
             {place && <span>{place}</span>}
-            {job.work_mode && WORK_MODE[job.work_mode] && <span>{WORK_MODE[job.work_mode]}</span>}
+            {job.work_mode && WORK_MODE[job.work_mode] && WORK_MODE[job.work_mode].toLowerCase() !== (place ?? '').toLowerCase() && <span>{WORK_MODE[job.work_mode]}</span>}
             {salary && <span><Briefcase size={13} aria-hidden="true" /> {salary}</span>}
           </p>
           <div className="job-foot">

@@ -9,6 +9,9 @@ import { Application, APPLIED_STATUSES, statusLabel } from '../lib/tracker';
 import { jobKey } from '../lib/userData';
 import { formatDate } from '../lib/dates';
 import { safeHttpUrl } from '../lib/url';
+import { followUp, followUpDraft, logFollowUp } from '../lib/followUp';
+import { useMatch } from '../lib/matchScore';
+import { CopyButton } from './CopyButton';
 
 interface SavedJobsViewProps {
   savedJobs: Job[];
@@ -111,9 +114,12 @@ export const SavedJobsView: React.FC<SavedJobsViewProps> = ({ savedJobs, onToggl
           )}
         </>
       ) : (
-        <ul className="app-rows">
-          {shownApplied.map((a) => <AppRow key={a.key} app={a} onRemove={() => void remove(a)} />)}
-        </ul>
+        <>
+          <FollowUps apps={shownApplied} onFollowed={async (a) => tracker && report(await tracker.updateApp(a.key, logFollowUp(a)), `Logged a follow-up for ${a.title}. Next reminder in 7 days.`)} />
+          <ul className="app-rows">
+            {shownApplied.map((a) => <AppRow key={a.key} app={a} onRemove={() => void remove(a)} />)}
+          </ul>
+        </>
       )}
     </div>
   );
@@ -131,6 +137,10 @@ const AppRow: React.FC<{ app: Application; onMarkApplied?: () => void; onRemove:
       <div className="row wrap app-row-meta">
         {app.applied_at && <span className="badge badge-outline">Applied {formatDate(app.applied_at)}</span>}
         {app.status !== 'saved' && app.status !== 'applied' && <span className="badge badge-outline">{statusLabel(app.status)}</span>}
+        {(() => { const f = followUp(app); if (!f) return null;
+          return f.state === 'due' ? <span className="badge badge-warning">Follow up now</span>
+            : f.state === 'cold' ? <span className="badge badge-outline">Followed up {f.count}×, no reply</span>
+            : <span className="badge badge-outline">{f.count ? `Followed up ${f.count}× · ` : ''}Follow up {formatDate(f.due!.toISOString())}</span>; })()}
       </div>
       <div className="row app-row-actions">
         {onMarkApplied && (
@@ -148,5 +158,43 @@ const AppRow: React.FC<{ app: Application; onMarkApplied?: () => void; onRemove:
         </button>
       </div>
     </li>
+  );
+};
+
+/** Applications that are due a follow-up, each with a short message to copy. */
+const FollowUps: React.FC<{ apps: Application[]; onFollowed: (a: Application) => void }> = ({ apps, onFollowed }) => {
+  const { profile } = useMatch();
+  const [open, setOpen] = useState<string | null>(null);
+  const due = apps.filter((a) => followUp(a)?.state === 'due');
+  if (!due.length) return null;
+  return (
+    <section className="card fu-card" aria-labelledby="fu-title">
+      <div><h3 id="fu-title">Follow-ups due <span className="aq-count">{due.length}</span></h3>
+        <p className="text-sm muted">A week has passed with no reply. A short note keeps you in mind; after two, it’s usually time to move on.</p></div>
+      <ul className="fu-list">
+        {due.map((a) => {
+          const d = followUpDraft(a, profile ?? null);
+          const f = followUp(a)!;
+          return (
+            <li key={a.key}>
+              <div className="row" style={{ justifyContent: 'space-between', gap: 8 }}>
+                <span><span className="font-medium">{a.title}</span> <span className="muted">· {a.company_name} · applied {f.days} days ago{f.count ? ` · followed up ${f.count}×` : ''}</span></span>
+                <span className="row" style={{ gap: 4 }}>
+                  <button type="button" className="btn btn-outline btn-sm" aria-expanded={open === a.key} onClick={() => setOpen(open === a.key ? null : a.key)}>{open === a.key ? 'Hide message' : 'Write follow-up'}</button>
+                  <button type="button" className="btn btn-sm" onClick={() => onFollowed(a)} aria-label={`I followed up: ${a.title} at ${a.company_name}`}>I followed up</button>
+                </span>
+              </div>
+              {open === a.key && (
+                <div className="fu-draft">
+                  <p className="text-xs muted">Subject: {d.subject}</p>
+                  <pre className="fu-text">{d.body}</pre>
+                  <CopyButton value={`Subject: ${d.subject}\n\n${d.body}`} label="follow-up message" text />
+                </div>
+              )}
+            </li>
+          );
+        })}
+      </ul>
+    </section>
   );
 };

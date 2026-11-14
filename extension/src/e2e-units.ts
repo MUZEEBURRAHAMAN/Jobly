@@ -9,3 +9,5 @@ export { findContacts, companyDomain } from './lib/integrations';
 export { searchProfiles, apolloPeople, parseTitle, sitesFor } from './lib/profileSearch';
 export { atsScan } from './lib/atsScan';
 export { resumeScore } from './lib/resumeScore';
+export { jobCheck } from './lib/jobCheck';
+export { followUp, followUpDraft, logFollowUp } from './lib/followUp';

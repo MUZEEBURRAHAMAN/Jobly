@@ -1,5 +1,6 @@
 import { createContext, useContext } from 'react';
 import { Job, Preferences } from '../types';
+import type { Profile } from './profile';
 
 /**
  * How well a job fits what the user asked for, as a percentage with the reasons. Only what the user has set counts:
@@ -58,5 +59,5 @@ export function matchScore(job: Job, prefs: Preferences | null, skills: string[]
 }
 
 /** What job cards need to work out a match: the preferences and the active profile's skills. */
-export const MatchContext = createContext<{ prefs: Preferences | null; skills: string[] }>({ prefs: null, skills: [] });
+export const MatchContext = createContext<{ prefs: Preferences | null; skills: string[]; profile?: Profile | null }>({ prefs: null, skills: [], profile: null });
 export const useMatch = () => useContext(MatchContext);

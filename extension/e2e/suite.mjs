@@ -648,6 +648,38 @@ await step('ATS check: parses a resume from plain text (unit)', async () => {
     'the Engineer template: company | title, bold marks, grouped skills, projects and grade, all escaped');
   ok(eng.flat.join('|') === 'React|TypeScript|AWS (EC2, S3)|Docker' && eng.regrouped === 'Frontend: Go, React, TypeScript\nCloud: Docker, AWS (EC2, S3)' && eng.plain[0] === 'Built a 500+ API', `skill groups survive reordering, brackets don't split, bold marks stay out of plain text (${eng.regrouped.replace(/\n/g, ' / ')})`);
   ok(eng.scan.problems === 2 && eng.scan.fields.find((f) => f.id === 'skills').detail === 'Only 4 skills detected' && eng.scan.positions === 1, `the ATS check reads the Engineer layout: projects and achievements don't count as skills (${eng.scan.fields.map((f) => f.detail).join(' ; ')})`);
+  const jc = await page.evaluate(() => {
+    const now = Date.parse('2026-11-15T10:00:00Z');
+    const prefs = { roles: ['product_design'], seniorities: ['senior'], locations: [], remote_only: true, custom_keywords: '', excluded_keywords: 'intern', min_salary: 150000, employment_types: ['full_time'], notify_enabled: true, sync_interval_mins: 60 };
+    const p = { ...window.units.emptyProfile(), skills: 'Figma, Design systems, User research', years_experience: '6', work: [{ id: 'w', company: 'Northwind', title: 'Designer', location: '', start: '2020-01', end: '', current: true, bullets: 'Built the design system in Figma used by 6 teams\nRan user research every week' }] };
+    const job = (x) => ({ id: 1, company_id: 1, company_name: 'Acme', source_type: 'greenhouse', external_id: '1', title: 'Senior Product Designer', normalized_role: 'product_design', seniority: 'senior', work_mode: 'remote', location: 'Remote', description: null, application_url: 'https://x.test', first_seen_at: '', last_seen_at: '', posted_at: '2026-11-14T00:00:00Z', status: 'open', is_saved: false, is_match: true, min_salary: 160000, max_salary: 190000, employment_type: 'full_time', ...x });
+    const jd = 'Requirements\n- 5+ years of product design\n- Experience with design systems in Figma\n- Strong user research skills\n' + 'We are a team building tools. '.repeat(10);
+    return {
+      good: window.units.jobCheck(job({}), prefs, p, jd, now),
+      low: window.units.jobCheck(job({ max_salary: 120000, min_salary: 90000 }), prefs, p, jd, now),
+      onsite: window.units.jobCheck(job({ work_mode: 'onsite', title: 'Product Design Intern' }), prefs, p, jd, now),
+      old: window.units.jobCheck(job({ posted_at: '2026-09-01T00:00:00Z' }), prefs, p, jd + ' Our client is hiring.', now),
+      nopay: window.units.jobCheck(job({ max_salary: null, min_salary: null }), prefs, p, '', now),
+    };
+  });
+  ok(jc.good.verdict === 'apply' && jc.good.score >= 4.5 && jc.good.dimensions.length === 4, `a job that fits on every count: Apply, ${jc.good.score}/5`);
+  ok(jc.low.verdict === 'skip' && jc.low.score <= 2.5 && /under|floor/.test(jc.low.dealbreakers.join()), `pay under your floor is a hard rule: Skip (${jc.low.dealbreakers.join('; ')})`);
+  ok(jc.onsite.dealbreakers.length === 2 && jc.onsite.verdict === 'skip', `on-site when you want remote, and a word you left out, are both quoted (${jc.onsite.dealbreakers.join('; ')})`);
+  ok(jc.old.flags.length === 2 && jc.old.score < jc.good.score, `an old posting and agency wording are red flags (${jc.old.flags.join('; ')})`);
+  ok(jc.nopay.left.some((x) => /Pay \(not stated\)/.test(x)) && !jc.nopay.dimensions.some((d) => d.name === 'Pay'), 'pay the job doesn\'t state is left out, never guessed');
+  const fu = await page.evaluate(() => {
+    const now = Date.parse('2026-11-15T10:00:00Z');
+    const app = (x) => ({ key: 'k', title: 'Designer', company_name: 'Acme', location: null, application_url: 'https://x.test', source: 'jobly', status: 'applied', notes: '', applied_at: '2026-11-05T10:00:00Z', follow_up_at: null, created_at: '', updated_at: '', ...x });
+    const due = window.units.followUp(app({}), now);
+    const waiting = window.units.followUp(app({ applied_at: '2026-11-12T10:00:00Z' }), now);
+    const logged = app(window.units.logFollowUp(app({}), new Date(now)));
+    const after = window.units.followUp(logged, now);
+    const cold = window.units.followUp(app({ notes: 'Followed up 2026-11-01\nFollowed up 2026-11-08' }), now);
+    const draft = window.units.followUpDraft(app({}), { ...window.units.emptyProfile(), first_name: 'Ada', last_name: 'L', work: [{ id: 'w', company: 'Northwind', title: '', location: '', start: '', end: '', current: true, bullets: 'Lifted conversion by 18%' }] }, now);
+    return { due: due.state, waiting: waiting.state, after: [after.state, after.count], cold: cold.state, draft };
+  });
+  ok(fu.due === 'due' && fu.waiting === 'waiting' && fu.after[0] === 'waiting' && fu.after[1] === 1 && fu.cold === 'cold', `follow-ups: due after 7 days, waiting after logging one, cold after two (${JSON.stringify(fu)})`.slice(0, 200));
+  ok(/applied for the Designer role at Acme on 5 November/.test(fu.draft.body) && /lifted conversion by 18%/.test(fu.draft.body) && /Ada L$/.test(fu.draft.body), 'the follow-up draft names the role and date, adds one result, and signs with your name');
   const grade = await page.evaluate(() => { const p = { ...window.units.emptyProfile(), summary: 'x'.repeat(100), skills: 'a,b,c,d,e,f,g,h' }; return [window.units.resumeScore(p, { coverage: { percent: 30, matches: [], keywordsFound: [], keywordsMissing: [], covered: 0 } }).grade, window.units.resumeScore(p).grade]; });
   ok(grade[0] !== 'Excellent' && grade[0] !== 'Good', `a low job match never grades as Good or Excellent for that job (${grade})`);
   await h.ctx.close();
@@ -780,6 +812,7 @@ await step('jobs page: full-width cards, job side sheet, apply queue', async () 
   await sheet.getByRole('heading', { name: 'Job description' }).waitFor(); await sleep(600);
   ok(await sheet.locator('[aria-busy]').count() === 0 && /Experience[\s\S]*Location[\s\S]*Pay[\s\S]*Job type/i.test(await sheet.locator('.sheet-facts').innerText()), 'the sheet shows the facts and the description (or where to read it)');
   ok(await sheet.getByRole('link', { name: /^Apply to / }).count() === 1, 'Apply is at the bottom of the sheet');
+  ok(/Job check/.test(await sheet.innerText()) && await sheet.getByLabel(/out of 5: (Apply|Worth a look|Skip)$/).count() === 1 && await sheet.getByRole('list', { name: 'How it scored' }).locator('li').count() >= 1, 'the sheet shows a job check: a score out of 5, a verdict and how it scored');
   await axe(d, 'jobs side sheet');
   await sheet.getByRole('button', { name: /^Add to queue:/ }).click(); await sleep(400);
   const q = await store('applyQueue');

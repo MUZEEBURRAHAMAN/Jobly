@@ -90,7 +90,7 @@ export const OptionsApp: React.FC = () => {
   useEffect(() => { const onHash = () => setTab(tabFromHash()); window.addEventListener('hashchange', onHash); return () => window.removeEventListener('hashchange', onHash); }, []);
   useEffect(() => { if (onboardedRef.current && window.location.hash.replace('#', '') !== tab) history.replaceState(null, '', tab === 'jobs' ? window.location.pathname : `#${tab}`); }, [tab]);
   const profiles = useProfiles();
-  const matchValue = React.useMemo(() => ({ prefs: preferences, skills: profiles.active ? skillList(profiles.active) : [] }), [preferences, profiles.active]);
+  const matchValue = React.useMemo(() => ({ prefs: preferences, skills: profiles.active ? skillList(profiles.active) : [], profile: profiles.active ?? null }), [preferences, profiles.active]);
   // Tailor hands a job to Cover letters and a saved version to Resume
   const [letterContext, setLetterContext] = useState<LetterContext | null>(null);
   const [openVersion, setOpenVersion] = useState<string | null>(null);

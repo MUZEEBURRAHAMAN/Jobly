@@ -6,7 +6,8 @@ import { jobData } from '../lib/api';
 import { getCompanyLogoUrl } from '../lib/companyLogos';
 import { hostOf, safeHttpUrl } from '../lib/url';
 import { BOARD_NAMES, EMPLOYMENT_LABELS, EXPERIENCE_LABELS, timeAgo } from '../lib/format';
-import { matchScore, useMatch } from '../lib/matchScore';
+import { useMatch } from '../lib/matchScore';
+import { jobCheck, VERDICT_LABEL } from '../lib/jobCheck';
 import { useTrackerContext } from '../lib/trackerContext';
 import { QueueButton } from './JobCard';
 import { ReportModal } from './ReportModal';
@@ -50,8 +51,7 @@ export const JobDetail: React.FC<{ job: Job; onToggleSave: (job: Job) => void; o
   const [report, setReport] = useState(false);
   const [imgFailed, setImgFailed] = useState(false);
   const tracker = useTrackerContext();
-  const { prefs, skills } = useMatch();
-  const match = React.useMemo(() => matchScore(job, prefs, skills), [job, prefs, skills]);
+  const { prefs, profile } = useMatch();
   const applyUrl = safeHttpUrl(job.application_url);
   const host = hostOf(job.application_url);
   const ref = useRef<HTMLDivElement>(null);
@@ -95,12 +95,13 @@ export const JobDetail: React.FC<{ job: Job; onToggleSave: (job: Job) => void; o
     if (!applyUrl) return;
     try { await navigator.clipboard.writeText(applyUrl); say('Link copied'); } catch { say("Couldn't copy"); }
   };
+  const check = React.useMemo(() => jobCheck(job, prefs, profile ?? null, desc ?? ''), [job, prefs, profile, desc]);
   const posted = job.posted_at ? timeAgo(job.posted_at) : '';
   const blocks = desc ? describe(desc) : [];
   const words = blocks.reduce((n, b) => n + (b.kind === 'ul' ? b.items.join(' ') : b.text).split(/\s+/).length, 0);
   const facts: { icon: React.ReactNode; label: string; value: string }[] = [
     { icon: <Star size={16} aria-hidden="true" />, label: 'Experience', value: (job.experience_tier && EXPERIENCE_LABELS[job.experience_tier]) || 'Not stated' },
-    { icon: <MapPin size={16} aria-hidden="true" />, label: 'Location', value: [job.location, job.work_mode && WORK_MODE[job.work_mode]].filter(Boolean).join(' · ') || 'Not stated' },
+    { icon: <MapPin size={16} aria-hidden="true" />, label: 'Location', value: [...new Set([job.location, job.work_mode && WORK_MODE[job.work_mode]].filter(Boolean).map((x) => String(x)))].filter((x, i, all) => all.findIndex((y) => y.toLowerCase() === x.toLowerCase()) === i).join(' · ') || 'Not stated' },
     { icon: <Briefcase size={16} aria-hidden="true" />, label: 'Pay', value: job.salary_summary || 'Not stated' },
     { icon: <Clock size={16} aria-hidden="true" />, label: 'Job type', value: (job.employment_type && EMPLOYMENT_LABELS[job.employment_type]) || 'Full-time or not stated' },
   ];
@@ -130,12 +131,23 @@ export const JobDetail: React.FC<{ job: Job; onToggleSave: (job: Job) => void; o
             <p className="sheet-source"><Building2 size={14} aria-hidden="true" /> {posted ? `Posted ${posted.toLowerCase()}` : 'Posting date not stated'} · applies on {BOARD_NAMES[job.source_type] ?? host ?? 'the company site'}</p>
           </div>
 
-          {match && (
-            <section className="sheet-box" aria-labelledby="sheet-fit">
-              <h3 id="sheet-fit" className="row" style={{ justifyContent: 'space-between' }}><span className="row" style={{ gap: 6 }}><Sparkles size={15} duo aria-hidden="true" /> How it fits you</span><b>{match.percent}% match</b></h3>
-              <ul className="jd-reasons">{match.reasons.map((r) => <li key={r.label} className={r.ok === true ? 'ok' : r.ok === false ? 'no' : ''}>{r.ok === true ? '✓' : r.ok === false ? '✗' : '·'} {r.label}</li>)}</ul>
-            </section>
-          )}
+          <section className={`sheet-box jc jc-${check.verdict}`} aria-labelledby="jc-title">
+            <div className="jc-head">
+              <div><h3 id="jc-title" className="row" style={{ gap: 6 }}><Sparkles size={15} duo aria-hidden="true" /> Job check</h3>
+                <p className="text-xs muted">Should you apply? Worked out from your profile and settings, no AI.</p></div>
+              <div className="jc-score" aria-label={`${check.score} out of 5: ${VERDICT_LABEL[check.verdict]}`}><b>{check.score.toFixed(1)}</b><span>/5</span><span className="jc-verdict">{VERDICT_LABEL[check.verdict]}</span></div>
+            </div>
+            {check.dealbreakers.length > 0 && <ul className="jc-deal" aria-label="Breaks your rules">{check.dealbreakers.map((d) => <li key={d}>✗ {d}</li>)}</ul>}
+            <ul className="jc-dims" aria-label="How it scored">
+              {check.dimensions.map((d) => (
+                <li key={d.name}><span className="jc-name">{d.name}<small> · {d.weight}%</small></span>
+                  <span className="meter" role="progressbar" aria-label={d.name} aria-valuemin={1} aria-valuemax={5} aria-valuenow={d.score}><span style={{ width: `${(d.score / 5) * 100}%` }} /></span>
+                  <span className="jc-note">{d.note}</span></li>
+              ))}
+            </ul>
+            {check.flags.length > 0 && <ul className="jc-flags" aria-label="Red flags">{check.flags.map((f) => <li key={f}>! {f}</li>)}</ul>}
+            {check.left.length > 0 && <p className="text-xs muted">Not scored: {check.left.join('; ')}.</p>}
+          </section>
 
           <section className="sheet-desc" aria-labelledby="sheet-desc-t">
             <h3 id="sheet-desc-t">Job description</h3>
