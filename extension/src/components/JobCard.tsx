@@ -95,10 +95,14 @@ export const JobCard: React.FC<JobCardProps> = ({ job, onToggleSave, onSelect, s
           <div className="job-head">
             <h3 className="job-title"><button type="button" className="job-open" aria-expanded={selected} onClick={() => onSelect(job)}>{job.title}</button></h3>
             {posted && <span className="posted-chip">Posted {posted.toLowerCase()}</span>}
+            <span className="job-save"><button type="button" className={`btn btn-ghost btn-sm btn-icon${job.is_saved ? ' is-on' : ''}`} onClick={() => onToggleSave(job)} aria-pressed={job.is_saved}
+            aria-label={`${job.is_saved ? 'Remove from saved' : 'Save'}: ${job.title} at ${job.company_name}`} title={job.is_saved ? 'Saved' : 'Save'}>
+            {job.is_saved ? <BookmarkCheck size={16} aria-hidden="true" /> : <Bookmark size={16} aria-hidden="true" />}
+          </button></span>
           </div>
-          <p className="job-company">{job.company_name}</p>
           <p className="job-meta">
-            {place && <span><MapPin size={13} aria-hidden="true" /> {place}</span>}
+            <span className="job-company">{job.company_name}</span>
+            {place && <span>{place}</span>}
             {job.work_mode && WORK_MODE[job.work_mode] && <span>{WORK_MODE[job.work_mode]}</span>}
             {salary && <span><Briefcase size={13} aria-hidden="true" /> {salary}</span>}
           </p>
@@ -126,12 +130,6 @@ export const JobCard: React.FC<JobCardProps> = ({ job, onToggleSave, onSelect, s
               : <span className="btn btn-secondary btn-sm" aria-disabled="true">Link unavailable</span>}
           </div>
           </div>
-        </div>
-        <div className="job-side">
-          <button type="button" className={`btn btn-ghost btn-sm btn-icon${job.is_saved ? ' is-on' : ''}`} onClick={() => onToggleSave(job)} aria-pressed={job.is_saved}
-            aria-label={`${job.is_saved ? 'Remove from saved' : 'Save'}: ${job.title} at ${job.company_name}`} title={job.is_saved ? 'Saved' : 'Save'}>
-            {job.is_saved ? <BookmarkCheck size={16} aria-hidden="true" /> : <Bookmark size={16} aria-hidden="true" />}
-          </button>
           <span role="status" className="text-xs muted card-note">{shareNote}</span>
         </div>
       </article>

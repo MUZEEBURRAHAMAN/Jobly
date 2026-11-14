@@ -26,8 +26,8 @@ export const DataSetting: React.FC<{ store: TrackerStore; notify: (message: stri
   };
 
   return (
-    <fieldset className="card stack" style={{ padding: 12, border: '1px solid var(--border)' }}>
-      <legend className="label" style={{ padding: '0 4px' }}>Your data</legend>
+    <fieldset className="card stack settings-card">
+      <legend className="label">Your data</legend>
       <p className="text-sm">Everything Jobly keeps is on this device. A backup is one file with your preferences, saved and applied jobs, profiles and contacts. It never includes your Hunter key.</p>
       <div className="row wrap">
         <button type="button" className="btn btn-outline btn-sm" onClick={() => void exportBackup()}><Download size={14} aria-hidden="true" /> Download a backup</button>

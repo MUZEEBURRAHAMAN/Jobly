@@ -120,8 +120,8 @@ export const CoverLetterView: React.FC<{ profiles: ProfilesStore; tracker: Track
                 onChange={(e) => { const v = e.target.value; setDescription(v); if (v.trim().length > 80 && !hasJd && !edited) setTemplate('matched'); }} />
             </div>
             <div className="row wrap" style={{ gap: 'var(--space-4)' }}>
-              <div role="radiogroup" aria-label="Tone" className="seg">{TONES.map((t) => <button key={t.id} type="button" role="radio" aria-checked={tone === t.id} onClick={() => pick({ tone: t.id })}>{t.label}</button>)}</div>
-              <div role="radiogroup" aria-label="Length" className="seg">{LENGTHS.map((l) => <button key={l.id} type="button" role="radio" aria-checked={length === l.id} onClick={() => pick({ length: l.id })}>{l.label}</button>)}</div>
+              <div><p className="label" id="cl-tone-l">Tone</p><div role="radiogroup" aria-labelledby="cl-tone-l" className="seg">{TONES.map((t) => <button key={t.id} type="button" role="radio" aria-checked={tone === t.id} onClick={() => pick({ tone: t.id })}>{t.label}</button>)}</div></div>
+              <div><p className="label" id="cl-len-l">Length</p><div role="radiogroup" aria-labelledby="cl-len-l" className="seg">{LENGTHS.map((l) => <button key={l.id} type="button" role="radio" aria-checked={length === l.id} onClick={() => pick({ length: l.id })}>{l.label}</button>)}</div></div>
             </div>
             <fieldset className="cl-fieldset">
               <legend className="label">Template</legend>

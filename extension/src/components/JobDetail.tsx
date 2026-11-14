@@ -30,7 +30,15 @@ export function describe(text: string): Block[] {
     }
     const next = lines[i + 1];
     const heading = l.length <= 60 && !!next && (/:$/.test(l) || (!/[.!?,;]$/.test(l) && l.split(' ').length <= 7 && /^[A-Z]/.test(l)));
-    out.push(heading ? { kind: 'h', text: l.replace(/:$/, '') } : { kind: 'p', text: l });
+    if (heading) { out.push({ kind: 'h', text: l.replace(/:$/, '') }); continue; }
+    // A description that arrives as one long line reads better in short paragraphs of a few sentences
+    if (l.length <= 500) { out.push({ kind: 'p', text: l }); continue; }
+    let para = '';
+    for (const sentence of l.split(/(?<=[.!?])\s+(?=[A-Z“"(])/)) {
+      para = para ? `${para} ${sentence}` : sentence;
+      if (para.length > 320) { out.push({ kind: 'p', text: para }); para = ''; }
+    }
+    if (para) out.push({ kind: 'p', text: para });
   }
   return out;
 }
@@ -65,7 +73,7 @@ export const JobDetail: React.FC<{ job: Job; onToggleSave: (job: Job) => void; o
   useEffect(() => {
     const opener = document.activeElement as HTMLElement | null;
     const focusables = () => Array.from(ref.current?.querySelectorAll<HTMLElement>('button:not([disabled]), a[href], [tabindex]:not([tabindex="-1"])') ?? []);
-    focusables()[0]?.focus();
+    ref.current?.focus();  // the sheet itself, so no button shows a focus ring until the user tabs
     const onKey = (e: KeyboardEvent) => {
       if (reportOpen.current) return;
       if (e.key === 'Escape') { e.stopPropagation(); closeRef.current(); return; }
@@ -99,7 +107,7 @@ export const JobDetail: React.FC<{ job: Job; onToggleSave: (job: Job) => void; o
 
   return createPortal(
     <div className="sheet-overlay" onMouseDown={(e) => { if (e.target === e.currentTarget) onClose(); }}>
-      <div ref={ref} className="sheet" role="dialog" aria-modal="true" aria-labelledby={titleId}>
+      <div ref={ref} className="sheet" tabIndex={-1} role="dialog" aria-modal="true" aria-labelledby={titleId}>
         <div className="sheet-top">
           <button type="button" className="btn btn-ghost btn-sm" onClick={onClose} aria-label="Close job details"><X size={16} aria-hidden="true" /> Close</button>
           <span className="grow" />

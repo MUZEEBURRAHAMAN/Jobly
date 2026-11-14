@@ -33,8 +33,8 @@ export const ConnectionsSetting: React.FC<{ onChange?: () => void }> = ({ onChan
   const [note, setNote] = useState('');
   const saved = (m: string) => { setNote(m); onChange?.(); };
   return (
-    <fieldset className="card stack" style={{ padding: 12, border: '1px solid var(--border)' }}>
-      <legend className="label" style={{ padding: '0 4px' }}>Connections</legend>
+    <fieldset className="card stack settings-card">
+      <legend className="label">Connections</legend>
       <p className="text-sm muted">Each is optional and uses your own account, straight from this browser. Jobly never sees the keys or the searches.</p>
       {SERVICES.map((s) => <KeyRow key={s.key} s={s} onSaved={saved} />)}
       {FEATURES.tracker && <div className="row" style={{ justifyContent: 'space-between' }}>

@@ -16,8 +16,8 @@ export const AiSetting: React.FC = () => {
   const choose = async (provider: AiProvider) => { await update({ provider }); setNote(''); };
   const saveKey = async () => { if (await saveAnthropicKey(key)) { setStored(!!key.trim()); setKey(''); setNote(key.trim() ? 'API key saved on this device.' : 'API key removed.'); } };
   return (
-    <fieldset className="card stack" style={{ padding: 12, border: '1px solid var(--border)' }}>
-      <legend className="label" style={{ padding: '0 4px' }}>AI</legend>
+    <fieldset className="card stack settings-card">
+      <legend className="label">AI</legend>
       <p className="text-sm">Optional. Used to reword your resume and draft cover letters for a job. Tailoring works without it.</p>
       <div className="stack" role="radiogroup" aria-label="AI">
         {([['off', 'Off', 'Only suggestions that reorder what you wrote'], ['chrome', "Chrome's built-in AI", `Runs on this computer, nothing leaves it. Status: ${STATUS[chrome] ?? chrome}`], ['anthropic', 'Claude, with your own API key', 'Sent from this browser to Anthropic with your key; Jobly never sees it. Anthropic charges your account.']] as const).map(([id, label, hint]) => (
