@@ -718,11 +718,8 @@ fieldset.card.stack > legend { margin-bottom: 0; }
 @media print {
   html.printing-letter body * { visibility: hidden; }
   html.printing-letter .letter-print, html.printing-letter .letter-print * { visibility: visible; }
-  html.printing-letter .letter-print { display: block; position: absolute; inset: 0 auto auto 0; width: 100%; padding: 0.9in 1in; background: #fff; color: #18181b; font: 11pt/1.55 Arial, Helvetica, sans-serif; }
-  html.printing-letter .letter-print header { border-bottom: 1px solid #18181b; padding-bottom: 10px; margin-bottom: 28px; }
-  html.printing-letter .letter-print h1 { margin: 0; font-size: 20pt; color: #18181b; }
-  html.printing-letter .letter-print header p { margin: 4px 0 0; color: #3f3f46; font-size: 9.5pt; }
-  html.printing-letter .letter-print > p { margin: 0 0 12px; color: #18181b; }
+  html.printing-letter .letter-print { display: block; position: absolute; inset: 0 auto auto 0; width: 100%; min-height: 100vh; }
+  html.printing-letter .letter-print .ld, html.printing-letter .letter-print .ld-sidebar { min-height: 100vh; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
   html.printing-letter .resume-view { display: none; }
 }
 
@@ -849,3 +846,19 @@ fieldset.card.stack > legend { margin-bottom: 0; }
 .popup .toolbar > .row:first-child { flex-wrap: wrap; }
 .popup .toolbar > .row:first-child > .search { flex: 1 0 100%; }
 .popup .toolbar > .row:first-child > .btn, .popup .toolbar > .row:first-child > .sort-select { flex: 1; }
+
+/* Cover letter designs: picker thumbnails, Preview / Edit text, the page */
+.cl-designs { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--space-2); }
+.cl-design { display: flex; flex-direction: column; gap: 6px; padding: 0; border: 0; background: none; color: inherit; font: inherit; cursor: pointer; text-align: left; }
+.cl-thumb { position: relative; display: block; aspect-ratio: 794 / 1123; overflow: hidden; border: 1px solid var(--border); border-radius: var(--radius); background: #fff; }
+.cl-thumb > .ld { position: absolute; top: 0; left: 0; width: 794px; min-height: 1123px; transform: scale(var(--s, .094)); transform-origin: 0 0; pointer-events: none; }
+.cl-design[aria-checked="true"] .cl-thumb { outline: 2px solid var(--foreground); outline-offset: 2px; }
+.cl-design:focus-visible .cl-thumb { outline: 2px solid var(--ring); outline-offset: 2px; }
+.cl-view { display: flex; gap: 2px; padding: 3px; margin: var(--space-3) var(--space-4) 0; align-self: flex-start; border-radius: var(--radius); background: var(--muted); border: 1px solid var(--border); width: max-content; }
+.cl-view button { font: inherit; font-size: var(--text-sm); font-weight: 500; padding: 5px 14px; border: 0; border-radius: calc(var(--radius) - 2px); background: none; color: var(--muted-foreground); cursor: pointer; }
+.cl-view button[aria-selected="true"] { background: var(--card); color: var(--foreground); box-shadow: 0 1px 2px rgb(0 0 0 / .08); }
+.cl-view button:focus-visible { outline: 2px solid var(--ring); outline-offset: 1px; }
+.cl-frame { margin: var(--space-3) var(--space-4); padding: var(--space-4); border-radius: var(--radius-lg); background: var(--muted); overflow: auto; max-height: calc(100vh - 230px); }
+.cl-frame:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
+.cl-page { width: 794px; min-height: 1123px; margin: 0 auto; background: #fff; box-shadow: var(--shadow-md); }
+.cl-page > .ld { min-height: 1123px; }

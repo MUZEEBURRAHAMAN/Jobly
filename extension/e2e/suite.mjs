@@ -548,6 +548,20 @@ await step('profile, copy kit, resume, cover letter, backup, sync', async () => 
   const lp = await d.evaluate(() => new Promise((res) => { window.print = () => res({ css: [...document.head.querySelectorAll('style')].map((x) => x.textContent).join(' '), cls: document.documentElement.className, text: document.querySelector('.letter-print').innerText, title: document.title }); [...document.querySelectorAll('button')].find((b) => b.textContent.trim() === 'PDF').click(); }));
   ok(/@page \{ size: auto; margin: 0; \}/.test(lp.css) && /printing-letter/.test(lp.cls) && lp.title === 'Ada-Lovelace-Cover-letter-Initech' && /Ada Lovelace/.test(lp.text), 'the letter PDF has no browser header or footer and is named after you');
   await d.evaluate(() => window.dispatchEvent(new Event('afterprint')));
+  // Letter designs: filled from the profile and the job
+  ok(await d.locator('.cl-thumb .ld').count() === 4 && await d.getByRole('tab', { name: 'Preview' }).getAttribute('aria-selected') === 'true', 'four letter designs, each a live thumbnail; the letter opens in Preview');
+  const page = () => d.locator('.cl-page').innerText();
+  ok(/ADA LOVELACE|Ada Lovelace/i.test(await page()) && /Staff Designer — Initech/.test(await page()), 'Letterhead: your name at the top and the role and company as the title');
+  ok(/Selected impact:[^\n]*12%/.test(await page()), `Letterhead: the footer lists impact taken from your experience points (${(await page()).split('\n').pop()})`);
+  await d.getByRole('radio', { name: 'Sidebar' }).click(); await sleep(200);
+  const side = await page();
+  ok(/Selected impact/i.test(side) && /12%/.test(side) && /Core strengths/i.test(side) && /Figma/.test(side) && /Where I could contribute at Initech/i.test(side) && /Application · Product design/i.test(side),
+    'Sidebar: impact, strengths and "Where I could contribute at Initech" from the profile and the job');
+  ok((await store('letterSettings'))?.design === 'sidebar', 'the chosen design is remembered');
+  const lp2 = await d.evaluate(() => new Promise((res) => { window.print = () => res(document.querySelector('.letter-print .ld')?.className ?? ''); document.querySelectorAll('.panel-head .btn')[[...document.querySelectorAll('.panel-head .btn')].findIndex((b) => b.textContent.trim() === 'PDF')].click(); }));
+  ok(/ld-sidebar/.test(lp2), 'the PDF is the chosen design');
+  await d.evaluate(() => window.dispatchEvent(new Event('afterprint')));
+  await axe(d, 'cover letter designs');
   await axe(d, 'cover letters');
   // backup carries profiles
   await d.getByRole('button', { name: 'Settings', exact: true }).click();

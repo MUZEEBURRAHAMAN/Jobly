@@ -77,7 +77,8 @@ export function writeLetter(x: LetterInput): string {
   const contact = p ? [p.email, p.phone].filter(Boolean).join(' · ') : '';
   const greeting = x.manager?.trim() ? `Dear ${x.manager.trim()},` : `Dear ${company} hiring team,`;
   const years = p?.years_experience ? `${p.years_experience} years` : '[years] years';
-  const headline = (p?.headline || p?.work[0]?.title || '[your role]').trim();
+  // "Product Designer | AI, SaaS & complex workflows" reads as "a Product Designer" inside a sentence
+  const headline = ((p?.headline || p?.work[0]?.title || '[your role]').split(/\s[|·•–—]\s|\s\|/)[0]).trim();
   const skills = p ? skillList(p) : [];
   const motivation = x.motivation?.trim() ? trimEnd(x.motivation) : '';
   const proofCount = length === 'short' ? 1 : length === 'standard' ? 2 : 3;

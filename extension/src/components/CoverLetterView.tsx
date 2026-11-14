@@ -16,6 +16,8 @@ import { AiError, AiSettings, loadAi, runAi, AI_KEY } from '../lib/ai';
 import { guardLetter, letterTask } from '../lib/aiGuard';
 import { onKeysChanged } from '../lib/userData';
 import type { LetterContext } from './TailorView';
+import { LETTER_DESIGNS, LetterDesignId, letterCss, letterHtml, roleFamily } from '../lib/letterDesign';
+import { ACCENTS, AccentId } from '../lib/resume';
 
 const TONE_SIGN: Record<Tone, string> = { confident: 'Best regards,', warm: 'Warm regards,', formal: 'Yours sincerely,' };
 
@@ -42,12 +44,35 @@ export const CoverLetterView: React.FC<{ profiles: ProfilesStore; tracker: Track
   const [ai, setAi] = useState<AiSettings | null>(null);
   const [writing, setWriting] = useState(false);
   const [issues, setIssues] = useState<string[]>([]);
+  const [design, setDesign] = useState<LetterDesignId>('letterhead');
+  const [accent, setAccent] = useState<AccentId>('navy');
+  const [tagline, setTagline] = useState('');
+  const [view, setView] = useState<'write' | 'preview'>('preview');
+  const [zoom, setZoom] = useState(0.8);
+  const frameRef = React.useRef<HTMLDivElement>(null);
   useEffect(() => { const load = () => void loadAi().then(setAi); load(); return onKeysChanged([AI_KEY], load); }, []);
   // From Tailor: the job and its description, with the letter built from it
   useEffect(() => { if (context) { setRole(context.role); setCompany(context.company); setDescription(context.description); setTemplate('matched'); setEdited(false); } }, [context]);
   const hasJd = description.trim().length > 80;
-  useEffect(() => { void readKey<{ tone?: Tone; length?: Length }>('letterSettings').then((x) => { if (x?.tone) setTone(x.tone); if (x?.length) setLength(x.length); }); }, []);
-  const pick = (patch: { tone?: Tone; length?: Length }) => { if (patch.tone) setTone(patch.tone); if (patch.length) setLength(patch.length); setEdited(false); void writeKey('letterSettings', { tone, length, ...patch }); };
+  useEffect(() => { void readKey<{ tone?: Tone; length?: Length; design?: LetterDesignId; accent?: AccentId }>('letterSettings').then((x) => {
+    if (x?.tone) setTone(x.tone); if (x?.length) setLength(x.length);
+    if (x?.design && LETTER_DESIGNS.some((d) => d.id === x.design)) setDesign(x.design);
+    if (x?.accent && ACCENTS.some((a) => a.id === x.accent)) setAccent(x.accent);
+  }); }, []);
+  const pick = (patch: { tone?: Tone; length?: Length }) => { if (patch.tone) setTone(patch.tone); if (patch.length) setLength(patch.length); setEdited(false); void writeKey('letterSettings', { tone, length, design, accent, ...patch }); };
+  const pickLook = (patch: { design?: LetterDesignId; accent?: AccentId }) => { if (patch.design) setDesign(patch.design); if (patch.accent) setAccent(patch.accent); void writeKey('letterSettings', { tone, length, design, accent, ...patch }); };
+  // Letter design styles in a constructed stylesheet (the extension's security policy blocks inline <style>)
+  useEffect(() => {
+    const sheet = new CSSStyleSheet(); sheet.replaceSync(letterCss(accent));
+    document.adoptedStyleSheets = [...document.adoptedStyleSheets, sheet];
+    return () => { document.adoptedStyleSheets = document.adoptedStyleSheets.filter((x) => x !== sheet); };
+  }, [accent]);
+  // The preview page is scaled to the panel's width
+  useEffect(() => {
+    const el = frameRef.current; if (!el) return;
+    const measure = () => setZoom(Math.min(1, Math.max(0.4, (el.clientWidth - 32) / 794)));
+    measure(); const ro = new ResizeObserver(measure); ro.observe(el); return () => ro.disconnect();
+  }, [view]);
   const build = (t: LetterTemplateId) => writeLetter({ profile: profiles.active, role, company, description, template: t === 'matched' && !hasJd ? 'achievement' : t, tone, length, manager, motivation, referrer });
   const writeWithAi = async () => {
     if (!ai || !profiles.active) return;
@@ -91,6 +116,7 @@ export const CoverLetterView: React.FC<{ profiles: ProfilesStore; tracker: Track
     window.addEventListener('afterprint', done); window.print();
   };
   const p = profiles.active;
+  const designed = letterHtml(design, { profile: p, role, company, text, description, tagline });
   const checks = letterChecks(text, company, role);
   const gaps = text.match(/\[[a-z ,:'’-]+\]/gi) ?? [];
   const missing = gaps.length;
@@ -124,6 +150,22 @@ export const CoverLetterView: React.FC<{ profiles: ProfilesStore; tracker: Track
               <div><p className="label" id="cl-len-l">Length</p><div role="radiogroup" aria-labelledby="cl-len-l" className="seg">{LENGTHS.map((l) => <button key={l.id} type="button" role="radio" aria-checked={length === l.id} onClick={() => pick({ length: l.id })}>{l.label}</button>)}</div></div>
             </div>
             <fieldset className="cl-fieldset">
+              <legend className="label">Design</legend>
+              <div className="cl-designs" role="radiogroup" aria-label="Design">
+                {LETTER_DESIGNS.map((d) => (
+                  <button key={d.id} type="button" role="radio" aria-checked={design === d.id} className="cl-design" onClick={() => { pickLook({ design: d.id }); setView('preview'); }} title={d.hint}>
+                    {/* Our own escaped markup (lib/letterDesign.ts) built from the profile and the letter */}
+                    <span className="cl-thumb" aria-hidden="true" dangerouslySetInnerHTML={{ __html: letterHtml(d.id, { profile: p, role, company, text, description, tagline }) }} />
+                    <span className="text-xs font-medium">{d.label}</span>
+                  </button>
+                ))}
+              </div>
+              <p className="hint">{LETTER_DESIGNS.find((d) => d.id === design)?.hint}</p>
+              {design !== 'plain' && <div className="row wrap" role="radiogroup" aria-label="Accent colour">
+                {ACCENTS.map((a) => <button key={a.id} type="button" role="radio" aria-checked={accent === a.id} aria-label={a.label} title={a.label} className="rv-swatch" style={{ background: a.color }} onClick={() => pickLook({ accent: a.id })} />)}
+              </div>}
+            </fieldset>
+            <fieldset className="cl-fieldset">
               <legend className="label">Template</legend>
               <div className="cl-templates" role="radiogroup" aria-label="Template">
                 {LETTER_TEMPLATES.map((t) => {
@@ -144,6 +186,8 @@ export const CoverLetterView: React.FC<{ profiles: ProfilesStore; tracker: Track
                 <div><label className="label" htmlFor="cl-manager">Hiring manager's name</label><input id="cl-manager" className="input" value={manager} maxLength={80} placeholder="e.g. Priya Shah" onChange={(e) => { setManager(e.target.value); setEdited(false); }} /></div>
                 <div><label className="label" htmlFor="cl-why">Why this company</label><input id="cl-why" className="input" value={motivation} maxLength={240} placeholder="e.g. your design system is used by millions of people" onChange={(e) => { setMotivation(e.target.value); setEdited(false); }} />
                   <p className="hint">One honest line in your own words. It's what makes a letter feel written for them.</p></div>
+                {design === 'sidebar' && <div><label className="label" htmlFor="cl-tagline">Headline at the top</label><input id="cl-tagline" className="input" value={tagline} maxLength={80} placeholder={roleFamily(role).tagline} onChange={(e) => setTagline(e.target.value)} />
+                  <p className="hint">The big line in the Sidebar design. Leave it empty to use the one shown.</p></div>}
                 <div><label className="label" htmlFor="cl-ref">Referred by</label><input id="cl-ref" className="input" value={referrer} maxLength={80} placeholder="e.g. Rahul Mehta, Design Lead" onChange={(e) => { setReferrer(e.target.value); setEdited(false); }} /></div>
               </div>
             </details>
@@ -159,7 +203,7 @@ export const CoverLetterView: React.FC<{ profiles: ProfilesStore; tracker: Track
         <section className="card panel flush">
           <div className="panel-head">
             <div className="row" style={{ gap: 10 }}>
-              <label className="panel-title" htmlFor="cl-text">Letter</label>
+              <h3 className="panel-title">Letter</h3>
               {missing > 0 && <span className="badge badge-warning">{missing} gap{missing === 1 ? '' : 's'} to fill</span>}
             </div>
             <div className="row wrap" style={{ gap: 8 }}>
@@ -171,14 +215,19 @@ export const CoverLetterView: React.FC<{ profiles: ProfilesStore; tracker: Track
             </div>
           </div>
           {issues.length > 0 && <div className="banner" role="alert"><p className="font-medium">Check before sending:</p><ul className="tailor-ol">{issues.map((i) => <li key={i}>{i}</li>)}</ul></div>}
-          <textarea id="cl-text" className="textarea letter" rows={18} value={text} onChange={(e) => { setText(e.target.value); setEdited(true); }} />
+          <div className="cl-view" role="tablist" aria-label="Letter view">
+            {(['preview', 'write'] as const).map((v) => <button key={v} type="button" role="tab" id={`cl-tab-${v}`} aria-selected={view === v} aria-controls={`cl-pane-${v}`} onClick={() => setView(v)}>{v === 'preview' ? 'Preview' : 'Edit text'}</button>)}
+          </div>
+          <div id="cl-pane-write" role="tabpanel" aria-labelledby="cl-tab-write" hidden={view !== 'write'}>
+            <textarea id="cl-text" aria-label="Letter" className="textarea letter" rows={18} value={text} onChange={(e) => { setText(e.target.value); setEdited(true); }} />
+          </div>
+          <div id="cl-pane-preview" role="tabpanel" aria-labelledby="cl-tab-preview" hidden={view !== 'preview'} ref={frameRef} className="cl-frame" tabIndex={0}>
+            <div className="cl-page" style={{ zoom }} dangerouslySetInnerHTML={{ __html: designed }} />
+          </div>
           <ul className="cl-checks" aria-label="Letter check">
             {checks.map((c) => <li key={c.label} className={c.ok ? 'ok' : ''}>{c.ok ? <CheckCircle2 size={14} aria-hidden="true" /> : <span className="cl-dot" aria-hidden="true" />}<span>{c.label}</span><span className="sr-only">{c.ok ? ': done' : ': to do'}</span></li>)}
           </ul>
-          <div className="letter-print" aria-hidden="true">
-            {p && <header><h1>{fullName(p)}</h1><p>{[p.email, p.phone, p.location].filter(Boolean).join(' · ')}</p></header>}
-            {text.split(/\n{2,}/).map((para, i) => <p key={i}>{para.split('\n').map((l, j) => <React.Fragment key={j}>{j > 0 && <br />}{l}</React.Fragment>)}</p>)}
-          </div>
+          <div className="letter-print" aria-hidden="true" dangerouslySetInnerHTML={{ __html: designed }} />
           {missing > 0 && (
             <p className="panel-foot text-xs muted">
               {profileGaps
