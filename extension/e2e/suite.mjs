@@ -833,6 +833,13 @@ await step('apply queue: opens, finds the form behind Apply, fills, asks, stops 
     const u = new URL(r.request().url());
     if (u.pathname === '/posting/7') return r.fulfill({ contentType: 'text/html', body: '<html><head><title>Designer</title></head><body><h1>Product Designer</h1><p>About the role.</p><a href="/jobs/7/apply">Apply now</a></body></html>' });
     if (u.pathname === '/empty') return r.fulfill({ contentType: 'text/html', body: '<html><body><h1>This job is closed</h1></body></html>' });
+    // A Workday-style job page: Apply opens a choice box; "Apply manually" leads to Create account / Sign in
+    if (u.pathname === '/wd/job') return r.fulfill({ contentType: 'text/html', body: `<html><body><h1>Software Engineer</h1><input aria-label="Search for jobs"><button id="ap">Apply</button>
+      <div id="box" hidden><h2>Start Your Application</h2><button>Autofill with Resume</button><button onclick="location.href='/wd/signin'">Apply Manually</button><button>Use My Last Application</button></div>
+      <script>document.getElementById('ap').onclick = () => { document.getElementById('box').hidden = false; };</script></body></html>` });
+    if (u.pathname === '/wd/signin') return r.fulfill({ contentType: 'text/html', body: '<html><body><h2>Create Account</h2><label>Email Address <input type="email"></label><label>Password <input type="password"></label><button>Create Account</button><p>Already have an account? <a href="#">Sign In</a></p></body></html>' });
+    // A page that rebuilds its form a moment after loading (as React sites do), wiping anything filled too early
+    if (u.pathname === '/rerender') return r.fulfill({ contentType: 'text/html', body: form.replace('</body>', '<script>const html = document.body.innerHTML; setTimeout(() => { document.body.innerHTML = html; }, 900);</script></body>') });
     return r.fulfill({ contentType: 'text/html', body: form });
   });
   const now = new Date().toISOString();
@@ -844,14 +851,21 @@ await step('apply queue: opens, finds the form behind Apply, fills, asks, stops 
       { id: 'q1', url: 'https://apply.example.test/jobs/42', title: 'Staff Product Designer', company: 'Initech', location: 'Remote', state: 'queued', note: '', needs: [], filled: 0, tabId: null, added_at: now, updated_at: now },
       { id: 'q2', url: 'https://apply.example.test/posting/7', title: 'Product Designer', company: 'Globex', location: '', state: 'queued', note: '', needs: [], filled: 0, tabId: null, added_at: now, updated_at: now },
       { id: 'q3', url: 'https://apply.example.test/empty', title: 'Closed role', company: 'Hooli', location: '', state: 'queued', note: '', needs: [], filled: 0, tabId: null, added_at: now, updated_at: now },
+      { id: 'q4', url: 'https://apply.example.test/wd/job', title: 'Software Engineer', company: 'Cisco', location: '', state: 'queued', note: '', needs: [], filled: 0, tabId: null, added_at: now, updated_at: now },
+      { id: 'q5', url: 'https://apply.example.test/rerender', title: 'Designer', company: 'Umbrella', location: '', state: 'queued', note: '', needs: [], filled: 0, tabId: null, added_at: now, updated_at: now },
     ],
   });
   const d = await open(h, 'options.html', { width: 1440, height: 900 });
   await d.goto(`chrome-extension://${h.id}/options.html#applications`); await d.getByRole('heading', { name: 'Applications' }).waitFor({ timeout: 8000 });
   await axe(d, 'applications');
-  await d.getByRole('button', { name: 'Start 3 applications' }).click();
+  await d.getByRole('button', { name: 'Start 5 applications' }).click();
   const until = async (fn, ms = 30000) => { const end = Date.now() + ms; while (Date.now() < end) { const q = await store('applyQueue'); if (fn(q)) return q; await sleep(300); } return store('applyQueue'); };
-  let q = await until((q) => q.find((x) => x.id === 'q1')?.state === 'needs-input' && q.find((x) => x.id === 'q2')?.state === 'needs-input' && q.find((x) => x.id === 'q3')?.state === 'stopped');
+  let q = await until((q) => q.find((x) => x.id === 'q1')?.state === 'needs-input' && q.find((x) => x.id === 'q2')?.state === 'needs-input' && q.find((x) => x.id === 'q3')?.state === 'stopped'
+    && q.find((x) => x.id === 'q4')?.state === 'needs-input' && q.find((x) => x.id === 'q5')?.state === 'needs-input', 90000);
+  const q4 = q.find((x) => x.id === 'q4');
+  ok(/Sign in or create your account/.test(q4.note) && q4.needs.includes('Sign in to the site'), `a Workday-style choice box is passed with "Apply Manually", and the sign-in page is handed to you (${q4.note})`);
+  const rr = (await h.ctx.pages()).find((p) => p.url().endsWith('/rerender'));
+  ok(!!rr && await rr.inputValue('#fn') === 'Ada' && await rr.inputValue('#em') === 'ada@example.com', 'a page that rebuilds its form after loading keeps what Jobly filled');
   const s = Object.fromEntries(q.map((x) => [x.id, x.state]));
   ok(s.q1 === 'needs-input' && s.q2 === 'needs-input' && s.q3 === 'stopped', `each job is opened and prepared, two at a time (${JSON.stringify(s)})`);
   const q1 = q.find((x) => x.id === 'q1');
@@ -877,7 +891,8 @@ await step('apply queue: opens, finds the form behind Apply, fills, asks, stops 
   await tab2.close(); q = await until((q) => q.find((x) => x.id === 'q2')?.state === 'stopped', 5000);
   ok(/closed before you submitted/.test(q.find((x) => x.id === 'q2').note), 'closing a tab before submitting stops that application');
   await d.reload(); await d.getByRole('heading', { name: 'Applications' }).waitFor();
-  ok(await d.getByRole('list', { name: 'Submitted' }).getByText('Staff Product Designer').count() === 1 && await d.getByRole('list', { name: 'Not submitted' }).locator('li').count() === 2, 'the board shows submitted and not-submitted jobs');
+  const boardState = JSON.stringify((await store('applyQueue')).map((x) => [x.id, x.state, x.note.slice(0, 40)]));
+  ok(await d.getByRole('list', { name: 'Submitted' }).getByText('Staff Product Designer').count() === 1 && await d.getByRole('list', { name: 'Not submitted' }).locator('li').count() === 2, `the board shows submitted and not-submitted jobs (${boardState})`);
   await d.getByRole('button', { name: /^Remove Closed role/ }).click(); await sleep(300);
   ok(!(await store('applyQueue')).some((x) => x.id === 'q3'), 'a job can be removed from the queue');
   await h.ctx.close();

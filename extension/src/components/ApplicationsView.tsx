@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { ArrowRight, CheckCircle2, Clock, ExternalLink, RotateCcw, Trash, Wand, X } from '../lib/icons';
-import { ACTIVE, originsOf, QueueItem, QueueState, removeItems, stateLabel, STEPS, updateItem, useApplyQueue, WAITING } from '../lib/applyQueue';
+import { ACTIVE, ATS_ORIGINS, originsOf, QueueItem, QueueState, removeItems, stateLabel, STEPS, updateItem, useApplyQueue, WAITING } from '../lib/applyQueue';
 import { isSensitive, rememberAnswers } from '../lib/answerBank';
 import { readKey, writeKey } from '../lib/userData';
 import { getCompanyLogoUrl } from '../lib/companyLogos';
@@ -48,7 +48,7 @@ export const ApplicationsView: React.FC<{ notify: (m: string, kind?: 'error' | '
 
   const start = async () => {
     // Access to just the sites in the queue, asked for here (a click is required for the browser to ask)
-    const origins = originsOf(queued);
+    const origins = [...new Set([...originsOf(queued), ...ATS_ORIGINS])];
     let granted = true;
     try { granted = origins.length === 0 || await chrome.permissions.contains({ origins }) || await chrome.permissions.request({ origins }); } catch { granted = false; }
     if (!granted) { notify('Jobly needs your OK to open those job sites. Nothing was started.'); return; }

@@ -446,7 +446,8 @@ async function handleAssist(message: Record<string, unknown>, sender: chrome.run
       const states = ['reading', 'filling', 'needs-input', 'review', 'stopped'] as const;
       const state = states.find((s) => s === message.state);
       if (!state) return null;
-      const item = await patchQueue((x) => x.tabId === sender.tab!.id && x.id === message.id, {
+      // A submitted application stays submitted, whatever the tab reports afterwards
+      const item = await patchQueue((x) => x.tabId === sender.tab!.id && x.id === message.id && x.state !== 'submitted', {
         state, note: str(message.note, 200), filled: Number(message.filled) || 0,
         needs: (Array.isArray(message.needs) ? message.needs : []).map((q) => str(q, 200)).filter(Boolean).slice(0, 30),
       });

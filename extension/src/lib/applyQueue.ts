@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { onKeysChanged, readKey, writeKey } from './userData';
 import { safeHttpUrl } from './url';
+import atsOrigins from './atsOrigins.json';
 
 /**
  * The apply queue: jobs the user picked for Jobly to prepare, one application tab at a time.
@@ -94,6 +95,9 @@ export async function removeItems(ids: string[]): Promise<void> {
   await storeQueue((await loadQueue()).filter((x) => !ids.includes(x.id)));
 }
 
+/** Hiring systems a company's job page often hands the form to (Cisco's careers page to Workday, a company page to a
+ *  Greenhouse or Lever form). Asked for together with the queued sites, once, when the user presses Start. */
+export const ATS_ORIGINS: string[] = atsOrigins;
 /** The origins the queue's pages live on, to ask the browser for access to just those sites. */
 export const originsOf = (items: QueueItem[]) => [...new Set(items.map((x) => { try { return `${new URL(x.url).origin}/*`; } catch { return ''; } }).filter(Boolean))];
 

@@ -25,6 +25,10 @@ function devBuild(): Plugin {
       }
       // The browser tests start apply assist on a test application page from the service worker
       manifest.host_permissions.push('https://apply.example.test/*');
+      // The hiring-system sites the apply queue asks for on Start (a test can't click Chrome's permission prompt)
+      manifest.host_permissions.push(...JSON.parse(readFileSync(resolve(__dirname, 'src/lib/atsOrigins.json'), 'utf8')));
+      // Real-form checks (e2e/real-forms.mjs) need every site without the permission prompt a test can't click
+      if (process.env.JOBLY_ALL_HOSTS) manifest.host_permissions.push('https://*/*');
       manifest.name += ' (DEV)';
       writeFileSync(file, JSON.stringify(manifest, null, 2) + '\n');
     },

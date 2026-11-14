@@ -81,25 +81,64 @@ function start() {
   let scannedIds = new Set<string>();
   const autoId = w.__joblyAuto ?? '';
   let selfClick = false;      // our own press of a job page's "Apply" link is not a submission
-  let pressedApply = false;
+  let pressedApply = false;  // eslint-disable-line @typescript-eslint/no-unused-vars
   let autoTimer = 0;
+  let resumeName = '';
+  let misses = 0;
   const report = (state: 'reading' | 'filling' | 'needs-input' | 'review' | 'stopped', note = '') => {
     if (!autoId) return;
     const needs = answers.filter((a) => !a.value && !a.filled && (a.required || a.kind === 'custom')).map((a) => a.label || 'Unlabelled question');
-    const signIn = !!document.querySelector('input[type="password"]');
+    const signIn = signInPage();
     void send({ type: 'ASSIST_PROGRESS', id: autoId, state, note, filled: answers.filter((a) => a.filled).length, needs: signIn && state === 'needs-input' && !needs.length ? ['Sign in to the site'] : needs });
   };
-  /** A job description page: press its own "Apply" link once to reach the form. */
-  const APPLY_LINK = /^(apply|apply now|apply for this (job|position|role)|apply to this job|start (your )?application|i'?m interested)$/i;
+  /**
+   * Getting from a job page to its form, as a person would: press the page's own Apply button, then the choice a
+   * hiring system shows before its form ("Apply manually" over "Autofill with resume" or "Use my last application",
+   * which need an account). Up to 4 presses per tab (counted across page loads), and a link that would open a new tab
+   * opens in this one so the queue keeps track of it. Never a Submit, Next or sign-in button.
+   */
+  const STEPS_KEY = '__jobly_apply_steps';
+  const CHOICES: RegExp[] = [
+    /^apply manually$/i,
+    /^(apply|continue) without (a )?(resume|account|linkedin)$/i,
+    /^(start|begin|continue)( your| my)? application$/i,
+    /^apply( now| for this (job|position|role)| to this (job|position|role)| here| online)?$/i,
+    /^i'?m interested$/i,
+    /^(easy )?apply on (company|employer) (site|website)$/i,
+  ];
+  const NEVER = /submit|sign ?in|log ?in|create account|register|last application|next|save|linkedin|indeed|google|facebook|upload|autofill/i;
+  const visible = (n: HTMLElement) => !!(n.offsetParent || n.getClientRects().length) && getComputedStyle(n).visibility !== 'hidden';
   const pressApplyLink = (): boolean => {
-    if (pressedApply) return false;
-    const target = Array.from(document.querySelectorAll<HTMLElement>('a, button, [role="button"]')).find((n) => {
-      const t = (n.textContent || n.getAttribute('aria-label') || '').replace(/\s+/g, ' ').trim();
-      return APPLY_LINK.test(t) && n.offsetParent !== null && !n.closest('form') && !host.contains(n);
-    });
+    let used = 0;
+    try { used = Number(sessionStorage.getItem(STEPS_KEY) || 0); } catch { /* storage blocked */ }
+    if (used >= 4) return false;
+    const nodes = Array.from(document.querySelectorAll<HTMLElement>('a, button, [role="button"], input[type="button"]'))
+      .filter((n) => visible(n) && !host.contains(n) && !(n as HTMLButtonElement).disabled);
+    const label = (n: HTMLElement) => ((n as HTMLInputElement).value || n.textContent || n.getAttribute('aria-label') || '').replace(/\s+/g, ' ').trim();
+    let target: HTMLElement | undefined;
+    for (const rx of CHOICES) {
+      target = nodes.find((n) => { const t = label(n); return t.length <= 40 && rx.test(t) && !NEVER.test(t.replace(/^apply manually$/i, '')) && !(n.closest('form') && n.matches('[type=submit]')); });
+      if (target) break;
+    }
+    // Any language: a link to this job's application page ("/apply", "/application", SmartRecruiters' one-click form)
+    if (!target) target = nodes.find((n) => n instanceof HTMLAnchorElement && /^https?:/.test(n.href) && /\/(apply|application|oneclick-ui)(\/|\?|$)/i.test(new URL(n.href).pathname) && !/\/(jobs|search)\/?$/i.test(new URL(n.href).pathname) && !NEVER.test(label(n)));
     if (!target) return false;
-    pressedApply = true; selfClick = true; target.click(); window.setTimeout(() => { selfClick = false; }, 500);
+    try { sessionStorage.setItem(STEPS_KEY, String(used + 1)); } catch { /* storage blocked */ }
+    pressedApply = true; selfClick = true;
+    const href = target instanceof HTMLAnchorElement ? target.href : '';
+    if (href && /^https?:/.test(href) && ((target as HTMLAnchorElement).target === '_blank' || target.getAttribute('rel')?.includes('noopener'))) location.assign(href);
+    else target.click();
+    window.setTimeout(() => { selfClick = false; }, 800);
     return true;
+  };
+  /** A page that wants to check the visitor is human (bot protection): the user takes over; Jobly never gets around it. */
+  const blockedPage = (): boolean => /access (is )?(temporarily )?restricted|unusual activity from your (device|network)|verify (that )?you are (a )?human|are you a robot|checking your browser|access denied/i
+    .test((document.body?.innerText || '').slice(0, 3000));
+  /** A sign-in or create-account page (Workday and others ask for one before their form). */
+  const signInPage = (): boolean => {
+    if (document.querySelector('input[type="password"]')) return true;
+    const text = (document.body.innerText || '').slice(0, 4000);
+    return /\b(sign in|log in)\b/i.test(text) && /\b(create account|create an account|new user|forgot (your )?password)\b/i.test(text) && !document.querySelector('input[type="file"]');
   };
   let seenQuestions = new Set<string>();
   const job: PageJob = (() => { try { return extractJobFromPage(); } catch { return { found: false, title: document.title, company: location.hostname, location: '', datePosted: '', employmentType: '', salary: '', url: location.href, description: '' }; } })();
@@ -183,18 +222,50 @@ function start() {
   /** Auto mode after each read: fill what Jobly knows, or find the form, then tell the extension where it stands. */
   const autoStep = async () => {
     window.clearTimeout(autoTimer);
-    if (!answers.length) {
-      // Nothing to fill yet: the form may still be loading, or sit behind the page's own Apply link
+    if (blockedPage()) {
+      report('needs-input', 'The site wants to check you’re human. Open the tab, finish that, and Jobly continues.');
+      return;
+    }
+    if (signInPage()) {
+      report('needs-input', `Sign in or create your account on ${location.hostname.replace(/^www\./, '')}. Jobly fills the form after that.`);
+      return;
+    }
+    // A job page's search box or a newsletter field is not an application: it needs the questions an application asks
+    const APPLICATION = /\b(first|last|full|given|family)?\s*name\b|e-?mail|phone|mobile|resume|\bcv\b|cover letter|linkedin/i;
+    // Once a real form was seen in this tab, its later steps count too (step 2 asks about experience, not your name)
+    const FORM_KEY = '__jobly_form_seen';
+    let seen = false; try { seen = sessionStorage.getItem(FORM_KEY) === '1'; } catch { /* storage blocked */ }
+    const isForm = (seen && answers.length > 0) || answers.filter((a) => a.kind === 'file' || APPLICATION.test(a.label)).length >= 2 || answers.length >= 6;
+    if (isForm) { try { sessionStorage.setItem(FORM_KEY, '1'); } catch { /* storage blocked */ } }
+    if (!isForm) {
+      // Nothing to fill yet: the form may still be loading, or sit behind the page's own Apply button or a choice box
       autoTimer = window.setTimeout(() => {
-        if (answers.length) return;
-        if (pressApplyLink()) { report('reading', 'Opened the application form'); return; }
-        if (document.querySelector('input[type="password"]')) { report('needs-input', 'This site asks you to sign in first.'); return; }
+        const nowForm = (seen && answers.length > 0) || answers.filter((a) => a.kind === 'file' || APPLICATION.test(a.label)).length >= 2 || answers.length >= 6;
+        if (nowForm) return;
+        if (blockedPage()) { report('needs-input', 'The site wants to check you’re human. Open the tab, finish that, and Jobly continues.'); return; }
+        if (signInPage()) { report('needs-input', `Sign in or create your account on ${location.hostname.replace(/^www\./, '')}. Jobly fills the form after that.`); return; }
+        if (pressApplyLink()) {
+          report('reading', 'Opening the application form');
+          // A choice box or a form that appears on the same page: look again shortly
+          window.setTimeout(() => { message = ''; void scan(); }, 2500);
+          return;
+        }
+        // A slow page (several tabs loading at once) gets one more look before Jobly gives up
+        if (misses++ < 1) { window.setTimeout(() => { message = ''; void scan(); }, 5000); return; }
         report('stopped', 'No application form found on the page. Open it to apply yourself.');
-      }, 6000);
+      }, 5000);
       return;
     }
     for (const a of answers) if (a.value && !a.filled && !currentValue(a)) a.include = true; else if (currentValue(a)) a.include = false;  // never overwrite what's on the page
-    if (answers.some((a) => a.value && !a.filled && a.include)) { report('filling'); await fill(); }
+    if (answers.some((a) => a.value && !a.filled && a.include)) {
+      report('filling'); await fill();
+      // Did the page keep what was filled? Some re-render a moment later; fill those again, once
+      await new Promise((r) => window.setTimeout(r, 2000));
+      // Many sites upload the file at once and show its name instead of keeping it in the input
+      const fileGone = (a: AssistAnswer) => { const f = fieldEl(a.id) as HTMLInputElement | null; return !!f && f.type === 'file' && !(f.files && f.files.length) && !(resumeName && (document.body.innerText || '').includes(resumeName)); };
+      const lost = answers.filter((a) => a.filled && (((a.kind === 'text' || a.kind === 'textarea' || a.kind === 'select') && !currentValue(a)) || (a.kind === 'file' && fileGone(a))));
+      if (lost.length) { for (const a of lost) { a.filled = false; a.include = true; } await fill(); }
+    }
     const captcha = !!document.querySelector('iframe[src*="recaptcha"], iframe[src*="hcaptcha"], iframe[src*="turnstile"], .g-recaptcha, .h-captcha');
     const left = answers.filter((a) => !a.value && !a.filled && (a.required || a.kind === 'custom')).length;
     report(left ? 'needs-input' : 'review', captcha ? 'The page has a CAPTCHA: complete it yourself before submitting.' : '');
@@ -206,6 +277,7 @@ function start() {
     busy = true; render();
     let resume: ResumePayload | null = null;
     if (chosen.some((a) => a.kind === 'file')) resume = (await send<{ resume: ResumePayload | null }>({ type: 'ASSIST_RESUME' }))?.resume ?? null;
+    if (resume) resumeName = resume.name;
     const items: FillItem[] = chosen.map((a) => ({ id: a.id, kind: a.kind as FillItem['kind'], value: a.value }));
     const out = await fillForm(items, resume);
     void send({ type: 'ASSIST_USED', keys: chosen.map((a) => a.savedKey).filter(Boolean) });
@@ -315,7 +387,19 @@ function start() {
   } catch { /* not in an extension context (tests) */ }
   if (autoId) panel.classList.add('min');
   render();
-  void scan();
+  if (!autoId) { void scan(); return; }
+  // Auto mode: many hiring sites rebuild the page just after it loads (React and the like), which would wipe what Jobly
+  // fills and remove its panel. Wait until the page has been quiet for a second (at most 10), keep the panel attached.
+  new MutationObserver(() => { if (!host.isConnected && document.documentElement) document.documentElement.appendChild(host); }).observe(document, { childList: true, subtree: true });
+  let quietSince = Date.now();
+  const settle = new MutationObserver(() => { quietSince = Date.now(); });
+  settle.observe(document.documentElement, { childList: true, subtree: true });
+  const started = Date.now();
+  const wait = window.setInterval(() => {
+    if ((Date.now() - quietSince > 1000 && Date.now() - started > 1500) || Date.now() - started > 10000) {
+      window.clearInterval(wait); settle.disconnect(); void scan();
+    }
+  }, 250);
 }
 
 start();
