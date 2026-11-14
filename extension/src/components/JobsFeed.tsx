@@ -61,11 +61,10 @@ export const JobsFeed: React.FC<JobsFeedProps> = ({
     return list.map((j, i) => [j, i] as const).sort((a, b) => pct.get(b[0])! - pct.get(a[0])! || a[1] - b[1]).map(([j]) => j);
   }, [jobs, filters, roleFilter, targetRoles, mutedCompanyIds, byMatch, match]);
 
-  // Wide page: the job open in the side panel (the first one until the user picks another)
+  // Wide page: the job the user clicked opens in a side sheet over the list
   const [picked, setPicked] = useState<string | null>(null);
-  const [panelClosed, setPanelClosed] = useState(false);
-  const selected = large && !panelClosed ? (visible.slice(0, displayLimit).find((j) => jobKey(j) === picked) ?? visible[0] ?? null) : null;
-  const select = (j: Job) => { setPicked(jobKey(j)); setPanelClosed(false); };
+  const selected = large && picked ? (visible.find((j) => jobKey(j) === picked) ?? null) : null;
+  const select = (j: Job) => setPicked(jobKey(j));
 
   const chips = [{ id: 'all_matching', label: 'For you' }, ...ROLES.map((r) => ({ id: r.id, label: r.short })), { id: 'design_it', label: 'Design & IT' }, { id: 'all', label: 'All' }];
   const resetFilters = () => onFiltersChange({ ...DEFAULT_FILTERS, search: filters.search });
@@ -262,7 +261,7 @@ export const JobsFeed: React.FC<JobsFeedProps> = ({
         </div>
       </div>
 
-      <div className={large ? `jobs-split${selected ? ' with-detail' : ''}` : undefined}>
+      <div className={large ? 'jobs-wide' : undefined}>
       <div className="list">
         {loadError && jobs.length > 0 && (
           <div className="banner" role="status">
@@ -277,7 +276,7 @@ export const JobsFeed: React.FC<JobsFeedProps> = ({
           {mutedHidden > 0 && <> · {mutedHidden} hidden from companies you turned off{onOpenCompanies && <> (<button type="button" className="link" onClick={onOpenCompanies}>manage</button>)</>}</>}</p>}
         {renderBody()}
       </div>
-      {selected && <JobDetail key={jobKey(selected)} job={selected} onToggleSave={onToggleSave} onClose={() => setPanelClosed(true)} />}
+      {selected && <JobDetail key={jobKey(selected)} job={selected} onToggleSave={onToggleSave} onClose={() => setPicked(null)} />}
       </div>
     </div>
   );

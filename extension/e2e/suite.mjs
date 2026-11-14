@@ -178,8 +178,7 @@ await step('dashboard layout fills the window', async () => {
   const h = await launch(); const p = await open(h, 'options.html', { width: 1920, height: 900 });
   for (const [w, minCols] of [[1920, 1], [1280, 1], [700, 1]]) {
     await p.setViewportSize({ width: w, height: 900 }); await p.goto(`chrome-extension://${h.id}/options.html`); await p.locator('article').nth(3).waitFor({ timeout: 30000 }); await sleep(400);
-    const panel = await p.locator('.job-detail').isVisible();
-    ok(w >= 1280 ? panel : !panel, `${w}px: ${w >= 1280 ? 'the job list with the selected job open beside it' : 'the job list alone'}`);
+    ok(await p.locator('.sheet').count() === 0, `${w}px: full-width cards, no job open until you click one`);
     const m = await p.evaluate(() => ({ cols: new Set([...document.querySelectorAll('article')].slice(0, 12).map((a) => Math.round(a.getBoundingClientRect().left))).size, inner: document.querySelector('.content-inner').getBoundingClientRect().width, over: document.documentElement.scrollWidth > document.documentElement.clientWidth + 1 }));
     ok(m.cols >= minCols && !m.over, `${w}px: ${m.cols} column(s), content ${Math.round(m.inner)}px, no sideways scroll`);
     if (w === 1920) ok(m.inner > 1500, 'uses the full 1920px window');
@@ -755,21 +754,27 @@ await step('apply assist: panel on the page, sources, action required, steps, sa
   await h.ctx.close();
 });
 
-await step('jobs page: job panel, apply queue from a card', async () => {
+await step('jobs page: full-width cards, job side sheet, apply queue', async () => {
   const h = await launch(); const store = async (k) => (await h.sw.evaluate((key) => chrome.storage.local.get(key), k))[k];
   const d = await open(h, 'options.html', { width: 1440, height: 900 }); await firstCard(d);
   const second = d.locator('article.job-row').nth(1); const title2 = (await second.getAttribute('aria-label')).split(' at ')[0];
-  ok(await d.locator('.job-detail').count() === 1 && await d.locator('article.job-row.selected').count() === 1, 'the first job is open in the panel beside the list');
+  ok(await d.locator('.sheet').count() === 0, 'the list starts with full-width cards and no job open');
   await second.locator('.job-meta').click(); await sleep(300);
-  ok((await d.locator('.jd-title').innerText()) === title2 && await second.evaluate((e) => e.classList.contains('selected')), 'clicking a card opens it in the panel');
-  await d.locator('.jd-desc').getByText(/About the job/).waitFor(); await sleep(500);
-  ok(await d.locator('.jd-desc [aria-busy]').count() === 0, 'the description loads in the panel (or says where to read it)');
-  await axe(d, 'jobs page with panel');
-  await second.getByRole('button', { name: /^Add to queue:/ }).click(); await sleep(400);
+  const sheet = d.getByRole('dialog', { name: title2 });
+  ok(await sheet.count() === 1 && await second.evaluate((e) => e.classList.contains('selected')), 'clicking a card opens the job in a side sheet');
+  ok(await d.evaluate(() => !!document.activeElement?.closest('.sheet')), 'focus moves into the sheet');
+  await sheet.getByRole('heading', { name: 'Job description' }).waitFor(); await sleep(600);
+  ok(await sheet.locator('[aria-busy]').count() === 0 && /Experience[\s\S]*Location[\s\S]*Pay[\s\S]*Job type/i.test(await sheet.locator('.sheet-facts').innerText()), 'the sheet shows the facts and the description (or where to read it)');
+  ok(await sheet.getByRole('link', { name: /^Apply to / }).count() === 1, 'Apply is at the bottom of the sheet');
+  await axe(d, 'jobs side sheet');
+  await sheet.getByRole('button', { name: /^Add to queue:/ }).click(); await sleep(400);
   const q = await store('applyQueue');
-  ok(q?.length === 1 && q[0].state === 'queued' && q[0].title === title2 && await second.getByRole('button', { name: /^Queued:/ }).isDisabled(), 'Add to queue puts the job in the apply queue once');
+  ok(q?.length === 1 && q[0].state === 'queued' && q[0].title === title2 && await sheet.getByRole('button', { name: /^Queued:/ }).isDisabled(), 'Add to queue puts the job in the apply queue once');
+  await d.keyboard.press('Escape'); await sleep(200);
+  ok(await d.locator('.sheet').count() === 0 && await second.getByRole('button', { name: /^Queued:/ }).isDisabled(), 'Escape closes the sheet; the card shows it queued');
+  await second.locator('.job-meta').click(); await sleep(200);
   await d.getByRole('button', { name: 'Close job details' }).click(); await sleep(200);
-  ok(await d.locator('.job-detail').count() === 0, 'the panel can be closed');
+  ok(await d.locator('.sheet').count() === 0, 'Close closes the sheet');
   await h.ctx.close();
 });
 
