@@ -34,13 +34,48 @@ export const COMMON_QUESTIONS: CommonQuestion[] = [
 
 const fill = (text: string, job: { company?: string; role?: string }) => text.replace(/\{company\}/gi, job.company?.trim() || 'your company').replace(/\{role\}/gi, job.role?.trim() || 'this role');
 
+/**
+ * A first answer to a common question, written from the profile when it has the facts (never invented): fit from the
+ * headline, years, skills and best result; about you from the summary; a project from the best point with a number;
+ * start date from the notice period. Questions the profile can't answer (relocation, office days, how you heard,
+ * why this company) get no draft.
+ */
+export function profileDraft(id: string, p: Profile | null): string {
+  if (!p) return '';
+  const role = (p.headline || p.work[0]?.title || '').split(/\s[|·•–—]\s/)[0].trim();
+  const a = (w: string) => (/^[aeiou]/i.test(w) ? 'an' : 'a');
+  const years = Number.parseFloat(p.years_experience);
+  const points = p.work.flatMap((w) => bulletList(w.bullets).map((b) => ({ b, w })));
+  const best = points.find((x) => /\d/.test(x.b)) ?? points[0];
+  const skills = skillList(p).slice(0, 3);
+  const said = (x: { b: string; w: Profile['work'][number] }) => `at ${x.w.company || 'my last role'} I ${x.b.charAt(0).toLowerCase()}${x.b.slice(1).replace(/\.$/, '')}`;
+  switch (id) {
+    case 'fit':
+      if (!role) return '';
+      return [`I'm ${a(role)} ${role}${years ? ` with ${years}+ years of experience` : ''}${skills.length ? `, working every day with ${skills.join(', ').replace(/, ([^,]*)$/, ' and $1')}` : ''}.`,
+        best ? `For example, ${said(best)}.` : '', 'I would bring the same focus on results to the {role} role at {company}.'].filter(Boolean).join(' ');
+    case 'about':
+      if (p.summary.trim()) return p.summary.trim().slice(0, 1200);
+      return role ? `I'm ${a(role)} ${role}${p.work[0]?.company ? `, currently at ${p.work[0].company}` : ''}${years ? `, with ${years}+ years of experience` : ''}.` : '';
+    case 'project':
+      return best && /\d/.test(best.b) ? `${best.b.replace(/\.$/, '')}${best.w.company ? ` (${best.w.company})` : ''}.` : '';
+    case 'start':
+      return p.notice_period.trim() ? (/^\d+\s*(day|week|month)/i.test(p.notice_period.trim()) ? `In ${p.notice_period.trim()}, after my notice period.` : p.notice_period.trim()) : '';
+    default:
+      return '';
+  }
+}
+
 /** The user's answer to a common question that this form question asks, with {company} and {role} filled in. */
-export function commonAnswer(label: string, saved: SavedAnswer[], job: { company?: string; role?: string }): { value: string; key: string } | null {
+export function commonAnswer(label: string, saved: SavedAnswer[], job: { company?: string; role?: string }, p: Profile | null = null): { value: string; key: string; drafted: boolean } | null {
   if (isSensitive(label)) return null;
   const q = COMMON_QUESTIONS.find((c) => c.match.test(label));
   if (!q) return null;
   const hit = saved.find((a) => a.key === questionKey(q.question));
-  return hit ? { value: fill(hit.value, job), key: hit.key } : null;
+  if (hit) return { value: fill(hit.value, job), key: hit.key, drafted: false };
+  // Not answered yet: a draft from the profile, which the user checks before submitting
+  const draft = profileDraft(q.id, p);
+  return draft ? { value: fill(draft, job), key: '', drafted: true } : null;
 }
 
 const esc = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -48,6 +83,8 @@ const SKILL_Q = /\b(experience|familiar|familiarity|proficient|proficiency|worke
 
 /** "Do you have experience of using Figma?" answered from the profile's skills: Yes, with a point that shows it. */
 export function skillAnswer(label: string, kind: string, options: string[], p: Profile): string {
+  // "Which design tools do you use day to day?": the skills list
+  if ((kind === 'text' || kind === 'textarea') && /\b(which|what)\b[^?]*\b(tools|software|technologies|tech stack|languages|frameworks|programs|apps)\b/i.test(label) && skillList(p).length) return skillList(p).slice(0, 10).join(', ');
   const m = SKILL_Q.exec(label) ?? /^(do|can) you (know|use)\s+([^?.,;]{2,40})/i.exec(label);
   if (!m) return '';
   const asked = m[3].replace(/^(using|the|a)\s+/i, '').trim();
@@ -94,6 +131,17 @@ export async function logQuestions(items: { question: string; kind: string }[], 
 }
 
 export const forgetQuestion = async (key: string) => writeKey(QUESTION_LOG_KEY, (await loadQuestionLog()).filter((x) => x.key !== key));
+
+/** A first answer to a logged question, from the profile when it has the fact (tools, salary, notice, years). */
+export function stuckDraft(question: string, kind: string, p: Profile | null): string {
+  if (!p) return '';
+  const tools = skillAnswer(question, kind === 'textarea' ? 'textarea' : 'text', [], p);
+  if (tools) return tools;
+  if (/salary|compensation|expected (pay|ctc)|desired pay/i.test(question)) return p.salary_expectation.trim();
+  if (/notice period/i.test(question)) return p.notice_period.trim();
+  if (/how many years|years of (professional |relevant )?experience/i.test(question)) return p.years_experience.trim();
+  return '';
+}
 
 /** Logged questions the user hasn't answered yet (a saved answer or a common answer covers them). */
 export const openQuestions = (log: LoggedQuestion[], saved: SavedAnswer[]) =>

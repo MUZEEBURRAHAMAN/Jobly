@@ -21,8 +21,8 @@ export function assistAnswers(fields: ScannedField[], profile: Profile, saved: S
     // A saved answer beats a suggestion (the user wrote it for this kind of question), never a profile fact
     if ((source === null || source === 'suggested') && f.kind !== 'file' && f.kind !== 'checkbox') {
       // A common question the user answered once ("Why are you a good fit for this role?"), filled in for this job
-      const common = f.kind === 'text' || f.kind === 'textarea' ? commonAnswer(f.label, saved, job) : null;
-      if (common) return { id: f.id, label: f.label, kind: f.kind, value: common.value, source: 'saved', include: !f.filled, required: f.required, filled: f.filled, savedKey: common.key };
+      const common = f.kind === 'text' || f.kind === 'textarea' ? commonAnswer(f.label, saved, job, profile) : null;
+      if (common) return { id: f.id, label: f.label, kind: f.kind, value: common.value, source: common.drafted ? 'suggested' : 'saved', include: !f.filled && !common.drafted, required: f.required, filled: f.filled, savedKey: common.key || undefined };
       // "Do you have experience with Figma?": yes when Figma is in the profile's skills, with a point that shows it
       const skill = skillAnswer(f.label, f.kind, f.options, profile);
       if (skill && source === null) { value = skill; source = f.kind === 'select' || f.kind === 'radio' ? 'profile' : 'suggested'; }

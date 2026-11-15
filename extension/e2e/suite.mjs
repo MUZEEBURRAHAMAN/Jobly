@@ -690,16 +690,20 @@ await step('ATS check: parses a resume from plain text (unit)', async () => {
       { id: 'b', label: 'Do you have experience with Kubernetes?', kind: 'textarea', type: 'textarea', options: [], required: true, filled: false },
       { id: 'c', label: 'Why do you want to work at Kpler?', kind: 'textarea', type: 'textarea', options: [], required: true, filled: false },
       { id: 'd', label: 'Are you proficient in React?', kind: 'radio', type: 'radio', options: ['Yes', 'No'], required: true, filled: false },
+      { id: 'e', label: 'Why are you a good fit for this role?', kind: 'textarea', type: 'textarea', options: [], required: true, filled: false },
+      { id: 'f', label: 'Are you willing to relocate?', kind: 'text', type: 'text', options: [], required: true, filled: false },
     ];
     const answers = u.assistAnswers(fields, p, saved, false, { company: 'Kpler', role: 'Product Designer' });
     await u.logQuestions([{ question: 'Do you have experience with Kubernetes?', kind: 'textarea' }, { question: 'What is your gender?', kind: 'select' }], { company: 'Kpler', url: 'https://jobs.lever.co/kpler/1/apply' });
     await u.logQuestions([{ question: 'Do you have experience with Kubernetes? *', kind: 'textarea' }], { company: 'Kpler', url: 'https://jobs.lever.co/kpler/1/apply' });
     await u.logQuestions([{ question: 'Do you have experience with Kubernetes?', kind: 'textarea' }], { company: 'Zoox', url: 'https://jobs.lever.co/zoox/2/apply' });
     const log = await u.loadQuestionLog();
-    return { a: answers.find((x) => x.id === 'a'), b: answers.find((x) => x.id === 'b'), c: answers.find((x) => x.id === 'c'), d: answers.find((x) => x.id === 'd'), log };
+    return { e: answers.find((x) => x.id === 'e'), f: answers.find((x) => x.id === 'f'), a: answers.find((x) => x.id === 'a'), b: answers.find((x) => x.id === 'b'), c: answers.find((x) => x.id === 'c'), d: answers.find((x) => x.id === 'd'), log };
   });
   ok(/^Yes\. I use Figma regularly in my work as a Product Designer\. For example, at Northwind I built the design system in Figma/.test(qb.a.value) && qb.d.value === 'Yes' && !qb.b.value,
     `a skill question is answered from your skills, with a point that shows it; a skill you don't list is left for you (${qb.a.value.slice(0, 80)})`);
+  ok(/^I'm a Product Designer with 6\+ years of experience, working every day with Figma, React and Design systems\. For example, at Northwind I built the design system/.test(qb.e.value) && /Product Designer role at Kpler\.$/.test(qb.e.value) && qb.e.source === 'suggested' && !qb.f.value,
+    `an unanswered common question gets a draft from the profile, marked to check; one the profile can't answer stays empty (${qb.e.value.slice(0, 90)})`);
   ok(qb.c.value === 'I admire how Kpler ships, and the Product Designer role fits what I do.' && qb.c.source === 'saved', 'a common question answered once is filled for each company, with {company} and {role} filled in');
   ok(qb.log.length === 1 && qb.log[0].count === 2 && qb.log[0].companies.join() === 'Zoox,Kpler', `stuck questions are logged once per page, counted across companies, never sensitive ones (${JSON.stringify(qb.log.map((x) => [x.question, x.count, x.companies]))})`);
   const grade = await page.evaluate(() => { const p = { ...window.units.emptyProfile(), summary: 'x'.repeat(100), skills: 'a,b,c,d,e,f,g,h' }; return [window.units.resumeScore(p, { coverage: { percent: 30, matches: [], keywordsFound: [], keywordsMissing: [], covered: 0 } }).grade, window.units.resumeScore(p).grade]; });
