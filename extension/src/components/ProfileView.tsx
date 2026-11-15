@@ -7,6 +7,7 @@ import { CopyButton } from './CopyButton';
 import { EduEditor, ProjectEditor, WorkEditor } from './ProfileEditors';
 import { ProfileSetup } from './ProfileSetup';
 import { SavedAnswers } from './SavedAnswers';
+import { QuestionBank } from './QuestionBank';
 import { CompletenessBar } from './CompletenessBar';
 import { useCompleteness } from '../lib/useCompleteness';
 import { SetupStep } from '../lib/completeness';
@@ -184,6 +185,7 @@ export const ProfileView: React.FC<{ store: ProfilesStore; notify: (m: string, k
         <p className="hint">Start a line with a label and a colon to put the label in bold. In any point, wrap words in **double stars** to make them bold on the resume.</p>
       </fieldset>
 
+      <QuestionBank notify={notify} />
       <SavedAnswers />
 
 

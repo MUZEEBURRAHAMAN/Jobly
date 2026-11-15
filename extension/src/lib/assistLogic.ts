@@ -1,6 +1,7 @@
 import { proposeAnswers, Proposal, ScannedField } from './autofill';
 import { findSaved, SavedAnswer } from './answerBank';
 import { Profile } from './profile';
+import { commonAnswer, skillAnswer } from './questionBank';
 
 /**
  * Apply assist's answers for one step of a form, each with where it came from:
@@ -12,13 +13,19 @@ import { Profile } from './profile';
 export type Source = 'profile' | 'saved' | 'suggested';
 export interface AssistAnswer { id: string; label: string; kind: ScannedField['kind']; value: string; source: Source | null; include: boolean; required: boolean; filled: boolean; savedKey?: string }
 
-export function assistAnswers(fields: ScannedField[], profile: Profile, saved: SavedAnswer[], hasResume: boolean): AssistAnswer[] {
+export function assistAnswers(fields: ScannedField[], profile: Profile, saved: SavedAnswer[], hasResume: boolean, job: { company?: string; role?: string } = {}): AssistAnswer[] {
   return proposeAnswers(fields, profile, hasResume).map((p: Proposal) => {
     const f = p.field;
     let value = p.value; let source: Source | null = p.answerId ? (p.answerId === 'summary' ? 'suggested' : 'profile') : null;
     let savedKey: string | undefined;
     // A saved answer beats a suggestion (the user wrote it for this kind of question), never a profile fact
     if ((source === null || source === 'suggested') && f.kind !== 'file' && f.kind !== 'checkbox') {
+      // A common question the user answered once ("Why are you a good fit for this role?"), filled in for this job
+      const common = f.kind === 'text' || f.kind === 'textarea' ? commonAnswer(f.label, saved, job) : null;
+      if (common) return { id: f.id, label: f.label, kind: f.kind, value: common.value, source: 'saved', include: !f.filled, required: f.required, filled: f.filled, savedKey: common.key };
+      // "Do you have experience with Figma?": yes when Figma is in the profile's skills, with a point that shows it
+      const skill = skillAnswer(f.label, f.kind, f.options, profile);
+      if (skill && source === null) { value = skill; source = f.kind === 'select' || f.kind === 'radio' ? 'profile' : 'suggested'; }
       const hit = findSaved(saved, f.label);
       // a custom dropdown's options are only known once it is open, so a saved choice is tried there and checked
       const fits = hit && (f.kind === 'select' || f.kind === 'radio' ? f.options.find((o) => o.toLowerCase() === hit.value.toLowerCase()) : hit.value);

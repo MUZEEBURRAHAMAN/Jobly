@@ -890,3 +890,12 @@ fieldset.card.stack > legend { margin-bottom: 0; }
 .fu-list > li { padding-top: var(--space-3); border-top: 1px solid var(--border); display: flex; flex-direction: column; gap: var(--space-2); }
 .fu-draft { display: flex; flex-direction: column; gap: var(--space-2); align-items: flex-start; padding: var(--space-3); border-radius: var(--radius); background: var(--muted); }
 .fu-text { margin: 0; white-space: pre-wrap; font: inherit; font-size: var(--text-sm); line-height: 1.55; }
+
+/* Questions employers ask (Profile) */
+.qb { display: flex; flex-direction: column; gap: var(--space-3); }
+.qb-section { display: flex; flex-direction: column; gap: var(--space-2); }
+.qb-section h3 { margin: var(--space-2) 0 0; font-size: var(--text-sm); display: flex; align-items: center; gap: 8px; }
+.qb-list { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: var(--space-3); }
+.qb-list > li { display: flex; flex-direction: column; gap: 6px; padding: var(--space-3); border: 1px solid var(--border); border-radius: var(--radius-md); }
+.qb-q { display: flex; justify-content: space-between; align-items: baseline; gap: var(--space-2); }
+.qb-q .muted { display: inline-flex; align-items: center; gap: 4px; flex: none; }

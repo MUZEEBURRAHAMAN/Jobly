@@ -13,7 +13,7 @@ const profile = {
   id: 'p1', label: 'Test', first_name: 'Testa', last_name: 'Candidate', email: 'testa.candidate@example.com', phone: '+1 415 555 0100', location: 'San Francisco, CA',
   headline: 'Senior Software Engineer', summary: 'Software engineer with eight years of experience building web products.', linkedin: 'linkedin.com/in/example-testa', github: 'github.com/example-testa',
   portfolio: 'example.com', website: '', work_authorization: 'Authorized to work in the US', needs_sponsorship: 'no', years_experience: '8', salary_expectation: '', notice_period: '2 weeks',
-  skills: 'TypeScript, React, Node.js', work: [{ id: 'w', company: 'Example Corp', title: 'Senior Software Engineer', location: 'Remote', start: '2020-01', end: '', current: true, bullets: 'Built the web platform used by 2 million people' }],
+  skills: 'TypeScript, React, Node.js, Figma', work: [{ id: 'w', company: 'Example Corp', title: 'Senior Software Engineer', location: 'Remote', start: '2020-01', end: '', current: true, bullets: 'Built the web platform used by 2 million people\nPrototyped new flows in Figma with the design team' }],
   education: [{ id: 'e', school: 'Example University', degree: 'BSc', field: 'Computer Science', start: '2012-09', end: '2016-06' }], projects: [], achievements: '', updated_at: now,
 };
 const h = await launch({ staticData: false });
@@ -39,6 +39,8 @@ for (const [i, x] of q.entries()) {
   const values = page ? await page.evaluate(() => [...document.querySelectorAll('input:not([type=hidden]):not([type=file]), textarea')].filter((e) => e.value).length).catch(() => -1) : -1;
   const files = page ? await page.evaluate(() => [...document.querySelectorAll('input[type=file]')].filter((e) => e.files?.length).length + ((document.body.innerText || '').includes('Testa-Candidate-resume.pdf') ? 1 : 0)).catch(() => -1) : -1;
   const submitted = page ? await page.evaluate(() => /thank you for applying|application (has been )?(submitted|received)/i.test(document.body.innerText)).catch(() => false) : false;
-  console.log(JSON.stringify({ url: x.url, now: page?.url(), state: x.state, filled: x.filled, needs: x.needs, note: x.note, fieldsWithValues: values, filesAttached: files, submitted, shot }));
+  const texts = page ? await page.evaluate(() => [...document.querySelectorAll('textarea')].filter((e) => e.value).map((e) => `${(e.closest('li,div')?.querySelector('label,.application-label,.text')?.textContent || '').trim().slice(0, 50)} => ${e.value.slice(0, 160)}`)).catch(() => []) : [];
+  console.log(JSON.stringify({ texts, url: x.url, now: page?.url(), state: x.state, filled: x.filled, needs: x.needs, note: x.note, fieldsWithValues: values, filesAttached: files, submitted, shot }));
 }
+console.log('QUESTION LOG', JSON.stringify(((await h.sw.evaluate(() => chrome.storage.local.get('questionLog'))).questionLog ?? []).map((x) => `${x.count}× ${x.question.slice(0, 70)}`)));
 await h.ctx.close();

@@ -680,6 +680,28 @@ await step('ATS check: parses a resume from plain text (unit)', async () => {
   });
   ok(fu.due === 'due' && fu.waiting === 'waiting' && fu.after[0] === 'waiting' && fu.after[1] === 1 && fu.cold === 'cold', `follow-ups: due after 7 days, waiting after logging one, cold after two (${JSON.stringify(fu)})`.slice(0, 200));
   ok(/applied for the Designer role at Acme on 5 November/.test(fu.draft.body) && /lifted conversion by 18%/.test(fu.draft.body) && /Ada L$/.test(fu.draft.body), 'the follow-up draft names the role and date, adds one result, and signs with your name');
+  const qb = await page.evaluate(async () => {
+    const u = window.units;
+    const p = { ...u.emptyProfile(), headline: 'Product Designer | AI', skills: 'Figma, React, Design systems', years_experience: '6',
+      work: [{ id: 'w', company: 'Northwind', title: 'Designer', location: '', start: '', end: '', current: true, bullets: 'Built the design system in Figma used by 6 teams' }] };
+    const saved = [{ question: 'Why do you want to work at {company}?', key: 'why want to work at company', value: 'I admire how {company} ships, and the {role} role fits what I do.', kind: 'textarea', used_at: '', uses: 0 }];
+    const fields = [
+      { id: 'a', label: 'Do you have experience of using Figma?', kind: 'textarea', type: 'textarea', options: [], required: true, filled: false },
+      { id: 'b', label: 'Do you have experience with Kubernetes?', kind: 'textarea', type: 'textarea', options: [], required: true, filled: false },
+      { id: 'c', label: 'Why do you want to work at Kpler?', kind: 'textarea', type: 'textarea', options: [], required: true, filled: false },
+      { id: 'd', label: 'Are you proficient in React?', kind: 'radio', type: 'radio', options: ['Yes', 'No'], required: true, filled: false },
+    ];
+    const answers = u.assistAnswers(fields, p, saved, false, { company: 'Kpler', role: 'Product Designer' });
+    await u.logQuestions([{ question: 'Do you have experience with Kubernetes?', kind: 'textarea' }, { question: 'What is your gender?', kind: 'select' }], { company: 'Kpler', url: 'https://jobs.lever.co/kpler/1/apply' });
+    await u.logQuestions([{ question: 'Do you have experience with Kubernetes? *', kind: 'textarea' }], { company: 'Kpler', url: 'https://jobs.lever.co/kpler/1/apply' });
+    await u.logQuestions([{ question: 'Do you have experience with Kubernetes?', kind: 'textarea' }], { company: 'Zoox', url: 'https://jobs.lever.co/zoox/2/apply' });
+    const log = await u.loadQuestionLog();
+    return { a: answers.find((x) => x.id === 'a'), b: answers.find((x) => x.id === 'b'), c: answers.find((x) => x.id === 'c'), d: answers.find((x) => x.id === 'd'), log };
+  });
+  ok(/^Yes\. I use Figma regularly in my work as a Product Designer\. For example, at Northwind I built the design system in Figma/.test(qb.a.value) && qb.d.value === 'Yes' && !qb.b.value,
+    `a skill question is answered from your skills, with a point that shows it; a skill you don't list is left for you (${qb.a.value.slice(0, 80)})`);
+  ok(qb.c.value === 'I admire how Kpler ships, and the Product Designer role fits what I do.' && qb.c.source === 'saved', 'a common question answered once is filled for each company, with {company} and {role} filled in');
+  ok(qb.log.length === 1 && qb.log[0].count === 2 && qb.log[0].companies.join() === 'Zoox,Kpler', `stuck questions are logged once per page, counted across companies, never sensitive ones (${JSON.stringify(qb.log.map((x) => [x.question, x.count, x.companies]))})`);
   const grade = await page.evaluate(() => { const p = { ...window.units.emptyProfile(), summary: 'x'.repeat(100), skills: 'a,b,c,d,e,f,g,h' }; return [window.units.resumeScore(p, { coverage: { percent: 30, matches: [], keywordsFound: [], keywordsMissing: [], covered: 0 } }).grade, window.units.resumeScore(p).grade]; });
   ok(grade[0] !== 'Excellent' && grade[0] !== 'Good', `a low job match never grades as Good or Excellent for that job (${grade})`);
   await h.ctx.close();
@@ -786,7 +808,14 @@ await step('apply assist: panel on the page, sources, action required, steps, sa
   const d = await open(h, 'options.html', { width: 1280, height: 900 });
   await d.getByRole('button', { name: /^Profile/ }).click(); await d.getByText('In 30 days').waitFor({ timeout: 5000 });
   await d.getByRole('button', { name: /Delete the saved answer to: Earliest start date/ }).click(); await sleep(300);
-  ok(!(await store('savedAnswers')).some((a) => a.value === 'In 30 days'), 'a saved answer can be deleted from the Profile page'); await d.close();
+  ok(!(await store('savedAnswers')).some((a) => a.value === 'In 30 days'), 'a saved answer can be deleted from the Profile page');
+  // Questions employers ask: the question the form asked that Jobly couldn't answer is listed, and answering it saves it
+  await d.getByRole('heading', { name: /Questions employers ask|Common questions/ }).first().waitFor();
+  await d.getByLabel('Why are you a good fit for this role?').fill('I build design systems that teams use, and {role} at {company} is that work.');
+  await d.locator('.qb li', { hasText: 'Why are you a good fit for this role?' }).getByRole('button', { name: 'Save answer' }).click(); await sleep(300);
+  ok((await store('savedAnswers')).some((a) => a.question === 'Why are you a good fit for this role?' && /\{company\}/.test(a.value)), 'a common question is answered once on the Profile page and saved with {company}');
+  await axe(d, 'profile with question bank');
+  await d.close();
   // starting it twice reuses the panel; closing removes it
   await startAssist(); ok(await page.locator('jobly-assist').count() === 1, 'starting again reuses the panel');
   await panel.getByRole('button', { name: 'Close apply assist' }).click(); ok(await page.locator('jobly-assist').count() === 0, 'Close removes the panel');

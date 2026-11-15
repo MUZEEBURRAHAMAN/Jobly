@@ -200,7 +200,7 @@ function start() {
     if (auto) { const saved = await remember(); if (saved) message = `Saved ${saved} answer${saved === 1 ? '' : 's'} for next time.`; }
     let fields: ScannedField[] = [];
     try { fields = scanForm().fields; } catch { fields = []; }
-    const r = await send<{ error?: string; profileLabel?: string; answers?: AssistAnswer[] }>({ type: 'ASSIST_PROPOSE', fields });
+    const r = await send<{ error?: string; profileLabel?: string; answers?: AssistAnswer[] }>({ type: 'ASSIST_PROPOSE', fields, job: { title: job.title, company: job.company, url: location.href } });
     busy = false;
     if (!r || r.error === 'no-profile') { answers = []; profileLabel = ''; render('no-profile'); return; }
     profileLabel = r.profileLabel ?? '';

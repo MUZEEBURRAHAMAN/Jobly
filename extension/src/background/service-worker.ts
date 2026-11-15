@@ -11,6 +11,7 @@ import { FEATURES } from '../lib/config';
 import type { PageJob } from '../lib/pageJob';
 import type { ScannedField } from '../lib/autofill';
 import { assistAnswers } from '../lib/assistLogic';
+import { logQuestions } from '../lib/questionBank';
 import { loadAnswers, markUsed, rememberAnswers } from '../lib/answerBank';
 import { loadActiveProfileId, loadProfiles, PROFILE_KEYS, ResumeFile } from '../lib/profile';
 import { safeHttpUrl } from '../lib/url';
@@ -425,7 +426,12 @@ async function handleAssist(message: Record<string, unknown>, sender: chrome.run
       const profile = profiles.find((p) => p.id === activeId) ?? profiles[0];
       if (!profile) return { error: 'no-profile' };
       const fields = (Array.isArray(message.fields) ? message.fields : []).slice(0, 150) as ScannedField[];
-      return { profileLabel: profile.label, answers: assistAnswers(fields, profile, saved, !!resumes?.[profile.id]) };
+      const j = (message.job ?? {}) as Record<string, unknown>;
+      const job = { company: str(j.company, 160), role: str(j.title, 200), url: safeHttpUrl(str(j.url, 2000)) ?? '' };
+      const answers = assistAnswers(fields, profile, saved, !!resumes?.[profile.id], job);
+      // Questions Jobly couldn't answer go to the question log, so the user can answer them once on the Profile page
+      void logQuestions(answers.filter((a) => !a.value && !a.filled && (a.required || a.kind === 'textarea' || a.kind === 'custom')).map((a) => ({ question: a.label, kind: a.kind })), job);
+      return { profileLabel: profile.label, answers };
     }
     case 'ASSIST_RESUME': {
       const [profiles, activeId, resumes] = await Promise.all([loadProfiles(), loadActiveProfileId(), readKey<Record<string, ResumeFile>>(PROFILE_KEYS.resume)]);
