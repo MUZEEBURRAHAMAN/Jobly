@@ -745,6 +745,12 @@ await step('autofill: scan, propose, fill only approved fields (in a real page)'
     <label><input type="checkbox" id="consent"> I agree to the privacy notice</label>
     <label for="fav">Favourite colour</label><input id="fav">
     <input type="hidden" name="token" value="x"><input type="password" id="pw">
+    <label for="trap1">Email address</label><input id="trap1" type="email" style="width:1px;height:1px">
+    <label for="trap2">Phone number</label><input id="trap2" style="opacity:0">
+    <div style="opacity:0.05"><label for="trap3">Home address</label><input id="trap3"></div>
+    <label for="trap4">Date of birth</label><input id="trap4" style="position:absolute;left:-9999px">
+    <label for="trap5">Full name</label><input id="trap5" style="position:absolute;clip:rect(0 0 0 0)">
+    <fieldset><legend>Do you need relocation support?</legend><label><input type="radio" name="reloc" value="y" style="opacity:0;position:absolute"> Yes</label><label><input type="radio" name="reloc" value="n" style="opacity:0;position:absolute"> No</label></fieldset>
   </form></body></html>`;
   await page.route('https://apply.example.test/**', (r) => r.fulfill({ contentType: 'text/html', body: form }));
   await page.goto('https://apply.example.test/job'); await page.addScriptTag({ content: bundle.outputFiles[0].text });
@@ -753,6 +759,8 @@ await step('autofill: scan, propose, fill only approved fields (in a real page)'
   const labels = scan.fields.map((f) => f.label);
   ok(labels.includes('First Name') && labels.includes('Phone') && labels.includes('LinkedIn Profile') && labels.some((l) => /legally authorized/.test(l)), `the scan finds questions by label, nearby text and legend (${scan.fields.length} fields)`);
   ok(!scan.fields.some((f) => f.type === 'password' || f.type === 'hidden'), 'password and hidden fields are never touched');
+  ok(!(await page.evaluate(() => ['trap1', 'trap2', 'trap3', 'trap4', 'trap5'].some((id) => document.getElementById(id).hasAttribute('data-jobly-field')))), 'fields a page hides to collect details (tiny, see-through, off the page, clipped) are never read or filled');
+  ok(scan.fields.some((f) => /relocation support/.test(f.label) && f.kind === 'radio'), 'styled radios whose real input is hidden behind a visible label are still read');
   const profile = await page.evaluate(() => ({ ...window.units.emptyProfile(), first_name: 'Ada', last_name: 'Lovelace', email: 'ada@example.com', phone: '+1 555 0100', linkedin: 'linkedin.com/in/ada', work_authorization: 'US citizen', needs_sponsorship: 'no', summary: 'I build design systems.' }));
   const props = await page.evaluate(([f, p]) => window.units.proposeAnswers(f, p, true), [scan.fields, profile]);
   const byLabel = Object.fromEntries(props.map((p) => [p.field.label, p]));

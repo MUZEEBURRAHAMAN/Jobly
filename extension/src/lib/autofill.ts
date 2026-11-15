@@ -23,7 +23,34 @@ export interface ScanResult { fields: ScannedField[]; frames: string[] }
 
 export function scanForm(): ScanResult {
   const clean = (s: string | null | undefined) => (s ?? '').replace(/\s+/g, ' ').replace(/[*✱]/g, '').trim();
-  const visible = (el: Element) => { const r = (el as HTMLElement).getBoundingClientRect(); const cs = getComputedStyle(el); return (r.width > 0 && r.height > 0 && cs.visibility !== 'hidden' && cs.display !== 'none') || (el as HTMLInputElement).type === 'file'; };
+  // Only fields a person can see get filled. A page that hides fields (tiny, see-through, clipped or moved off the page)
+  // to collect details nobody typed gets nothing. File inputs are often hidden behind an "Attach" button, so they pass.
+  const visible = (el: Element): boolean => {
+    if ((el as HTMLInputElement).type === 'file') return true;
+    // Styled radios and checkboxes hide the real input behind a visible label: the label decides
+    const t = (el as HTMLInputElement).type;
+    if ((t === 'radio' || t === 'checkbox') && !seen(el)) {
+      const id = (el as HTMLElement).id;
+      const label = (id ? document.querySelector(`label[for="${CSS.escape(id)}"]`) : null) ?? el.closest('label');
+      return !!label && seen(label);
+    }
+    return seen(el);
+  };
+  const seen = (el: Element): boolean => {
+    const r = (el as HTMLElement).getBoundingClientRect();
+    const cs = getComputedStyle(el);
+    if (cs.visibility === 'hidden' || cs.display === 'none') return false;
+    // Tiny on purpose: a text field narrower than 20px or shorter than 12px isn't meant to be typed in (a checkbox can be 12px)
+    const box = (el as HTMLInputElement).type === 'checkbox' || (el as HTMLInputElement).type === 'radio';
+    if (r.width < (box ? 8 : 20) || r.height < (box ? 8 : 12)) return false;
+    if (r.right + window.scrollX < 0 || r.bottom + window.scrollY < 0) return false;            // moved off the page
+    if (/rect\(0(px)?,? 0(px)?,? 0(px)?,? 0(px)?\)/.test(cs.clip) || /inset\(50%\)|circle\(0/.test(cs.clipPath)) return false;
+    for (let n: Element | null = el, i = 0; n && i < 12; n = n.parentElement, i++) {
+      const c = getComputedStyle(n);
+      if (Number.parseFloat(c.opacity) < 0.1 || c.visibility === 'hidden') return false;   // see-through, itself or a parent
+    }
+    return true;
+  };
   const labelOf = (el: HTMLElement): string => {
     const id = el.getAttribute('id');
     if (id) { const l = document.querySelector(`label[for="${CSS.escape(id)}"]`); if (l) return clean(l.textContent); }
