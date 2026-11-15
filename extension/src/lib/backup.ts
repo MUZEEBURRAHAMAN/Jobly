@@ -2,14 +2,79 @@ import { Application, AppStatus, STATUSES, sanitizeApp, TRACKER_KEYS } from './t
 import { readKey, writeKey, STORAGE_KEYS } from './userData';
 import { cleanProfile, MAX_PROFILES, Profile } from './profile';
 import { cleanContact, Contact, MAX_CONTACTS } from './contacts';
+import { cleanPreferences } from './userData';
+import { cleanItem, MAX_QUEUE, QueueItem, QUEUE_KEY } from './applyQueue';
+import { isSensitive, MAX_ANSWERS, questionKey } from './answerBank';
+import { MAX_LOGGED, QUESTION_LOG_KEY } from './questionBank';
+import { MAX_RESUME_BYTES } from './profile';
 
 /**
  * Export and import. A JSON backup holds everything Jobly keeps on this device; a CSV holds the tracker only and is
  * what spreadsheets, Notion and Google Sheets export, so applications kept elsewhere can be brought in.
  */
 
-const BACKUP_KEYS = [STORAGE_KEYS.preferences, STORAGE_KEYS.saved, TRACKER_KEYS.apps, TRACKER_KEYS.interviews, TRACKER_KEYS.tasks, TRACKER_KEYS.settings, 'mutedCompanyIds', 'followedCompanyIds', 'profiles', 'activeProfileId', 'resumeFile', 'resumeTemplate', 'contacts', 'savedAnswers', 'resumeVersions', 'aiSettings'];  // never the Hunter or Anthropic key
+const BACKUP_KEYS = [STORAGE_KEYS.preferences, STORAGE_KEYS.saved, TRACKER_KEYS.apps, TRACKER_KEYS.interviews, TRACKER_KEYS.tasks, TRACKER_KEYS.settings, 'mutedCompanyIds', 'followedCompanyIds', 'profiles', 'activeProfileId', 'resumeFile', 'resumeTemplate', 'contacts', 'savedAnswers', 'resumeVersions', 'aiSettings', QUEUE_KEY, QUESTION_LOG_KEY, 'resumeSettings', 'letterSettings'];  // never the Hunter or Anthropic key
 const MAX_FILE_BYTES = 5_000_000;
+
+const isObj = (o: unknown): o is Record<string, unknown> => !!o && typeof o === 'object' && !Array.isArray(o);
+const str = (v: unknown, n: number) => (typeof v === 'string' ? v.slice(0, n) : '');
+const has = (o: unknown, fields: string[]) => isObj(o) && fields.every((f) => typeof o[f] === 'string');
+
+/** One backup key's value made safe, or undefined to skip it. */
+export function restoreValue(k: string, v: unknown): unknown {
+  const arr = Array.isArray(v) ? v : null;
+  switch (k) {
+    case TRACKER_KEYS.apps: return (arr ?? []).map((a) => sanitizeApp(a as Partial<Application>)).filter(Boolean);
+    case TRACKER_KEYS.interviews: return arr ? arr.filter((i) => has(i, ['id', 'app_key', 'at']) && Array.isArray((i as { checklist?: unknown }).checklist)).slice(0, 500) : undefined;
+    case TRACKER_KEYS.tasks: return arr ? arr.filter((t) => has(t, ['id', 'text'])).slice(0, 1000) : undefined;
+    case 'savedJobs': return arr ? arr.filter((j) => has(j, ['title', 'company_name'])).slice(0, 2000) : undefined;
+    case 'mutedCompanyIds': case 'followedCompanyIds': return arr ? arr.filter((n) => Number.isInteger(n)).slice(0, 5000) : undefined;
+    case 'contacts': return arr ? arr.filter((c) => has(c, ['id', 'name'])).map((c) => cleanContact(c as Partial<Contact>)).filter(Boolean).slice(0, MAX_CONTACTS) : undefined;
+    case 'profiles': return (arr ?? []).slice(0, MAX_PROFILES).map((x) => cleanProfile((isObj(x) ? x : {}) as Partial<Profile>));
+    case 'activeProfileId': case 'resumeTemplate': return typeof v === 'string' ? v.slice(0, 80) : undefined;
+    case STORAGE_KEYS.preferences: return cleanPreferences(v);
+    case 'savedAnswers':
+      return arr ? arr.filter((a) => has(a, ['question', 'value']) && !isSensitive(String((a as Record<string, unknown>).question))).slice(0, MAX_ANSWERS).map((a) => {
+        const o = a as Record<string, unknown>; const question = str(o.question, 300);
+        return { question, key: questionKey(question), value: str(o.value, 3000), kind: str(o.kind, 20) || 'text', used_at: str(o.used_at, 40), uses: Number.isInteger(o.uses) ? o.uses : 0 };
+      }) : undefined;
+    case 'resumeVersions':
+      return arr ? arr.filter((x) => isObj(x) && isObj(x.profile) && isObj(x.job)).slice(0, 30).map((x) => {
+        const o = x as Record<string, any>; // eslint-disable-line @typescript-eslint/no-explicit-any
+        return { id: str(o.id, 80) || crypto.randomUUID(), created_at: str(o.created_at, 40), description: str(o.description, 20000), before: Number(o.before) || 0, after: Number(o.after) || 0,
+          job: { key: typeof o.job.key === 'string' ? o.job.key.slice(0, 600) : null, title: str(o.job.title, 200), company: str(o.job.company, 160) }, profile: cleanProfile(o.profile) };
+      }) : undefined;
+    case 'resumeFile': {
+      // Only a real PDF or Word file under the resume limit, stored as base64
+      if (!isObj(v)) return undefined;
+      const out: Record<string, unknown> = {};
+      for (const [id, f] of Object.entries(v).slice(0, MAX_PROFILES)) {
+        if (!isObj(f) || typeof f.data !== 'string') continue;
+        const m = /^data:(application\/pdf|application\/msword|application\/vnd\.openxmlformats-officedocument\.wordprocessingml\.document);base64,([A-Za-z0-9+/=]+)$/.exec(f.data);
+        if (!m || m[2].length * 0.75 > MAX_RESUME_BYTES) continue;
+        out[id.slice(0, 80)] = { name: str(f.name, 120).replace(/[\\/:*?"<>|]/g, '_') || 'resume.pdf', type: m[1], size: Math.round(m[2].length * 0.75), data: f.data };
+      }
+      return out;
+    }
+    case 'aiSettings': return isObj(v) && ['off', 'chrome', 'anthropic'].includes(String(v.provider)) ? { provider: v.provider, model: str(v.model, 60) } : undefined;
+    case TRACKER_KEYS.settings: return isObj(v) ? v : undefined;
+    case QUEUE_KEY:
+      // Tabs belong to the computer the backup came from: open jobs come back to the queue, the rest as they were
+      return arr ? arr.map((x) => cleanItem(isObj(x) ? x as Partial<QueueItem> : {})).filter((x): x is QueueItem => !!x).slice(0, MAX_QUEUE)
+        .map((x) => ({ ...x, tabId: null, state: x.state === 'submitted' || x.state === 'stopped' ? x.state : 'queued' })) : undefined;
+    case QUESTION_LOG_KEY:
+      return arr ? arr.filter((q) => has(q, ['question']) && !isSensitive(String((q as Record<string, unknown>).question))).slice(0, MAX_LOGGED).map((q) => {
+        const o = q as Record<string, unknown>; const question = str(o.question, 300);
+        return { key: questionKey(question), question, kind: str(o.kind, 20) || 'text', count: Math.max(1, Math.min(10000, Number(o.count) || 1)),
+          companies: (Array.isArray(o.companies) ? o.companies : []).filter((c): c is string => typeof c === 'string').map((c) => c.slice(0, 160)).slice(0, 6), last_url: '', last_seen: str(o.last_seen, 40) };
+      }) : undefined;
+    case 'resumeSettings':
+      return isObj(v) ? { template: str(v.template, 30), accent: str(v.accent, 20), page: v.page === 'letter' ? 'letter' : 'a4', fit: v.fit !== false } : undefined;
+    case 'letterSettings':
+      return isObj(v) ? { tone: str(v.tone, 20), length: str(v.length, 20), design: str(v.design, 20), accent: str(v.accent, 20) } : undefined;
+    default: return undefined;
+  }
+}
 
 function download(name: string, type: string, body: string) {
   const url = URL.createObjectURL(new Blob([body], { type }));
@@ -118,23 +183,11 @@ export async function importFile(file: File): Promise<ImportResult> {
     let restored = 0, apps = 0;
     for (const k of BACKUP_KEYS) {
       if (!(k in parsed.data)) continue;
-      let value = parsed.data[k];
-      if (k === TRACKER_KEYS.apps) {
-        value = (Array.isArray(value) ? value : []).map((a) => sanitizeApp(a as Partial<Application>)).filter(Boolean);
-        apps = (value as unknown[]).length;
-      } else if (['savedJobs', TRACKER_KEYS.interviews, TRACKER_KEYS.tasks, 'mutedCompanyIds', 'followedCompanyIds', 'contacts', 'savedAnswers', 'resumeVersions'].includes(k)) {
-        if (!Array.isArray(value)) continue;
-        const arr: unknown[] = value;
-        const ok = (o: unknown, fields: string[]) => !!o && typeof o === 'object' && fields.every((f) => typeof (o as Record<string, unknown>)[f] === 'string');
-        if (k === TRACKER_KEYS.interviews) value = arr.filter((i) => ok(i, ['id', 'app_key', 'at']) && Array.isArray((i as { checklist?: unknown }).checklist));
-        if (k === TRACKER_KEYS.tasks) value = arr.filter((t) => ok(t, ['id', 'text']));
-        if (k === 'savedJobs') value = arr.filter((j) => ok(j, ['title', 'company_name']));
-        if (k === 'mutedCompanyIds' || k === 'followedCompanyIds') value = arr.filter((n) => typeof n === 'number');
-        // Through the same cleaning as a contact saved by hand: a backup file is outside data (profile links must be http/https)
-        if (k === 'contacts') value = arr.filter((c) => ok(c, ['id', 'name'])).map((c) => cleanContact(c as Partial<Contact>)).filter(Boolean).slice(0, MAX_CONTACTS);
-      }
-      if (k === 'profiles') value = (Array.isArray(value) ? value : []).slice(0, MAX_PROFILES).map((x) => cleanProfile(x as Partial<Profile>));
-      if (k === 'resumeFile' && (typeof value !== 'object' || value === null || Array.isArray(value))) continue;
+      // A backup file comes from outside: every key goes through its own cleaner, and anything that isn't the right
+      // shape is dropped, so a crafted file can't put scripts, odd links or oversized data into Jobly
+      const value = restoreValue(k, parsed.data[k]);
+      if (value === undefined) continue;
+      if (k === TRACKER_KEYS.apps) apps = (value as unknown[]).length;
       if (!(await writeKey(k, value))) throw new Error("Couldn't restore the backup. Your browser storage may be full.");
       restored++;
     }

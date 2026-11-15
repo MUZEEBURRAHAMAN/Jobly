@@ -68,9 +68,22 @@ export const jobKey = (job: Pick<Job, 'application_url' | 'company_name' | 'exte
   job.application_url || `${job.company_name}|${job.external_id}`;
 
 // ------------------------------------------------------------------ preferences
+/** Preferences with every field of the right type (stored, synced or restored data is never trusted as-is). */
+export function cleanPreferences(x: unknown): Preferences {
+  const o = (x && typeof x === 'object' && !Array.isArray(x) ? x : {}) as Record<string, unknown>;
+  const strs = (v: unknown, n: number) => (Array.isArray(v) ? v.filter((s): s is string => typeof s === 'string').map((s) => s.slice(0, 80)).slice(0, n) : null);
+  const str = (v: unknown, n: number) => (typeof v === 'string' ? v.slice(0, n) : '');
+  const num = (v: unknown, lo: number, hi: number, d: number) => (typeof v === 'number' && Number.isFinite(v) ? Math.min(hi, Math.max(lo, v)) : d);
+  return {
+    roles: strs(o.roles, 40) ?? DEFAULT_PREFERENCES.roles, seniorities: strs(o.seniorities, 10) ?? DEFAULT_PREFERENCES.seniorities,
+    locations: strs(o.locations, 20) ?? [], remote_only: o.remote_only === true, custom_keywords: str(o.custom_keywords, 500), excluded_keywords: str(o.excluded_keywords, 500),
+    min_salary: num(o.min_salary, 0, 10_000_000, 0), employment_types: strs(o.employment_types, 6) ?? [], notify_enabled: o.notify_enabled !== false,
+    sync_interval_mins: num(o.sync_interval_mins, 15, 1440, DEFAULT_PREFERENCES.sync_interval_mins),
+  };
+}
+
 export async function loadPreferences(): Promise<Preferences> {
-  const stored = (await readKey<Preferences>(KEYS.preferences)) ?? (await readKey<Preferences>(LEGACY.preferences));
-  return { ...DEFAULT_PREFERENCES, ...(stored ?? {}) };
+  return cleanPreferences((await readKey<Partial<Preferences>>(KEYS.preferences)) ?? (await readKey<Partial<Preferences>>(LEGACY.preferences)));
 }
 
 export async function hasStoredPreferences(): Promise<boolean> {

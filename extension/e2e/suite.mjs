@@ -291,6 +291,23 @@ await step('focus: tracker hidden, Applied toggle, Saved | Applied, data in Sett
   await d.getByText(/Backup restored: 3 applications/).waitFor({ timeout: 5000 }); ok((await store('applications')).length === 3, 'a backup restores applied jobs');
   await d.locator('input[type="file"]').setInputFiles({ name: 'evil.json', mimeType: 'application/json', buffer: Buffer.from('{"app":"other"}') });
   await d.getByText("That isn't a Jobly backup file.").waitFor({ timeout: 5000 }); ok(true, 'a file that is not a Jobly backup is refused');
+  // A crafted backup: everything outside the expected shape is dropped or cleaned
+  const crafted = JSON.stringify({ app: 'jobly', version: 1, data: {
+    contacts: [{ id: 'c1', name: 'Eve', linkedin: 'javascript:alert(1)' }],
+    savedAnswers: [{ question: 'What is your gender?', value: 'x' }, { question: 'Why us?', value: '<img src=x onerror=alert(1)>' }],
+    resumeFile: { p1: { name: '../evil.html', type: 'text/html', data: 'data:text/html;base64,PHNjcmlwdD5hbGVydCgxKTwvc2NyaXB0Pg==' } },
+    applyQueue: [{ id: 'q', url: 'javascript:alert(1)', title: 'x' }, { id: 'q2', url: 'https://jobs.example.test/1', title: 'Designer', state: 'filling', tabId: 42 }],
+    userPreferences: { roles: 'all', min_salary: 'lots', remote_only: 'yes' },
+    questionLog: [{ question: 'Your ethnicity?', count: 3 }, { question: 'Which tools do you use?', count: 9e9, companies: [1, 'Acme'] }],
+    aiSettings: { provider: 'evil', model: 'x' },
+  } });
+  await d.locator('input[type="file"]').setInputFiles({ name: 'crafted.json', mimeType: 'application/json', buffer: Buffer.from(crafted) }); await sleep(800);
+  const got = await h.sw.evaluate(() => chrome.storage.local.get(['contacts', 'savedAnswers', 'resumeFile', 'applyQueue', 'userPreferences', 'questionLog', 'aiSettings']));
+  ok(got.contacts?.[0]?.linkedin === '' && got.savedAnswers.length === 1 && got.savedAnswers[0].question === 'Why us?' && Object.keys(got.resumeFile ?? {}).length === 0,
+    'a crafted backup: javascript: links are emptied, sensitive answers dropped, a non-PDF "resume" refused');
+  ok(got.applyQueue.length === 1 && got.applyQueue[0].state === 'queued' && got.applyQueue[0].tabId === null && Array.isArray(got.userPreferences.roles) && got.userPreferences.min_salary === 0 && got.userPreferences.remote_only === false,
+    'restored queue items lose old tabs and go back to the queue; preferences of the wrong type fall back to safe values');
+  ok(got.questionLog.length === 1 && got.questionLog[0].count === 10000 && got.questionLog[0].companies.join() === 'Acme' && !got.aiSettings?.provider?.includes('evil'), 'the question log is cleaned and capped; an unknown AI provider is ignored');
   await axe(d, 'settings');
   // reminders belong to the switched-off pages: none are shown
   await h.sw.evaluate(() => chrome.storage.local.get('applications').then(({ applications }) => chrome.storage.local.set({ applications: applications.map((a, i) => (i === 0 ? { ...a, follow_up_at: new Date(Date.now() - 86400000).toISOString(), follow_up_notified: false } : a)) })));
