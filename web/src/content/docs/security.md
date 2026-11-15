@@ -38,7 +38,9 @@ There is no Jobly server, so there is nothing that receives your searches, prefe
 
 ## Built-in protections
 
-- **Content Security Policy.** The extension only runs its own scripts and only connects to Jobly's job files and the optional services you turn on: `default-src 'self'; script-src 'self'; connect-src https://jobly-data.pages.dev https://api.hunter.io https://api.search.brave.com https://api.apollo.io https://api.anthropic.com`.
+- **Hidden fields are never filled.** Autofill only reads fields a person can see. A page that hides fields (tiny, see-through, clipped or moved off the page) to collect details you didn't type gets nothing.
+- **Backups are checked on the way in.** Restoring a backup file cleans every part of it: links must be ordinary web addresses, a resume must be a real PDF or Word file, and anything in the wrong shape is dropped.
+- **Content Security Policy.** The extension only runs its own scripts and only connects to Jobly's job files and the optional services you turn on: `default-src 'self'; script-src 'self'; connect-src https://jobly-data.pages.dev https://api.hunter.io https://api.search.brave.com https://api.apollo.io https://api.anthropic.com; object-src 'none'; base-uri 'none'; frame-ancestors 'none'`.
 - **Links that don't leak.** Apply links open the job's original page in a new tab with `noopener noreferrer`, so that site can't see or control the page you came from.
 - **Nothing to attack on our side.** With no server, there is no database of users, no login and no API that accepts input. The job files are read-only.
 - **No secrets in the extension.** The extension ships with no API keys or tokens. If you add your own Brave Search, Apollo or Hunter key, it stays in your browser and is left out of backups.
