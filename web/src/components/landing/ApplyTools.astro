@@ -24,6 +24,13 @@ const reqs = [
   { s: 'missing', r: 'Familiarity with React' },
 ];
 const STATUS = { covered: 'Covered', partial: 'Partly', missing: 'Missing' } as const;
+const lanes = [
+  { name: 'Queue', cards: [{ t: 'Product Designer', c: 'Globex' }] },
+  { name: 'Filling', cards: [{ t: 'Senior Designer', c: 'Initech', bar: 3 }] },
+  { name: 'Ready for you', cards: [{ t: 'Design Lead', c: 'Hooli', need: '2 questions' }, { t: 'Lead Designer', c: 'Acme', bar: 4 }] },
+  { name: 'Submitted', cards: [{ t: 'Product Designer', c: 'Northwind', done: true }] },
+];
+const checks = [{ n: 'Role fit', w: 35, v: 100 }, { n: 'Place', w: 25, v: 100 }, { n: 'Resume match', w: 15, v: 82 }];
 ---
 <section class="shell apply-wrap" id="apply" aria-labelledby="apply-title">
   <div class="panel panel-pad">
@@ -63,7 +70,42 @@ const STATUS = { covered: 'Covered', partial: 'Partly', missing: 'Missing' } as 
             </div>
           </div>
           <h3>Apply assist fills it with you</h3>
-          <p>Open Jobly on any application. A panel fills each step from your profile after you approve the answers, shows where every answer came from, and marks the questions only you can answer. Answers you type once are remembered for the next form.</p>
+          <p>Open Jobly on any application. A panel fills each step from your profile after you approve the answers, shows where every answer came from, and marks the questions only you can answer. Questions you get stuck on are saved, so you answer each one once and Jobly fills it on every form after.</p>
+        </article>
+
+        <!-- Apply queue: jobs move from Queue to Submitted; Jobly stops before Submit -->
+        <article class="tile t-queue" data-reveal>
+          <div class="stage" aria-hidden="true">
+            <div class="board">
+              {lanes.map((l) => (
+                <div class="lane"><span class="lane-name">{l.name}</span>
+                  {l.cards.map((c) => (
+                    <div class:list={['qcard', { done: c.done }]}>
+                      <b>{c.t}</b><small>{c.c}</small>
+                      {c.bar && <span class="qbar"><i style={`width:${c.bar * 20}%`}></i></span>}
+                      {c.need && <span class="qneed">{c.need}</span>}
+                      {c.done && <span class="qdone"><Icon name="check" size={10} duo={false} />Applied</span>}
+                    </div>
+                  ))}
+                </div>
+              ))}
+            </div>
+          </div>
+          <h3>An apply queue that stops before Submit</h3>
+          <p>Add jobs to your queue and press Start. Jobly opens each one, gets past “Apply manually” boxes, fills your profile, resume and saved answers, and lists what only you can answer. You check each form and press Submit.</p>
+        </article>
+
+        <!-- Job check: should you apply? -->
+        <article class="tile t-check" data-reveal>
+          <div class="stage" aria-hidden="true">
+            <div class="jcard">
+              <div class="jc-top"><span><b>Job check</b><small>Senior Product Designer · Acme</small></span><span class="jc-num"><span><b>4.8</b>/5</span><em>Apply</em></span></div>
+              {checks.map((c) => <div class="jc-row"><span>{c.n} <small>{c.w}%</small></span><span class="jc-bar"><i style={`width:${c.v}%`}></i></span></div>)}
+              <p class="jc-left">Pay not stated, so it isn’t scored</p>
+            </div>
+          </div>
+          <h3>Know if it’s worth applying</h3>
+          <p>Every job gets a score out of 5 from your roles, places, pay floor and resume, with red flags and your dealbreakers. Unknowns are left out, never guessed.</p>
         </article>
 
         <!-- 2. Profile import: a LinkedIn PDF becomes a profile -->
@@ -113,8 +155,8 @@ const STATUS = { covered: 'Covered', partial: 'Partly', missing: 'Missing' } as 
               <span class="stamp"><Icon name="shield" size={14} duo={false} />Checked against your profile</span>
             </div>
           </div>
-          <h3>Cover letters that answer the job</h3>
-          <p>The letter quotes what the posting asks for and answers with your own experience. Optional AI rewording uses Chrome's built-in model or your own Claude key, and every line is checked against your profile.</p>
+          <h3>Cover letters made for the job</h3>
+          <p>The letter quotes what the posting asks for and answers with your own experience, in four designs filled from your profile: your impact, your strengths and what you’d bring to the company. Optional AI uses Chrome’s built-in model or your own Claude key, checked against your profile.</p>
         </article>
       </div>
     </div>
@@ -125,7 +167,7 @@ const STATUS = { covered: 'Covered', partial: 'Partly', missing: 'Missing' } as 
   .bento { display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px; margin-top: 48px; }
   .tile { background: var(--card); border: 1px solid var(--border); border-radius: 18px; padding: 6px 6px 24px; display: flex; flex-direction: column; min-width: 0; }
   .t-assist { grid-column: span 4; } .t-import { grid-column: span 2; }
-  .t-tailor, .t-letter { grid-column: span 3; }
+  .t-tailor, .t-letter, .t-queue, .t-check { grid-column: span 3; }
   h3 { margin: 22px 18px 0; font-size: 1.1875rem; font-weight: 500; letter-spacing: -0.015em; color: var(--fg); }
   .tile > p { margin: 8px 18px 0; font-size: var(--text-md); line-height: 1.6; color: var(--muted); }
 
@@ -232,10 +274,30 @@ const STATUS = { covered: 'Covered', partial: 'Partly', missing: 'Missing' } as 
   .stamp { position: absolute; right: -10px; bottom: -14px; display: inline-flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 600; color: var(--success);
     background: var(--card); border: 1px solid color-mix(in srgb, var(--success) 35%, var(--border)); border-radius: 999px; padding: 5px 11px; box-shadow: var(--shadow-md); transform: rotate(1.5deg); }
 
+  /* apply queue board */
+  .board { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; width: 100%; align-items: start; }
+  .lane { display: grid; gap: 6px; padding: 8px; border-radius: 10px; background: color-mix(in srgb, var(--card) 55%, transparent); border: 1px solid var(--border); min-width: 0; }
+  .lane-name { font-size: 10.5px; font-weight: 600; color: var(--subtle); }
+  .qcard { display: grid; gap: 4px; padding: 8px; border-radius: 8px; background: var(--card); border: 1px solid var(--border); box-shadow: var(--shadow-sm, none); min-width: 0; }
+  .qcard b { font-size: 11px; line-height: 1.25; } .qcard small { font-size: 10px; color: var(--subtle); }
+  .qbar { height: 4px; border-radius: 2px; background: var(--border); overflow: hidden; } .qbar i { display: block; height: 100%; background: var(--fg); }
+  .qneed { font-size: 10px; font-weight: 600; color: var(--warning, #b45309); }
+  .qdone { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; font-weight: 600; color: var(--success); }
+  /* job check card */
+  .jcard { width: 100%; max-width: 340px; background: var(--card); border: 1px solid var(--border); border-radius: 12px; box-shadow: var(--shadow-md); padding: 16px; display: grid; gap: 10px; }
+  .jc-top { display: flex; justify-content: space-between; gap: 10px; }
+  .jc-top > span:first-child { display: grid; gap: 2px; } .jc-top b { font-size: 13px; } .jc-top small { font-size: 10.5px; color: var(--subtle); }
+  .jc-num { text-align: right; font-size: 11px; color: var(--subtle); display: grid; justify-items: end; }
+  .jc-num b { font-size: 24px; color: var(--fg); line-height: 1; }
+  .jc-num em { font-style: normal; margin-top: 4px; font-size: 10.5px; font-weight: 600; padding: 2px 8px; border-radius: 999px; background: color-mix(in srgb, var(--success) 14%, transparent); color: var(--success); }
+  .jc-row { display: grid; grid-template-columns: 110px 1fr; align-items: center; gap: 10px; font-size: 11.5px; }
+  .jc-row small { color: var(--subtle); }
+  .jc-bar { height: 5px; border-radius: 3px; background: var(--border); overflow: hidden; } .jc-bar i { display: block; height: 100%; background: var(--fg); }
+  .jc-left { margin: 0; font-size: 10.5px; color: var(--subtle); }
   @media (max-width: 1000px) {
     .bento { grid-template-columns: repeat(2, 1fr); }
     .t-assist { grid-column: span 2; }
-    .t-import, .t-tailor, .t-letter { grid-column: span 1; }
+    .t-import, .t-tailor, .t-letter, .t-queue, .t-check { grid-column: span 1; }
   }
   @media (max-width: 640px) {
     .bento { grid-template-columns: 1fr; }
@@ -247,5 +309,6 @@ const STATUS = { covered: 'Covered', partial: 'Partly', missing: 'Missing' } as 
     .assist { position: static; transform: none; width: 100%; max-width: 280px; }
     .tailor { flex-direction: column; }
     .reqs { width: 100%; }
+    .board { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   }
 </style>

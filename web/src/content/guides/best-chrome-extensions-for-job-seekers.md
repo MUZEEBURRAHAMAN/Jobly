@@ -15,9 +15,9 @@ A job search has three slow parts: **finding** good jobs, **filling in** applica
 
 ### Jobly
 
-Our own extension, so take this with a pinch of salt. Jobly reads the career pages of 2,000+ companies around the world, plus three remote job boards, and lists every job with its real posting date, with design, development and IT sorted by area (product design, frontend, fullstack, backend, mobile, DevOps, data, QA, security, IT and more). It hides anything older than 60 days and alerts you to new matches. It's free, needs no account, and keeps your preferences in your browser.
+Our own extension, so take this with a pinch of salt. Jobly reads the career pages of 2,000+ companies around the world, plus three remote job boards, and lists every job with its real posting date, with design, development and IT sorted by area (product design, frontend, fullstack, backend, mobile, DevOps, data, QA, security, IT and more). It hides anything older than 60 days, alerts you to new matches, scores each job out of 5, and has an apply queue that fills applications and stops before Submit, plus resume and cover letter tools. It's free, needs no account, and keeps everything in your browser.
 
-**Good for:** seeing new design, development and IT jobs from the source early. **Not for:** small local employers without an online careers page, or applying for you.
+**Good for:** seeing new design, development and IT jobs from the source early, and filling applications without retyping. **Not for:** small local employers without an online careers page, or submitting applications without you.
 
 ### HiringCafe (a website, not an extension)
 
@@ -49,6 +49,6 @@ Our own extension, so take this with a pinch of salt. Jobly reads the career pag
 
 ## Check the permissions
 
-Before installing any extension, open its Chrome Web Store page and read what it can access. Autofill tools need to read the pages you apply on. Look for tools that read only the page you ask them to: Jobly, for example, reads a tab only when you click Save or Autofill, and never your browsing history. See [Jobly's permissions](/security#permissions).
+Before installing any extension, open its Chrome Web Store page and read what it can access. Autofill tools need to read the pages you apply on. Look for tools that read only the page you ask them to: Jobly, for example, reads a tab only when you click Save or Autofill, asks for the job sites in your apply queue only when you press Start, and never reads your browsing history. See [Jobly's permissions](/security#permissions).
 
 Sources: [Simplify Copilot](https://simplify.jobs/copilot), [HiringCafe review (Scoutify)](https://scoutify.com/blog/hiringcafe-review), [Teal review (Scoutify)](https://scoutify.com/blog/teal-review), [Huntr job tracker](https://huntr.co/product/job-tracker).
