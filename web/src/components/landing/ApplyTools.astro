@@ -73,6 +73,28 @@ const checks = [{ n: 'Role fit', w: 35, v: 100 }, { n: 'Place', w: 25, v: 100 },
           <p>Open Jobly on any application. A panel fills each step from your profile after you approve the answers, shows where every answer came from, and marks the questions only you can answer. Questions you get stuck on are saved, so you answer each one once and Jobly fills it on every form after.</p>
         </article>
 
+        <!-- 2. Profile import: a LinkedIn PDF becomes a profile -->
+        <article class="tile t-import" data-reveal data-play>
+          <div class="stage" aria-hidden="true">
+            <div class="import">
+              <div class="pdf">
+                <span class="pdf-tag">PDF</span>
+                <span class="pdf-name">linkedin.pdf</span>
+                <span class="pdf-lines"><i></i><i></i><i></i><i class="short"></i></span>
+              </div>
+              <span class="flow"><Icon name="arrow-right" size={16} duo={false} /></span>
+              <div class="person">
+                <span class="ring"><span class="avatar">AR</span></span>
+                <b>Ananya Rao</b>
+                <small>93% complete</small>
+              </div>
+            </div>
+            <div class="found">{found.map((f, i) => <span style={`--i:${i}`}><Icon name="check" size={11} duo={false} />{f}</span>)}</div>
+          </div>
+          <h3>Your profile in a minute</h3>
+          <p>Import the PDF LinkedIn makes of your profile, or your resume. Jobly reads it in your browser, never uploads it, and you check each step.</p>
+        </article>
+
         <!-- Apply queue: jobs move from Queue to Submitted; Jobly stops before Submit -->
         <article class="tile t-queue" data-reveal>
           <div class="stage" aria-hidden="true">
@@ -106,28 +128,6 @@ const checks = [{ n: 'Role fit', w: 35, v: 100 }, { n: 'Place', w: 25, v: 100 },
           </div>
           <h3>Know if it’s worth applying</h3>
           <p>Every job gets a score out of 5 from your roles, places, pay floor and resume, with red flags and your dealbreakers. Unknowns are left out, never guessed.</p>
-        </article>
-
-        <!-- 2. Profile import: a LinkedIn PDF becomes a profile -->
-        <article class="tile t-import" data-reveal data-play>
-          <div class="stage" aria-hidden="true">
-            <div class="import">
-              <div class="pdf">
-                <span class="pdf-tag">PDF</span>
-                <span class="pdf-name">linkedin.pdf</span>
-                <span class="pdf-lines"><i></i><i></i><i></i><i class="short"></i></span>
-              </div>
-              <span class="flow"><Icon name="arrow-right" size={16} duo={false} /></span>
-              <div class="person">
-                <span class="ring"><span class="avatar">AR</span></span>
-                <b>Ananya Rao</b>
-                <small>93% complete</small>
-              </div>
-            </div>
-            <div class="found">{found.map((f, i) => <span style={`--i:${i}`}><Icon name="check" size={11} duo={false} />{f}</span>)}</div>
-          </div>
-          <h3>Your profile in a minute</h3>
-          <p>Import the PDF LinkedIn makes of your profile, or your resume. Jobly reads it in your browser, never uploads it, and you check each step.</p>
         </article>
 
         <!-- 3. Tailor: coverage gauge and the requirement checklist -->
@@ -298,6 +298,7 @@ const checks = [{ n: 'Role fit', w: 35, v: 100 }, { n: 'Place', w: 25, v: 100 },
     .bento { grid-template-columns: repeat(2, 1fr); }
     .t-assist { grid-column: span 2; }
     .t-import, .t-tailor, .t-letter, .t-queue, .t-check { grid-column: span 1; }
+    .t-letter { grid-column: span 2; }  /* the fifth tile fills its row */
   }
   @media (max-width: 640px) {
     .bento { grid-template-columns: 1fr; }
