@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { ArrowRight, CheckCircle2, Clock, ExternalLink, RotateCcw, Trash, Wand, X } from '../lib/icons';
-import { ACTIVE, ATS_ORIGINS, originsOf, QueueItem, QueueState, removeItems, stateLabel, STEPS, updateItem, useApplyQueue, WAITING } from '../lib/applyQueue';
+import { ACTIVE, ATS_ORIGINS, formReport, originsOf, QueueItem, QueueState, removeItems, stateLabel, STEPS, updateItem, useApplyQueue, WAITING } from '../lib/applyQueue';
 import { isSensitive, rememberAnswers } from '../lib/answerBank';
 import { readKey, writeKey } from '../lib/userData';
 import { getCompanyLogoUrl } from '../lib/companyLogos';
 import { EmptyState } from './EmptyState';
+import { openMail, supportMailto } from '../lib/mail';
+import { Flag } from '../lib/icons';
 
 const RUN_KEY = 'applyQueueRunning';
 const COLUMNS: { id: string; title: string; hint: string; states: QueueState[] }[] = [
@@ -140,6 +142,11 @@ export const ApplicationsView: React.FC<{ notify: (m: string, kind?: 'error' | '
                             <a className="btn btn-ghost btn-sm" href={x.url} target="_blank" rel="noopener noreferrer">Open job <ExternalLink size={12} aria-hidden="true" /></a></>}
                           {x.state === 'submitted' && <span className="text-xs aq-sent"><CheckCircle2 size={14} aria-hidden="true" /> Added to Applied</span>}
                           <span className="grow" />
+                          {(x.state === 'stopped' || x.state === 'needs-input') && (
+                            <button type="button" className="btn btn-ghost btn-sm btn-icon" title="Report this form" aria-label={`Report this form: ${x.title} at ${x.company}`}
+                              onClick={() => { const r = formReport(x, chrome.runtime.getManifest().version); openMail(supportMailto(r.subject, r.lines)); notify('Your email app opened with a short report: the page address and where Jobly stopped, nothing from your profile. Send it if you’re happy with it.', 'info'); }}>
+                              <Flag size={14} aria-hidden="true" /></button>
+                          )}
                           <button type="button" className="btn btn-ghost btn-sm btn-icon" onClick={() => void remove(x)} aria-label={`Remove ${x.title} at ${x.company}`} title="Remove"><Trash size={14} aria-hidden="true" /></button>
                         </div>
                       </li>

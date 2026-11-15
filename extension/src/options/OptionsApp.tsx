@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Bell, Bookmark, Briefcase, Building2, Calendar, FileText, Kanban, ListChecks, Mail, Moon, RefreshCw, Settings, SlidersHorizontal, Sun, Target, User, Contacts, X } from '../lib/icons';
+import { Bell, Bookmark, Briefcase, Building2, Calendar, FileText, Kanban, ListChecks, Mail, Moon, RefreshCw, Settings, SlidersHorizontal, Sun, Target, User, Contacts, X, Check } from '../lib/icons';
 import { api, ConnectionStatus } from '../lib/api';
 import { FEATURES, MAX_PAGE_SIZE } from '../lib/config';
 import { DEFAULT_FILTERS, JobFilters } from '../lib/filters';
@@ -234,6 +234,7 @@ export const OptionsApp: React.FC = () => {
   };
 
   const queueWaiting = applyQueue.filter((x) => WAITING.includes(x.state)).length;
+  const queueStarted = applyQueue.some((x) => x.state !== 'queued');
   const allTabs: { id: Tab; label: string; icon: React.ElementType; badge?: number; badgeText?: string }[] = [
     { id: 'jobs', label: 'Jobs', icon: Briefcase },
     { id: 'applications', label: 'Applications', icon: Kanban, badge: queueWaiting },
@@ -319,15 +320,29 @@ export const OptionsApp: React.FC = () => {
                 ))}
               </div>
             )}
-            {tab === 'jobs' && profiles.ready && completeness.percent < 80 && !nudgeHidden && (
-              <div className="card profile-nudge">
-                <CompletenessBar completeness={completeness} action={
-                  <div className="row" style={{ gap: 4 }}>
-                    <button type="button" className="btn btn-sm" onClick={() => { setSetupOnOpen(true); setTab('profile'); }}>Complete your profile</button>
-                    <button type="button" className="btn btn-ghost btn-sm btn-icon" onClick={hideNudge} aria-label="Hide for a week" title="Hide for a week"><X size={14} aria-hidden="true" /></button>
-                  </div>} />
-                <p className="text-xs muted">Autofill can only fill in what's in your profile. Import your LinkedIn PDF to finish in a minute.</p>
-              </div>
+            {tab === 'jobs' && profiles.ready && !nudgeHidden && !(completeness.percent >= 80 && queueStarted) && (
+              <section className="card getting-started" aria-labelledby="gs-title">
+                <div className="row" style={{ justifyContent: 'space-between' }}>
+                  <div><h2 id="gs-title">Get started</h2><p className="text-sm muted">Three steps to your first applications filled for you.</p></div>
+                  <button type="button" className="btn btn-ghost btn-sm btn-icon" onClick={hideNudge} aria-label="Hide for a week" title="Hide for a week"><X size={14} aria-hidden="true" /></button>
+                </div>
+                <ol className="gs-steps">
+                  <li className={completeness.percent >= 80 ? 'done' : 'now'}>
+                    <span className="gs-n" aria-hidden="true">{completeness.percent >= 80 ? <Check size={13} aria-hidden="true" /> : 1}</span>
+                    <div className="grow"><p className="font-medium">Set up your profile <span className="muted">· {completeness.percent}%</span></p><p className="text-xs muted">Import your LinkedIn PDF or resume. Jobly can only fill what your profile has.</p></div>
+                    {completeness.percent < 80 && <button type="button" className="btn btn-sm" onClick={() => { setSetupOnOpen(true); setTab('profile'); }}>Complete your profile</button>}
+                  </li>
+                  <li className={applyQueue.length > 0 ? 'done' : completeness.percent >= 80 ? 'now' : ''}>
+                    <span className="gs-n" aria-hidden="true">{applyQueue.length > 0 ? <Check size={13} aria-hidden="true" /> : 2}</span>
+                    <div className="grow"><p className="font-medium">Add jobs to your queue{applyQueue.length > 0 ? <span className="muted"> · {applyQueue.length} added</span> : ''}</p><p className="text-xs muted">Press “Add to queue” on any job below, or in a job’s details.</p></div>
+                  </li>
+                  <li className={queueStarted ? 'done' : applyQueue.length > 0 ? 'now' : ''}>
+                    <span className="gs-n" aria-hidden="true">{queueStarted ? <Check size={13} aria-hidden="true" /> : 3}</span>
+                    <div className="grow"><p className="font-medium">Press Start on Applications</p><p className="text-xs muted">Jobly opens each job, fills it and stops for you to check and press Submit.</p></div>
+                    {applyQueue.length > 0 && !queueStarted && <button type="button" className="btn btn-sm" onClick={() => setTab('applications')}>Open Applications</button>}
+                  </li>
+                </ol>
+              </section>
             )}
             {tab === 'jobs' && companyFilter && (
               <div className="banner company-filter" role="status">

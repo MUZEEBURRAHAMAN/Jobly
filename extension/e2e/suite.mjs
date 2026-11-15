@@ -399,7 +399,8 @@ await step('onboarding: LinkedIn PDF and resume import, completeness, reminder',
   const h = await launch(); const store = async (k) => (await h.sw.evaluate((key) => chrome.storage.local.get(key), k))[k];
   const fixtures = path.resolve(path.dirname(fileURLToPath(import.meta.url)), 'fixtures');
   const d = await open(h, 'options.html', { width: 1280, height: 900 }); await firstCard(d);
-  ok(await d.getByText('Profile 0% complete').count() === 1 && /0%/.test(await d.getByRole('button', { name: /^Profile/ }).innerText()), 'with no profile, the jobs list and the sidebar show 0%');
+  ok(/Set up your profile · 0%/.test(await d.locator('.getting-started').innerText()) && /0%/.test(await d.getByRole('button', { name: /^Profile/ }).innerText()), 'with no profile, Get started and the sidebar show 0%');
+  await axe(d, 'jobs with get started');
   await d.getByRole('button', { name: 'Complete your profile' }).click(); await d.getByRole('heading', { name: 'Set up your profile' }).waitFor({ timeout: 5000 });
   await axe(d, 'profile setup: import');
   await d.locator('input[type="file"]').setInputFiles({ name: 'notes.pdf', mimeType: 'application/pdf', buffer: Buffer.from('not really a pdf') });
@@ -429,7 +430,7 @@ await step('onboarding: LinkedIn PDF and resume import, completeness, reminder',
   ok(p1.work_authorization === 'Indian citizen' && p1.needs_sponsorship === 'no' && Number(p1.years_experience) >= 7, 'answers typed in the steps are saved, and years of experience are worked out');
   ok(/9[0-9]% complete/.test(await d.locator('.profile-progress').innerText()), `the Profile page shows the new score (${(await d.locator('.profile-progress').innerText()).split('\n')[0]})`);
   await d.getByRole('button', { name: /^Jobs/ }).click(); await firstCard(d);
-  ok(await d.locator('.profile-nudge').count() === 0, 'the reminder on the jobs list goes away once the profile is mostly done');
+  ok(await d.locator('.getting-started li').first().evaluate((e) => e.classList.contains('done')) && await d.getByRole('button', { name: 'Complete your profile' }).count() === 0, 'once the profile is mostly done, Get started ticks the first step and moves on to the queue');
   // a resume into the same profile: fills what's empty, replaces roles only when asked, keeps the file
   await d.getByRole('button', { name: /^Profile/ }).click(); await d.getByRole('button', { name: 'Import a file' }).click();
   await d.locator('input[type="file"]').setInputFiles(path.join(fixtures, 'resume.pdf'));
@@ -723,6 +724,9 @@ await step('ATS check: parses a resume from plain text (unit)', async () => {
     `an unanswered common question gets a draft from the profile, marked to check; one the profile can't answer stays empty (${qb.e.value.slice(0, 90)})`);
   ok(qb.c.value === 'I admire how Kpler ships, and the Product Designer role fits what I do.' && qb.c.source === 'saved', 'a common question answered once is filled for each company, with {company} and {role} filled in');
   ok(qb.log.length === 1 && qb.log[0].count === 2 && qb.log[0].companies.join() === 'Zoox,Kpler', `stuck questions are logged once per page, counted across companies, never sensitive ones (${JSON.stringify(qb.log.map((x) => [x.question, x.count, x.companies]))})`);
+  const rep = await page.evaluate(() => window.units.formReport({ id: 'q', url: 'https://cisco.wd5.myworkdayjobs.com/en-US/Cisco_Careers/job/123?email=ada@example.com&utm_source=x#apply', title: 'Engineer', company: 'Cisco', location: '', state: 'needs-input', note: 'Sign in or create your account', needs: ['Sign in to the site'], filled: 0, tabId: 3, added_at: '', updated_at: '' }, '1.5.0'));
+  ok(rep.subject === "Form Jobly couldn't fill: Workday" && rep.lines.some((l) => l === 'Page: https://cisco.wd5.myworkdayjobs.com/en-US/Cisco_Careers/job/123') && !rep.lines.join('\n').includes('ada@example.com') && !rep.lines.join('\n').includes('utm_'),
+    'a form report names the hiring system and page, without the query (which can hold an email) or anything from the profile');
   const grade = await page.evaluate(() => { const p = { ...window.units.emptyProfile(), summary: 'x'.repeat(100), skills: 'a,b,c,d,e,f,g,h' }; return [window.units.resumeScore(p, { coverage: { percent: 30, matches: [], keywordsFound: [], keywordsMissing: [], covered: 0 } }).grade, window.units.resumeScore(p).grade]; });
   ok(grade[0] !== 'Excellent' && grade[0] !== 'Good', `a low job match never grades as Good or Excellent for that job (${grade})`);
   await h.ctx.close();

@@ -899,3 +899,17 @@ fieldset.card.stack > legend { margin-bottom: 0; }
 .qb-list > li { display: flex; flex-direction: column; gap: 6px; padding: var(--space-3); border: 1px solid var(--border); border-radius: var(--radius-md); }
 .qb-q { display: flex; justify-content: space-between; align-items: baseline; gap: var(--space-2); }
 .qb-q .muted { display: inline-flex; align-items: center; gap: 4px; flex: none; }
+
+/* Get started (Jobs page, first run) */
+.getting-started { padding: var(--space-4); display: flex; flex-direction: column; gap: var(--space-3); }
+.getting-started h2 { margin: 0; font-size: var(--text-base); }
+.getting-started p { margin: 0; }
+.gs-steps { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-3); }
+.gs-steps li { display: flex; flex-direction: column; gap: var(--space-2); align-items: flex-start; padding: var(--space-3); border: 1px solid var(--border); border-radius: var(--radius-md); }
+.gs-steps li.now { border-color: var(--foreground); }
+.gs-steps li.done { background: var(--muted); }
+.gs-steps .grow { display: flex; flex-direction: column; gap: 2px; }
+.gs-n { width: 24px; height: 24px; flex: none; border-radius: 50%; display: grid; place-items: center; font-size: 12px; font-weight: 600; border: 1px solid var(--border); background: var(--card); }
+.gs-steps li.now .gs-n { background: var(--foreground); color: var(--background); border-color: var(--foreground); }
+.gs-steps li.done .gs-n { background: var(--success-soft); color: var(--success); border-color: transparent; }
+@media (max-width: 900px) { .gs-steps { grid-template-columns: 1fr; } }

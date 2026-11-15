@@ -106,3 +106,28 @@ export function useApplyQueue(): QueueItem[] {
   useEffect(() => { const load = () => void loadQueue().then(setList); load(); return onKeysChanged([QUEUE_KEY], load); }, []);
   return list;
 }
+
+/** Which hiring system a form address belongs to, for reports ("Workday", "Greenhouse"...). */
+export function atsOf(url: string): string {
+  const h = (() => { try { return new URL(url).hostname; } catch { return ''; } })();
+  const known: [RegExp, string][] = [[/myworkday(jobs|site)\.com$/, 'Workday'], [/greenhouse\.io$/, 'Greenhouse'], [/lever\.co$/, 'Lever'], [/ashbyhq\.com$/, 'Ashby'],
+    [/smartrecruiters\.com$/, 'SmartRecruiters'], [/icims\.com$/, 'iCIMS'], [/taleo\.net$/, 'Taleo'], [/successfactors\.(com|eu)$/, 'SuccessFactors'], [/oraclecloud\.com$/, 'Oracle'],
+    [/workable\.com$/, 'Workable'], [/recruitee\.com$/, 'Recruitee'], [/teamtailor\.com$/, 'Teamtailor'], [/jobvite\.com$/, 'Jobvite'], [/bamboohr\.com$/, 'BambooHR']];
+  return known.find(([rx]) => rx.test(h))?.[1] ?? (h ? 'Company site' : 'Unknown');
+}
+
+/** What a "Report this form" email may carry: the page address without its query or fragment (they can hold tracking
+ *  or personal details), the hiring system and where Jobly stopped. Nothing from the profile. */
+export function formReport(x: QueueItem, version: string): { subject: string; lines: string[] } {
+  let page = x.url;
+  try { const u = new URL(x.url); page = `${u.origin}${u.pathname}`; } catch { /* keep as is */ }
+  return {
+    subject: `Form Jobly couldn't fill: ${atsOf(x.url)}`,
+    lines: [
+      'This form gave Jobly trouble (sent from the Applications page).', '',
+      `Page: ${page}`, `Hiring system: ${atsOf(x.url)}`, `Where it stopped: ${stateLabel[x.state]}${x.note ? ` (${x.note})` : ''}`,
+      `Questions it couldn't answer: ${x.needs.length}`, `Jobly version: ${version}`, '',
+      'Anything else you noticed (optional):', '',
+    ],
+  };
+}
