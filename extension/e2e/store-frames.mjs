@@ -16,27 +16,28 @@ if (!RAW) throw new Error('Set RAW to the folder of raw screens');
 const OUT = path.join(root, 'store-assets', 'screenshots', 'v1.5');
 fs.mkdirSync(OUT, { recursive: true });
 const font = (w) => `file://${path.join(root, 'web', 'public', 'fonts', 'switzer', `Switzer-${w}.woff2`)}`;
+const display = (w) => `file://${path.join(here, 'fonts', `InstrumentSerif-${w}.woff2`)}`;
 const icon = `file://${path.join(root, 'web', 'public', 'img', 'icon-128.png')}`;
 const shot = (n) => `file://${path.join(RAW, `dashboard-${n}-light.png`)}`;
 
 // crop: the part of the 1440x900 screen to show (CSS px); callout: HTML placed over the frame
 const slides = [
   {
-    file: '1-jobs.png', shot: 'jobs', eyebrow: 'Find jobs', title: 'Fresh jobs,<br>real posting dates.',
-    text: 'Jobs from 2,000+ company career pages, each with the date it was really posted and how well it fits you.',
-    crop: { x: 250, y: 180, w: 1190, h: 720 }, url: 'Jobly · Jobs',
-    callout: `<div class="co co-bl"><div class="co-row"><span class="pill brand">✦ 100% match</span></div>
-      <ul class="ticks"><li>One of your roles</li><li>Senior level</li><li>Title mentions product designer</li></ul></div>`,
+    file: '1-jobs.png', shot: 'sheet', eyebrow: 'Find jobs', title: 'Fresh jobs,<br><em>checked</em> before<br>you apply.',
+    text: 'Jobs from 2,000+ company career pages with their real posting dates, and a 1–5 check on how well each one fits you.',
+    crop: { x: 560, y: 40, w: 880, h: 760 }, url: 'Jobly · Jobs',
+    callout: `<div class="co co-bl"><div class="co-label">Job check</div><div class="co-big">5.0<span class="muted-num" style="font-size:18px"> /5</span> <span class="pill ok" style="font-size:13px;vertical-align:middle">Apply</span></div>
+      <ul class="ticks"><li>One of your roles</li><li>In one of your places</li><li>Unknown pay is left out, never guessed</li></ul></div>`,
   },
   {
-    file: '2-apply-queue.png', shot: 'applications', eyebrow: 'Apply queue', title: 'Queue the jobs.<br>Jobly fills them.',
+    file: '2-apply-queue.png', shot: 'applications', eyebrow: 'Apply queue', title: 'Queue the jobs.<br><em>Jobly fills them.</em>',
     text: 'Jobly opens each job, fills your profile, resume and saved answers, asks what it couldn’t answer, and stops for your review.',
     crop: { x: 244, y: 56, w: 1196, h: 760 }, url: 'Jobly · Applications',
     callout: `<div class="co co-br wide"><div class="co-row"><span class="dot ok"></span><b>15 fields filled for Acme</b></div>
       <div class="co-row"><span class="dot need"></span><span>2 questions need your answer</span></div><div class="co-foot">You press Submit. Jobly never does.</div></div>`,
   },
   {
-    file: '3-apply-assist.png', shot: 'assist-filled', eyebrow: 'Apply faster', title: 'You approve.<br>Jobly fills.<br>You submit.',
+    file: '3-apply-assist.png', shot: 'assist-filled', eyebrow: 'Apply faster', title: 'You approve.<br>Jobly fills.<br><em>You submit.</em>',
     text: 'On any application page, Jobly fills each step from your profile, shows where every answer came from, and marks what only you can answer.',
     crop: { x: 60, y: 120, w: 760, h: 760 }, url: 'careers.northwind.example/apply', frameWidth: 470, frameAlign: 'start',
     overlay: { crop: { x: 1048, y: 414, w: 362, h: 470 }, width: 330, right: 40, top: 150 },
@@ -44,21 +45,18 @@ const slides = [
       <div class="co-row"><span class="dot need"></span><span>Each answer shows where it came from</span></div><div class="co-foot">You press Submit. Jobly never does.</div></div>`,
   },
   {
-    file: '4-resume.png', shot: 'resume', eyebrow: 'Resume', title: 'A resume that<br>reads cleanly.',
+    file: '4-resume.png', shot: 'resume', eyebrow: 'Resume', title: 'A resume that<br><em>reads cleanly.</em>',
     text: 'Eight one-column templates, a score with the fixes that matter most, and an ATS check of what a hiring system reads.',
     crop: { x: 244, y: 84, w: 1196, h: 760 }, url: 'Jobly · Resume',
     callout: `<div class="co co-br"><div class="co-label">ATS check</div>
       <ul class="ticks"><li>Name and contact found</li><li>2 positions with dates</li><li>Single column, standard headings</li></ul><div class="co-foot">Checked in your browser, no AI</div></div>`,
   },
   {
-    file: '5-people.png', shot: 'people', eyebrow: 'Get noticed', title: 'Reach the people<br>who hire.',
-    text: 'Find recruiters, hiring managers and the team, ask for a referral, and keep your references together.',
-    crop: { x: 244, y: 150, w: 900, h: 460 }, url: 'Jobly · People',
-    callout: `<div class="co co-br people"><div class="co-label">Saved people</div>
-      <div class="person"><span class="av">PS</span><span class="who"><b>Priya Shah</b><small>Design Manager · Northwind Labs</small></span><span class="pill">Hiring manager</span></div>
-      <div class="person"><span class="av">AM</span><span class="who"><b>Arjun Menon</b><small>Talent Partner · Northwind Labs</small></span><span class="pill ok">Contacted</span></div>
-      <div class="person"><span class="av">RM</span><span class="who"><b>Rahul Mehta</b><small>Former manager · Quill Systems</small></span><span class="pill">Reference</span></div>
-      <div class="co-foot">Jobly opens the searches. It never collects anything.</div></div>`,
+    file: '5-cover-letters.png', shot: 'letters', eyebrow: 'Cover letters', title: 'Letters that look<br><em>made for them.</em>',
+    text: 'Four designs filled from your profile and the job: your impact, your strengths, and what you’d bring to the company.',
+    crop: { x: 640, y: 120, w: 800, h: 760 }, url: 'Jobly · Cover letters',
+    callout: `<div class="co co-bl"><div class="co-label">Where I could contribute at Acme</div>
+      <ul class="ticks"><li>From the job’s requirements</li><li>Each with your own result</li></ul><div class="co-foot">Nothing is made up</div></div>`,
   },
 ];
 
@@ -67,6 +65,8 @@ const page = (s) => `<!doctype html><html><head><meta charset="utf-8"><style>
 @font-face { font-family: Switzer; src: url('${font('Medium')}') format('woff2'); font-weight: 500; }
 @font-face { font-family: Switzer; src: url('${font('Semibold')}') format('woff2'); font-weight: 600; }
 @font-face { font-family: Switzer; src: url('${font('Bold')}') format('woff2'); font-weight: 700; }
+@font-face { font-family: 'Instrument Serif'; src: url('${display('Regular')}') format('woff2'); font-weight: 400; font-style: normal; }
+@font-face { font-family: 'Instrument Serif'; src: url('${display('Italic')}') format('woff2'); font-weight: 400; font-style: italic; }
 * { box-sizing: border-box; margin: 0; }
 html, body { width: 1280px; height: 800px; overflow: hidden; }
 body { font-family: Switzer, system-ui, sans-serif; color: #0a0a0a; display: grid; grid-template-columns: 448px 1fr;
@@ -76,8 +76,9 @@ body::before { content: ''; position: absolute; inset: 0; background-image: line
   background-size: 40px 40px; mask-image: linear-gradient(90deg, #000 0, #000 30%, transparent 40%); }
 .left { position: relative; padding: 64px 40px 40px 48px; display: flex; flex-direction: column; color: #fff; }
 .eyebrow { font-size: 13px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: rgb(255 255 255 / .75); }
-h1 { margin-top: 18px; font-size: 54px; line-height: 1.04; font-weight: 600; letter-spacing: -0.025em; }
-.lead { margin-top: 22px; font-size: 19px; line-height: 1.5; color: rgb(255 255 255 / .86); max-width: 350px; }
+h1 { margin-top: 16px; font-family: 'Instrument Serif', Georgia, serif; font-size: 68px; line-height: 0.98; font-weight: 400; letter-spacing: -0.015em; }
+h1 em { font-style: italic; color: rgb(255 255 255 / .78); }
+.lead { margin-top: 26px; font-size: 19px; line-height: 1.5; color: rgb(255 255 255 / .86); max-width: 350px; }
 .brand { margin-top: auto; display: flex; align-items: center; gap: 12px; }
 .brand img { width: 40px; height: 40px; border-radius: 10px; box-shadow: 0 4px 14px rgb(0 0 0 / .25); }
 .brand b { font-size: 20px; font-weight: 600; }

@@ -100,6 +100,6 @@ export function jobCheck(job: Job, prefs: Preferences | null, profile: Profile |
   score = Math.round(Math.max(1, Math.min(5, score)) * 10) / 10;
   let verdict: Verdict = deal.length ? 'skip' : score >= 4 ? 'apply' : score >= 3 ? 'maybe' : 'skip';
   // One known part is not enough to say "Apply": the rest of the job is unknown
-  if (verdict === 'apply' && dims.length < 2) { verdict = 'maybe'; left.unshift('Only one part could be scored, so Jobly won’t say Apply yet'); }
+  if (verdict === 'apply' && dims.length < 2) { verdict = 'maybe'; score = Math.min(score, 3.9); left.unshift('Only one part could be scored, so Jobly won’t say Apply yet'); }
   return { score, verdict, dimensions: dims, flags, dealbreakers: deal, left };
 }

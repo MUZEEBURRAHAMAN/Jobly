@@ -38,7 +38,7 @@ for (const theme of (process.env.THEMES || 'light,dark').split(',')) {
     profiles: [profile], activeProfileId: 'p1',
     resumeFile: { p1: { name: 'Ananya-Rao-resume.pdf', type: 'application/pdf', size: 20, data: 'data:application/pdf;base64,JVBERi0xLjQK' } },
     savedAnswers: [{ question: 'How did you hear about us?', key: 'how did hear about us', value: 'LinkedIn', kind: 'text', used_at: iso(-3), uses: 2 }],
-    userPreferences: { roles: ['product_design'], seniorities: ['mid', 'senior', 'lead'], locations: [], remote_only: false, custom_keywords: 'product designer', excluded_keywords: '', min_salary: 0, employment_types: [], notify_enabled: true, sync_interval_mins: 60 },
+    userPreferences: { roles: ['product_design'], seniorities: ['mid', 'senior', 'lead'], locations: ['London', 'Bengaluru', 'Remote'], remote_only: false, custom_keywords: 'product designer', excluded_keywords: '', min_salary: 30000, employment_types: [], notify_enabled: true, sync_interval_mins: 60 },
     applications: [{ key: 'https://careers.northwind.example/designer', title: 'Senior Product Designer', company_name: 'Northwind Labs', location: 'Bengaluru, India', application_url: 'https://careers.northwind.example/designer', source: 'page', status: 'applied', notes: '', applied_at: iso(-1), follow_up_at: null, created_at: iso(-1), updated_at: iso(-1) }],
     contacts: [
       { id: 'c1', name: 'Priya Shah', position: 'Design Manager', email: '', linkedin: 'https://linkedin.com/in/example-priya', company: 'Northwind Labs', app_key: 'https://careers.northwind.example/designer', source: 'manual', relation: 'hiring_manager', notes: '', contacted_at: null, created_at: iso(0) },
@@ -65,6 +65,11 @@ for (const theme of (process.env.THEMES || 'light,dark').split(',')) {
   for (let i = 0; i < 40 && (await d.locator('article').first().getAttribute('aria-label')) === before; i++) await sleep(300);
   await d.evaluate(() => document.activeElement.blur()); await sleep(1200);
   await shot(d, 'jobs');
+  // The job side sheet with its job check (a job whose description is in the data)
+  { const cards = d.locator('article.job-row');
+    for (let i = 0; i < 15; i++) { await cards.nth(i).locator('.job-meta').click(); await sleep(1200); if (await d.locator('.sheet .jd-text').count()) break; await d.keyboard.press('Escape'); await sleep(200); }
+    await d.locator('.sheet-body').evaluate((e) => e.scrollTo(0, 120)); await sleep(500);
+    await shot(d, 'sheet'); await d.keyboard.press('Escape'); await sleep(300); }
   // Apply assist on a made-up company's form
   const form = await h.ctx.newPage(); await form.setViewportSize({ width: 1440, height: 900 }); await form.emulateMedia({ colorScheme: theme });
   await form.route('https://apply.example.test/**', (r) => r.fulfill({ contentType: 'text/html', body: fs.readFileSync(path.join(here, 'fixtures', 'apply-store.html'), 'utf8') }));
@@ -98,5 +103,11 @@ for (const theme of (process.env.THEMES || 'light,dark').split(',')) {
   await d.goto(`chrome-extension://${h.id}/options.html#contacts`); await sleep(1000);
   await d.getByLabel('Job', { exact: true }).selectOption({ index: 1 }); await d.getByRole('radio', { name: 'Hiring manager' }).click(); await sleep(500);
   await shot(d, 'people');
+  // Cover letters: the Sidebar design filled from the profile and a job description
+  await d.goto(`chrome-extension://${h.id}/options.html#letters`); await sleep(1000);
+  await d.getByLabel('Role', { exact: true }).fill('Senior Product Designer'); await d.getByLabel('Company', { exact: true }).fill('Acme');
+  await d.getByLabel('Job description (optional)').fill(JD); await sleep(400);
+  await d.getByRole('radio', { name: 'Sidebar' }).click(); await sleep(800);
+  await shot(d, 'letters');
   await h.ctx.close();
 }

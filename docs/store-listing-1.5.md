@@ -6,6 +6,10 @@ Everything to paste into the Chrome Web Store developer dashboard, tab by tab. V
 
 - **Apply queue (new Applications page).** Add jobs to a queue. Press Start and Jobly opens each one in a background tab. It presses the page's own Apply link if the form is behind it, then fills the form from the profile, the resume file and saved answers. It lists the questions it couldn't answer under "Needs your input" and stops. The user checks the form and presses Submit, and the job moves to Applied. Jobly never presses Submit or Next, never signs in, and never creates accounts on hiring sites.
 - **Site access only when asked.** The queue needs to open the job sites in it. Chrome asks for access to just those sites when the user presses Start. This is the new optional `https://*/*` host permission; nothing is granted at install.
+- **Job check.** Click a job: a 1–5 score with a verdict (Apply, Worth a look, Skip) from role fit, pay, place and resume match. Unknowns are left out, red flags lower it, and the user's own dealbreakers are quoted as hard rules. Rules only, no AI.
+- **Follow-ups.** Saved › Applied shows which applications are due a follow-up (7 days after applying, then 7 days after each one), with a ready message to copy.
+- **Cover letter designs.** Letterhead, Sidebar, Banner and Plain, filled from the profile and the job (impact numbers, strengths, "where I could contribute"), saved as a designed PDF.
+- **Apply queue on real hiring systems.** It gets past a hiring system's choice box ("Apply manually"), hands sign-in and "check you're human" pages to the user, and keeps what it filled on pages that rebuild themselves. Tested on Greenhouse, Lever, Ashby and Workday forms.
 - **New Jobs page.** Filter pills, cleaner job cards with "Add to queue", and the chosen job open in a panel beside the list, with fit, details and the full description.
 - **Resume.**
   - 8 templates, all one column, so every one reads cleanly in an applicant tracking system. The new Engineer template is a classic tech resume.
@@ -94,15 +98,15 @@ Free. Learn more at https://jobly-88t.pages.dev
 
 ### Screenshot content
 
-The jobs in shot 1 are real listings from Jobly's job data. Everything else is made up: Ananya Rao is a demo profile, and the queued companies (Globex, Initech, Hooli, Acme, Northwind Labs, Umbrella) and the application form in shot 3 are demo pages.
+The jobs in shot 1 are real listings from Jobly's job data. Everything else is made up: Ananya Rao is a demo profile, and the queued companies (Globex, Initech, Hooli, Acme, Northwind Labs, Umbrella), the application form in shot 3 and Acme in shot 5 are demo pages. Headlines are set in Instrument Serif (SIL Open Font License, `extension/e2e/fonts/OFL.txt`).
 
 | # | File | Headline | What it shows |
 | --- | --- | --- | --- |
-| 1 | `1-jobs.png` | Fresh jobs, real posting dates. | The Jobs page: filter pills, job cards with Add to queue, the chosen job open beside the list |
+| 1 | `1-jobs.png` | Fresh jobs, checked before you apply. | The Jobs page with a job open in the side sheet: the job check, facts and description |
 | 2 | `2-apply-queue.png` | Queue the jobs. Jobly fills them. | Applications: Needs your input and the board from Queue to Submitted |
 | 3 | `3-apply-assist.png` | You approve. Jobly fills. You submit. | The apply assist panel on a demo application form |
 | 4 | `4-resume.png` | A resume that reads cleanly. | Resume: the ATS check, the score and the page |
-| 5 | `5-people.png` | Reach the people who hire. | People: who to look for at a company, and saved people |
+| 5 | `5-cover-letters.png` | Letters that look made for them. | Cover letters: the Sidebar design filled from the profile and a job |
 
 ### Additional fields
 
@@ -131,7 +135,7 @@ Jobly helps people find and apply for jobs: it lists recent jobs from company ca
 | `scripting` | Runs Jobly's packaged page-reading code and its packaged apply assist panel (assist.js). It runs in the active tab after the user clicks, and in apply-queue tabs on sites the user granted when pressing Start. Jobly has no content scripts that run on their own. |
 | `contextMenus` | Adds "Save this job to Jobly" to the page's right-click menu. |
 | Host `https://jobly-data.pages.dev/*` | Reads Jobly's public job list, published as static files. Nothing is sent to it except the request for those files. |
-| Optional host `https://*/*` | Requested only when the user presses Start on the apply queue, and only for the sites of the jobs in their queue (for example `https://boards.greenhouse.io/*`). Jobly opens those job pages in background tabs and fills the application form with the user's profile for them to check and submit. Nothing is granted at install, and no other site is accessed. |
+| Optional host `https://*/*` | Requested only when the user presses Start on the apply queue: the sites of the jobs in their queue, plus the common hiring systems a company's job page hands its form to (Workday, Greenhouse, Lever, Ashby, SmartRecruiters, iCIMS, Taleo, SuccessFactors and similar; the exact list is in `src/lib/atsOrigins.json`). Jobly opens those job pages in background tabs and fills the application form with the user's profile for them to check and submit. Nothing is granted at install, and no other site is accessed. |
 | Optional host `https://api.hunter.io/*` | Requested only when the user searches for contacts with their own Hunter API key. |
 | Optional host `https://api.search.brave.com/*` | Requested only when the user searches for public profiles with their own Brave Search API key. |
 | Optional host `https://api.apollo.io/*` | Requested only when the user looks up who works at a company with their own Apollo API key. |
