@@ -1,5 +1,6 @@
 import { bulletList, Profile, skillList } from './profile';
 import { Coverage } from './tailor';
+import { GENERIC } from './recruiterQuestions';
 
 /**
  * A resume score out of 100, worked out in the browser, in five categories with the checks behind each:
@@ -8,17 +9,19 @@ import { Coverage } from './tailor';
  *   Optimization           how well it fits a job (needs a pasted job description) and the skills list
  *   Best practices         wording: action verbs, no filler, no buzzwords, no "I", short points
  *   Application readiness  contact details and a headline a recruiter can act on
+ *   Stands out             what a recruiter looks for in the first seconds: a specific first line, no borrowed
+ *                          phrases, proof the work exists, ownership, and results at the top of each role
  * Every check that fails carries a fix and an impact (high, medium, low), so the biggest fixes come first.
  */
 export type Impact = 'high' | 'medium' | 'low';
-export const CATEGORIES = ['Content', 'Format', 'Optimization', 'Best practices', 'Application readiness'] as const;
+export const CATEGORIES = ['Content', 'Format', 'Optimization', 'Best practices', 'Application readiness', 'Stands out'] as const;
 export type Category = (typeof CATEGORIES)[number];
 export interface ScoreCheck { id: string; category: Category; label: string; ok: boolean; got: number; max: number; tip: string; impact: Impact }
 export interface CategoryScore { name: Category; percent: number; failed: number }
 export interface ResumeScore { score: number; grade: 'Excellent' | 'Good' | 'Needs work' | 'Weak'; checks: ScoreCheck[]; categories: CategoryScore[]; fixes: ScoreCheck[] }
 export interface ScoreOptions { coverage?: Coverage | null; singleColumn?: boolean; overflows?: boolean }
 
-const VERBS = new Set(('accelerated achieved added analysed analyzed architected automated built championed coached collaborated conceived consolidated created cut defined delivered designed developed directed drove earned enabled engineered established expanded facilitated founded generated grew guided hired implemented improved increased influenced initiated introduced launched led lowered managed mentored migrated modernised modernized negotiated optimised optimized orchestrated organised organized owned partnered pioneered planned produced prototyped raised redesigned reduced refactored resolved restructured revamped saved scaled secured shipped simplified spearheaded standardised standardized streamlined strengthened tested trained transformed tripled doubled unified upgraded validated won wrote ran conducted researched mapped crafted illustrated animated sold closed onboarded audited authored coordinated curated evaluated forecasted integrated maintained measured presented published recruited reviewed taught translated').split(' '));
+const VERBS = new Set(('fixed found debugged diagnosed rebuilt joined accelerated achieved added analysed analyzed architected automated built championed coached collaborated conceived consolidated created cut defined delivered designed developed directed drove earned enabled engineered established expanded facilitated founded generated grew guided hired implemented improved increased influenced initiated introduced launched led lowered managed mentored migrated modernised modernized negotiated optimised optimized orchestrated organised organized owned partnered pioneered planned produced prototyped raised redesigned reduced refactored resolved restructured revamped saved scaled secured shipped simplified spearheaded standardised standardized streamlined strengthened tested trained transformed tripled doubled unified upgraded validated won wrote ran conducted researched mapped crafted illustrated animated sold closed onboarded audited authored coordinated curated evaluated forecasted integrated maintained measured presented published recruited reviewed taught translated').split(' '));
 const WEAK = /\b(responsible for|duties included|helped( to)?|worked on|assisted (with|in)|tasked with|involved in|participated in)\b/i;
 const BUZZ = /\b(hard[- ]working|team player|results[- ]driven|go[- ]getter|self[- ]starter|detail[- ]oriented|synergy|think outside the box|dynamic|passionate|motivated|best[- ]of[- ]breed|rockstar|ninja|guru)\b/i;
 const FIRST_PERSON = /(^|\s)(i|me|my|myself)\b/i;
@@ -81,6 +84,22 @@ export function resumeScore(p: Profile, opts: ScoreOptions = {}): ResumeScore {
   add('contact', 'Application readiness', 'Name, email, phone and city', contact.filter(Boolean).length * 2.5, 10, 'high', 'Recruiters look for all four at the top. Add what is missing in your profile.');
   add('linkedin', 'Application readiness', 'LinkedIn or portfolio link', /linkedin\.com\//i.test(p.linkedin) || !!(p.portfolio || p.website || p.github).trim() ? 4 : 0, 4, 'medium', 'Add your LinkedIn, and a portfolio if your field uses one.');
   add('headline', 'Application readiness', 'A headline with the role you want', p.headline.trim() ? 3 : 0, 3, 'low', 'Add a headline such as "Senior Product Designer".');
+
+  // Stands out: the few seconds a recruiter gives a resume (what you built, what you figured out, why talk to you)
+  const firstLine = (p.summary.trim().split(/(?<=[.!?])\s/)[0] ?? '') + ' ' + p.headline;
+  add('top-line', 'Stands out', 'A specific first line (years, what you build, a number)', NUMBER.test(firstLine) && !GENERIC.test(firstLine) && !BUZZ.test(firstLine) ? 5 : firstLine.trim() ? 2 : 0, 5, 'high',
+    'Open the summary with one line like "6 years building payment systems used by 2 million people". The Questions tab helps.');
+  const generic = [p.summary, p.headline, p.achievements, ...bullets, ...p.projects.map((x) => x.bullets)].join('\n').match(new RegExp(GENERIC.source, 'gi')) ?? [];
+  add('generic', 'Stands out', 'No borrowed phrases like "drove efficiency" or "aligned stakeholders"', Math.max(0, 5 - generic.length * 2), 5, 'high',
+    `${generic.length ? `Found: ${[...new Set(generic.map((g) => g.toLowerCase()))].slice(0, 3).join(', ')}. ` : ''}Say what you actually did and what changed.`);
+  const projectPoints = p.projects.flatMap((x) => bulletList(x.bullets));
+  const proof = !!p.github.trim() || !!p.portfolio.trim() || p.projects.some((x) => x.link.trim()) || [...bullets, ...projectPoints].some((b) => /\b(stars?|forks?|downloads?|users|installs|github|open[- ]source|live at|app store)\b/i.test(b));
+  add('proof', 'Stands out', 'Proof the work exists (GitHub, portfolio, a live project)', proof ? 4 : 0, 4, 'medium', 'Link your GitHub, portfolio or a project people use, with stars, users or downloads if you have them.');
+  const owned = [...bullets, ...projectPoints, p.achievements].some((b) => /\b(owned|founded|founding|co-?founded|hired|interviewed|mentored|coached|from scratch|end[- ]to[- ]end|led a team|team of \d|managed \d)/i.test(b));
+  add('ownership', 'Stands out', 'Shows ownership or people (owned, founded, hired, mentored)', owned ? 4 : 0, 4, 'medium', 'A decision you owned, people you hired or mentored: recruiters ask about it first. The Questions tab asks about it.');
+  const tops = roles.filter((w) => bulletList(w.bullets).length).slice(0, 3);
+  add('top-points', 'Stands out', 'The first point of each recent role shows a result', tops.length ? (tops.filter((w) => NUMBER.test(bulletList(w.bullets)[0])).length / tops.length) * 4 : 0, 4, 'medium',
+    'Recruiters read the top 2 or 3 points of a role. Move the point with a result to the top.');
 
   const total = (list: ScoreCheck[]) => list.reduce((s, c) => s + c.max, 0);
   const got = (list: ScoreCheck[]) => list.reduce((s, c) => s + c.got, 0);

@@ -11,12 +11,13 @@ import { AtsScan, atsScan } from '../lib/atsScan';
 import { AiError, AI_KEY, AiSettings, loadAi, runAi } from '../lib/ai';
 import { guardRewrite, rewriteTask } from '../lib/aiGuard';
 import { onKeysChanged } from '../lib/userData';
+import { RecruiterQuestions } from './RecruiterQuestions';
 
 const SETTINGS_KEY = 'resumeSettings';
 interface Settings { template: TemplateId; accent: AccentId; page: PageId; fit: boolean }
 const MIN_FIT = 0.75;
-type Tab = 'design' | 'tailor' | 'check';
-const TABS: { id: Tab; label: string }[] = [{ id: 'design', label: 'Design' }, { id: 'tailor', label: 'Tailor to a job' }, { id: 'check', label: 'Score and ATS' }];
+type Tab = 'design' | 'questions' | 'tailor' | 'check';
+const TABS: { id: Tab; label: string }[] = [{ id: 'design', label: 'Design' }, { id: 'questions', label: 'Questions' }, { id: 'tailor', label: 'Tailor' }, { id: 'check', label: 'Score & ATS' }];
 
 function download(name: string, type: string, body: string) {
   const url = URL.createObjectURL(new Blob([body], { type }));
@@ -171,7 +172,7 @@ export const ResumeView: React.FC<{ store: ProfilesStore; onOpenProfile: () => v
       <div className="row wrap rv-head" style={{ justifyContent: 'space-between' }}>
         <div><h2>Resume</h2><p className="text-sm">{tailored ? `Tailored to the job description below (not saved yet).` : version ? `Tailored for ${version.job.title}${version.job.company ? ` at ${version.job.company}` : ''}.` : `From your profile “${base.label}”.`}</p></div>
         <div className="row wrap">
-          {score && scan && <button type="button" className="rv-pill" onClick={() => setTab('check')} title="Open Score and ATS">
+          {score && scan && <button type="button" className="rv-pill" onClick={() => setTab('check')} title="Open Score & ATS">
             Score <b>{score.score}</b>/100 · ATS {scan.problems ? <span className="warn">{scan.problems} to fix</span> : <span className="ok">clean</span>}</button>}
           <button type="button" className="btn btn-outline btn-sm" onClick={onOpenProfile}><FileText size={14} aria-hidden="true" /> Edit profile</button>
           <button type="button" className="btn btn-outline btn-sm" onClick={() => download(`${name}.doc`, 'application/msword', resumeWordDoc(p, settings.template, settings.accent))}><Download size={14} aria-hidden="true" /> Word</button>
@@ -217,6 +218,11 @@ export const ResumeView: React.FC<{ store: ProfilesStore; onOpenProfile: () => v
             </div>
             <p className="hint" role="status">{fit.over ? 'Longer than one page even at 75%. Remove older points, or try Compact.' : fit.scale < 1 ? `Fits on one page at ${Math.round(fit.scale * 100)}%.` : 'Fits on one page.'}</p>
           </section>
+          </div>
+
+          <div id="rv-panel-questions" role="tabpanel" aria-labelledby="rv-tab-questions" className="rv-panel" hidden={tab !== 'questions'}>
+            {(version || tailored) && <p className="hint">Lines you add go into your profile “{store.active?.label}”, not this tailored copy.</p>}
+            <RecruiterQuestions store={store} notify={notify} />
           </div>
 
           <div id="rv-panel-tailor" role="tabpanel" aria-labelledby="rv-tab-tailor" className="rv-panel" hidden={tab !== 'tailor'}>
@@ -287,7 +293,7 @@ export const ResumeView: React.FC<{ store: ProfilesStore; onOpenProfile: () => v
                   </div>
                   <span className={`meter ${cov.percent >= 70 ? 'ats-high' : cov.percent >= 40 ? 'ats-mid' : 'ats-low'}`} role="progressbar" aria-label="Qualification match" aria-valuemin={0} aria-valuemax={100} aria-valuenow={cov.percent}><span style={{ width: `${cov.percent}%` }} /></span>
                 </div>
-              ) : <p className="text-sm muted">Paste a job description in <button type="button" className="link-btn" onClick={() => setTab('tailor')}>Tailor to a job</button> to see your qualification match.</p>}
+              ) : <p className="text-sm muted">Paste a job description in <button type="button" className="link-btn" onClick={() => setTab('tailor')}>Tailor</button> to see your qualification match.</p>}
               <div>
                 <p className="label">Parsed fields</p>
                 <ul className="ats-fields" aria-label="Parsed fields">
@@ -332,7 +338,7 @@ export const ResumeView: React.FC<{ store: ProfilesStore; onOpenProfile: () => v
                   {score.fixes.slice(0, 5).map((c) => <li key={c.id} className={`fix-${c.impact}`}><span className="row" style={{ justifyContent: 'space-between' }}><span className="text-sm font-medium">{c.label}</span><span className={`imp imp-${c.impact}`}>{c.impact === 'high' ? 'High impact' : c.impact === 'medium' ? 'Medium' : 'Low'}</span></span><span className="text-xs muted">{c.tip}</span></li>)}
                 </ul>
               )}
-              {!cov && <p className="hint">Paste a job description in Tailor to a job to add the job match to your score.</p>}
+              {!cov && <p className="hint">Paste a job description in Tailor to add the job match to your score.</p>}
               <details className="text-sm"><summary>All {score.checks.length} checks</summary>
                 {score.categories.map((cat) => <div key={cat.name}><p className="label" style={{ marginTop: 8 }}>{cat.name} · {cat.percent}%</p>
                   <ul className="rv-all">{score.checks.filter((c) => c.category === cat.name).map((c) => <li key={c.id} className={c.ok ? 'ok' : ''}>{c.ok ? '✓' : '○'} {c.label} <span className="muted">{c.got}/{c.max}</span></li>)}</ul></div>)}</details>

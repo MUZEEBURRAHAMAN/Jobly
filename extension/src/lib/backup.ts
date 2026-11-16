@@ -7,13 +7,14 @@ import { cleanItem, MAX_QUEUE, QueueItem, QUEUE_KEY } from './applyQueue';
 import { isSensitive, MAX_ANSWERS, questionKey } from './answerBank';
 import { MAX_LOGGED, QUESTION_LOG_KEY } from './questionBank';
 import { MAX_RESUME_BYTES } from './profile';
+import { ANSWERS_KEY, cleanAnswers } from './recruiterQuestions';
 
 /**
  * Export and import. A JSON backup holds everything Jobly keeps on this device; a CSV holds the tracker only and is
  * what spreadsheets, Notion and Google Sheets export, so applications kept elsewhere can be brought in.
  */
 
-const BACKUP_KEYS = [STORAGE_KEYS.preferences, STORAGE_KEYS.saved, TRACKER_KEYS.apps, TRACKER_KEYS.interviews, TRACKER_KEYS.tasks, TRACKER_KEYS.settings, 'mutedCompanyIds', 'followedCompanyIds', 'profiles', 'activeProfileId', 'resumeFile', 'resumeTemplate', 'contacts', 'savedAnswers', 'resumeVersions', 'aiSettings', QUEUE_KEY, QUESTION_LOG_KEY, 'resumeSettings', 'letterSettings'];  // never the Hunter or Anthropic key
+const BACKUP_KEYS = [STORAGE_KEYS.preferences, STORAGE_KEYS.saved, TRACKER_KEYS.apps, TRACKER_KEYS.interviews, TRACKER_KEYS.tasks, TRACKER_KEYS.settings, 'mutedCompanyIds', 'followedCompanyIds', 'profiles', 'activeProfileId', 'resumeFile', 'resumeTemplate', 'contacts', 'savedAnswers', 'resumeVersions', 'aiSettings', QUEUE_KEY, QUESTION_LOG_KEY, 'resumeSettings', 'letterSettings', ANSWERS_KEY];  // never the Hunter or Anthropic key
 const MAX_FILE_BYTES = 5_000_000;
 
 const isObj = (o: unknown): o is Record<string, unknown> => !!o && typeof o === 'object' && !Array.isArray(o);
@@ -72,6 +73,7 @@ export function restoreValue(k: string, v: unknown): unknown {
       return isObj(v) ? { template: str(v.template, 30), accent: str(v.accent, 20), page: v.page === 'letter' ? 'letter' : 'a4', fit: v.fit !== false } : undefined;
     case 'letterSettings':
       return isObj(v) ? { tone: str(v.tone, 20), length: str(v.length, 20), design: str(v.design, 20), accent: str(v.accent, 20) } : undefined;
+    case ANSWERS_KEY: return cleanAnswers(v);
     default: return undefined;
   }
 }

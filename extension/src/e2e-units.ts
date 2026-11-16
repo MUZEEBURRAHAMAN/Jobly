@@ -14,3 +14,4 @@ export { followUp, followUpDraft, logFollowUp } from './lib/followUp';
 export { skillAnswer, commonAnswer, logQuestions, loadQuestionLog, openQuestions } from './lib/questionBank';
 export { assistAnswers } from './lib/assistLogic';
 export { formReport, atsOf } from './lib/applyQueue';
+export { toLine, lineTips, addLine } from './lib/recruiterQuestions';

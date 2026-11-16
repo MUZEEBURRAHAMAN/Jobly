@@ -12,6 +12,8 @@ Everything to paste into the Chrome Web Store developer dashboard, tab by tab. V
 - **Apply queue on real hiring systems.** It gets past a hiring system's choice box ("Apply manually"), hands sign-in and "check you're human" pages to the user, and keeps what it filled on pages that rebuild themselves. Tested on Greenhouse, Lever, Ashby and Workday forms.
 - **New Jobs page.** Filter pills, cleaner job cards with "Add to queue", and the chosen job open in a panel beside the list, with fit, details and the full description.
 - **Resume.**
+  - Recruiter questions (new Questions tab): ten questions a recruiter would ask (what you built, what you figured out, a decision you owned, people you hired or mentored, a fix under pressure, a side project people use). Each answer, in the user's own words, becomes one resume line placed first in its role. Jobly drops the "I" and starts with the verb; it never adds a fact or a number.
+  - The score has a sixth part, Stands out: a specific first line, no borrowed phrases ("drove efficiency", "aligned stakeholders"), proof the work exists, ownership, and a result at the top of each role.
   - 8 templates, all one column, so every one reads cleanly in an applicant tracking system. The new Engineer template is a classic tech resume.
   - Projects, achievements, grouped skills and **bold** words in points.
   - A score in five parts with the top fixes, and an ATS check of what a hiring system reads. Rules only, no AI.
@@ -61,7 +63,8 @@ APPLY ASSIST
 RESUMES AND COVER LETTERS
 • Set up your profile in a minute: import the PDF LinkedIn makes of your profile, or your resume
 • 8 one-column templates that read cleanly in applicant tracking systems, with projects, achievements and grouped skills
-• A resume score in five parts with the fixes that matter most, and an ATS check of what a hiring system reads
+• Recruiter questions: answer what a recruiter would ask, in your own words, and each answer becomes a line on your resume. Nothing is made up
+• A resume score in six parts (including Stands out: no borrowed phrases, proof, ownership) with the fixes that matter most, and an ATS check of what a hiring system reads
 • Tailor your resume to a pasted job description: the skills and points the job asks for come first; nothing is made up
 • A clean one-page PDF, or a Word file
 • Cover letters in seven structures, three tones and three lengths, with a check before you send

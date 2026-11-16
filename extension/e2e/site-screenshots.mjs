@@ -95,9 +95,9 @@ for (const theme of (process.env.THEMES || 'light,dark').split(',')) {
   // Applications: the apply queue board
   await d.goto(`chrome-extension://${h.id}/options.html#applications`); await d.getByRole('heading', { name: 'Applications' }).waitFor(); await sleep(1200);
   await shot(d, 'applications');
-  // Resume: the Score and ATS tab beside the page
+  // Resume: the Score & ATS tab beside the page
   await d.goto(`chrome-extension://${h.id}/options.html#resume`); await d.locator('.resume-print .resume h1').waitFor(); await sleep(600);
-  await d.getByRole('tab', { name: /^Score and ATS/ }).click(); await sleep(600);
+  await d.getByRole('tab', { name: /^Score & ATS/ }).click(); await sleep(600);
   await shot(d, 'resume');
   // People: who to look for at the company, and saved people with how you know them
   await d.goto(`chrome-extension://${h.id}/options.html#contacts`); await sleep(1000);

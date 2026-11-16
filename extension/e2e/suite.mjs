@@ -499,10 +499,10 @@ await step('profile, copy kit, resume, cover letter, backup, sync', async () => 
   await d.getByRole('radio', { name: 'Navy' }).click(); await sleep(200);
   ok(await d.evaluate(() => getComputedStyle(document.querySelector('.resume-print .resume h2')).borderBottomColor === 'rgb(30, 58, 138)'), 'the accent colour changes the section rules');
   ok(/Fits on one page/.test(await d.locator('.rv-card [role="status"]').innerText()), 'a short resume fits on one page');
-  await d.getByRole('tab', { name: /^Score and ATS/ }).click();
+  await d.getByRole('tab', { name: /^Score & ATS/ }).click();
   const sc = Number(/Score (\d+)/.exec(await d.getByRole('img', { name: /^Score \d+ out of 100/ }).getAttribute('aria-label'))?.[1]);
   const fixes = await d.getByRole('list', { name: 'Top fixes' }).locator('li').allInnerTexts();
-  ok(sc > 0 && sc < 100 && await d.getByRole('progressbar', { name: 'Best practices' }).count() === 1 && /High impact/.test(fixes[0] ?? ''), `the resume score has five categories and puts high-impact fixes first (${sc}/100; ${fixes[0]?.replace(/\n/g, ' ')})`);
+  ok(sc > 0 && sc < 100 && await d.getByRole('progressbar', { name: 'Best practices' }).count() === 1 && /High impact/.test(fixes[0] ?? ''), `the resume score has six categories and puts high-impact fixes first (${sc}/100; ${fixes[0]?.replace(/\n/g, ' ')})`);
   // ATS check: reads the finished page's text like a parser, with rules only
   const ats = async () => (await d.getByRole('list', { name: 'Parsed fields' }).locator('li').allInnerTexts()).map((t) => t.replace(/\n+/g, ' | '));
   let fields = await ats();
@@ -511,7 +511,7 @@ await step('profile, copy kit, resume, cover letter, backup, sync', async () => 
   const perTemplate = [];
   for (const t of ['Modern', 'Engineer', 'Classic', 'Bold', 'Executive', 'Accent', 'Compact', 'Minimal']) {
     await d.getByRole('tab', { name: 'Design' }).click(); await d.getByRole('radio', { name: t, exact: true }).click(); await sleep(250);
-    await d.getByRole('tab', { name: /^Score and ATS/ }).click(); const f = await ats();
+    await d.getByRole('tab', { name: /^Score & ATS/ }).click(); const f = await ats();
     if (!/^Name \| Detected/.test(f[0]) || !/Layout \| Single column/.test(f.join('\n')) || f.join('\n') !== fields.join('\n')) perTemplate.push(t);
   }
   ok(perTemplate.length === 0, `all 8 templates read the same to an ATS: name first, one column (${perTemplate.join(', ') || 'none differ'})`);
@@ -521,7 +521,7 @@ await step('profile, copy kit, resume, cover letter, backup, sync', async () => 
   ok(/@page \{ size: (A4|letter); margin: 0; \}/.test(printed.css) && /height: (1123|1056)px; overflow: hidden/.test(printed.css) && printed.title === 'Ada-Lovelace-Resume', `the PDF has no browser header or footer, one page, and your name as the file name (${printed.title})`);
   await d.evaluate(() => window.dispatchEvent(new Event('afterprint')));
   // Tailor to a pasted job description right on the Resume page
-  await d.getByRole('tab', { name: 'Tailor to a job' }).click();
+  await d.getByRole('tab', { name: 'Tailor', exact: true }).click();
   await d.getByLabel('Role', { exact: true }).fill('Design Systems Lead'); await d.getByLabel('Company', { exact: true }).fill('Globex');
   await d.getByLabel('Job description', { exact: true }).fill('Requirements\n- Experience building and maintaining design systems\n- Strong user research skills\n- React and TypeScript knowledge is a plus\n- 5+ years of product design');
   await d.getByRole('button', { name: 'Apply to my resume' }).click(); await d.locator('.rv-coverage').waitFor({ timeout: 5000 });
@@ -530,17 +530,28 @@ await step('profile, copy kit, resume, cover letter, backup, sync', async () => 
   ok(await d.getByRole('list', { name: 'Keywords in your resume' }).getByText('React').count() === 1, 'keywords the resume already has are shown as found');
   const pct = Number(await d.getByRole('progressbar', { name: 'Qualification match' }).getAttribute('aria-valuenow'));
   ok(pct > 0 && pct <= 100 && await d.getByRole('list', { name: 'Job skills missing' }).getByText('TypeScript').count() === 1, `the ATS check shows the qualification match and the job skills the resume is missing (${pct}%)`);
-  await d.getByRole('tab', { name: /^Tailor to a job/ }).click();
+  await d.getByRole('tab', { name: /^Tailor/ }).click();
   await d.getByRole('button', { name: 'I have TypeScript: add it to skills' }).click(); await sleep(200);
   ok(/TypeScript/.test(await d.locator('.resume-print .resume .skills').innerText()) && !/TypeScript/.test((await store('profiles'))[0].skills), 'a missing keyword is added only when you say you have it, and only to this tailored copy');
-  await d.getByRole('tab', { name: /^Score and ATS/ }).click();
+  await d.getByRole('tab', { name: /^Score & ATS/ }).click();
   ok(/for this job/.test(await d.locator('.rv-cats').innerText()), 'the score includes the job match once a job description is applied');
-  await d.getByRole('tab', { name: /^Tailor to a job/ }).click();
+  await d.getByRole('tab', { name: /^Tailor/ }).click();
   await d.getByRole('button', { name: 'Save for this job' }).click(); await sleep(400);
   ok((await store('resumeVersions'))?.[0]?.job.company === 'Globex' && /Tailored: Design Systems Lead at Globex/.test(await d.getByLabel('Version').locator('option:checked').innerText()), 'the tailored resume is saved as a version for the job');
   await d.getByLabel('Version').selectOption('base'); await sleep(200);
   const [doc] = await Promise.all([d.waitForEvent('download'), d.getByRole('button', { name: 'Word' }).click()]);
   const docText = fs.readFileSync(await doc.path(), 'utf8'); ok(docText.includes('Ada Lovelace') && docText.includes('Experience') && doc.suggestedFilename() === 'Ada-Lovelace-Resume.doc', 'Word export holds the resume');
+  // Recruiter questions: an answer in your own words becomes a line, placed first in the role, nothing added
+  await d.getByRole('tab', { name: 'Questions', exact: true }).click();
+  await d.getByRole('button', { name: /^What did you build or ship/ }).click();
+  await d.getByLabel(/^Your answer: What did you build/).fill('I built the design token pipeline for every product team.');
+  ok(await d.locator('.rq-preview').innerText() === 'Built the design token pipeline for every product team' && /Add a number if you have a real one/.test(await d.getByRole('list', { name: 'How to make it land' }).innerText()),
+    'an answer is tidied into a resume line (no "I", starts with the verb) and a missing number is pointed out, not invented');
+  await d.getByRole('button', { name: /^Add to resume/ }).click(); await sleep(300);
+  const rqWork = (await store('profiles'))[0].work[0].bullets.split('\n')[0];
+  ok(rqWork === 'Built the design token pipeline for every product team' && /Built the design token pipeline/.test(await d.locator('.resume-print .resume').innerText()) && /1 of 10 on your resume/.test(await d.locator('.rq-count').innerText()),
+    `the line goes first in the role, into the profile and the preview (${rqWork})`);
+  ok((await store('recruiterAnswers'))?.[(await store('profiles'))[0].id]?.built?.startsWith('I built'), 'the answer itself is kept on this device for the profile');
   await axe(d, 'resume');
   // cover letter
   await d.getByRole('button', { name: /^Cover letters/ }).click(); await d.getByLabel('Role', { exact: true }).fill('Staff Designer'); await d.getByLabel('Company', { exact: true }).fill('Initech'); await sleep(300);
@@ -729,6 +740,15 @@ await step('ATS check: parses a resume from plain text (unit)', async () => {
     'a form report names the hiring system and page, without the query (which can hold an email) or anything from the profile');
   const grade = await page.evaluate(() => { const p = { ...window.units.emptyProfile(), summary: 'x'.repeat(100), skills: 'a,b,c,d,e,f,g,h' }; return [window.units.resumeScore(p, { coverage: { percent: 30, matches: [], keywordsFound: [], keywordsMissing: [], covered: 0 } }).grade, window.units.resumeScore(p).grade]; });
   ok(grade[0] !== 'Excellent' && grade[0] !== 'Good', `a low job match never grades as Good or Excellent for that job (${grade})`);
+  const so = await page.evaluate(() => {
+    const base = { ...window.units.emptyProfile(), summary: 'Results-driven professional who drove efficiency and aligned stakeholders.', work: [{ id: 'w', company: 'Acme', title: 'Engineer', location: '', start: '2020', end: '', current: true, bullets: 'Led projects across teams\nOptimized processes' }] };
+    const strong = { ...base, summary: '6 years building payment systems used by 2 million people.', github: 'https://github.com/ada', work: [{ ...base.work[0], bullets: 'Cut checkout errors 40% by rebuilding the payment retry logic\nMentored 4 engineers; 2 were promoted' }] };
+    const pick = (p) => Object.fromEntries(window.units.resumeScore(p).checks.filter((c) => c.category === 'Stands out').map((c) => [c.id, c.ok]));
+    return { weak: pick(base), strong: pick(strong), line: window.units.toLine('  i have fixed a 3am outage. ', 'work'), tips: window.units.lineTips('Drove efficiency') };
+  });
+  ok(!so.weak['top-line'] && !so.weak.generic && !so.weak.proof && !so.weak.ownership && !so.weak['top-points'] && Object.values(so.strong).every(Boolean),
+    `"Stands out" flags a generic first line, borrowed phrases, no proof, no ownership and no result up top, and passes a specific resume (${JSON.stringify(so)})`);
+  ok(so.line === 'Fixed a 3am outage' && so.tips.some((t) => /"Drove efficiency" is on most resumes/.test(t)), 'answers are tidied without adding anything, and borrowed phrases are named');
   await h.ctx.close();
 });
 
